@@ -21,7 +21,7 @@ export function YardSetupForm() {
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } =
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors, isSubmitting } } =
     useForm<YardProfileFormInput, unknown, YardProfileInput>({
       resolver: zodResolver(yardProfileSchema),
       defaultValues: { name: "My Yard", grassType: "unknown" },
@@ -164,7 +164,18 @@ export function YardSetupForm() {
           ) : <div />}
 
           {step < STEPS.length - 1 ? (
-            <Button type="button" onClick={() => setStep((s) => s + 1)} className="bg-green-600 hover:bg-green-700">
+            <Button type="button" onClick={async () => {
+              const fields: Record<number, (keyof YardProfileInput)[]> = {
+                0: ["zipCode", "name"],
+                1: ["grassType"],
+              };
+              const toValidate = fields[step];
+              if (toValidate) {
+                const valid = await trigger(toValidate as any);
+                if (!valid) return;
+              }
+              setStep((s) => s + 1);
+            }} className="bg-green-600 hover:bg-green-700">
               Next
             </Button>
           ) : (
