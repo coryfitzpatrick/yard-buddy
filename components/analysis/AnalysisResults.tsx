@@ -1,10 +1,15 @@
-"use client";
-
 import { AnalysisResult } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
+
+const PRIORITY_BORDER_COLOR: Record<string, string> = {
+  urgent: "#ef4444",
+  high: "#f97316",
+  medium: "#eab308",
+  low: "#22c55e",
+};
 
 const PRIORITY_COLOR: Record<string, string> = {
   urgent: "bg-red-100 text-red-700 border-red-200",
@@ -60,7 +65,7 @@ export function AnalysisResults({ result }: { result: AnalysisResult }) {
         <h3 className="font-semibold text-lg mb-3">Recommendations</h3>
         <div className="space-y-3">
           {result.recommendations.map((rec, i) => (
-            <Card key={i} className="border-l-4" style={{ borderLeftColor: rec.priority === "urgent" ? "#ef4444" : rec.priority === "high" ? "#f97316" : rec.priority === "medium" ? "#eab308" : "#22c55e" }}>
+            <Card key={i} className="border-l-4" style={{ borderLeftColor: PRIORITY_BORDER_COLOR[rec.priority] ?? "#22c55e" }}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h4 className="font-medium text-sm">{rec.title}</h4>

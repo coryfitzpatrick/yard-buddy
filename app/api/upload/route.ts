@@ -22,7 +22,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "File must be under 10MB" }, { status: 400 });
   }
 
-  const ext = file.name.split(".").pop();
+  const MIME_TO_EXT: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/heic": "heic",
+    "image/gif": "gif",
+  };
+  const ext = MIME_TO_EXT[file.type] ?? "jpg";
   const path = `${session.user.id}/${Date.now()}.${ext}`;
   const bytes = await file.arrayBuffer();
 

@@ -19,24 +19,32 @@ export default function AnalyzePage() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
 
   useEffect(() => {
-    fetch("/api/yard").then((r) => r.json()).then((data) => {
-      setProfiles(data);
-      if (data.length > 0) setSelectedProfileId(data[0].id);
-    });
+    fetch("/api/yard")
+      .then((r) => r.json())
+      .then((data: YardProfile[]) => {
+        if (Array.isArray(data)) {
+          setProfiles(data);
+          if (data.length > 0) setSelectedProfileId(data[0].id);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   async function handleUploaded(urls: string[]) {
     if (!selectedProfileId) return;
     setAnalyzing(true);
     setResult(null);
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ profileId: selectedProfileId, imageUrls: urls }),
-    });
-    const data = await res.json();
-    setResult(data.result);
-    setAnalyzing(false);
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileId: selectedProfileId, imageUrls: urls }),
+      });
+      const data = await res.json();
+      setResult(data.result);
+    } finally {
+      setAnalyzing(false);
+    }
   }
 
   return (

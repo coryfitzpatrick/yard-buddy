@@ -24,18 +24,25 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
 
   async function uploadAll() {
     setUploading(true);
-    const uploaded: string[] = [];
-    for (const item of previews) {
-      if (item.uploaded) { uploaded.push(item.uploaded); continue; }
-      const fd = new FormData();
-      fd.append("file", item.file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.url) uploaded.push(data.url);
+    try {
+      const uploaded: Array<string | null> = [];
+      for (const item of previews) {
+        if (item.uploaded) { uploaded.push(item.uploaded); continue; }
+        const fd = new FormData();
+        fd.append("file", item.file);
+        try {
+          const res = await fetch("/api/upload", { method: "POST", body: fd });
+          const data = await res.json();
+          uploaded.push(data.url ?? null);
+        } catch {
+          uploaded.push(null);
+        }
+      }
+      setPreviews((p) => p.map((item, i) => ({ ...item, uploaded: uploaded[i] ?? undefined })));
+      onUploaded(uploaded.filter((u): u is string => u !== null));
+    } finally {
+      setUploading(false);
     }
-    setPreviews((p) => p.map((item, i) => ({ ...item, uploaded: uploaded[i] })));
-    setUploading(false);
-    onUploaded(uploaded);
   }
 
   return (
