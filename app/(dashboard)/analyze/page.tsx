@@ -40,6 +40,7 @@ export default function AnalyzePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profileId: selectedProfileId, imageUrls: urls }),
       });
+      if (!res.ok) return;
       const data = await res.json();
       setResult(data.result);
     } finally {
