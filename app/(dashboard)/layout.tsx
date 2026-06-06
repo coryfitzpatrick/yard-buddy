@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { auth } from "@/lib/auth";
+import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { signOut } from "@/lib/auth";
 import { LayoutDashboard, Search, Settings, LogOut, Leaf } from "lucide-react";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

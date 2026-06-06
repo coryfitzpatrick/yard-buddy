@@ -8,6 +8,13 @@ import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { TaskList } from "@/components/dashboard/TaskList";
 import { Plus, Camera } from "lucide-react";
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
@@ -15,7 +22,7 @@ export default async function DashboardPage() {
   const yards = await db.yardProfile.findMany({
     where: { userId: session.user.id },
     include: {
-      tasks: { where: { status: "pending" }, orderBy: { createdAt: "desc" }, take: 20 },
+      tasks: { orderBy: { createdAt: "desc" }, take: 20 },
       analyses: { orderBy: { createdAt: "desc" }, take: 1 },
     },
     orderBy: { createdAt: "desc" },
@@ -31,7 +38,7 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Good morning, {session.user.name?.split(" ")[0]}!
+            {getGreeting()}, {session.user.name?.split(" ")[0]}!
           </h1>
           <p className="text-gray-500 text-sm">{yard.name} · {yard.grassType.replace(/_/g, " ")} grass</p>
         </div>

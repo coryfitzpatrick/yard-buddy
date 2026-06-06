@@ -10,7 +10,11 @@ export async function PATCH(
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
+  const VALID_STATUSES = ["pending", "completed", "skipped"] as const;
   const { status } = await req.json();
+  if (!VALID_STATUSES.includes(status)) {
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  }
   const task = await db.lawnTask.findFirst({
     where: { id, yardProfile: { userId: session.user.id } },
   });

@@ -33,7 +33,7 @@ export default function HomePage() {
             Start for free — no credit card
           </Button>
         </Link>
-        <div className="mt-12 grid sm:grid-cols-1 gap-3 text-left max-w-md mx-auto">
+        <div className="mt-12 grid gap-3 text-left max-w-md mx-auto">
           {FEATURES.map((f) => (
             <div key={f} className="flex items-center gap-3 text-gray-600">
               <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />

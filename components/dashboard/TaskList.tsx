@@ -27,12 +27,19 @@ export function TaskList({ tasks: initial }: { tasks: Task[] }) {
 
   async function toggleTask(id: string, current: string) {
     const newStatus = current === "completed" ? "pending" : "completed";
-    await fetch(`/api/tasks/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: newStatus }),
-    });
+    // Optimistic update
     setTasks((t) => t.map((task) => task.id === id ? { ...task, status: newStatus } : task));
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) throw new Error("Failed");
+    } catch {
+      // Rollback on failure
+      setTasks((t) => t.map((task) => task.id === id ? { ...task, status: current } : task));
+    }
   }
 
   const pending = tasks.filter((t) => t.status !== "completed");
