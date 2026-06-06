@@ -35,6 +35,8 @@ export interface WeatherData {
   description: string;
   icon: string;
   windSpeed: number;
+  precipitationChance: number;
+  location: string;
   forecast: Array<{ date: string; high: number; low: number; description: string }>;
 }
 
@@ -43,6 +45,8 @@ export interface AnalysisResult {
   healthScore: number;
   summary: string;
   recommendations: RecommendationItem[];
+  grassTypeDetected?: GrassType;
+  confidence?: number;
 }
 
 export interface RecommendationItem {
@@ -53,4 +57,5 @@ export interface RecommendationItem {
   productSuggestion?: string;
   applicationRate?: string;
   spreaderSetting?: string;
+  spreaderType?: SpreadType;
 }
