@@ -36,6 +36,7 @@ model Account {
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -43,6 +44,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -74,6 +77,8 @@ model YardProfile {
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   analyses      LawnAnalysis[]
   tasks         LawnTask[]
+
+  @@index([userId])
 }
 
 model LawnAnalysis {
@@ -87,6 +92,8 @@ model LawnAnalysis {
   createdAt     DateTime    @default(now())
   yardProfile   YardProfile @relation(fields: [yardProfileId], references: [id], onDelete: Cascade)
   tasks         LawnTask[]
+
+  @@index([yardProfileId])
 }
 
 model LawnTask {
@@ -106,4 +113,7 @@ model LawnTask {
   updatedAt       DateTime      @updatedAt
   yardProfile     YardProfile   @relation(fields: [yardProfileId], references: [id], onDelete: Cascade)
   analysis        LawnAnalysis? @relation(fields: [analysisId], references: [id])
+
+  @@index([yardProfileId])
+  @@index([analysisId])
 }
