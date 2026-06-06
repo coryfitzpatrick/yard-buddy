@@ -2,7 +2,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Search, Settings, LogOut, Leaf } from "lucide-react";
+import { LayoutDashboard, Search, Leaf, LogOut, Plus, Fence } from "lucide-react";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -22,8 +22,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Link href="/analyze">
               <Button variant="ghost" size="sm"><Search className="w-4 h-4 mr-1" /> Analyze</Button>
             </Link>
+            <Link href="/yard">
+              <Button variant="ghost" size="sm"><Fence className="w-4 h-4 mr-1" /> Yards</Button>
+            </Link>
             <Link href="/yard/setup">
-              <Button variant="ghost" size="sm"><Settings className="w-4 h-4 mr-1" /> Setup</Button>
+              <Button size="sm" className="bg-green-600 hover:bg-green-700 ml-1">
+                <Plus className="w-4 h-4 mr-1" /> Yard
+              </Button>
             </Link>
             <form action={async () => { "use server"; await signOut({ redirectTo: "/login" }); }}>
               <Button variant="ghost" size="sm" type="submit">
@@ -43,8 +48,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <Link href="/analyze" className="flex flex-col items-center gap-0.5 text-xs text-gray-500 px-4 py-1">
           <Search className="w-5 h-5" /> Analyze
         </Link>
-        <Link href="/yard/setup" className="flex flex-col items-center gap-0.5 text-xs text-gray-500 px-4 py-1">
-          <Settings className="w-5 h-5" /> Setup
+        <Link href="/yard" className="flex flex-col items-center gap-0.5 text-xs text-gray-500 px-4 py-1">
+          <Fence className="w-5 h-5" /> Yards
+        </Link>
+        <Link href="/yard/setup" className="flex flex-col items-center gap-0.5 text-xs text-green-600 px-4 py-1">
+          <Plus className="w-5 h-5" /> Add
         </Link>
       </nav>
     </div>
