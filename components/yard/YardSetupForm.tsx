@@ -13,9 +13,23 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Camera, Loader2, CheckCircle } from "lucide-react";
+import { Camera, Loader2, CheckCircle, Search } from "lucide-react";
 
 const STEPS = ["Location & Size", "Grass Type", "Soil & Equipment", "Review"];
+
+const SQFT_PER_ACRE = 43560;
+
+function toDisplaySize(sqft: number | undefined, unit: "sqft" | "acres"): string {
+  if (!sqft) return "";
+  if (unit === "acres") return (sqft / SQFT_PER_ACRE).toFixed(3);
+  return String(sqft);
+}
+
+function toSqft(display: string, unit: "sqft" | "acres"): number | undefined {
+  const n = parseFloat(display);
+  if (isNaN(n) || n <= 0) return undefined;
+  return unit === "acres" ? Math.round(n * SQFT_PER_ACRE) : Math.round(n);
+}
 
 const SPREADER_BRANDS: Record<string, string[]> = {
   broadcast: ["Scotts EdgeGuard DLX", "Scotts Turf Builder EdgeGuard", "Andersons Rotary Spreader", "Lesco 80 lb Rotary", "Earthway 2600"],
@@ -41,6 +55,49 @@ export function YardSetupForm() {
   const [identifying, setIdentifying] = useState(false);
   const [identified, setIdentified] = useState<{ confidence: string; explanation: string } | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
+
+  const [streetAddress, setStreetAddress] = useState("");
+  const [sizeUnit, setSizeUnit] = useState<"sqft" | "acres">("sqft");
+  const [sizeDisplay, setSizeDisplay] = useState("");
+  const [lookingUp, setLookingUp] = useState(false);
+  const [lookupNote, setLookupNote] = useState<string | null>(null);
+
+  function handleSizeInput(raw: string) {
+    setSizeDisplay(raw);
+    const sqft = toSqft(raw, sizeUnit);
+    setValue("yardSizeSqft", sqft as never);
+  }
+
+  function handleUnitChange(next: "sqft" | "acres") {
+    const currentSqft = toSqft(sizeDisplay, sizeUnit);
+    setSizeUnit(next);
+    if (currentSqft) setSizeDisplay(toDisplaySize(currentSqft, next));
+  }
+
+  async function lookupYardSize() {
+    if (!streetAddress.trim()) return;
+    setLookingUp(true);
+    setLookupNote(null);
+    try {
+      const res = await fetch("/api/lookup-yard-size", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: `${streetAddress}, ${watch("zipCode")}` }),
+      });
+      const data = await res.json();
+      if (data.sqft) {
+        setValue("yardSizeSqft", data.sqft as never);
+        setSizeDisplay(toDisplaySize(data.sqft, sizeUnit));
+        setLookupNote(data.note ?? (data.source === "parcel" ? "Lot size from parcel data" : "Estimated from map data"));
+      } else {
+        setLookupNote(data.message ?? "Size not found — enter manually below");
+      }
+    } catch {
+      setLookupNote("Lookup failed — enter manually below");
+    } finally {
+      setLookingUp(false);
+    }
+  }
 
   async function identifyGrass(file: File) {
     setIdentifying(true);
@@ -115,8 +172,46 @@ export function YardSetupForm() {
               {errors.zipCode && <p className="text-xs text-red-500">{errors.zipCode.message}</p>}
             </div>
             <div className="space-y-1">
-              <Label>Yard Size (sq ft)</Label>
-              <Input type="number" placeholder="2500" {...register("yardSizeSqft")} />
+              <Label>Street Address (optional — used to look up yard size)</Label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="123 Main St"
+                  value={streetAddress}
+                  onChange={(e) => setStreetAddress(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); lookupYardSize(); } }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={!streetAddress.trim() || lookingUp}
+                  onClick={lookupYardSize}
+                  className="shrink-0"
+                >
+                  {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                </Button>
+              </div>
+              {lookupNote && <p className="text-xs text-gray-500">{lookupNote}</p>}
+            </div>
+            <div className="space-y-1">
+              <Label>Yard Size</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder={sizeUnit === "sqft" ? "5000" : "0.115"}
+                  value={sizeDisplay}
+                  onChange={(e) => handleSizeInput(e.target.value)}
+                  min="0"
+                  step={sizeUnit === "acres" ? "0.001" : "1"}
+                />
+                <Select value={sizeUnit} onValueChange={(v) => handleUnitChange(v as "sqft" | "acres")}>
+                  <SelectTrigger className="w-28 shrink-0"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sqft">sq ft</SelectItem>
+                    <SelectItem value="acres">acres</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <p className="text-xs text-gray-400">Optional — helps calculate product amounts</p>
             </div>
           </div>
