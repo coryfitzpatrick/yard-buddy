@@ -31,7 +31,7 @@ IMPORTANT: You must return valid JSON only — no markdown, no code fences, no e
 export async function generateRecommendations(context: LawnContext): Promise<RecommendationItem[]> {
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 2000,
+    max_tokens: 3000,
     system: SYSTEM_PROMPT,
     messages: [
       {
@@ -45,7 +45,7 @@ ${context.spreaderType ? `Spreader: ${context.spreaderType}` : ""}
 ${context.soilPh ? `Soil pH: ${context.soilPh}` : ""}
 ${context.soilMoisture ? `Soil Moisture: ${context.soilMoisture}` : ""}
 ${context.weatherSummary ? `Current Weather: ${context.weatherSummary}` : ""}
-${context.notes ? `Notes: ${context.notes}` : ""}
+${context.notes ? `Notes: ${context.notes.slice(0, 500)}` : ""}
 
 Return a JSON array of 3-6 recommendations. Each item must follow this exact structure:
 {
@@ -63,8 +63,15 @@ Return a JSON array of 3-6 recommendations. Each item must follow this exact str
   });
 
   const text = (message.content[0] as Anthropic.TextBlock).text.trim();
-  const cleaned = text.startsWith("```") ? text.replace(/```(?:json)?\n?/g, "").trim() : text;
-  return JSON.parse(cleaned) as RecommendationItem[];
+  const cleaned = text
+    .replace(/```(?:json)?\n?/g, "")
+    .replace(/^[^[{]*/s, "")
+    .trim();
+  try {
+    return JSON.parse(cleaned) as RecommendationItem[];
+  } catch {
+    throw new Error(`Claude returned non-JSON response: ${cleaned.slice(0, 300)}`);
+  }
 }
 
 export async function analyzeImages(
@@ -96,6 +103,7 @@ ${context.yardSizeSqft ? `- Yard Size: ${context.yardSizeSqft} sq ft` : ""}
 ${context.spreaderType ? `- Spreader: ${context.spreaderType}` : ""}
 ${context.soilPh ? `- Soil pH: ${context.soilPh}` : ""}
 ${context.weatherSummary ? `- Weather: ${context.weatherSummary}` : ""}
+${context.notes ? `- Notes: ${context.notes.slice(0, 500)}` : ""}
 
 Return this exact JSON structure:
 {
@@ -124,6 +132,13 @@ Return this exact JSON structure:
   });
 
   const text = (message.content[0] as Anthropic.TextBlock).text.trim();
-  const cleaned = text.startsWith("```") ? text.replace(/```(?:json)?\n?/g, "").trim() : text;
-  return JSON.parse(cleaned) as AnalysisResult;
+  const cleaned = text
+    .replace(/```(?:json)?\n?/g, "")
+    .replace(/^[^[{]*/s, "")
+    .trim();
+  try {
+    return JSON.parse(cleaned) as AnalysisResult;
+  } catch {
+    throw new Error(`Claude returned non-JSON response: ${cleaned.slice(0, 300)}`);
+  }
 }

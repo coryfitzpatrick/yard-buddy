@@ -31,38 +31,46 @@ export async function POST(req: NextRequest) {
     // weather is optional context
   }
 
-  const result = await analyzeImages(imageUrls, {
-    grassType: profile.grassType as any,
-    zipCode: profile.zipCode,
-    yardSizeSqft: profile.yardSizeSqft,
-    spreaderType: profile.spreaderType,
-    soilPh: profile.soilPh,
-    weatherSummary,
-    notes: profile.notes,
-  });
+  try {
+    const result = await analyzeImages(imageUrls, {
+      grassType: profile.grassType as any,
+      zipCode: profile.zipCode,
+      yardSizeSqft: profile.yardSizeSqft,
+      spreaderType: profile.spreaderType,
+      soilPh: profile.soilPh,
+      weatherSummary,
+      notes: profile.notes,
+    });
 
-  const analysis = await db.lawnAnalysis.create({
-    data: {
-      yardProfileId: profileId,
-      imageUrls,
-      healthScore: result.healthScore,
-      issues: result.issues,
-      summary: result.summary,
-      rawResponse: JSON.stringify(result),
-      tasks: {
-        create: result.recommendations.map((r) => ({
-          yardProfileId: profileId,
-          title: r.title,
-          description: r.description,
-          priority: r.priority,
-          product: r.productSuggestion,
-          applicationRate: r.applicationRate,
-          spreaderSetting: r.spreaderSetting,
-        })),
+    const analysis = await db.lawnAnalysis.create({
+      data: {
+        yardProfileId: profileId,
+        imageUrls,
+        healthScore: result.healthScore,
+        issues: result.issues,
+        summary: result.summary,
+        rawResponse: JSON.stringify(result),
+        tasks: {
+          create: result.recommendations.map((r) => ({
+            yardProfileId: profileId,
+            title: r.title,
+            description: r.description,
+            priority: r.priority,
+            product: r.productSuggestion,
+            applicationRate: r.applicationRate,
+            spreaderSetting: r.spreaderSetting,
+          })),
+        },
       },
-    },
-    include: { tasks: true },
-  });
+      include: { tasks: true },
+    });
 
-  return NextResponse.json({ analysis, result });
+    return NextResponse.json({ analysis, result });
+  } catch (err) {
+    console.error("Analysis failed:", err);
+    return NextResponse.json(
+      { error: "Analysis failed. Please try again." },
+      { status: 500 }
+    );
+  }
 }

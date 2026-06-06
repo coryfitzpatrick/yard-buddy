@@ -24,28 +24,36 @@ export async function GET(req: NextRequest) {
     // weather is optional context — proceed without it
   }
 
-  const recommendations = await generateRecommendations({
-    grassType: profile.grassType as any,
-    zipCode: profile.zipCode,
-    yardSizeSqft: profile.yardSizeSqft,
-    spreaderType: profile.spreaderType,
-    soilPh: profile.soilPh,
-    soilMoisture: profile.soilMoisture ?? undefined,
-    weatherSummary,
-    notes: profile.notes,
-  });
+  try {
+    const recommendations = await generateRecommendations({
+      grassType: profile.grassType as any,
+      zipCode: profile.zipCode,
+      yardSizeSqft: profile.yardSizeSqft,
+      spreaderType: profile.spreaderType,
+      soilPh: profile.soilPh,
+      soilMoisture: profile.soilMoisture ?? undefined,
+      weatherSummary,
+      notes: profile.notes,
+    });
 
-  await db.lawnTask.createMany({
-    data: recommendations.map((r) => ({
-      yardProfileId: profileId,
-      title: r.title,
-      description: r.description,
-      priority: r.priority,
-      product: r.productSuggestion,
-      applicationRate: r.applicationRate,
-      spreaderSetting: r.spreaderSetting,
-    })),
-  });
+    await db.lawnTask.createMany({
+      data: recommendations.map((r) => ({
+        yardProfileId: profileId,
+        title: r.title,
+        description: r.description,
+        priority: r.priority,
+        product: r.productSuggestion,
+        applicationRate: r.applicationRate,
+        spreaderSetting: r.spreaderSetting,
+      })),
+    });
 
-  return NextResponse.json(recommendations);
+    return NextResponse.json(recommendations);
+  } catch (err) {
+    console.error("Recommendations failed:", err);
+    return NextResponse.json(
+      { error: "Recommendations failed. Please try again." },
+      { status: 500 }
+    );
+  }
 }
