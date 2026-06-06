@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Upload, X, Loader2 } from "lucide-react";
 
@@ -70,7 +71,7 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {previews.map((item, i) => (
             <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
-              <img src={item.url} alt="" className="object-cover w-full h-full" />
+              <Image src={item.url} alt="Lawn photo preview" fill className="object-cover" unoptimized />
               <button
                 className="absolute top-1 right-1 bg-black/50 rounded-full p-0.5 text-white hover:bg-black/70"
                 onClick={() => setPreviews((p) => p.filter((_, j) => j !== i))}

@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const recommendations = await generateRecommendations({
-      grassType: profile.grassType as any,
+      grassType: profile.grassType as import("@/types").GrassType,
       zipCode: profile.zipCode,
       yardSizeSqft: profile.yardSizeSqft,
       spreaderType: profile.spreaderType,

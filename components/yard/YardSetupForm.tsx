@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, type Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -165,13 +165,13 @@ export function YardSetupForm() {
 
           {step < STEPS.length - 1 ? (
             <Button type="button" onClick={async () => {
-              const fields: Record<number, (keyof YardProfileInput)[]> = {
+              const fields: Record<number, Path<YardProfileFormInput>[]> = {
                 0: ["zipCode", "name"],
                 1: ["grassType"],
               };
               const toValidate = fields[step];
               if (toValidate) {
-                const valid = await trigger(toValidate as any);
+                const valid = await trigger(toValidate);
                 if (!valid) return;
               }
               setStep((s) => s + 1);

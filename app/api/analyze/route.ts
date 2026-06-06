@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await analyzeImages(imageUrls, {
-      grassType: profile.grassType as any,
+      grassType: profile.grassType as import("@/types").GrassType,
       zipCode: profile.zipCode,
       yardSizeSqft: profile.yardSizeSqft,
       spreaderType: profile.spreaderType,

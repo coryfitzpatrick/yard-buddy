@@ -31,8 +31,8 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 const FormField = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> &
-    ControllerProps<any, any> & {
-      children: React.ReactNode
+    ControllerProps<FieldValues, FieldPath<FieldValues>> & {
+      children: React.ReactNode | ((field: unknown) => React.ReactNode)
     }
 >(({ ...props }, ref) => {
   const { name, control, children } = props
@@ -43,7 +43,7 @@ const FormField = React.forwardRef<
         control={control}
         render={({ field }) => (
           <div ref={ref} {...props}>
-            {typeof children === "function" ? children(field) : children}
+            {typeof children === "function" ? (children as (field: unknown) => React.ReactNode)(field) : children}
           </div>
         )}
       />
@@ -115,7 +115,7 @@ const FormLabel = React.forwardRef<
 FormLabel.displayName = "FormLabel"
 
 const FormControl = React.forwardRef<
-  Slot,
+  React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } =

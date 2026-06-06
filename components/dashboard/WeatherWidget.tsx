@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WeatherData } from "@/types";
 import { Droplets, Wind, CloudRain } from "lucide-react";
@@ -40,7 +41,7 @@ export function WeatherWidget({ zip }: { zip: string }) {
             <div className="text-4xl font-bold">{weather.temp}°F</div>
             <div className="text-sm opacity-90 capitalize">{weather.description}</div>
           </div>
-          <img
+          <Image
             src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
             alt={weather.description}
             width={64}
