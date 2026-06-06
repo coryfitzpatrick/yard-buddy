@@ -3,7 +3,7 @@
 import { useForm, type Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { yardProfileSchema, YardProfileInput, YardProfileFormInput } from "@/lib/validations/yard";
 import { GrassTypeSelector } from "./GrassTypeSelector";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Camera, Loader2, CheckCircle } from "lucide-react";
 
 const STEPS = ["Location & Size", "Grass Type", "Soil & Equipment", "Review"];
 
@@ -37,6 +38,33 @@ export function YardSetupForm() {
 
   const grassType = watch("grassType") as YardProfileInput["grassType"] | undefined;
   const spreaderType = watch("spreaderType");
+  const [identifying, setIdentifying] = useState(false);
+  const [identified, setIdentified] = useState<{ confidence: string; explanation: string } | null>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
+
+  async function identifyGrass(file: File) {
+    setIdentifying(true);
+    setIdentified(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!uploadRes.ok) return;
+      const { url } = await uploadRes.json();
+
+      const identifyRes = await fetch("/api/identify-grass", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: url }),
+      });
+      if (!identifyRes.ok) return;
+      const result = await identifyRes.json();
+      setValue("grassType", result.grassType);
+      setIdentified({ confidence: result.confidence, explanation: result.explanation });
+    } finally {
+      setIdentifying(false);
+    }
+  }
 
   async function onSubmit(data: YardProfileInput) {
     setError(null);
@@ -95,13 +123,57 @@ export function YardSetupForm() {
         )}
 
         {step === 1 && (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-500 mb-3">
-              Select the grass type growing in your yard. This determines what products and timing work best.
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Select your grass type, or upload a photo and let AI identify it for you.
             </p>
+
+            <div className="rounded-lg border-2 border-dashed border-green-200 p-4 text-center">
+              <input
+                ref={photoRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) identifyGrass(file);
+                }}
+              />
+              {identifying ? (
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-500 py-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-green-500" />
+                  Analyzing your grass...
+                </div>
+              ) : identified ? (
+                <div className="text-left space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-medium text-green-700">
+                    <CheckCircle className="w-4 h-4" />
+                    Identified — {identified.confidence} confidence
+                  </div>
+                  <p className="text-xs text-gray-500">{identified.explanation}</p>
+                  <button
+                    type="button"
+                    onClick={() => photoRef.current?.click()}
+                    className="text-xs text-green-600 underline mt-1"
+                  >
+                    Try a different photo
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => photoRef.current?.click()}
+                  className="flex items-center gap-2 mx-auto text-sm text-green-600 font-medium hover:text-green-700"
+                >
+                  <Camera className="w-4 h-4" />
+                  Upload a photo to identify my grass
+                </button>
+              )}
+            </div>
+
             <GrassTypeSelector
               value={grassType}
-              onChange={(v) => setValue("grassType", v)}
+              onChange={(v) => { setValue("grassType", v); setIdentified(null); }}
             />
             {errors.grassType && <p className="text-xs text-red-500">{errors.grassType.message}</p>}
           </div>
