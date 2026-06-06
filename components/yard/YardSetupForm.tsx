@@ -16,6 +16,14 @@ import {
 
 const STEPS = ["Location & Size", "Grass Type", "Soil & Equipment", "Review"];
 
+const SPREADER_BRANDS: Record<string, string[]> = {
+  broadcast: ["Scotts EdgeGuard DLX", "Scotts Turf Builder EdgeGuard", "Andersons Rotary Spreader", "Lesco 80 lb Rotary", "Earthway 2600"],
+  drop: ["Scotts Snap Spreader", "Scotts Classic Drop", "Earthway 2150", "Agri-Fab 45-0462"],
+  handheld: ["Scotts Wizz", "Scotts Elite Hand Spreader", "Chapin 8701B"],
+  liquid: ["Chapin 20000", "Solo 420", "Smith Performance Sprayer", "Ortho Dial N Spray"],
+  none: [],
+};
+
 export function YardSetupForm() {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -28,6 +36,7 @@ export function YardSetupForm() {
     });
 
   const grassType = watch("grassType") as YardProfileInput["grassType"] | undefined;
+  const spreaderType = watch("spreaderType");
 
   async function onSubmit(data: YardProfileInput) {
     setError(null);
@@ -60,7 +69,8 @@ export function YardSetupForm() {
           />
         ))}
       </div>
-      <h2 className="text-xl font-semibold mb-4">{STEPS[step]}</h2>
+      <h2 className="text-xl font-semibold mb-1">{STEPS[step]}</h2>
+      <p className="text-xs text-gray-400 mb-4">All details can be updated later.</p>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {error && <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
@@ -114,6 +124,7 @@ export function YardSetupForm() {
                   <SelectItem value="moist">Moist — stays damp, possible overwatering</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-gray-400">Push a screwdriver 6" into the soil: slides in easily = moist, some resistance = moderate, very hard = dry.</p>
             </div>
             <div className="space-y-1">
               <Label>Spreader Type</Label>
@@ -131,6 +142,20 @@ export function YardSetupForm() {
             <div className="space-y-1">
               <Label>Spreader Model (optional)</Label>
               <Input placeholder="e.g. Scotts EdgeGuard DLX" {...register("spreaderModel")} />
+              {spreaderType && SPREADER_BRANDS[spreaderType]?.length > 0 && (
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {SPREADER_BRANDS[spreaderType].map((brand) => (
+                    <button
+                      key={brand}
+                      type="button"
+                      onClick={() => setValue("spreaderModel", brand)}
+                      className="text-xs px-2 py-0.5 rounded-full border border-green-300 text-green-700 hover:bg-green-50 transition-colors"
+                    >
+                      {brand}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="space-y-1">
               <Label>Additional Notes</Label>
