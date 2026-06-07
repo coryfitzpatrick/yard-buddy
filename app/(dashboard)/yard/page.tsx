@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowRight } from "lucide-react";
+import { Plus, ArrowRight, Pencil } from "lucide-react";
 import { SectionCard } from "@/components/yard/SectionCard";
 import { YardDeleteButton } from "@/components/yard/YardDeleteButton";
 
@@ -50,6 +50,11 @@ export default async function YardPage() {
                   <Link href={`/yard/${yard.id}`}>
                     <Button variant="outline" size="sm">
                       <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
+                    </Button>
+                  </Link>
+                  <Link href={`/yard/${yard.id}/edit`}>
+                    <Button variant="outline" size="sm">
+                      <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
                     </Button>
                   </Link>
                   <Link href={`/yard/${yard.id}/sections/new`}>
