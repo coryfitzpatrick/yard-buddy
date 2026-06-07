@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardNav signOutAction={handleSignOut} />
-      <main className="max-w-6xl mx-auto">
+      <main className="max-w-6xl mx-auto pb-20 sm:pb-0">
         {children}
       </main>
     </div>

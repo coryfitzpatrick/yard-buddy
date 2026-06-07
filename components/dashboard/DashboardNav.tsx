@@ -25,8 +25,8 @@ export function DashboardNav({ signOutAction }: Props) {
       {/* Top nav */}
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
-          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-green-700 text-lg">
-            <Image src="/gnome-buddy.png" alt="Yard Buddy" width={32} height={32} className="rounded-full" />
+          <Link href="/dashboard" className="flex items-center gap-1 font-bold text-green-700 text-lg">
+            <Image src="/gnome-buddy.png" alt="Yard Buddy" width={32} height={32} className="rounded-full scale-x-[-1]" />
             Yard Buddy
           </Link>
           <div className="hidden sm:flex items-center gap-1">
