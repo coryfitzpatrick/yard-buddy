@@ -41,6 +41,16 @@ export async function POST(req: NextRequest) {
     forecastText = formatForecastForClaude(weather.forecast);
   } catch { /* weather is optional context */ }
 
+  function deduplicateRecommendations<T extends { title: string }>(recs: T[]): T[] {
+    const seen = new Set<string>();
+    return recs.filter((r) => {
+      const key = r.title.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).slice(0, 3).join(" ");
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
   try {
     const today = new Date();
     const result = await analyzeImages(imageUrls, {
@@ -55,6 +65,8 @@ export async function POST(req: NextRequest) {
       forecastText,
       notes: section.notes,
     });
+
+    result.recommendations = deduplicateRecommendations(result.recommendations);
 
     const analysis = await db.lawnAnalysis.create({
       data: {
