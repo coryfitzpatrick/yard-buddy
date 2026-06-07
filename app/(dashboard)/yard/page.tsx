@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, ArrowRight, Pencil } from "lucide-react";
 import { SectionCard } from "@/components/yard/SectionCard";
 import { YardDeleteButton } from "@/components/yard/YardDeleteButton";
+import { YardTasksSection } from "@/components/yard/YardTasksSection";
 
 export default async function YardPage() {
   const session = await auth();
@@ -14,7 +15,32 @@ export default async function YardPage() {
   const yards = await db.yard.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "asc" },
-    include: { sections: { orderBy: { createdAt: "asc" } } },
+    include: {
+      sections: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          tasks: {
+            where: { status: { not: "skipped" } },
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              priority: true,
+              status: true,
+              scheduledStart: true,
+              scheduledEnd: true,
+              overdueNote: true,
+              stillWorthDoing: true,
+              product: true,
+              applicationRate: true,
+              spreaderSetting: true,
+              yardSectionId: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   return (
@@ -23,7 +49,7 @@ export default async function YardPage() {
         <h1 className="text-2xl font-bold text-gray-900">My Yards</h1>
         <Link href="/yard/setup">
           <Button className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4 mr-1" /> Add Yard
+            <Plus className="w-4 h-4" />Add Yard
           </Button>
         </Link>
       </div>
@@ -33,7 +59,7 @@ export default async function YardPage() {
           <p className="mb-4">No yards yet. Add your first to get started.</p>
           <Link href="/yard/setup">
             <Button className="bg-green-600 hover:bg-green-700">
-              <Plus className="w-4 h-4 mr-1" /> Add Yard
+              <Plus className="w-4 h-4" />Add Yard
             </Button>
           </Link>
         </div>
@@ -68,11 +94,32 @@ export default async function YardPage() {
               {yard.sections.length === 0 ? (
                 <p className="text-sm text-gray-400 pl-1">No sections yet.</p>
               ) : (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {yard.sections.map((section: (typeof yard)["sections"][number]) => (
-                    <SectionCard key={section.id} section={section} />
-                  ))}
-                </div>
+                <>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {yard.sections.map((section: (typeof yard)["sections"][number]) => (
+                      <SectionCard key={section.id} section={section} />
+                    ))}
+                  </div>
+                  <YardTasksSection
+                    sections={yard.sections.map((s: (typeof yard)["sections"][number]) => ({
+                      id: s.id,
+                      name: s.name,
+                    }))}
+                    tasks={yard.sections.flatMap((s: (typeof yard)["sections"][number]) =>
+                      s.tasks.map((t) => ({
+                        ...t,
+                        scheduledStart: t.scheduledStart?.toISOString() ?? null,
+                        scheduledEnd: t.scheduledEnd?.toISOString() ?? null,
+                        yardSection: {
+                          id: s.id,
+                          name: s.name,
+                          areaType: s.areaType,
+                          yard: { name: yard.name },
+                        },
+                      }))
+                    )}
+                  />
+                </>
               )}
             </div>
           ))}

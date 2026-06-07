@@ -1,12 +1,9 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { DashboardInteractiveSection } from "@/components/dashboard/DashboardInteractiveSection";
 import { Greeting } from "@/components/dashboard/Greeting";
-import { Plus } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -86,14 +83,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="px-4 py-6 pb-20 sm:pb-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <Greeting name={session.user.name?.split(" ")[0] ?? "there"} />
-        <Link href="/yard/setup">
-          <Button size="sm" className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4 mr-1" /> Yard
-          </Button>
-        </Link>
-      </div>
+      <Greeting name={session.user.name?.split(" ")[0] ?? "there"} />
 
       <WeatherWidget zip={primaryZip} />
 

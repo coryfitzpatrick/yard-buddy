@@ -152,6 +152,46 @@ export default async function YardDetailPage({
                 {!latestAnalysis && (
                   <p className="text-sm text-gray-400">No analyses yet — tap Analyze to get started.</p>
                 )}
+
+                {/* Past analyses */}
+                {section.analyses.length > 1 && (
+                  <details className="border-t pt-4">
+                    <summary className="text-sm text-gray-500 cursor-pointer font-medium select-none">
+                      {section.analyses.length - 1} past analysis{section.analyses.length - 1 > 1 ? "es" : ""}
+                    </summary>
+                    <div className="mt-3 space-y-3">
+                      {[...section.analyses].reverse().slice(1).map((a: (typeof section)["analyses"][number]) => {
+                        const color =
+                          a.healthScore >= 70 ? "text-green-600" :
+                          a.healthScore >= 40 ? "text-yellow-600" : "text-red-600";
+                        return (
+                          <div key={a.id} className="bg-gray-50 rounded-lg p-3 space-y-1.5">
+                            <div className="flex items-baseline gap-2">
+                              <span className={`text-xl font-bold ${color}`}>{a.healthScore}</span>
+                              <span className="text-xs text-gray-400">/ 100</span>
+                              <span className="text-xs text-gray-400 ml-auto">
+                                {format(new Date(a.createdAt), "MMM d, yyyy")}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600">{a.summary}</p>
+                            {a.issues.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {a.issues.map((issue: string) => (
+                                  <span
+                                    key={issue}
+                                    className="text-xs bg-orange-50 text-orange-700 border border-orange-200 rounded-full px-2 py-0.5"
+                                  >
+                                    {issue}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </details>
+                )}
               </div>
             );
           })}
