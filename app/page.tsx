@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 
@@ -14,7 +15,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
-        <span className="text-xl font-bold text-green-700">Yard Buddy</span>
+        <div className="flex items-center gap-2">
+          <Image src="/gnome-buddy.png" alt="Yard Buddy" width={32} height={32} className="rounded-full" />
+          <span className="text-xl font-bold text-green-700">Yard Buddy</span>
+        </div>
         <div className="flex gap-2">
           <Link href="/login"><Button variant="ghost">Sign in</Button></Link>
           <Link href="/register"><Button className="bg-green-600 hover:bg-green-700">Get started free</Button></Link>
