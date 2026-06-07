@@ -28,7 +28,7 @@ export default async function DashboardPage() {
         orderBy: { createdAt: "asc" },
         include: {
           analyses: { orderBy: { createdAt: "desc" }, take: 1, select: { healthScore: true } },
-          _count: { select: { tasks: { where: { status: { not: "completed" } } } } },
+          tasks: { select: { status: true } },
         },
       },
     },
@@ -58,7 +58,7 @@ export default async function DashboardPage() {
       areaType: s.areaType,
       grassType: s.grassType,
       latestHealthScore: s.analyses[0]?.healthScore ?? null,
-      pendingTaskCount: s._count.tasks,
+      pendingTaskCount: s.tasks.filter((t) => t.status !== "completed").length,
     })),
   }));
 
