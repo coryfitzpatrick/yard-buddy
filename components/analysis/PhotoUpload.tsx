@@ -8,21 +8,28 @@ import { supabaseClient } from "@/lib/supabase-client";
 
 interface Props {
   onUploaded: (urls: string[]) => void;
+  onReset?: () => void;
+  analyzing?: boolean;
   maxImages?: number;
 }
 
-export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
+export function PhotoUpload({ onUploaded, onReset, analyzing = false, maxImages = 4 }: Props) {
   const [previews, setPreviews] = useState<Array<{ file: File; url: string; uploaded?: string }>>([]);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
+
+  function changePhotos(updater: (p: typeof previews) => typeof previews) {
+    if (analyzing) onReset?.();
+    setPreviews(updater);
+  }
 
   async function handleFiles(files: FileList) {
     const newItems = Array.from(files).slice(0, maxImages - previews.length).map((file) => ({
       file,
       url: URL.createObjectURL(file),
     }));
-    setPreviews((p) => [...p, ...newItems]);
+    changePhotos((p) => [...p, ...newItems]);
   }
 
   async function uploadAll() {
@@ -137,7 +144,7 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
               <Image src={item.url} alt="Lawn photo preview" fill className="object-cover" unoptimized />
               <button
                 className="absolute top-1 right-1 bg-black/50 rounded-full p-0.5 text-white hover:bg-black/70"
-                onClick={() => setPreviews((p) => p.filter((_, j) => j !== i))}
+                onClick={() => changePhotos((p) => p.filter((_, j) => j !== i))}
               >
                 <X className="w-3 h-3" />
               </button>
@@ -146,7 +153,7 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
         </div>
       )}
 
-      {previews.length > 0 && (
+      {previews.length > 0 && !analyzing && (
         <Button
           onClick={uploadAll}
           disabled={uploading}

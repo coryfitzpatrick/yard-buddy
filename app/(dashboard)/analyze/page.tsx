@@ -177,7 +177,7 @@ export default function AnalyzePage() {
             </div>
           )}
 
-          {selectedSectionId && <PhotoUpload onUploaded={handleUploaded} />}
+          {selectedSectionId && <PhotoUpload onUploaded={handleUploaded} analyzing={analyzing} onReset={cancelAnalysis} />}
 
           {analyzing && (
             <div className="flex flex-col items-center gap-3 py-8">
