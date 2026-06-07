@@ -20,6 +20,8 @@ export type GrassType =
 
 export type SpreadType = "broadcast" | "drop" | "handheld" | "liquid" | "none";
 
+export type WeatherCondition = "no_rain_48h" | "dry_day" | "soil_moist" | "any";
+
 export type LawnIssue =
   | "grubs"
   | "weeds_broadleaf"
@@ -45,7 +47,13 @@ export interface WeatherData {
   windSpeed: number;
   precipitationChance: number;
   location: string;
-  forecast: Array<{ date: string; high: number; low: number; description: string }>;
+  forecast: Array<{
+    date: string;
+    high: number;
+    low: number;
+    description: string;
+    precipChance: number;
+  }>;
 }
 
 export interface AnalysisResult {
@@ -62,6 +70,9 @@ export interface RecommendationItem {
   description: string;
   priority: TaskPriority;
   timing: string;
+  scheduledStartDays: number;
+  scheduledEndDays: number;
+  weatherCondition: WeatherCondition;
   productSuggestion?: string;
   productSearchQuery?: string;
   estimatedPrice?: string;
