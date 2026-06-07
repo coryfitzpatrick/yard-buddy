@@ -225,11 +225,17 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
               <button type="button" onClick={() => photoRef.current?.click()} className="text-sm text-green-600 underline">Try a different photo</button>
             </div>
           ) : identifyError ? (
-            <div className="text-left space-y-2">
+            <div className="space-y-2">
               <p className="text-sm text-red-500">{identifyError}</p>
-              <button type="button" onClick={() => photoRef.current?.click()} className="flex items-center gap-2 text-sm text-green-600 font-medium hover:text-green-700">
-                <Camera className="w-4 h-4" /> Try again
-              </button>
+              <div className="flex items-center justify-center gap-3">
+                <button type="button" onClick={() => cameraRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
+                  <Camera className="w-4 h-4" /> Take Photo
+                </button>
+                <span className="text-gray-300">|</span>
+                <button type="button" onClick={() => photoRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
+                  <Images className="w-4 h-4" /> Choose Photo
+                </button>
+              </div>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-3">
