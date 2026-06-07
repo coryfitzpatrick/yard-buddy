@@ -61,8 +61,7 @@ export async function getWeatherByZip(zip: string, country = "us"): Promise<Weat
 }
 
 export function formatForecastForClaude(
-  forecast: WeatherData["forecast"],
-  today: Date = new Date()
+  forecast: WeatherData["forecast"]
 ): string {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   return forecast
