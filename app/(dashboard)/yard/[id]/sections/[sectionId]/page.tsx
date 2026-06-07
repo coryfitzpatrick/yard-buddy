@@ -162,17 +162,18 @@ export default async function SectionDetailPage({
 
       {/* Past analyses */}
       {section.analyses.length > 1 && (
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            Past Analyses
-          </h2>
-          <div className="space-y-3">
+        <details className="bg-white border border-gray-200 rounded-xl mb-8">
+          <summary className="px-5 py-4 text-sm text-gray-500 cursor-pointer font-medium select-none list-none flex items-center gap-2 [&::-webkit-details-marker]:hidden">
+            <span className="details-arrow">▶</span>
+            {section.analyses.length - 1} past analysis{section.analyses.length - 1 > 1 ? "es" : ""}
+          </summary>
+          <div className="px-5 pb-4 space-y-3 border-t border-gray-100 pt-3">
             {section.analyses.slice(1).map((a) => {
               const color =
                 a.healthScore >= 70 ? "text-green-600" :
                 a.healthScore >= 40 ? "text-yellow-600" : "text-red-600";
               return (
-                <div key={a.id} className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
+                <div key={a.id} className="bg-gray-50 rounded-lg p-4 space-y-2">
                   <div className="flex items-baseline gap-2">
                     <span className={`text-xl font-bold ${color}`}>{a.healthScore}</span>
                     <span className="text-xs text-gray-400">/ 100</span>
@@ -210,7 +211,7 @@ export default async function SectionDetailPage({
               );
             })}
           </div>
-        </div>
+        </details>
       )}
 
       {/* Tasks */}
