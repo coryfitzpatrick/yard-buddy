@@ -67,7 +67,9 @@ export function TaskList({
               <div className="flex-1 min-w-0">
                 {multiYard && task.yardSection && (
                   <div className="text-xs text-green-700 font-medium mb-1">
-                    {task.yardSection.yard.name} › {task.yardSection.name}
+                    {task.yardSection.yard.name === task.yardSection.name
+                      ? task.yardSection.name
+                      : `${task.yardSection.yard.name} › ${task.yardSection.name}`}
                   </div>
                 )}
                 <div className="flex items-center gap-2 mb-1">
