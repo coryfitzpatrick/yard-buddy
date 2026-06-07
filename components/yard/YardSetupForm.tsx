@@ -58,6 +58,8 @@ export function YardSetupForm() {
   const [identifyError, setIdentifyError] = useState<string | null>(null);
   const [identified, setIdentified] = useState<{ confidence: string; explanation: string } | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
+  const uploadZoneRef = useRef<HTMLDivElement>(null);
+  const [highlightUpload, setHighlightUpload] = useState(false);
 
   const [streetAddress, setStreetAddress] = useState("");
   const [sizeUnit, setSizeUnit] = useState<"sqft" | "acres">("sqft");
@@ -250,7 +252,10 @@ export function YardSetupForm() {
               Select your grass type, or upload a photo and let AI identify it for you.
             </p>
 
-            <div className="rounded-lg border-2 border-dashed border-green-200 p-4 text-center">
+            <div
+              ref={uploadZoneRef}
+              className={`rounded-lg border-2 border-dashed p-4 text-center transition-colors duration-300 ${highlightUpload ? "border-green-500 bg-green-50 animate-pulse" : "border-green-200"}`}
+            >
               <input
                 ref={photoRef}
                 type="file"
@@ -258,7 +263,8 @@ export function YardSetupForm() {
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  e.target.value = ""; // reset so the same file can be re-selected
+                  e.target.value = "";
+                  setHighlightUpload(false);
                   if (file) identifyGrass(file);
                 }}
               />
@@ -308,7 +314,16 @@ export function YardSetupForm() {
 
             <GrassTypeSelector
               value={grassType}
-              onChange={(v) => { setValue("grassType", v); setIdentified(null); }}
+              onChange={(v) => {
+                setValue("grassType", v);
+                setIdentified(null);
+                if (v === "unknown") {
+                  setHighlightUpload(true);
+                  uploadZoneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                } else {
+                  setHighlightUpload(false);
+                }
+              }}
             />
             {errors.grassType && <p className="text-xs text-red-500">{errors.grassType.message}</p>}
           </div>
