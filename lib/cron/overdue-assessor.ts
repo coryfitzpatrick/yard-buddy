@@ -34,7 +34,7 @@ export async function assessOverdueTasks(
 
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 1000,
+    max_tokens: 2048,
     messages: [
       {
         role: "user",
@@ -65,10 +65,18 @@ Return a JSON array only:
   });
 
   const text = (message.content[0] as Anthropic.TextBlock).text.trim();
-  const cleaned = text
-    .replace(/```(?:json)?\n?/g, "")
-    .replace(/^[^[{]*/s, "")
-    .trim();
+  const jsonStart = text.indexOf("[");
+  const jsonEnd = text.lastIndexOf("]");
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {
+    console.error("assessOverdueTasks: no JSON array found in response");
+    return [];
+  }
+  const cleaned = text.slice(jsonStart, jsonEnd + 1);
 
-  return JSON.parse(cleaned) as OverdueAssessment[];
+  try {
+    return JSON.parse(cleaned) as OverdueAssessment[];
+  } catch (err) {
+    console.error("assessOverdueTasks: JSON.parse failed:", err);
+    return [];
+  }
 }
