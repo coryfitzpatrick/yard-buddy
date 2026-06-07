@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { PhotoUpload } from "@/components/analysis/PhotoUpload";
 import { AnalysisResults } from "@/components/analysis/AnalysisResults";
 import type { AnalysisResult, AreaType } from "@/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
@@ -174,7 +176,16 @@ export default function AnalyzePage() {
           {analysisError && (
             <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 mt-4">{analysisError}</div>
           )}
-          {result && <div className="mt-6"><AnalysisResults result={result} /></div>}
+          {result && (
+            <div className="mt-6 space-y-4">
+              <AnalysisResults result={result} />
+              <Link href={`/yard/${selectedYardId}/sections/${selectedSectionId}`}>
+                <Button className="w-full bg-green-600 hover:bg-green-700">
+                  <ArrowRight className="w-4 h-4 mr-2" /> View Full Plan &amp; Tasks
+                </Button>
+              </Link>
+            </div>
+          )}
         </>
       )}
     </div>
