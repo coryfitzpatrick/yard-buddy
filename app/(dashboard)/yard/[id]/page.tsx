@@ -26,7 +26,7 @@ export default async function YardDetailPage({
         include: {
           analyses: {
             orderBy: { createdAt: "asc" },
-            select: { id: true, healthScore: true, issues: true, summary: true, createdAt: true },
+            select: { id: true, healthScore: true, createdAt: true },
           },
         },
       },
@@ -72,7 +72,7 @@ export default async function YardDetailPage({
           </Link>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {yard.sections.map((section: NonNullable<typeof yard>["sections"][number]) => {
             const areaCfg = section.areaType ? AREA_CONFIG[section.areaType as AreaType] : null;
             const AreaIcon = areaCfg?.icon;
@@ -87,7 +87,7 @@ export default async function YardDetailPage({
               latestAnalysis.healthScore >= 40 ? "text-yellow-600" : "text-red-600";
 
             return (
-              <div key={section.id} className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+              <div key={section.id} className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
                 {/* Header */}
                 <div className="flex items-start justify-between">
                   <div>
@@ -114,85 +114,22 @@ export default async function YardDetailPage({
                   </div>
                 </div>
 
-                {/* Health score + chart */}
-                {latestAnalysis && (
+                {/* Health score + trend */}
+                {latestAnalysis ? (
                   <div>
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className={`text-3xl font-bold ${scoreColor}`}>
                         {latestAnalysis.healthScore}
                       </span>
-                      <span className="text-sm text-gray-400">/ 100 health score</span>
+                      <span className="text-sm text-gray-400">/ 100</span>
                       <span className="text-xs text-gray-400 ml-auto">
                         {format(new Date(latestAnalysis.createdAt), "MMM d, yyyy")}
                       </span>
                     </div>
-                    {chartData.length >= 2 && (
-                      <SectionHealthChart data={chartData} />
-                    )}
+                    {chartData.length >= 2 && <SectionHealthChart data={chartData} />}
                   </div>
-                )}
-
-                {/* Latest analysis summary + issues */}
-                {latestAnalysis && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-700">{latestAnalysis.summary}</p>
-                    {latestAnalysis.issues.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {latestAnalysis.issues.map((issue: string) => (
-                          <span
-                            key={issue}
-                            className="text-xs bg-orange-50 text-orange-700 border border-orange-200 rounded-full px-2 py-0.5"
-                          >
-                            {issue}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {!latestAnalysis && (
+                ) : (
                   <p className="text-sm text-gray-400">No analyses yet — tap Analyze to get started.</p>
-                )}
-
-                {/* Past analyses */}
-                {section.analyses.length > 1 && (
-                  <details className="border-t pt-4">
-                    <summary className="text-sm text-gray-500 cursor-pointer font-medium select-none">
-                      {section.analyses.length - 1} past analysis{section.analyses.length - 1 > 1 ? "es" : ""}
-                    </summary>
-                    <div className="mt-3 space-y-3">
-                      {[...section.analyses].reverse().slice(1).map((a: (typeof section)["analyses"][number]) => {
-                        const color =
-                          a.healthScore >= 70 ? "text-green-600" :
-                          a.healthScore >= 40 ? "text-yellow-600" : "text-red-600";
-                        return (
-                          <div key={a.id} className="bg-gray-50 rounded-lg p-3 space-y-1.5">
-                            <div className="flex items-baseline gap-2">
-                              <span className={`text-xl font-bold ${color}`}>{a.healthScore}</span>
-                              <span className="text-xs text-gray-400">/ 100</span>
-                              <span className="text-xs text-gray-400 ml-auto">
-                                {format(new Date(a.createdAt), "MMM d, yyyy")}
-                              </span>
-                            </div>
-                            <p className="text-xs text-gray-600">{a.summary}</p>
-                            {a.issues.length > 0 && (
-                              <div className="flex flex-wrap gap-1">
-                                {a.issues.map((issue: string) => (
-                                  <span
-                                    key={issue}
-                                    className="text-xs bg-orange-50 text-orange-700 border border-orange-200 rounded-full px-2 py-0.5"
-                                  >
-                                    {issue}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </details>
                 )}
               </div>
             );
