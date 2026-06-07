@@ -97,27 +97,38 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
       </div>
 
       {/* Picker buttons */}
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          onClick={() => cameraRef.current?.click()}
-          className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-green-300 py-6 hover:border-green-500 hover:bg-green-50 transition-colors"
-        >
-          <Camera className="h-8 w-8 text-green-500" />
-          <span className="text-sm font-medium text-gray-700">Take Photo</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
-          className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-6 hover:border-green-400 hover:bg-green-50 transition-colors"
-        >
-          <Images className="h-8 w-8 text-gray-400" />
-          <span className="text-sm font-medium text-gray-700">Choose Photo</span>
-        </button>
-      </div>
-      <p className="text-xs text-gray-400 text-center">Up to {maxImages} photos · max 10MB each</p>
+      {(() => {
+        const atMax = previews.length >= maxImages;
+        return (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                disabled={atMax}
+                onClick={() => !atMax && cameraRef.current?.click()}
+                className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-6 transition-colors ${atMax ? "border-gray-200 bg-gray-50 cursor-not-allowed opacity-50" : "border-green-300 hover:border-green-500 hover:bg-green-50"}`}
+              >
+                <Camera className={`h-8 w-8 ${atMax ? "text-gray-300" : "text-green-500"}`} />
+                <span className={`text-sm font-medium ${atMax ? "text-gray-400" : "text-gray-700"}`}>Take Photo</span>
+              </button>
+              <button
+                type="button"
+                disabled={atMax}
+                onClick={() => !atMax && inputRef.current?.click()}
+                onDragOver={(e) => { if (!atMax) e.preventDefault(); }}
+                onDrop={(e) => { e.preventDefault(); if (!atMax) handleFiles(e.dataTransfer.files); }}
+                className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-6 transition-colors ${atMax ? "border-gray-200 bg-gray-50 cursor-not-allowed opacity-50" : "border-gray-200 hover:border-green-400 hover:bg-green-50"}`}
+              >
+                <Images className={`h-8 w-8 ${atMax ? "text-gray-300" : "text-gray-400"}`} />
+                <span className={`text-sm font-medium ${atMax ? "text-gray-400" : "text-gray-700"}`}>Choose Photo</span>
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 text-center">
+              {atMax ? `${maxImages}/${maxImages} photos — remove one to add another` : `${previews.length}/${maxImages} photos added`}
+            </p>
+          </>
+        );
+      })()}
 
       {previews.length > 0 && (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

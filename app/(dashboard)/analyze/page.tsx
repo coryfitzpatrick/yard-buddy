@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ export default function AnalyzePage() {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     fetch("/api/yard")
@@ -55,6 +56,8 @@ export default function AnalyzePage() {
 
   async function handleUploaded(urls: string[]) {
     if (!selectedSectionId) return;
+    const controller = new AbortController();
+    abortRef.current = controller;
     setAnalyzing(true);
     setResult(null);
     setAnalysisError(null);
@@ -63,6 +66,7 @@ export default function AnalyzePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sectionId: selectedSectionId, imageUrls: urls }),
+        signal: controller.signal,
       });
       if (!res.ok) {
         setAnalysisError("Analysis failed. Please try again.");
@@ -70,11 +74,19 @@ export default function AnalyzePage() {
       }
       const data = await res.json();
       setResult(data.result);
-    } catch {
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return;
       setAnalysisError("Network error. Please check your connection.");
     } finally {
       setAnalyzing(false);
+      abortRef.current = null;
     }
+  }
+
+  function cancelAnalysis() {
+    abortRef.current?.abort();
+    setAnalyzing(false);
+    setAnalysisError(null);
   }
 
   return (
@@ -168,9 +180,17 @@ export default function AnalyzePage() {
           {selectedSectionId && <PhotoUpload onUploaded={handleUploaded} />}
 
           {analyzing && (
-            <div className="flex items-center justify-center gap-2 py-8 text-gray-500">
-              <Loader2 className="h-5 w-5 animate-spin text-green-500" />
-              <span>Analyzing… this usually takes 20–40 seconds</span>
+            <div className="flex flex-col items-center gap-3 py-8">
+              <div className="flex items-center gap-2 text-gray-500">
+                <Loader2 className="h-5 w-5 animate-spin text-green-500" />
+                <span>Analyzing… this usually takes 20–40 seconds</span>
+              </div>
+              <button
+                onClick={cancelAnalysis}
+                className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2"
+              >
+                Cancel and change photos
+              </button>
             </div>
           )}
           {analysisError && (
