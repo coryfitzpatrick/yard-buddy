@@ -53,7 +53,9 @@ Return a JSON array of 3-6 recommendations. Each item must follow this exact str
   "description": "string (2-3 sentences: what to do and why)",
   "priority": "urgent" | "high" | "medium" | "low",
   "timing": "string (e.g. 'This week', 'Next 2-4 weeks', 'Wait until fall')",
-  "productSuggestion": "string (optional)",
+  "productSuggestion": "string (brand + product name, optional)",
+  "productSearchQuery": "string (concise search term for online retailers, e.g. 'Scotts DiseaseEx Fungicide 10lb', omit if no product)",
+  "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
   "applicationRate": "string (optional, e.g. '3 lbs per 1000 sq ft')",
   "spreaderSetting": "string (optional, e.g. 'Scotts: 4, Andersons: 12')",
   "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional)
@@ -118,7 +120,9 @@ Return this exact JSON structure:
       "description": "string",
       "priority": "urgent" | "high" | "medium" | "low",
       "timing": "string",
-      "productSuggestion": "string (optional)",
+      "productSuggestion": "string (brand + product name, optional)",
+      "productSearchQuery": "string (concise search term for online retailers, omit if no product)",
+      "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
       "applicationRate": "string (optional)",
       "spreaderSetting": "string (optional)",
       "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional)

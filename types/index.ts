@@ -55,6 +55,8 @@ export interface RecommendationItem {
   priority: TaskPriority;
   timing: string;
   productSuggestion?: string;
+  productSearchQuery?: string;
+  estimatedPrice?: string;
   applicationRate?: string;
   spreaderSetting?: string;
   spreaderType?: SpreadType;

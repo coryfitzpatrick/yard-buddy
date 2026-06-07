@@ -2,7 +2,47 @@ import { AnalysisResult } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, ShoppingCart } from "lucide-react";
+
+const RETAILERS = [
+  { label: "Amazon",     url: (q: string) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}` },
+  { label: "Home Depot", url: (q: string) => `https://www.homedepot.com/s/${encodeURIComponent(q)}` },
+  { label: "Lowe's",     url: (q: string) => `https://www.lowes.com/search?searchTerm=${encodeURIComponent(q)}` },
+  { label: "Walmart",    url: (q: string) => `https://www.walmart.com/search?q=${encodeURIComponent(q)}` },
+];
+
+function BuyLinks({ query, estimatedPrice }: { query: string; estimatedPrice?: string }) {
+  return (
+    <div className="mt-2 pt-2 border-t border-gray-100">
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <ShoppingCart className="w-3 h-3 text-gray-400 shrink-0" />
+        {estimatedPrice && (
+          <span className="text-xs text-gray-500 mr-1">{estimatedPrice} —</span>
+        )}
+        {RETAILERS.map((r) => (
+          <a
+            key={r.label}
+            href={r.url(query)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-green-700 hover:text-green-900 hover:underline"
+          >
+            {r.label}
+          </a>
+        ))}
+        <span className="text-gray-300 text-xs">|</span>
+        <a
+          href={`https://www.google.com/search?q=${encodeURIComponent(query + " price")}&tbm=shop`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+        >
+          Compare prices →
+        </a>
+      </div>
+    </div>
+  );
+}
 
 const PRIORITY_BORDER_COLOR: Record<string, string> = {
   urgent: "#ef4444",
@@ -82,6 +122,9 @@ export function AnalysisResults({ result }: { result: AnalysisResult }) {
                     <div><span className="font-medium">Product:</span> {rec.productSuggestion}</div>
                     {rec.applicationRate && <div><span className="font-medium">Rate:</span> {rec.applicationRate}</div>}
                     {rec.spreaderSetting && <div><span className="font-medium">Setting:</span> {rec.spreaderSetting}</div>}
+                    {rec.productSearchQuery && (
+                      <BuyLinks query={rec.productSearchQuery} estimatedPrice={rec.estimatedPrice} />
+                    )}
                   </div>
                 )}
               </CardContent>
