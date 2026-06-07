@@ -70,6 +70,8 @@ export default async function DashboardPage() {
     })),
   }));
 
+  const weatherRefreshedAt = yards[0]?.weatherRefreshedAt?.toISOString() ?? null;
+
   const allSections = yards.flatMap((y: (typeof yards)[number]) =>
     y.sections.map((s: (typeof yards)[number]["sections"][number]) => ({
       id: s.id,
@@ -99,6 +101,7 @@ export default async function DashboardPage() {
         yards={yardSummaries}
         tasks={tasks}
         allSections={allSections}
+        weatherRefreshedAt={weatherRefreshedAt}
       />
     </div>
   );

@@ -52,9 +52,10 @@ interface Props {
   yards: YardCard[];
   tasks: Task[];
   allSections: TaskSection[];
+  weatherRefreshedAt: string | null;
 }
 
-export function DashboardInteractiveSection({ yards, tasks, allSections }: Props) {
+export function DashboardInteractiveSection({ yards, tasks, allSections, weatherRefreshedAt }: Props) {
   const [selectedYardId, setSelectedYardId] = useState<string | null>(null);
 
   const selectedYard = selectedYardId ? yards.find((y) => y.id === selectedYardId) ?? null : null;
@@ -93,7 +94,7 @@ export function DashboardInteractiveSection({ yards, tasks, allSections }: Props
         <h2 className="font-semibold text-lg mb-3">
           {selectedYard ? `${selectedYard.name} Tasks` : "Tasks"}
         </h2>
-        <DashboardTaskSection tasks={displayTasks} sections={displaySections} />
+        <DashboardTaskSection tasks={displayTasks} sections={displaySections} weatherRefreshedAt={weatherRefreshedAt} />
       </div>
     </div>
   );

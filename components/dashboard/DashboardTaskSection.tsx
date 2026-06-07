@@ -39,9 +39,10 @@ interface Task {
 interface Props {
   tasks: Task[];
   sections: TaskSection[];
+  weatherRefreshedAt: string | null;
 }
 
-export function DashboardTaskSection({ tasks, sections }: Props) {
+export function DashboardTaskSection({ tasks, sections, weatherRefreshedAt }: Props) {
   const [activeSection, setActiveSection] = useState<"all" | string>("all");
 
   const filteredTasks =
@@ -97,10 +98,26 @@ export function DashboardTaskSection({ tasks, sections }: Props) {
           </CardContent>
         </Card>
       ) : (
-        <TaskList
-          tasks={filteredTasks}
-          multiYard={multiYard && activeSection === "all"}
-        />
+        <>
+          {weatherRefreshedAt && (
+            <p className="text-xs text-gray-400 mb-3">
+              Tasks updated{" "}
+              {new Date(weatherRefreshedAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}{" "}
+              at{" "}
+              {new Date(weatherRefreshedAt).toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+              })}
+            </p>
+          )}
+          <TaskList
+            tasks={filteredTasks}
+            multiYard={multiYard && activeSection === "all"}
+          />
+        </>
       )}
     </div>
   );

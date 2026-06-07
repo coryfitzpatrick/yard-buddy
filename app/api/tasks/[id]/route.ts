@@ -10,15 +10,31 @@ export async function PATCH(
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const VALID_STATUSES = ["pending", "completed", "skipped"] as const;
-  const { status } = await req.json();
-  if (!VALID_STATUSES.includes(status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
-  }
+  const body = await req.json();
+
   const task = await db.lawnTask.findFirst({
     where: { id, yardSection: { yard: { userId: session.user.id } } },
   });
   if (!task) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Support updating status and/or stillWorthDoing independently
+  if ("stillWorthDoing" in body && !("status" in body)) {
+    const { stillWorthDoing } = body;
+    if (stillWorthDoing !== null && typeof stillWorthDoing !== "boolean") {
+      return NextResponse.json({ error: "Invalid stillWorthDoing" }, { status: 400 });
+    }
+    const updated = await db.lawnTask.update({
+      where: { id },
+      data: { stillWorthDoing },
+    });
+    return NextResponse.json(updated);
+  }
+
+  const VALID_STATUSES = ["pending", "completed", "skipped"] as const;
+  const { status } = body;
+  if (!VALID_STATUSES.includes(status)) {
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  }
 
   const updated = await db.lawnTask.update({
     where: { id },

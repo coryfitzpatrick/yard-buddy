@@ -48,10 +48,10 @@ const PRIORITY_GROUP: Record<string, "Urgent" | "High" | "Routine"> = {
   low: "Routine",
 };
 
-const GROUP_STYLES: Record<string, { heading: string; dot: string }> = {
-  Urgent: { heading: "text-red-600", dot: "bg-red-500" },
-  High: { heading: "text-orange-600", dot: "bg-orange-400" },
-  Routine: { heading: "text-green-700", dot: "bg-green-400" },
+const GROUP_STYLES: Record<string, { heading: string }> = {
+  Urgent: { heading: "text-red-600" },
+  High: { heading: "text-orange-600" },
+  Routine: { heading: "text-green-700" },
 };
 
 function formatDateRange(startStr: string, endStr: string): string {
@@ -133,10 +133,12 @@ function TaskCard({
 
 function OverdueSection({
   tasks,
-  onAction,
+  onDoIt,
+  onSkip,
 }: {
   tasks: Task[];
-  onAction: (id: string, action: "pending" | "skipped") => void;
+  onDoIt: (id: string) => void;
+  onSkip: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   if (tasks.length === 0) return null;
@@ -169,7 +171,7 @@ function OverdueSection({
                       "h-7 text-xs",
                       task.stillWorthDoing === false && "opacity-40"
                     )}
-                    onClick={() => onAction(task.id, "pending")}
+                    onClick={() => onDoIt(task.id)}
                   >
                     Do it
                   </Button>
@@ -177,7 +179,7 @@ function OverdueSection({
                     size="sm"
                     variant="ghost"
                     className="h-7 text-xs text-gray-500"
-                    onClick={() => onAction(task.id, "skipped")}
+                    onClick={() => onSkip(task.id)}
                   >
                     Skip
                   </Button>
@@ -215,6 +217,24 @@ export function TaskList({
     }
   }
 
+  async function resetOverdue(id: string) {
+    const prev = tasks.find((t) => t.id === id);
+    if (!prev) return;
+    // Optimistic update: clear stillWorthDoing so task moves back to pending groups
+    setTasks((t) => t.map((task) => (task.id === id ? { ...task, stillWorthDoing: null } : task)));
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stillWorthDoing: null }),
+      });
+      if (!res.ok) throw new Error("Failed");
+    } catch {
+      // Rollback
+      setTasks((t) => t.map((task) => (task.id === id ? prev : task)));
+    }
+  }
+
   // Tasks stay in pending until the cron assesses them (sets stillWorthDoing).
   // A task with a past scheduledEnd but stillWorthDoing === null remains in pending, not overdue.
   const pending = tasks.filter((t) => t.status === "pending" && t.stillWorthDoing === null);
@@ -223,7 +243,6 @@ export function TaskList({
 
   // Group pending tasks by priority group, preserving order within group by scheduledStart
   const groups: Array<{ label: "Urgent" | "High" | "Routine"; tasks: Task[] }> = [];
-  const seen = new Set<string>();
 
   for (const groupLabel of ["Urgent", "High", "Routine"] as const) {
     const groupTasks = pending
@@ -235,8 +254,7 @@ export function TaskList({
         return (PRIORITY_ORDER[a.priority] ?? 3) - (PRIORITY_ORDER[b.priority] ?? 3);
       });
 
-    if (groupTasks.length > 0 && !seen.has(groupLabel)) {
-      seen.add(groupLabel);
+    if (groupTasks.length > 0) {
       groups.push({ label: groupLabel, tasks: groupTasks });
     }
   }
@@ -273,7 +291,8 @@ export function TaskList({
 
       <OverdueSection
         tasks={overdue}
-        onAction={(id, status) => patchTask(id, status)}
+        onDoIt={resetOverdue}
+        onSkip={(id) => patchTask(id, "skipped")}
       />
 
       {completed.length > 0 && (
