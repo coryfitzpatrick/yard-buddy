@@ -73,11 +73,11 @@ export default async function YardDetailPage({
         </div>
       ) : (
         <div className="space-y-6">
-          {yard.sections.map((section) => {
+          {yard.sections.map((section: NonNullable<typeof yard>["sections"][number]) => {
             const areaCfg = section.areaType ? AREA_CONFIG[section.areaType as AreaType] : null;
             const AreaIcon = areaCfg?.icon;
             const latestAnalysis = section.analyses[section.analyses.length - 1] ?? null;
-            const chartData = section.analyses.map((a) => ({
+            const chartData = section.analyses.map((a: (typeof section)["analyses"][number]) => ({
               date: a.createdAt.toISOString(),
               score: a.healthScore,
             }));
@@ -136,7 +136,7 @@ export default async function YardDetailPage({
                     <p className="text-sm text-gray-700">{latestAnalysis.summary}</p>
                     {latestAnalysis.issues.length > 0 && (
                       <div className="flex flex-wrap gap-1">
-                        {latestAnalysis.issues.map((issue) => (
+                        {latestAnalysis.issues.map((issue: string) => (
                           <span
                             key={issue}
                             className="text-xs bg-orange-50 text-orange-700 border border-orange-200 rounded-full px-2 py-0.5"

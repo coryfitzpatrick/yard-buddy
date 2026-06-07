@@ -55,6 +55,19 @@ export async function getWeatherByZip(zip: string, country = "us"): Promise<Weat
         high: Math.round(data.high),
         low: Math.round(data.low),
         description: data.description,
+        precipChance: Math.round(data.precipChance),
       })),
   };
+}
+
+export function formatForecastForClaude(
+  forecast: WeatherData["forecast"]
+): string {
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return forecast
+    .map((day, i) => {
+      const label = i === 0 ? "Today" : dayNames[new Date(day.date + "T12:00:00").getDay()];
+      return `- ${label} ${day.date}: ${day.high}F, ${day.description}, ${day.precipChance}% rain`;
+    })
+    .join("\n");
 }

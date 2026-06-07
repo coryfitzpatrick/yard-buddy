@@ -28,23 +28,41 @@ export default async function DashboardPage() {
 
   if (yards.length === 0) redirect("/yard/setup");
 
-  const sectionIds = yards.flatMap((y) => y.sections.map((s) => s.id));
+  const sectionIds = yards.flatMap((y: (typeof yards)[number]) => y.sections.map((s: (typeof yards)[number]["sections"][number]) => s.id));
 
-  const tasks = await db.lawnTask.findMany({
+  const rawTasks = await db.lawnTask.findMany({
     where: { yardSectionId: { in: sectionIds } },
     orderBy: { createdAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      priority: true,
+      status: true,
+      scheduledStart: true,
+      scheduledEnd: true,
+      overdueNote: true,
+      stillWorthDoing: true,
+      product: true,
+      applicationRate: true,
+      spreaderSetting: true,
       yardSection: {
         select: { id: true, name: true, areaType: true, yard: { select: { name: true } } },
       },
     },
   });
 
-  const yardSummaries = yards.map((yard) => ({
+  const tasks = rawTasks.map((t) => ({
+    ...t,
+    scheduledStart: t.scheduledStart?.toISOString() ?? null,
+    scheduledEnd: t.scheduledEnd?.toISOString() ?? null,
+  }));
+
+  const yardSummaries = yards.map((yard: (typeof yards)[number]) => ({
     id: yard.id,
     name: yard.name,
     zipCode: yard.zipCode,
-    sections: yard.sections.map((s) => ({
+    sections: yard.sections.map((s: (typeof yards)[number]["sections"][number]) => ({
       id: s.id,
       name: s.name,
       areaType: s.areaType,
@@ -52,8 +70,10 @@ export default async function DashboardPage() {
     })),
   }));
 
-  const allSections = yards.flatMap((y) =>
-    y.sections.map((s) => ({
+  const weatherRefreshedAt = yards[0]?.weatherRefreshedAt?.toISOString() ?? null;
+
+  const allSections = yards.flatMap((y: (typeof yards)[number]) =>
+    y.sections.map((s: (typeof yards)[number]["sections"][number]) => ({
       id: s.id,
       name: s.name,
       yardId: y.id,
@@ -81,6 +101,7 @@ export default async function DashboardPage() {
         yards={yardSummaries}
         tasks={tasks}
         allSections={allSections}
+        weatherRefreshedAt={weatherRefreshedAt}
       />
     </div>
   );
