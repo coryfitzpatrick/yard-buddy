@@ -21,7 +21,7 @@ export const yardSectionSchema = z.object({
   areaType: z.enum(["front", "back", "left_side", "right_side", "garden", "other"]).optional(),
   yardSizeSqft: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().min(100).max(100000).optional()
+    z.number().min(1).max(500000).optional()
   ),
   grassType: z.enum([
     "bermuda", "kentucky_bluegrass", "tall_fescue", "fine_fescue",

@@ -84,7 +84,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
   }
   function handleSizeInput(raw: string) {
     setSizeDisplay(raw);
-    setValue("yardSizeSqft", toSqft(raw, sizeUnit) as never);
+    setValue("yardSizeSqft", toSqft(raw, sizeUnit) as never, { shouldDirty: true, shouldValidate: true });
   }
   function handleUnitChange(next: "sqft" | "acres") {
     const cur = toSqft(sizeDisplay, sizeUnit);
@@ -337,11 +337,13 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
               ? "Adjust to just this section's share of the lawn"
               : "Optional — helps calculate product amounts"}
           </p>
+          {errors.yardSizeSqft && <p className="text-sm text-red-500">{errors.yardSizeSqft.message}</p>}
         </div>
 
         <div className="space-y-1">
           <Label>Soil pH</Label>
           <Input type="number" step="0.1" min="4" max="9" placeholder="6.5" {...register("soilPh")} />
+          {errors.soilPh && <p className="text-sm text-red-500">{errors.soilPh.message}</p>}
         </div>
         <div className="space-y-1">
           <Label>Soil Moisture</Label>
@@ -357,6 +359,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
         <div className="space-y-1">
           <Label>Additional Notes</Label>
           <Textarea placeholder="Shady areas, problem spots…" {...register("notes")} />
+          {errors.notes && <p className="text-sm text-red-500">{errors.notes.message}</p>}
         </div>
       </div>
 
