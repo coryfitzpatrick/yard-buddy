@@ -13,18 +13,11 @@ import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 interface YardSection { id: string; name: string; areaType: string | null; grassType: string; }
 interface Yard { id: string; name: string; zipCode: string; sections: YardSection[]; }
 
-interface SectionOption {
-  sectionId: string;
-  sectionName: string;
-  grassType: string;
-  areaType: string | null;
-  yardName: string;
-}
-
 export default function AnalyzePage() {
   const searchParams = useSearchParams();
   const [yards, setYards] = useState<Yard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedYardId, setSelectedYardId] = useState<string>("");
   const [selectedSectionId, setSelectedSectionId] = useState<string>("");
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -36,28 +29,27 @@ export default function AnalyzePage() {
       .then((data: Yard[]) => {
         if (!Array.isArray(data)) return;
         setYards(data);
-        const allSections = data.flatMap((y) => y.sections);
         const preselect = searchParams.get("sectionId");
-        if (preselect && allSections.some((s) => s.id === preselect)) {
-          setSelectedSectionId(preselect);
-        } else if (allSections.length > 0) {
-          setSelectedSectionId(allSections[0].id);
+        if (preselect) {
+          const yard = data.find((y) => y.sections.some((s) => s.id === preselect));
+          if (yard) { setSelectedYardId(yard.id); setSelectedSectionId(preselect); }
+        } else if (data.length === 1) {
+          setSelectedYardId(data[0].id);
         }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [searchParams]);
 
-  const multiYard = yards.length > 1;
-  const allOptions: SectionOption[] = yards.flatMap((y) =>
-    y.sections.map((s) => ({
-      sectionId: s.id,
-      sectionName: s.name,
-      grassType: s.grassType,
-      areaType: s.areaType,
-      yardName: y.name,
-    }))
-  );
+  const selectedYard = yards.find((y) => y.id === selectedYardId) ?? null;
+
+  function handleYardSelect(yardId: string) {
+    if (yardId === selectedYardId) return;
+    setSelectedYardId(yardId);
+    setSelectedSectionId("");
+    setResult(null);
+    setAnalysisError(null);
+  }
 
   async function handleUploaded(urls: string[]) {
     if (!selectedSectionId) return;
@@ -93,7 +85,7 @@ export default function AnalyzePage() {
           <Loader2 className="w-4 h-4 animate-spin" />
           <span className="text-sm">Loading your yards…</span>
         </div>
-      ) : allOptions.length === 0 ? (
+      ) : yards.length === 0 ? (
         <Card>
           <CardContent className="p-6 text-center text-gray-500">
             <p>Set up a yard first before analyzing.</p>
@@ -101,44 +93,75 @@ export default function AnalyzePage() {
         </Card>
       ) : (
         <>
-          <div className="mb-6">
-            <p className="text-sm font-medium text-gray-700 mb-3">Which section are you photographing?</p>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {allOptions.map((opt) => {
-                const areaCfg = opt.areaType ? AREA_CONFIG[opt.areaType as AreaType] : null;
-                const Icon = areaCfg?.icon;
-                const selected = selectedSectionId === opt.sectionId;
-                return (
-                  <button
-                    key={opt.sectionId}
-                    type="button"
-                    onClick={() => { setSelectedSectionId(opt.sectionId); setResult(null); }}
-                    className={cn(
-                      "flex flex-col items-start rounded-lg border-2 px-3 py-2.5 text-left transition-all",
-                      selected
-                        ? "border-green-600 bg-green-50"
-                        : "border-gray-200 bg-white hover:border-green-400"
-                    )}
-                  >
-                    {multiYard && (
-                      <span className="text-xs text-gray-400 mb-0.5">{opt.yardName}</span>
-                    )}
-                    <div className="flex items-center gap-1.5">
-                      {Icon && (
-                        <Icon className={cn("w-3.5 h-3.5 shrink-0", selected ? "text-green-700" : "text-gray-400")} />
+          {/* Step 1: yard picker — only shown when multiple yards */}
+          {yards.length > 1 && (
+            <div className="mb-6">
+              <p className="text-sm font-medium text-gray-700 mb-3">Which property?</p>
+              <div className="flex gap-3 flex-wrap">
+                {yards.map((yard) => {
+                  const sel = yard.id === selectedYardId;
+                  return (
+                    <button
+                      key={yard.id}
+                      type="button"
+                      onClick={() => handleYardSelect(yard.id)}
+                      className={cn(
+                        "flex flex-col items-start rounded-lg border-2 px-4 py-2.5 text-left transition-all",
+                        sel ? "border-green-600 bg-green-50" : "border-gray-200 bg-white hover:border-green-400"
                       )}
-                      <span className={cn("font-medium text-sm", selected ? "text-green-900" : "text-gray-800")}>
-                        {opt.sectionName}
+                    >
+                      <span className={cn("font-medium text-sm", sel ? "text-green-900" : "text-gray-800")}>
+                        {yard.name}
                       </span>
-                    </div>
-                    <span className="text-xs text-gray-400 capitalize mt-0.5">
-                      {opt.grassType.replace(/_/g, " ")}
-                    </span>
-                  </button>
-                );
-              })}
+                      <span className="text-xs text-gray-400">ZIP {yard.zipCode}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Step 2: section picker — shown once a yard is selected */}
+          {selectedYard && selectedYard.sections.length === 0 && (
+            <Card className="mb-6">
+              <CardContent className="p-6 text-center text-gray-500">
+                <p>This yard has no sections yet. Add one from My Yards.</p>
+              </CardContent>
+            </Card>
+          )}
+          {selectedYard && selectedYard.sections.length > 0 && (
+            <div className="mb-6">
+              <p className="text-sm font-medium text-gray-700 mb-3">Which section are you photographing?</p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {selectedYard.sections.map((s) => {
+                  const areaCfg = s.areaType ? AREA_CONFIG[s.areaType as AreaType] : null;
+                  const Icon = areaCfg?.icon;
+                  const sel = selectedSectionId === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => { setSelectedSectionId(s.id); setResult(null); setAnalysisError(null); }}
+                      className={cn(
+                        "flex flex-col items-start rounded-lg border-2 px-3 py-2.5 text-left transition-all",
+                        sel ? "border-green-600 bg-green-50" : "border-gray-200 bg-white hover:border-green-400"
+                      )}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        {Icon && <Icon className={cn("w-3.5 h-3.5 shrink-0", sel ? "text-green-700" : "text-gray-400")} />}
+                        <span className={cn("font-medium text-sm", sel ? "text-green-900" : "text-gray-800")}>
+                          {s.name}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400 capitalize mt-0.5">
+                        {s.grassType.replace(/_/g, " ")}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {selectedSectionId && <PhotoUpload onUploaded={handleUploaded} />}
 
