@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Ruler, Sprout } from "lucide-react";
+import { Pencil, Trash2, Ruler, Sprout, ArrowRight } from "lucide-react";
 import { AREA_CONFIG } from "./AreaTypeSelector";
 import type { AreaType } from "@/types";
 
@@ -81,6 +81,11 @@ export function SectionCard({ section }: { section: Section }) {
           </div>
         )}
       </div>
+      <Link href={`/yard/${section.yardId}/sections/${section.id}`} className="mt-auto">
+        <Button variant="outline" size="sm" className="w-full">
+          <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
+        </Button>
+      </Link>
     </div>
   );
 }
