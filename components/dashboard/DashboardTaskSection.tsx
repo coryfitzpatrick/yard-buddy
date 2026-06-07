@@ -21,9 +21,13 @@ interface Task {
   description: string;
   priority: string;
   status: string;
-  product?: string | null;
-  applicationRate?: string | null;
-  spreaderSetting?: string | null;
+  scheduledStart: string | null;
+  scheduledEnd: string | null;
+  overdueNote: string | null;
+  stillWorthDoing: boolean | null;
+  product: string | null;
+  applicationRate: string | null;
+  spreaderSetting: string | null;
   yardSection?: {
     id: string;
     name: string;

@@ -30,15 +30,33 @@ export default async function DashboardPage() {
 
   const sectionIds = yards.flatMap((y: (typeof yards)[number]) => y.sections.map((s: (typeof yards)[number]["sections"][number]) => s.id));
 
-  const tasks = await db.lawnTask.findMany({
+  const rawTasks = await db.lawnTask.findMany({
     where: { yardSectionId: { in: sectionIds } },
     orderBy: { createdAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      priority: true,
+      status: true,
+      scheduledStart: true,
+      scheduledEnd: true,
+      overdueNote: true,
+      stillWorthDoing: true,
+      product: true,
+      applicationRate: true,
+      spreaderSetting: true,
       yardSection: {
         select: { id: true, name: true, areaType: true, yard: { select: { name: true } } },
       },
     },
   });
+
+  const tasks = rawTasks.map((t) => ({
+    ...t,
+    scheduledStart: t.scheduledStart?.toISOString() ?? null,
+    scheduledEnd: t.scheduledEnd?.toISOString() ?? null,
+  }));
 
   const yardSummaries = yards.map((yard: (typeof yards)[number]) => ({
     id: yard.id,
