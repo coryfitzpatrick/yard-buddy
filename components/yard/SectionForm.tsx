@@ -22,6 +22,7 @@ interface Props {
   zipCode: string;
   lotSqft?: number;
   buildingSqft?: number;
+  streetAddress?: string;
   initialData?: Partial<YardSectionFormInput & { id: string }>;
 }
 
@@ -32,7 +33,7 @@ const AREA_NAME_MAP: Record<AreaType, string> = {
   garden: "Garden", other: "My Yard",
 };
 
-export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialData }: Props) {
+export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const isEdit = !!initialData?.id;
@@ -45,6 +46,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
         areaType: initialData?.areaType as AreaType | undefined,
         grassType: (initialData?.grassType as YardSectionInput["grassType"]) ?? "unknown",
         soilMoisture: initialData?.soilMoisture as YardSectionInput["soilMoisture"] | undefined,
+        soilPh: initialData?.soilPh as never,
         notes: initialData?.notes ?? undefined,
         yardSizeSqft: (initialData?.yardSizeSqft ?? (lotSqft && !initialData ? (lotSqft - (buildingSqft ?? 0)) || lotSqft : undefined)) as never,
       },
@@ -64,7 +66,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
   // Lot size lookup + controlled size input
   const usableSqft = lotSqft && buildingSqft ? lotSqft - buildingSqft : lotSqft ?? null;
   const hasYardLotData = !!lotSqft;
-  const [streetAddress, setStreetAddress] = useState("");
+  const [streetAddress, setStreetAddress] = useState(initialStreetAddress ?? "");
   const [lookingUp, setLookingUp] = useState(false);
   const [lookupNote, setLookupNote] = useState<string | null>(null);
   const [sizeUnit, setSizeUnit] = useState<"sqft" | "acres">("sqft");
@@ -177,7 +179,6 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
-      {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
       <div className="space-y-2">
         <Label>Area Type</Label>
@@ -355,6 +356,12 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
         </div>
       </div>
 
+      {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
+      {Object.keys(errors).length > 0 && (
+        <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+          Please fix the errors above before saving.
+        </div>
+      )}
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="outline" onClick={() => router.push(isEdit ? `/yard/${yardId}/sections/${initialData!.id}` : `/yard/${yardId}`)}>Cancel</Button>
         <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">

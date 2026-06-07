@@ -16,7 +16,7 @@ export default async function EditSectionPage({
   const { id, sectionId } = await params;
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { id, userId: session.user.id } },
-    include: { yard: { select: { name: true, zipCode: true } } },
+    include: { yard: { select: { name: true, zipCode: true, lotSqft: true, buildingSqft: true, streetAddress: true } } },
   });
   if (!section) notFound();
 
@@ -29,6 +29,9 @@ export default async function EditSectionPage({
       <SectionForm
         yardId={id}
         zipCode={section.yard.zipCode}
+        lotSqft={section.yard.lotSqft ?? undefined}
+        buildingSqft={section.yard.buildingSqft ?? undefined}
+        streetAddress={section.yard.streetAddress ?? undefined}
         initialData={{
           id: section.id,
           name: section.name,
