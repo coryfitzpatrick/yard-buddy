@@ -7,14 +7,13 @@ import { resend, buildDigestEmail, generateUnsubscribeToken } from "@/lib/email"
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
-  result.setDate(result.getDate() + days);
+  result.setUTCDate(result.getUTCDate() + days);
   return result;
 }
 
 function startOfToday(): Date {
   const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 
 function isBefore(a: Date, b: Date): boolean {
@@ -59,7 +58,6 @@ export async function GET(req: NextRequest) {
               scheduledEnd: true,
               weatherCondition: true,
               stillWorthDoing: true,
-              yardSection: { select: { grassType: true, areaType: true } },
             },
           },
         },
@@ -89,7 +87,10 @@ export async function GET(req: NextRequest) {
 
   for (const yard of yards) {
     const weather = weatherByZip.get(yard.zipCode);
-    if (!weather) continue;
+    if (!weather) {
+      console.warn(`[cron] No weather data for ZIP ${yard.zipCode}, skipping yard ${yard.id}`);
+      continue;
+    }
 
     for (const section of yard.sections) {
       const newlyOverdue: SectionTasks = [];
