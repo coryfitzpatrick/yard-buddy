@@ -9,19 +9,32 @@ export function YardDeleteButton({ yardId }: { yardId: string }) {
   const router = useRouter();
   const [confirm, setConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
 
   async function handleDelete() {
     setDeleting(true);
+    setDeleteError(false);
     try {
       const res = await fetch(`/api/yard/${yardId}`, { method: "DELETE" });
       if (res.ok) {
         router.push("/yard");
         router.refresh();
+      } else {
+        setDeleteError(true);
+        setConfirm(false);
       }
+    } catch {
+      setDeleteError(true);
+      setConfirm(false);
     } finally {
       setDeleting(false);
-      setConfirm(false);
     }
+  }
+
+  if (deleteError) {
+    return (
+      <span className="text-xs text-red-600">Delete failed. Try again.</span>
+    );
   }
 
   if (confirm) {
