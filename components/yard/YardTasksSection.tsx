@@ -50,7 +50,7 @@ export function YardTasksSection({
         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Tasks</h3>
         <SectionFilterPills sections={sections} activeId={activeId} onSelect={setActiveId} />
       </div>
-      <TaskList tasks={filtered} multiYard={sections.length > 1 && activeId === null} />
+      <TaskList key={activeId ?? "all"} tasks={filtered} multiYard={sections.length > 1 && activeId === null} />
     </div>
   );
 }

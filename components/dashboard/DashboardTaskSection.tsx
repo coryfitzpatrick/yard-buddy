@@ -97,6 +97,7 @@ export function DashboardTaskSection({ tasks, sections, weatherRefreshedAt }: Pr
             </p>
           )}
           <TaskList
+            key={activeSection ?? "all"}
             tasks={filteredTasks}
             multiYard={multiYard && activeSection === null}
           />
