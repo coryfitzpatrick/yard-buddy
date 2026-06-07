@@ -4,6 +4,8 @@ import { db } from "@/lib/db";
 import { analyzeImages } from "@/lib/claude";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
 
+export const maxDuration = 60;
+
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
@@ -31,7 +33,10 @@ export async function POST(req: NextRequest) {
   let weatherSummary: string | undefined;
   let forecastText: string | undefined;
   try {
-    const weather = await getWeatherByZip(section.yard.zipCode);
+    const weather = await Promise.race([
+      getWeatherByZip(section.yard.zipCode),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("weather timeout")), 5000)),
+    ]);
     weatherSummary = `${weather.temp}°F, ${weather.description}, ${weather.humidity}% humidity, ${weather.precipitationChance}% chance of rain`;
     forecastText = formatForecastForClaude(weather.forecast);
   } catch { /* weather is optional context */ }

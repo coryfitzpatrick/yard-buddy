@@ -170,7 +170,7 @@ export default function AnalyzePage() {
           {analyzing && (
             <div className="flex items-center justify-center gap-2 py-8 text-gray-500">
               <Loader2 className="h-5 w-5 animate-spin text-green-500" />
-              <span>Analyzing… this takes about 10 seconds</span>
+              <span>Analyzing… this usually takes 20–40 seconds</span>
             </div>
           )}
           {analysisError && (
@@ -178,12 +178,12 @@ export default function AnalyzePage() {
           )}
           {result && (
             <div className="mt-6 space-y-4">
-              <AnalysisResults result={result} />
               <Link href={`/yard/${selectedYardId}/sections/${selectedSectionId}`}>
                 <Button className="w-full bg-green-600 hover:bg-green-700">
                   <ArrowRight className="w-4 h-4 mr-2" /> View Full Plan &amp; Tasks
                 </Button>
               </Link>
+              <AnalysisResults result={result} />
             </div>
           )}
         </>
