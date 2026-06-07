@@ -16,18 +16,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Camera, CheckCircle, CheckCircle2, Images, Loader2, Plus, Search } from "lucide-react";
 import { supabaseClient } from "@/lib/supabase-client";
 
-const STEPS = ["Property", "Area Type", "Grass Type", "Soil & Equipment", "Review"];
-const SQFT_PER_ACRE = 43560;
+import { toSqft, toDisplaySize } from "@/lib/size-utils";
 
-function toDisplaySize(sqft: number | undefined | null, unit: "sqft" | "acres"): string {
-  if (!sqft) return "";
-  return unit === "acres" ? (sqft / SQFT_PER_ACRE).toFixed(3) : String(sqft);
-}
-function toSqft(display: string, unit: "sqft" | "acres"): number | undefined {
-  const n = parseFloat(display);
-  if (isNaN(n) || n <= 0) return undefined;
-  return unit === "acres" ? Math.round(n * SQFT_PER_ACRE) : Math.round(n);
-}
+const STEPS = ["Property", "Area Type", "Grass Type", "Soil & Equipment", "Review"];
 
 const SPREADER_BRANDS: Record<string, string[]> = {
   broadcast: ["Scotts EdgeGuard DLX", "Scotts Turf Builder EdgeGuard", "Andersons Rotary Spreader", "Lesco 80 lb Rotary", "Earthway 2600"],

@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Camera, CheckCircle, Images, Loader2, Search } from "lucide-react";
 import { supabaseClient } from "@/lib/supabase-client";
+import { toSqft, toDisplaySize, SQFT_PER_ACRE } from "@/lib/size-utils";
 
 interface Props {
   yardId: string;
@@ -73,15 +74,6 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
     return "";
   });
 
-  const SQFT_PER_ACRE = 43560;
-  function toSqft(display: string, unit: "sqft" | "acres"): number | undefined {
-    const n = parseFloat(display);
-    if (isNaN(n) || n <= 0) return undefined;
-    return unit === "acres" ? Math.round(n * SQFT_PER_ACRE) : Math.round(n);
-  }
-  function toDisplaySize(sqft: number, unit: "sqft" | "acres"): string {
-    return unit === "acres" ? (sqft / SQFT_PER_ACRE).toFixed(3) : String(sqft);
-  }
   function handleSizeInput(raw: string) {
     setSizeDisplay(raw);
     setValue("yardSizeSqft", toSqft(raw, sizeUnit) as never, { shouldDirty: true, shouldValidate: true });

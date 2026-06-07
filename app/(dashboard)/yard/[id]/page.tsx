@@ -132,12 +132,12 @@ export default async function YardDetailPage({
                     </div>
                     <div className="flex items-center gap-2">
                       <Link href={`/yard/${yard.id}/sections/${section.id}`}>
-                        <Button variant="outline" size="sm">
+                        <Button size="sm" className="bg-green-600 hover:bg-green-700">
                           <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
                         </Button>
                       </Link>
                       <Link href={`/analyze?sectionId=${section.id}`}>
-                        <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                        <Button variant="outline" size="sm">
                           <Camera className="w-3.5 h-3.5 mr-1" /> Analyze
                         </Button>
                       </Link>
