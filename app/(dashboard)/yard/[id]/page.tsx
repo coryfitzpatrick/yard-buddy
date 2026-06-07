@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Plus, Camera, Pencil } from "lucide-react";
+import { ChevronLeft, Plus, Camera, Pencil, ArrowRight } from "lucide-react";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
@@ -101,8 +101,10 @@ export default async function YardDetailPage({
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/yard/${yard.id}/sections/${section.id}/edit`}>
-                      <Button variant="outline" size="sm">Edit</Button>
+                    <Link href={`/yard/${yard.id}/sections/${section.id}`}>
+                      <Button variant="outline" size="sm">
+                        <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
+                      </Button>
                     </Link>
                     <Link href={`/analyze?sectionId=${section.id}`}>
                       <Button size="sm" className="bg-green-600 hover:bg-green-700">
