@@ -4,8 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
-import { DashboardTaskSection } from "@/components/dashboard/DashboardTaskSection";
-import { YardOverviewCard } from "@/components/dashboard/YardOverviewCard";
+import { DashboardInteractiveSection } from "@/components/dashboard/DashboardInteractiveSection";
 import { Plus } from "lucide-react";
 
 function getGreeting() {
@@ -55,9 +54,7 @@ export default async function DashboardPage() {
       id: s.id,
       name: s.name,
       areaType: s.areaType,
-      grassType: s.grassType,
       latestHealthScore: s.analyses[0]?.healthScore ?? null,
-      pendingTaskCount: s.tasks.filter((t) => t.status !== "completed").length,
     })),
   }));
 
@@ -65,6 +62,7 @@ export default async function DashboardPage() {
     y.sections.map((s) => ({
       id: s.id,
       name: s.name,
+      yardId: y.id,
       yardName: y.name,
       showYardLabel: yards.length > 1,
     }))
@@ -87,20 +85,11 @@ export default async function DashboardPage() {
 
       <WeatherWidget zip={primaryZip} />
 
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-lg">My Yards</h2>
-          <Link href="/yard" className="text-sm text-green-700 hover:underline">Manage →</Link>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {yardSummaries.map((yard) => <YardOverviewCard key={yard.id} yard={yard} />)}
-        </div>
-      </div>
-
-      <div>
-        <h2 className="font-semibold text-lg mb-3">Tasks</h2>
-        <DashboardTaskSection tasks={tasks} sections={allSections} />
-      </div>
+      <DashboardInteractiveSection
+        yards={yardSummaries}
+        tasks={tasks}
+        allSections={allSections}
+      />
     </div>
   );
 }
