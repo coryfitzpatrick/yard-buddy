@@ -12,6 +12,7 @@ export interface LawnContext {
   soilPh?: number | null;
   soilMoisture?: string | null;
   weatherSummary?: string;
+  forecastText?: string;
   notes?: string | null;
 }
 
@@ -53,7 +54,7 @@ ${context.yardSizeSqft ? `Yard Size: ${context.yardSizeSqft} sq ft` : ""}
 ${context.spreaderType ? `Spreader: ${context.spreaderType}` : ""}
 ${context.soilPh ? `Soil pH: ${context.soilPh}` : ""}
 ${context.soilMoisture ? `Soil Moisture: ${context.soilMoisture}` : ""}
-${context.weatherSummary ? `Current Weather: ${context.weatherSummary}` : ""}
+${context.forecastText ? `5-Day Weather Forecast:\n${context.forecastText}` : context.weatherSummary ? `Current Weather: ${context.weatherSummary}` : ""}
 ${context.notes ? `Notes: ${context.notes.slice(0, 500)}` : ""}
 
 Return a JSON array of 3-6 recommendations. Each item must follow this exact structure:
@@ -62,13 +63,18 @@ Return a JSON array of 3-6 recommendations. Each item must follow this exact str
   "description": "string (2-3 sentences: what to do and why)",
   "priority": "urgent" | "high" | "medium" | "low",
   "timing": "string (e.g. 'This week', 'Next 2-4 weeks', 'Wait until fall')",
+  "scheduledStartDays": number (integer, days from today to start — 0 means today),
+  "scheduledEndDays": number (integer, days from today for hard cutoff — must be >= scheduledStartDays),
+  "weatherCondition": "no_rain_48h" | "dry_day" | "soil_moist" | "any",
   "productSuggestion": "string (brand + product name, optional)",
   "productSearchQuery": "string (concise search term for online retailers, e.g. 'Scotts DiseaseEx Fungicide 10lb', omit if no product)",
   "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
   "applicationRate": "string (optional, e.g. '3 lbs per 1000 sq ft')",
   "spreaderSetting": "string (optional, e.g. 'Scotts: 4, Andersons: 12')",
   "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional)
-}`,
+}
+
+For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic windows. Example: if rain is Thursday-Friday, schedule a fungicide application for today-Wednesday (scheduledStartDays: 0, scheduledEndDays: 2) with weatherCondition "no_rain_48h". Use "any" only for tasks where weather does not matter (e.g. mowing, edging).`,
       },
     ],
   });
@@ -121,7 +127,7 @@ ${context.areaType ? `- Yard Area: ${context.areaType.replace(/_/g, " ")} (${
 ${context.yardSizeSqft ? `- Yard Size: ${context.yardSizeSqft} sq ft` : ""}
 ${context.spreaderType ? `- Spreader: ${context.spreaderType}` : ""}
 ${context.soilPh ? `- Soil pH: ${context.soilPh}` : ""}
-${context.weatherSummary ? `- Weather: ${context.weatherSummary}` : ""}
+${context.forecastText ? `- 5-Day Forecast:\n${context.forecastText}` : context.weatherSummary ? `- Weather: ${context.weatherSummary}` : ""}
 ${context.notes ? `- Notes: ${context.notes.slice(0, 500)}` : ""}
 
 Return this exact JSON structure:
@@ -137,6 +143,9 @@ Return this exact JSON structure:
       "description": "string",
       "priority": "urgent" | "high" | "medium" | "low",
       "timing": "string",
+      "scheduledStartDays": number (integer, days from today to start — 0 means today),
+      "scheduledEndDays": number (integer, days from today for hard cutoff — must be >= scheduledStartDays),
+      "weatherCondition": "no_rain_48h" | "dry_day" | "soil_moist" | "any",
       "productSuggestion": "string (brand + product name, optional)",
       "productSearchQuery": "string (concise search term for online retailers, omit if no product)",
       "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
