@@ -203,6 +203,7 @@ export function YardSetupForm() {
   function handleAddAnotherSection() {
     reset({ name: "Front Yard", grassType: "unknown" });
     setSizeDisplay("");
+    setSizeUnit("sqft");
     setStreetAddress("");
     setLookupNote(null);
     setIdentified(null);
