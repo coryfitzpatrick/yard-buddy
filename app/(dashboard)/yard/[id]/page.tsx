@@ -8,6 +8,7 @@ import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
 import { YardTasksSection } from "@/components/yard/YardTasksSection";
+import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { format } from "date-fns";
 
 export default async function YardDetailPage({
@@ -90,6 +91,10 @@ export default async function YardDetailPage({
             </Button>
           </Link>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <WeatherWidget zip={yard.zipCode} />
       </div>
 
       {yard.sections.length === 0 ? (
