@@ -28,6 +28,7 @@ export default function AnalyzePage() {
   const [selectedSectionId, setSelectedSectionId] = useState<string>("");
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/yard")
@@ -62,15 +63,21 @@ export default function AnalyzePage() {
     if (!selectedSectionId) return;
     setAnalyzing(true);
     setResult(null);
+    setAnalysisError(null);
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sectionId: selectedSectionId, imageUrls: urls }),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        setAnalysisError("Analysis failed. Please try again.");
+        return;
+      }
       const data = await res.json();
       setResult(data.result);
+    } catch {
+      setAnalysisError("Network error. Please check your connection.");
     } finally {
       setAnalyzing(false);
     }
@@ -104,6 +111,7 @@ export default function AnalyzePage() {
                 return (
                   <button
                     key={opt.sectionId}
+                    type="button"
                     onClick={() => { setSelectedSectionId(opt.sectionId); setResult(null); }}
                     className={cn(
                       "flex flex-col items-start rounded-lg border-2 px-3 py-2.5 text-left transition-all",
@@ -139,6 +147,9 @@ export default function AnalyzePage() {
               <Loader2 className="h-5 w-5 animate-spin text-green-500" />
               <span>Analyzing… this takes about 10 seconds</span>
             </div>
+          )}
+          {analysisError && (
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 mt-4">{analysisError}</div>
           )}
           {result && <div className="mt-6"><AnalysisResults result={result} /></div>}
         </>
