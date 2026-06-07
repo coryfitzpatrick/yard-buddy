@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
-// Shoelace formula on a projected coordinate plane (equirectangular)
 function polygonAreaSqft(coords: [number, number][]): number {
   let area = 0;
   const n = coords.length;
   const latRef = (coords[0][1] * Math.PI) / 180;
-  const R = 6371000; // earth radius in meters
+  const R = 6371000;
   for (let i = 0; i < n; i++) {
     const j = (i + 1) % n;
     const x1 = ((coords[i][0] * Math.PI) / 180) * R * Math.cos(latRef);
@@ -27,7 +26,7 @@ export async function POST(req: NextRequest) {
 
   const ua = "yard-buddy/1.0 (lawn care app; fitzmx6@gmail.com)";
 
-  // Geocode with Nominatim (free, no key)
+  // Geocode with Nominatim — get building footprint polygon
   const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&polygon_geojson=1&addressdetails=1`;
   const nominatimRes = await fetch(nominatimUrl, {
     headers: { "User-Agent": ua },
@@ -35,53 +34,58 @@ export async function POST(req: NextRequest) {
   });
 
   if (!nominatimRes.ok) {
-    return NextResponse.json({ sqft: null, message: "Address lookup failed" });
+    return NextResponse.json({ lotSqft: null, buildingSqft: null, message: "Address lookup failed" });
   }
 
   const nominatimData = await nominatimRes.json();
   const place = nominatimData[0];
   if (!place) {
-    return NextResponse.json({ sqft: null, message: "Address not found" });
+    return NextResponse.json({ lotSqft: null, buildingSqft: null, message: "Address not found" });
   }
 
   const lat = parseFloat(place.lat);
   const lon = parseFloat(place.lon);
 
-  // Try Regrid if API key is configured (accurate parcel/lot data)
-  const regridKey = process.env.REGRID_API_KEY;
-  if (regridKey) {
-    const regridRes = await fetch(
-      `https://app.regrid.com/api/v2/parcels/point?lat=${lat}&lon=${lon}&token=${regridKey}`,
-      { signal: AbortSignal.timeout(8000) }
-    );
-    if (regridRes.ok) {
-      const regridData = await regridRes.json();
-      const acres = regridData?.parcels?.features?.[0]?.properties?.fields?.ll_gisacre;
-      if (acres) {
-        return NextResponse.json({
-          sqft: Math.round(acres * 43560),
-          lat,
-          lon,
-          source: "parcel",
-        });
-      }
-    }
+  // Building footprint from Nominatim (when type is house/building, polygon is the footprint)
+  let buildingSqft: number | null = null;
+  const geo = place.geojson;
+  const isBuilding = ["house", "building", "residential"].includes(place.type ?? "");
+  if (isBuilding && geo?.type === "Polygon" && geo.coordinates?.[0]?.length >= 3) {
+    const area = polygonAreaSqft(geo.coordinates[0] as [number, number][]);
+    if (area > 100 && area < 20000) buildingSqft = area; // sanity check
   }
 
-  // Fall back to Nominatim polygon (often building footprint for residential)
-  const geo = place.geojson;
-  if (geo?.type === "Polygon" && geo.coordinates?.[0]?.length >= 3) {
+  // Lot size from Regrid (accurate parcel data)
+  const regridKey = process.env.REGRID_API_KEY;
+  if (regridKey) {
+    try {
+      const regridRes = await fetch(
+        `https://app.regrid.com/api/v2/parcels/point?lat=${lat}&lon=${lon}&token=${regridKey}`,
+        { signal: AbortSignal.timeout(8000) }
+      );
+      if (regridRes.ok) {
+        const regridData = await regridRes.json();
+        const acres = regridData?.parcels?.features?.[0]?.properties?.fields?.ll_gisacre;
+        if (acres) {
+          const lotSqft = Math.round(acres * 43560);
+          const usableSqft = buildingSqft ? Math.max(0, lotSqft - buildingSqft) : null;
+          return NextResponse.json({ lotSqft, buildingSqft, usableSqft, lat, lon, source: "parcel" });
+        }
+      }
+    } catch { /* fall through */ }
+  }
+
+  // Fallback: Nominatim polygon as lot estimate (less reliable for residential)
+  if (!isBuilding && geo?.type === "Polygon" && geo.coordinates?.[0]?.length >= 3) {
     const sqft = polygonAreaSqft(geo.coordinates[0] as [number, number][]);
-    if (sqft > 200) {
+    if (sqft > 500) {
       return NextResponse.json({
-        sqft,
-        lat,
-        lon,
-        source: "building_footprint",
-        note: "Estimated from map data — may reflect building footprint, not full lot",
+        lotSqft: sqft, buildingSqft: null, usableSqft: null, lat, lon,
+        source: "map",
+        note: "Estimated from map data — may not reflect exact lot boundaries",
       });
     }
   }
 
-  return NextResponse.json({ sqft: null, lat, lon, message: "No parcel data found for this address" });
+  return NextResponse.json({ lotSqft: null, buildingSqft: null, usableSqft: null, lat, lon, message: "No size data found for this address" });
 }

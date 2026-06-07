@@ -103,10 +103,15 @@ export function YardSetupForm() {
         body: JSON.stringify({ address: `${streetAddress}, ${zipCode}` }),
       });
       const data = await res.json();
-      if (data.sqft) {
-        setValue("yardSizeSqft", data.sqft as never);
-        setSizeDisplay(toDisplaySize(data.sqft, sizeUnit));
-        setLookupNote(data.note ?? (data.source === "parcel" ? "Lot size from parcel data" : "Estimated from map data"));
+      const sqft = data.usableSqft ?? data.lotSqft;
+      if (sqft) {
+        setValue("yardSizeSqft", sqft as never);
+        setSizeDisplay(toDisplaySize(sqft, sizeUnit));
+        if (data.usableSqft && data.buildingSqft) {
+          setLookupNote(`Lot: ~${data.lotSqft.toLocaleString()} sq ft · Home: ~${data.buildingSqft.toLocaleString()} sq ft · Lawn: ~${data.usableSqft.toLocaleString()} sq ft`);
+        } else {
+          setLookupNote(data.source === "parcel" ? "Lot size from parcel data" : "Estimated from map data");
+        }
       } else {
         setLookupNote(data.message ?? "Size not found — enter manually");
       }

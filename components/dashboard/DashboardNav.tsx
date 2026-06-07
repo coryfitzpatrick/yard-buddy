@@ -3,8 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Search, LogOut, Fence } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
+import { LayoutDashboard, Search, LogOut, Fence, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -19,6 +21,7 @@ const NAV_ITEMS = [
 
 export function DashboardNav({ signOutAction }: Props) {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
@@ -29,6 +32,8 @@ export function DashboardNav({ signOutAction }: Props) {
             <Image src="/gnome-buddy.png" alt="Yard Buddy" width={32} height={32} className="rounded-full scale-x-[-1]" />
             Yard Buddy
           </Link>
+
+          {/* Desktop nav */}
           <div className="hidden sm:flex items-center gap-1">
             {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
               const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
@@ -52,11 +57,58 @@ export function DashboardNav({ signOutAction }: Props) {
               </Button>
             </form>
           </div>
+
+          {/* Mobile hamburger */}
+          <button
+            className="sm:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
         </div>
       </nav>
 
+      {/* Mobile sheet menu */}
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side="right" className="w-72 p-0">
+          <SheetHeader className="px-5 pt-5 pb-3 border-b border-gray-100">
+            <SheetTitle className="flex items-center gap-2 text-green-700">
+              <Image src="/gnome-buddy.png" alt="Yard Buddy" width={28} height={28} className="rounded-full scale-x-[-1]" />
+              Yard Buddy
+            </SheetTitle>
+          </SheetHeader>
+          <nav className="flex flex-col p-3 gap-1">
+            {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+              const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+              return (
+                <SheetClose key={href} render={<Link href={href} />}>
+                  <span
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                      active
+                        ? "bg-green-50 text-green-700"
+                        : "text-gray-700 hover:bg-gray-100"
+                    )}
+                  >
+                    <Icon className="w-5 h-5 shrink-0" /> {label}
+                  </span>
+                </SheetClose>
+              );
+            })}
+          </nav>
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
+            <form action={signOutAction}>
+              <Button type="submit" variant="ghost" className="w-full justify-start text-gray-600 hover:text-red-600 hover:bg-red-50">
+                <LogOut className="w-4 h-4 mr-3" /> Sign out
+              </Button>
+            </form>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       {/* Bottom mobile nav */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 z-10">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
           return (
