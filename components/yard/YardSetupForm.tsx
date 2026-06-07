@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Camera, CheckCircle, CheckCircle2, Loader2, Plus, Search } from "lucide-react";
+import { Camera, CheckCircle, CheckCircle2, Images, Loader2, Plus, Search } from "lucide-react";
 import { supabaseClient } from "@/lib/supabase-client";
 
 const STEPS = ["Property", "Area Type", "Grass Type", "Soil & Equipment", "Review"];
@@ -66,6 +66,7 @@ export function YardSetupForm() {
   const spreaderType = watch("spreaderType");
 
   const photoRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const uploadZoneRef = useRef<HTMLDivElement>(null);
   const [identifying, setIdentifying] = useState(false);
   const [identifyPhase, setIdentifyPhase] = useState<"uploading" | "analyzing">("uploading");
@@ -291,6 +292,19 @@ export function YardSetupForm() {
                   className={`rounded-lg border-2 border-dashed p-4 text-center transition-colors duration-300 ${highlightUpload ? "border-green-500 bg-green-50 animate-pulse" : "border-green-200"}`}
                 >
                   <input
+                    ref={cameraRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      setHighlightUpload(false);
+                      if (file) identifyGrass(file);
+                    }}
+                  />
+                  <input
                     ref={photoRef}
                     type="file"
                     accept="image/*"
@@ -323,9 +337,15 @@ export function YardSetupForm() {
                       </button>
                     </div>
                   ) : (
-                    <button type="button" onClick={() => photoRef.current?.click()} className="flex items-center gap-2 mx-auto text-sm text-green-600 font-medium hover:text-green-700">
-                      <Camera className="w-4 h-4" /> Upload a photo to identify my grass
-                    </button>
+                    <div className="flex items-center justify-center gap-3">
+                      <button type="button" onClick={() => cameraRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
+                        <Camera className="w-4 h-4" /> Take Photo
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button type="button" onClick={() => photoRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
+                        <Images className="w-4 h-4" /> Choose Photo
+                      </button>
+                    </div>
                   )}
                 </div>
                 <GrassTypeSelector

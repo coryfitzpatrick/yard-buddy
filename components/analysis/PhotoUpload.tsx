@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Camera, Images, X, Loader2 } from "lucide-react";
 import { supabaseClient } from "@/lib/supabase-client";
 
 interface Props {
@@ -15,6 +15,7 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
   const [previews, setPreviews] = useState<Array<{ file: File; url: string; uploaded?: string }>>([]);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
 
   async function handleFiles(files: FileList) {
     const newItems = Array.from(files).slice(0, maxImages - previews.length).map((file) => ({
@@ -58,24 +59,46 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
 
   return (
     <div className="space-y-4">
-      <div
-        className="border-2 border-dashed border-green-300 rounded-xl p-8 text-center cursor-pointer hover:border-green-500 transition-colors"
-        onClick={() => inputRef.current?.click()}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
-      >
-        <Upload className="mx-auto h-10 w-10 text-green-400 mb-3" />
-        <p className="text-sm font-medium text-gray-700">Drop photos here or click to browse</p>
-        <p className="text-xs text-gray-400 mt-1">Up to {maxImages} photos, max 10MB each</p>
-        <input
-          ref={inputRef}
-          type="file"
-          className="hidden"
-          multiple
-          accept="image/*"
-          onChange={(e) => e.target.files && handleFiles(e.target.files)}
-        />
+      {/* Hidden inputs */}
+      <input
+        ref={cameraRef}
+        type="file"
+        className="hidden"
+        accept="image/*"
+        capture="environment"
+        onChange={(e) => e.target.files && handleFiles(e.target.files)}
+      />
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        multiple
+        accept="image/*"
+        onChange={(e) => e.target.files && handleFiles(e.target.files)}
+      />
+
+      {/* Picker buttons */}
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={() => cameraRef.current?.click()}
+          className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-green-300 py-6 hover:border-green-500 hover:bg-green-50 transition-colors"
+        >
+          <Camera className="h-8 w-8 text-green-500" />
+          <span className="text-sm font-medium text-gray-700">Take Photo</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
+          className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-6 hover:border-green-400 hover:bg-green-50 transition-colors"
+        >
+          <Images className="h-8 w-8 text-gray-400" />
+          <span className="text-sm font-medium text-gray-700">Choose Photo</span>
+        </button>
       </div>
+      <p className="text-xs text-gray-400 text-center">Up to {maxImages} photos · max 10MB each</p>
 
       {previews.length > 0 && (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
