@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { userId: session.user.id } },
-    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true, lotSqft: true } } },
+    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true } } },
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       // Section-aware enrichment
       sectionName: section.name,
       streetAddress: section.yard.streetAddress,
-      lotSqft: section.yard.lotSqft,
+      sunExposure: null, // YardSection.sunExposure not yet in schema; passes null rather than wrong areaType
       weatherData: enrichedWeather,
     });
 

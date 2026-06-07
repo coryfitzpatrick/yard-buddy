@@ -5,7 +5,6 @@ type SectionInput = {
   sunExposure?: string | null
   squareFootage?: number | null
   streetAddress?: string | null
-  lotSize?: number | null
   irrigationType?: string | null
 }
 

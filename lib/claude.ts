@@ -18,7 +18,7 @@ export interface LawnContext {
   // Section-aware enrichment fields
   sectionName?: string;
   streetAddress?: string | null;
-  lotSqft?: number | null;
+  sunExposure?: string | null;
   weatherData?: {
     temp: number;
     humidity: number;
@@ -130,10 +130,9 @@ export async function analyzeImages(
           name: context.sectionName ?? context.areaType ?? "Lawn Section",
           grassType: context.grassType,
           soilPh: context.soilPh,
-          sunExposure: context.areaType ?? null,
+          sunExposure: context.sunExposure ?? null,
           squareFootage: context.yardSizeSqft,
           streetAddress: context.streetAddress,
-          lotSize: context.lotSqft,
         },
         weather: context.weatherData,
       }).systemPrompt + `
