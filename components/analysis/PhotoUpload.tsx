@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Camera, Images, X, Loader2 } from "lucide-react";
+import { Camera, Images, X, Loader2, Expand, ZoomIn, ScanEye } from "lucide-react";
 import { supabaseClient } from "@/lib/supabase-client";
 
 interface Props {
@@ -76,6 +76,25 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
         accept="image/*"
         onChange={(e) => e.target.files && handleFiles(e.target.files)}
       />
+
+      {/* Photo tips */}
+      <div className="rounded-lg bg-green-50 border border-green-100 px-4 py-3 space-y-2">
+        <p className="text-xs font-semibold text-green-800 uppercase tracking-wide">Tips for the best analysis</p>
+        <ul className="space-y-1.5">
+          <li className="flex items-start gap-2 text-xs text-gray-600">
+            <Expand className="w-3.5 h-3.5 text-green-600 mt-0.5 shrink-0" />
+            <span><span className="font-medium text-gray-700">Wide shot</span> — stand back and photograph the whole section so patterns and problem zones are visible</span>
+          </li>
+          <li className="flex items-start gap-2 text-xs text-gray-600">
+            <ZoomIn className="w-3.5 h-3.5 text-green-600 mt-0.5 shrink-0" />
+            <span><span className="font-medium text-gray-700">Close-up at ground level</span> — crouch down and shoot toward the soil to reveal thatch, bare soil, and disease up close</span>
+          </li>
+          <li className="flex items-start gap-2 text-xs text-gray-600">
+            <ScanEye className="w-3.5 h-3.5 text-green-600 mt-0.5 shrink-0" />
+            <span><span className="font-medium text-gray-700">Problem spots</span> — zoom in on any dead patches, discoloration, or areas that look different from the rest</span>
+          </li>
+        </ul>
+      </div>
 
       {/* Picker buttons */}
       <div className="grid grid-cols-2 gap-3">
