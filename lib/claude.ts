@@ -146,6 +146,7 @@ Return this exact JSON structure:
       "scheduledStartDays": number (integer, days from today to start — 0 means today),
       "scheduledEndDays": number (integer, days from today for hard cutoff — must be >= scheduledStartDays),
       "weatherCondition": "no_rain_48h" | "dry_day" | "soil_moist" | "any",
+      Use the forecast to pick realistic windows. Example: if rain Thursday-Friday, schedule a fungicide for today-Wednesday (scheduledStartDays: 0, scheduledEndDays: 2) with weatherCondition "no_rain_48h". Use "any" only for tasks where weather does not matter (mowing, edging, etc).
       "productSuggestion": "string (brand + product name, optional)",
       "productSearchQuery": "string (concise search term for online retailers, omit if no product)",
       "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
