@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 interface YardCardSection {
   id: string;
@@ -55,13 +55,13 @@ export function YardCarousel({ yards, selectedYardId, onSelect }: Props) {
               <Link
                 href={`/yard/${yard.id}`}
                 onClick={(e) => e.stopPropagation()}
-                className="shrink-0 p-0.5 rounded text-gray-400 hover:text-green-600 transition-colors"
+                className="shrink-0 flex items-center gap-0.5 text-xs font-medium text-green-600 hover:text-green-700 px-1.5 py-0.5 rounded-md hover:bg-green-100 transition-colors"
               >
-                <ArrowRight className="w-3.5 h-3.5" />
+                View <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
             <p className="text-xs text-gray-400 mb-2">ZIP {yard.zipCode}</p>
-            <div className="space-y-1">
+            <div className="space-y-1 mb-3">
               {yard.sections.slice(0, 3).map((s) => {
                 const areaCfg = s.areaType ? AREA_CONFIG[s.areaType as AreaType] : null;
                 const Icon = areaCfg?.icon;
@@ -82,6 +82,18 @@ export function YardCarousel({ yards, selectedYardId, onSelect }: Props) {
               )}
               {yard.sections.length === 0 && (
                 <p className="text-xs text-gray-400">No sections yet</p>
+              )}
+            </div>
+            <div
+              className={cn(
+                "border-t pt-2 flex items-center gap-1 text-xs",
+                selected ? "border-green-200 text-green-700" : "border-gray-100 text-gray-400"
+              )}
+            >
+              {selected ? (
+                <><CheckCircle2 className="w-3 h-3" /> Filtering tasks</>
+              ) : (
+                "Tap to filter tasks"
               )}
             </div>
           </button>
