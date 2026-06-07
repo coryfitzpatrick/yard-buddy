@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { TaskList } from "@/components/dashboard/TaskList";
-import { cn } from "@/lib/utils";
+import { SectionFilterPills } from "@/components/dashboard/SectionFilterPills";
 
 interface Section {
   id: string;
@@ -22,7 +22,6 @@ interface Task {
   product: string | null;
   applicationRate: string | null;
   spreaderSetting: string | null;
-  yardSectionId: string;
   yardSection: {
     id: string;
     name: string;
@@ -38,48 +37,20 @@ export function YardTasksSection({
   sections: Section[];
   tasks: Task[];
 }) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const active = tasks.filter((t) => t.status !== "skipped");
   if (active.length === 0) return null;
 
-  const filtered = selectedId ? active.filter((t) => t.yardSectionId === selectedId) : active;
+  const filtered = activeId ? active.filter((t) => t.yardSection.id === activeId) : active;
 
   return (
     <div className="mt-6 border-t pt-5">
-      <div className="flex items-center justify-between mb-3 gap-2">
-        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide shrink-0">Tasks</h3>
-        {sections.length > 1 && (
-          <div className="flex gap-1.5 flex-wrap justify-end">
-            <button
-              onClick={() => setSelectedId(null)}
-              className={cn(
-                "text-xs px-2.5 py-1 rounded-full border transition-colors",
-                selectedId === null
-                  ? "bg-green-600 text-white border-green-600"
-                  : "text-gray-500 border-gray-200 hover:border-gray-300"
-              )}
-            >
-              All
-            </button>
-            {sections.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setSelectedId(s.id)}
-                className={cn(
-                  "text-xs px-2.5 py-1 rounded-full border transition-colors",
-                  selectedId === s.id
-                    ? "bg-green-600 text-white border-green-600"
-                    : "text-gray-500 border-gray-200 hover:border-gray-300"
-                )}
-              >
-                {s.name}
-              </button>
-            ))}
-          </div>
-        )}
+      <div className="mb-3">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Tasks</h3>
+        <SectionFilterPills sections={sections} activeId={activeId} onSelect={setActiveId} />
       </div>
-      <TaskList tasks={filtered} multiYard={sections.length > 1} />
+      <TaskList tasks={filtered} multiYard={sections.length > 1 && activeId === null} />
     </div>
   );
 }

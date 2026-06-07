@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TaskList } from "./TaskList";
+import { SectionFilterPills } from "./SectionFilterPills";
 import { Camera } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface TaskSection {
   id: string;
@@ -43,46 +43,29 @@ interface Props {
 }
 
 export function DashboardTaskSection({ tasks, sections, weatherRefreshedAt }: Props) {
-  const [activeSection, setActiveSection] = useState<"all" | string>("all");
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const filteredTasks =
-    activeSection === "all"
+    activeSection === null
       ? tasks
       : tasks.filter((t) => t.yardSection?.id === activeSection);
 
   const multiYard = sections.some((s) => s.showYardLabel);
 
+  const pillSections = sections.map((s) => ({
+    id: s.id,
+    name: s.showYardLabel ? `${s.yardName}: ${s.name}` : s.name,
+  }));
+
   return (
     <div>
       {sections.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-1 px-1">
-          <button
-            type="button"
-            onClick={() => setActiveSection("all")}
-            className={cn(
-              "shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors",
-              activeSection === "all"
-                ? "bg-green-600 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            )}
-          >
-            All
-          </button>
-          {sections.map((sec) => (
-            <button
-              key={sec.id}
-              type="button"
-              onClick={() => setActiveSection(sec.id)}
-              className={cn(
-                "shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors whitespace-nowrap",
-                activeSection === sec.id
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              )}
-            >
-              {sec.showYardLabel ? `${sec.yardName}: ${sec.name}` : sec.name}
-            </button>
-          ))}
+        <div className="mb-4">
+          <SectionFilterPills
+            sections={pillSections}
+            activeId={activeSection}
+            onSelect={setActiveSection}
+          />
         </div>
       )}
 
@@ -115,7 +98,7 @@ export function DashboardTaskSection({ tasks, sections, weatherRefreshedAt }: Pr
           )}
           <TaskList
             tasks={filteredTasks}
-            multiYard={multiYard && activeSection === "all"}
+            multiYard={multiYard && activeSection === null}
           />
         </>
       )}
