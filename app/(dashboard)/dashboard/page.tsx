@@ -5,14 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { DashboardInteractiveSection } from "@/components/dashboard/DashboardInteractiveSection";
+import { Greeting } from "@/components/dashboard/Greeting";
 import { Plus } from "lucide-react";
-
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-}
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -73,9 +67,7 @@ export default async function DashboardPage() {
   return (
     <div className="px-4 py-6 pb-20 sm:pb-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">
-          {getGreeting()}, {session.user.name?.split(" ")[0]}!
-        </h1>
+        <Greeting name={session.user.name?.split(" ")[0] ?? "there"} />
         <Link href="/yard/setup">
           <Button size="sm" className="bg-green-600 hover:bg-green-700">
             <Plus className="w-4 h-4 mr-1" /> Yard
