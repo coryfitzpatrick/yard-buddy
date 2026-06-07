@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Upload, X, Loader2 } from "lucide-react";
+import { supabaseClient } from "@/lib/supabase-client";
 
 interface Props {
   onUploaded: (urls: string[]) => void;
@@ -29,12 +30,21 @@ export function PhotoUpload({ onUploaded, maxImages = 4 }: Props) {
       const uploaded: Array<string | null> = [];
       for (const item of previews) {
         if (item.uploaded) { uploaded.push(item.uploaded); continue; }
-        const fd = new FormData();
-        fd.append("file", item.file);
         try {
-          const res = await fetch("/api/upload", { method: "POST", body: fd });
-          const data = await res.json();
-          uploaded.push(data.url ?? null);
+          // Step 1: get signed upload URL (auth check server-side)
+          const signRes = await fetch("/api/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contentType: item.file.type }),
+          });
+          if (!signRes.ok) { uploaded.push(null); continue; }
+          const { token, path, publicUrl } = await signRes.json();
+
+          // Step 2: upload directly to Supabase
+          const { error } = await supabaseClient.storage
+            .from("lawn-photos")
+            .uploadToSignedUrl(path, token, item.file, { contentType: item.file.type });
+          uploaded.push(error ? null : publicUrl);
         } catch {
           uploaded.push(null);
         }

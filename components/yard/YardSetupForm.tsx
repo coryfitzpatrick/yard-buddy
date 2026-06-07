@@ -14,6 +14,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Camera, Loader2, CheckCircle, Search } from "lucide-react";
+import { supabaseClient } from "@/lib/supabase-client";
 
 const STEPS = ["Location & Size", "Grass Type", "Soil & Equipment", "Review"];
 
@@ -107,21 +108,33 @@ export function YardSetupForm() {
     setIdentifyError(null);
     setIdentifyPhase("uploading");
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
-      if (!uploadRes.ok) {
-        const body = await uploadRes.json().catch(() => ({}));
-        setIdentifyError(`Upload failed (${uploadRes.status}): ${body.error ?? "unknown error"}`);
+      // Step 1: get a signed upload URL from the server (auth check happens here)
+      const signRes = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentType: file.type }),
+      });
+      if (!signRes.ok) {
+        const body = await signRes.json().catch(() => ({}));
+        setIdentifyError(`Upload failed (${signRes.status}): ${body.error ?? "unknown error"}`);
         return;
       }
-      const { url } = await uploadRes.json();
+      const { token, path, publicUrl } = await signRes.json();
+
+      // Step 2: upload directly to Supabase — bypasses Vercel's 4.5MB body limit
+      const { error: uploadError } = await supabaseClient.storage
+        .from("lawn-photos")
+        .uploadToSignedUrl(path, token, file, { contentType: file.type });
+      if (uploadError) {
+        setIdentifyError(`Upload failed: ${uploadError.message}`);
+        return;
+      }
 
       setIdentifyPhase("analyzing");
       const identifyRes = await fetch("/api/identify-grass", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: url }),
+        body: JSON.stringify({ imageUrl: publicUrl }),
       });
       if (!identifyRes.ok) {
         setIdentifyError("Analysis failed — please try again.");

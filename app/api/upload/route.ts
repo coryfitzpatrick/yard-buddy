@@ -15,34 +15,29 @@ const MIME_TO_EXT: Record<string, string> = {
   "image/gif": "gif",
 };
 
+// Returns a signed upload URL — the client uploads directly to Supabase,
+// bypassing Vercel's 4.5MB serverless body limit.
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const formData = await req.formData();
-  const file = formData.get("file") as File;
-  if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
-
-  if (!file.type.startsWith("image/")) {
+  const { contentType } = await req.json();
+  if (!contentType?.startsWith("image/")) {
     return NextResponse.json({ error: "File must be an image" }, { status: 400 });
   }
-  if (file.size > 10 * 1024 * 1024) {
-    return NextResponse.json({ error: "File must be under 10MB" }, { status: 400 });
-  }
 
-  const ext = MIME_TO_EXT[file.type] ?? "jpg";
+  const ext = MIME_TO_EXT[contentType] ?? "jpg";
   const path = `${session.user.id}/${Date.now()}.${ext}`;
-  const bytes = await file.arrayBuffer();
 
-  const { error } = await supabase.storage
+  const { data, error } = await supabase.storage
     .from("lawn-photos")
-    .upload(path, bytes, { contentType: file.type });
+    .createSignedUploadUrl(path);
 
   if (error) {
-    console.error("Supabase storage upload error:", JSON.stringify(error));
-    return NextResponse.json({ error: error.message, cause: error.cause }, { status: 500 });
+    console.error("Failed to create signed upload URL:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   const { data: { publicUrl } } = supabase.storage.from("lawn-photos").getPublicUrl(path);
-  return NextResponse.json({ url: publicUrl });
+  return NextResponse.json({ token: data.token, path, publicUrl });
 }
