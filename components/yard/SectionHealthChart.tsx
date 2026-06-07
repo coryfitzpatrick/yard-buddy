@@ -1,7 +1,7 @@
 "use client";
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 interface Props {
   data: { date: string; score: number }[];
@@ -9,7 +9,7 @@ interface Props {
 
 export function SectionHealthChart({ data }: Props) {
   const points = data.map((d) => ({
-    date: format(new Date(d.date), "MMM d"),
+    date: format(parseISO(d.date), "MMM d"),
     score: d.score,
   }));
 
