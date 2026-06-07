@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       yardSizeSqft: section.yardSizeSqft,
       spreaderType: section.spreaderType,
       soilPh: section.soilPh,
+      soilMoisture: section.soilMoisture ?? undefined,
       weatherSummary,
       forecastText,
       notes: section.notes,
