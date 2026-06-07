@@ -175,11 +175,8 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialDat
         body: JSON.stringify(data),
       });
       if (!res.ok) { setError("Failed to save. Please try again."); return; }
-      if (isEdit) {
-        router.push(`/analyze?sectionId=${initialData!.id}`);
-      } else {
-        router.push(`/yard/${yardId}`);
-      }
+      const saved = await res.json();
+      router.push(`/analyze?sectionId=${isEdit ? initialData!.id : saved.id}`);
       router.refresh();
     } catch {
       setError("Network error. Please check your connection.");
