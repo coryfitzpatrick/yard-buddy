@@ -1,0 +1,3 @@
+ALTER TABLE "Yard" ADD COLUMN "streetAddress" TEXT;
+ALTER TABLE "Yard" ADD COLUMN "lotSqft" INTEGER;
+ALTER TABLE "Yard" ADD COLUMN "buildingSqft" INTEGER;

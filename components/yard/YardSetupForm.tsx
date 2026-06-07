@@ -81,6 +81,7 @@ export function YardSetupForm() {
   const [streetAddress, setStreetAddress] = useState("");
   const [lookingUp, setLookingUp] = useState(false);
   const [lookupNote, setLookupNote] = useState<string | null>(null);
+  const [lotData, setLotData] = useState<{ lotSqft: number | null; buildingSqft: number | null } | null>(null);
 
   function handleSizeInput(raw: string) {
     setSizeDisplay(raw);
@@ -107,12 +108,14 @@ export function YardSetupForm() {
       if (sqft) {
         setValue("yardSizeSqft", sqft as never);
         setSizeDisplay(toDisplaySize(sqft, sizeUnit));
+        setLotData({ lotSqft: data.lotSqft ?? null, buildingSqft: data.buildingSqft ?? null });
         if (data.usableSqft && data.buildingSqft) {
           setLookupNote(`Lot: ~${data.lotSqft.toLocaleString()} sq ft · Home: ~${data.buildingSqft.toLocaleString()} sq ft · Lawn: ~${data.usableSqft.toLocaleString()} sq ft`);
         } else {
           setLookupNote(data.source === "parcel" ? "Lot size from parcel data" : "Estimated from map data");
         }
       } else {
+        setLotData(null);
         setLookupNote(data.message ?? "Size not found — enter manually");
       }
     } catch {
@@ -177,6 +180,9 @@ export function YardSetupForm() {
             zipCode,
             spreaderType: spreaderType || undefined,
             spreaderModel: spreaderModel || undefined,
+            streetAddress: streetAddress || undefined,
+            lotSqft: lotData?.lotSqft ?? undefined,
+            buildingSqft: lotData?.buildingSqft ?? undefined,
           }),
         });
         if (!yardRes.ok) { setError("Failed to save property. Please try again."); return; }

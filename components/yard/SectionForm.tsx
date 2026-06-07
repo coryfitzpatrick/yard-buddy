@@ -19,6 +19,8 @@ import { supabaseClient } from "@/lib/supabase-client";
 interface Props {
   yardId: string;
   zipCode: string;
+  lotSqft?: number;
+  buildingSqft?: number;
   initialData?: Partial<YardSectionFormInput & { id: string }>;
 }
 
@@ -29,7 +31,7 @@ const AREA_NAME_MAP: Record<AreaType, string> = {
   garden: "Garden", other: "My Yard",
 };
 
-export function SectionForm({ yardId, zipCode, initialData }: Props) {
+export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, initialData }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const isEdit = !!initialData?.id;
@@ -43,6 +45,7 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
         grassType: (initialData?.grassType as YardSectionInput["grassType"]) ?? "unknown",
         soilMoisture: initialData?.soilMoisture as YardSectionInput["soilMoisture"] | undefined,
         notes: initialData?.notes ?? undefined,
+        yardSizeSqft: (initialData?.yardSizeSqft ?? (lotSqft && !initialData ? (lotSqft - (buildingSqft ?? 0)) || lotSqft : undefined)) as never,
       },
     });
 
@@ -58,13 +61,17 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
   const [identified, setIdentified] = useState<{ confidence: string; explanation: string } | null>(null);
 
   // Lot size lookup + controlled size input
+  const usableSqft = lotSqft && buildingSqft ? lotSqft - buildingSqft : lotSqft ?? null;
+  const hasYardLotData = !!lotSqft;
   const [streetAddress, setStreetAddress] = useState("");
   const [lookingUp, setLookingUp] = useState(false);
   const [lookupNote, setLookupNote] = useState<string | null>(null);
   const [sizeUnit, setSizeUnit] = useState<"sqft" | "acres">("sqft");
-  const [sizeDisplay, setSizeDisplay] = useState(
-    initialData?.yardSizeSqft ? String(initialData.yardSizeSqft) : ""
-  );
+  const [sizeDisplay, setSizeDisplay] = useState(() => {
+    if (initialData?.yardSizeSqft) return String(initialData.yardSizeSqft);
+    if (usableSqft) return String(usableSqft);
+    return "";
+  });
 
   const SQFT_PER_ACRE = 43560;
   function toSqft(display: string, unit: "sqft" | "acres"): number | undefined {
@@ -271,33 +278,43 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
       </div>
 
       <div className="space-y-4">
-        {/* Lot size lookup */}
-        <div className="space-y-1">
-          <Label>Street Address (optional — look up lot size)</Label>
-          <div className="flex gap-2">
-            <Input
-              placeholder="123 Main St"
-              value={streetAddress}
-              onChange={(e) => setStreetAddress(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); lookupYardSize(); } }}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!streetAddress.trim() || lookingUp}
-              onClick={lookupYardSize}
-              className="shrink-0"
-            >
-              {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            </Button>
+        {/* Lot size — from yard data or manual lookup */}
+        {hasYardLotData ? (
+          <div className="rounded-lg bg-green-50 border border-green-100 px-4 py-3 text-sm text-green-800">
+            {buildingSqft
+              ? <>Lot: ~{lotSqft!.toLocaleString()} sq ft · Home: ~{buildingSqft.toLocaleString()} sq ft · Lawn: ~{usableSqft!.toLocaleString()} sq ft</>
+              : <>Lot: ~{lotSqft!.toLocaleString()} sq ft</>
+            }
+            <span className="text-green-600"> — adjust the size below for just this section</span>
           </div>
-          {lookupNote && (
-            <p className={`text-sm font-medium ${lookupNote.startsWith("Lot:") ? "text-green-700" : "text-gray-500"}`}>
-              {lookupNote}
-            </p>
-          )}
-        </div>
+        ) : (
+          <div className="space-y-1">
+            <Label>Street Address (optional — look up lot size)</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="123 Main St"
+                value={streetAddress}
+                onChange={(e) => setStreetAddress(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); lookupYardSize(); } }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!streetAddress.trim() || lookingUp}
+                onClick={lookupYardSize}
+                className="shrink-0"
+              >
+                {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+              </Button>
+            </div>
+            {lookupNote && (
+              <p className={`text-sm font-medium ${lookupNote.startsWith("Lot:") ? "text-green-700" : "text-gray-500"}`}>
+                {lookupNote}
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="space-y-1">
           <Label>Section Size</Label>

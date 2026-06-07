@@ -9,6 +9,9 @@ export const yardSchema = z.object({
   longitude: z.number().optional(),
   spreaderType: z.enum(["broadcast", "drop", "handheld", "liquid", "none"]).optional(),
   spreaderModel: z.string().optional(),
+  streetAddress: z.string().optional(),
+  lotSqft: z.number().int().positive().optional(),
+  buildingSqft: z.number().int().positive().optional(),
 });
 
 export type YardInput = z.infer<typeof yardSchema>;

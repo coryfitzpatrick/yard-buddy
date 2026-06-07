@@ -63,10 +63,13 @@ model Yard {
   userId             String
   name               String        @default("My Property")
   zipCode            String
+  streetAddress      String?
   city               String?
   state              String?
   latitude           Float?
   longitude          Float?
+  lotSqft            Int?
+  buildingSqft       Int?
   spreaderType       String?
   spreaderModel      String?
   weatherRefreshedAt DateTime?
