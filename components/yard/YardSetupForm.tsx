@@ -111,7 +111,8 @@ export function YardSetupForm() {
       fd.append("file", file);
       const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
       if (!uploadRes.ok) {
-        setIdentifyError("Upload failed — check your connection and try again.");
+        const body = await uploadRes.json().catch(() => ({}));
+        setIdentifyError(`Upload failed (${uploadRes.status}): ${body.error ?? "unknown error"}`);
         return;
       }
       const { url } = await uploadRes.json();
