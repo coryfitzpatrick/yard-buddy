@@ -60,6 +60,21 @@ export function WeatherWidget({ zip }: { zip: string }) {
             <CloudRain className="w-3 h-3" /> {weather.precipitationChance}% rain
           </span>
         </div>
+
+        {weather.forecast.length > 0 && (
+          <div className="mt-4 pt-3 border-t border-white/20 grid grid-cols-4 gap-2">
+            {weather.forecast.slice(0, 4).map((day) => (
+              <div key={day.date} className="text-center">
+                <div className="text-xs opacity-75 mb-1">
+                  {new Date(day.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short" })}
+                </div>
+                <div className="text-xs capitalize opacity-80 leading-tight mb-1 line-clamp-2">{day.description}</div>
+                <div className="text-sm font-semibold">{day.high}°</div>
+                <div className="text-xs opacity-70">{day.low}°</div>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

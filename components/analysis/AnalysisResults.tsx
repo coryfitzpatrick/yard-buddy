@@ -113,12 +113,12 @@ export function AnalysisResults({ result }: { result: AnalysisResult }) {
                     {rec.priority}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
+                <p className="text-base text-gray-600 mb-2">{rec.description}</p>
                 <div className="flex items-center gap-1 text-xs text-gray-500">
                   <Clock className="w-3 h-3" /> {rec.timing}
                 </div>
                 {rec.productSuggestion && (
-                  <div className="mt-2 text-xs bg-gray-50 rounded p-2 space-y-1">
+                  <div className="mt-2 text-sm bg-gray-50 rounded p-2 space-y-1">
                     <div><span className="font-medium">Product:</span> {rec.productSuggestion}</div>
                     {rec.applicationRate && <div><span className="font-medium">Rate:</span> {rec.applicationRate}</div>}
                     {rec.spreaderSetting && <div><span className="font-medium">Setting:</span> {rec.spreaderSetting}</div>}

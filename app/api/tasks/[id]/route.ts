@@ -16,7 +16,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid status" }, { status: 400 });
   }
   const task = await db.lawnTask.findFirst({
-    where: { id, yardProfile: { userId: session.user.id } },
+    where: { id, yardSection: { yard: { userId: session.user.id } } },
   });
   if (!task) return NextResponse.json({ error: "Not found" }, { status: 404 });
 

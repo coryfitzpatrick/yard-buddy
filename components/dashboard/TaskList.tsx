@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, Circle, Package } from "lucide-react";
+import { CheckCircle2, Circle, Package, RotateCcw } from "lucide-react";
 
 interface Task {
   id: string;
@@ -13,6 +13,12 @@ interface Task {
   product?: string | null;
   applicationRate?: string | null;
   spreaderSetting?: string | null;
+  yardSection?: {
+    id: string;
+    name: string;
+    areaType: string | null;
+    yard: { name: string };
+  } | null;
 }
 
 const PRIORITY_DOT: Record<string, string> = {
@@ -22,12 +28,17 @@ const PRIORITY_DOT: Record<string, string> = {
   low: "bg-green-400",
 };
 
-export function TaskList({ tasks: initial }: { tasks: Task[] }) {
+export function TaskList({
+  tasks: initial,
+  multiYard = false,
+}: {
+  tasks: Task[];
+  multiYard?: boolean;
+}) {
   const [tasks, setTasks] = useState(initial);
 
   async function toggleTask(id: string, current: string) {
     const newStatus = current === "completed" ? "pending" : "completed";
-    // Optimistic update
     setTasks((t) => t.map((task) => task.id === id ? { ...task, status: newStatus } : task));
     try {
       const res = await fetch(`/api/tasks/${id}`, {
@@ -37,7 +48,6 @@ export function TaskList({ tasks: initial }: { tasks: Task[] }) {
       });
       if (!res.ok) throw new Error("Failed");
     } catch {
-      // Rollback on failure
       setTasks((t) => t.map((task) => task.id === id ? { ...task, status: current } : task));
     }
   }
@@ -55,11 +65,16 @@ export function TaskList({ tasks: initial }: { tasks: Task[] }) {
                 <Circle className="w-5 h-5 text-gray-300 hover:text-green-500 transition-colors" />
               </button>
               <div className="flex-1 min-w-0">
+                {multiYard && task.yardSection && (
+                  <div className="text-xs text-green-700 font-medium mb-1">
+                    {task.yardSection.yard.name} › {task.yardSection.name}
+                  </div>
+                )}
                 <div className="flex items-center gap-2 mb-1">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${PRIORITY_DOT[task.priority] ?? "bg-gray-400"}`} />
-                  <span className="font-medium text-sm">{task.title}</span>
+                  <span className="font-medium text-base">{task.title}</span>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed">{task.description}</p>
+                <p className="text-sm text-gray-500 leading-relaxed">{task.description}</p>
                 {task.product && (
                   <div className="mt-2 flex items-center gap-1 text-xs text-gray-400">
                     <Package className="w-3 h-3" />
@@ -80,17 +95,22 @@ export function TaskList({ tasks: initial }: { tasks: Task[] }) {
       )}
       {completed.length > 0 && (
         <details className="mt-4">
-          <summary className="text-xs text-gray-400 cursor-pointer">
+          <summary className="text-sm text-gray-500 cursor-pointer font-medium">
             {completed.length} completed task{completed.length > 1 ? "s" : ""}
           </summary>
           <div className="space-y-2 mt-2">
             {completed.map((task) => (
-              <Card key={task.id} className="opacity-50">
-                <CardContent className="p-3 flex gap-3">
-                  <button onClick={() => toggleTask(task.id, task.status)}>
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+              <Card key={task.id} className="opacity-60">
+                <CardContent className="p-3 flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+                  <span className="text-sm line-through text-gray-400 flex-1">{task.title}</span>
+                  <button
+                    onClick={() => toggleTask(task.id, task.status)}
+                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-600 transition-colors shrink-0"
+                    title="Mark as not done"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" /> Undo
                   </button>
-                  <span className="text-sm line-through text-gray-400">{task.title}</span>
                 </CardContent>
               </Card>
             ))}

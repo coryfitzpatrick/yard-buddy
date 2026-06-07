@@ -1,3 +1,11 @@
+export type AreaType =
+  | "front"
+  | "back"
+  | "left_side"
+  | "right_side"
+  | "garden"
+  | "other";
+
 export type GrassType =
   | "bermuda"
   | "kentucky_bluegrass"

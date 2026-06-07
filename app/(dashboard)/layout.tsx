@@ -2,7 +2,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Search, Leaf, LogOut, Plus, Fence } from "lucide-react";
+import { LayoutDashboard, Search, Leaf, LogOut, Fence } from "lucide-react";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -25,11 +25,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Link href="/yard">
               <Button variant="ghost" size="sm"><Fence className="w-4 h-4 mr-1" /> Yards</Button>
             </Link>
-            <Link href="/yard/setup">
-              <Button size="sm" className="bg-green-600 hover:bg-green-700 ml-1">
-                <Plus className="w-4 h-4 mr-1" /> Yard
-              </Button>
-            </Link>
             <form action={async () => { "use server"; await signOut({ redirectTo: "/login" }); }}>
               <Button variant="ghost" size="sm" type="submit">
                 <LogOut className="w-4 h-4 mr-1" /> Sign out
@@ -50,9 +45,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </Link>
         <Link href="/yard" className="flex flex-col items-center gap-0.5 text-xs text-gray-500 px-4 py-1">
           <Fence className="w-5 h-5" /> Yards
-        </Link>
-        <Link href="/yard/setup" className="flex flex-col items-center gap-0.5 text-xs text-green-600 px-4 py-1">
-          <Plus className="w-5 h-5" /> Add
         </Link>
       </nav>
     </div>

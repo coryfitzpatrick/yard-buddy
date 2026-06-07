@@ -8,43 +8,41 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const { profileId, imageUrls } = body;
-
-  if (!profileId || !Array.isArray(imageUrls) || imageUrls.length === 0) {
-    return NextResponse.json({ error: "profileId and imageUrls[] required" }, { status: 400 });
+  const { sectionId, imageUrls } = await req.json();
+  if (!sectionId || !Array.isArray(imageUrls) || imageUrls.length === 0) {
+    return NextResponse.json({ error: "sectionId and imageUrls[] required" }, { status: 400 });
   }
   if (imageUrls.length > 4) {
     return NextResponse.json({ error: "Maximum 4 images per analysis" }, { status: 400 });
   }
 
-  const profile = await db.yardProfile.findFirst({
-    where: { id: profileId, userId: session.user.id },
+  const section = await db.yardSection.findFirst({
+    where: { id: sectionId, yard: { userId: session.user.id } },
+    include: { yard: { select: { zipCode: true } } },
   });
-  if (!profile) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   let weatherSummary: string | undefined;
   try {
-    const weather = await getWeatherByZip(profile.zipCode);
+    const weather = await getWeatherByZip(section.yard.zipCode);
     weatherSummary = `${weather.temp}°F, ${weather.description}, ${weather.humidity}% humidity, ${weather.precipitationChance}% chance of rain`;
-  } catch {
-    // weather is optional context
-  }
+  } catch { /* weather is optional context */ }
 
   try {
     const result = await analyzeImages(imageUrls, {
-      grassType: profile.grassType as import("@/types").GrassType,
-      zipCode: profile.zipCode,
-      yardSizeSqft: profile.yardSizeSqft,
-      spreaderType: profile.spreaderType,
-      soilPh: profile.soilPh,
+      grassType: section.grassType as import("@/types").GrassType,
+      zipCode: section.yard.zipCode,
+      areaType: section.areaType,
+      yardSizeSqft: section.yardSizeSqft,
+      spreaderType: section.spreaderType,
+      soilPh: section.soilPh,
       weatherSummary,
-      notes: profile.notes,
+      notes: section.notes,
     });
 
     const analysis = await db.lawnAnalysis.create({
       data: {
-        yardProfileId: profileId,
+        yardSectionId: sectionId,
         imageUrls,
         healthScore: result.healthScore,
         issues: result.issues,
@@ -52,7 +50,7 @@ export async function POST(req: NextRequest) {
         rawResponse: JSON.stringify(result),
         tasks: {
           create: result.recommendations.map((r) => ({
-            yardProfileId: profileId,
+            yardSectionId: sectionId,
             title: r.title,
             description: r.description,
             priority: r.priority,
@@ -68,9 +66,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ analysis, result });
   } catch (err) {
     console.error("Analysis failed:", err);
-    return NextResponse.json(
-      { error: "Analysis failed. Please try again." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Analysis failed. Please try again." }, { status: 500 });
   }
 }

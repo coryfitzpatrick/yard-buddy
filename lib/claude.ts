@@ -6,6 +6,7 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 export interface LawnContext {
   grassType: GrassType;
   zipCode: string;
+  areaType?: string | null;
   yardSizeSqft?: number | null;
   spreaderType?: string | null;
   soilPh?: number | null;
@@ -40,6 +41,14 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
 
 Grass Type: ${context.grassType.replace(/_/g, " ")}
 ZIP Code: ${context.zipCode}
+${context.areaType ? `Yard Area: ${context.areaType.replace(/_/g, " ")} (${
+  context.areaType === "front"      ? "high visibility, aesthetics matter most" :
+  context.areaType === "back"       ? "recreational use, durability matters" :
+  context.areaType === "left_side" || context.areaType === "right_side"
+                                    ? "narrow side yard, often shaded" :
+  context.areaType === "garden"     ? "garden or landscaped area" :
+  "custom area"
+})` : ""}
 ${context.yardSizeSqft ? `Yard Size: ${context.yardSizeSqft} sq ft` : ""}
 ${context.spreaderType ? `Spreader: ${context.spreaderType}` : ""}
 ${context.soilPh ? `Soil pH: ${context.soilPh}` : ""}
@@ -101,6 +110,14 @@ export async function analyzeImages(
 Known context:
 - Grass Type: ${context.grassType.replace(/_/g, " ")}
 - ZIP Code: ${context.zipCode}
+${context.areaType ? `- Yard Area: ${context.areaType.replace(/_/g, " ")} (${
+  context.areaType === "front"      ? "high visibility, aesthetics matter most" :
+  context.areaType === "back"       ? "recreational use, durability matters" :
+  context.areaType === "left_side" || context.areaType === "right_side"
+                                    ? "narrow side yard, often shaded" :
+  context.areaType === "garden"     ? "garden or landscaped area" :
+  "custom area"
+})` : ""}
 ${context.yardSizeSqft ? `- Yard Size: ${context.yardSizeSqft} sq ft` : ""}
 ${context.spreaderType ? `- Spreader: ${context.spreaderType}` : ""}
 ${context.soilPh ? `- Soil pH: ${context.soilPh}` : ""}

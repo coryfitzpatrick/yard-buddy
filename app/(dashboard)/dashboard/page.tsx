@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { TaskList } from "@/components/dashboard/TaskList";
+import { YardOverviewCard } from "@/components/dashboard/YardOverviewCard";
 import { Plus, Camera } from "lucide-react";
 
 function getGreeting() {
@@ -19,67 +20,91 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const yards = await db.yardProfile.findMany({
+  const yards = await db.yard.findMany({
     where: { userId: session.user.id },
+    orderBy: { createdAt: "asc" },
     include: {
-      tasks: { orderBy: { createdAt: "desc" }, take: 20 },
-      analyses: { orderBy: { createdAt: "desc" }, take: 1 },
+      sections: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          analyses: { orderBy: { createdAt: "desc" }, take: 1, select: { healthScore: true } },
+          _count: { select: { tasks: { where: { status: { not: "completed" } } } } },
+        },
+      },
     },
-    orderBy: { createdAt: "desc" },
   });
 
   if (yards.length === 0) redirect("/yard/setup");
 
-  const yard = yards[0];
-  const latestScore = yard.analyses[0]?.healthScore;
+  const sectionIds = yards.flatMap((y) => y.sections.map((s) => s.id));
+
+  const tasks = await db.lawnTask.findMany({
+    where: { yardSectionId: { in: sectionIds } },
+    orderBy: { createdAt: "desc" },
+    include: {
+      yardSection: {
+        select: { id: true, name: true, areaType: true, yard: { select: { name: true } } },
+      },
+    },
+  });
+
+  const yardSummaries = yards.map((yard) => ({
+    id: yard.id,
+    name: yard.name,
+    zipCode: yard.zipCode,
+    sections: yard.sections.map((s) => ({
+      id: s.id,
+      name: s.name,
+      areaType: s.areaType,
+      grassType: s.grassType,
+      latestHealthScore: s.analyses[0]?.healthScore ?? null,
+      pendingTaskCount: s._count.tasks,
+    })),
+  }));
+
+  const multiYard = yards.length > 1 || yards.some((y) => y.sections.length > 1);
+  const primaryZip = yards[0].zipCode;
 
   return (
     <div className="px-4 py-6 pb-20 sm:pb-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {getGreeting()}, {session.user.name?.split(" ")[0]}!
-          </h1>
-          <p className="text-gray-500 text-sm">{yard.name} · {yard.grassType.replace(/_/g, " ")} grass</p>
-        </div>
-        {latestScore != null && (
-          <div className="text-center">
-            <div className={`text-3xl font-bold ${latestScore >= 70 ? "text-green-600" : latestScore >= 40 ? "text-yellow-600" : "text-red-600"}`}>
-              {latestScore}
-            </div>
-            <div className="text-xs text-gray-400">Health Score</div>
-          </div>
-        )}
+        <h1 className="text-2xl font-bold text-gray-900">
+          {getGreeting()}, {session.user.name?.split(" ")[0]}!
+        </h1>
+        <Link href="/yard/setup">
+          <Button size="sm" className="bg-green-600 hover:bg-green-700">
+            <Plus className="w-4 h-4 mr-1" /> Yard
+          </Button>
+        </Link>
       </div>
 
-      <WeatherWidget zip={yard.zipCode} />
+      <WeatherWidget zip={primaryZip} />
 
-      <div className="grid grid-cols-2 gap-3">
-        <Link href="/analyze">
-          <Button className="w-full bg-green-600 hover:bg-green-700 h-12">
-            <Camera className="mr-2 w-4 h-4" /> Analyze Lawn
-          </Button>
-        </Link>
-        <Link href="/yard/setup">
-          <Button variant="outline" className="w-full h-12">
-            <Plus className="mr-2 w-4 h-4" /> Add Yard
-          </Button>
-        </Link>
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-lg">My Yards</h2>
+          <Link href="/yard" className="text-sm text-green-700 hover:underline">Manage →</Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {yardSummaries.map((yard) => <YardOverviewCard key={yard.id} yard={yard} />)}
+        </div>
       </div>
 
       <div>
-        <h2 className="font-semibold text-lg mb-3">Your Tasks</h2>
-        {yard.tasks.length === 0 ? (
+        <h2 className="font-semibold text-lg mb-3">{multiYard ? "All Tasks" : "Your Tasks"}</h2>
+        {tasks.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-gray-500 text-sm mb-3">No tasks yet. Analyze your lawn to get started.</p>
+              <p className="text-gray-500 mb-3">No tasks yet. Analyze a section to get started.</p>
               <Link href="/analyze">
-                <Button className="bg-green-600 hover:bg-green-700">Analyze My Lawn</Button>
+                <Button className="bg-green-600 hover:bg-green-700">
+                  <Camera className="mr-2 w-4 h-4" /> Analyze My Lawn
+                </Button>
               </Link>
             </CardContent>
           </Card>
         ) : (
-          <TaskList tasks={yard.tasks} />
+          <TaskList tasks={tasks} multiYard={multiYard} />
         )}
       </div>
     </div>
