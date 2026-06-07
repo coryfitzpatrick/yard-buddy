@@ -3,11 +3,10 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
-import { TaskList } from "@/components/dashboard/TaskList";
+import { DashboardTaskSection } from "@/components/dashboard/DashboardTaskSection";
 import { YardOverviewCard } from "@/components/dashboard/YardOverviewCard";
-import { Plus, Camera } from "lucide-react";
+import { Plus } from "lucide-react";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -62,7 +61,15 @@ export default async function DashboardPage() {
     })),
   }));
 
-  const multiYard = yards.length > 1 || yards.some((y) => y.sections.length > 1);
+  const allSections = yards.flatMap((y) =>
+    y.sections.map((s) => ({
+      id: s.id,
+      name: s.name,
+      yardName: y.name,
+      showYardLabel: yards.length > 1,
+    }))
+  );
+
   const primaryZip = yards[0].zipCode;
 
   return (
@@ -91,21 +98,8 @@ export default async function DashboardPage() {
       </div>
 
       <div>
-        <h2 className="font-semibold text-lg mb-3">{multiYard ? "All Tasks" : "Your Tasks"}</h2>
-        {tasks.length === 0 ? (
-          <Card>
-            <CardContent className="p-6 text-center">
-              <p className="text-gray-500 mb-3">No tasks yet. Analyze a section to get started.</p>
-              <Link href="/analyze">
-                <Button className="bg-green-600 hover:bg-green-700">
-                  <Camera className="mr-2 w-4 h-4" /> Analyze My Lawn
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <TaskList tasks={tasks} multiYard={multiYard} />
-        )}
+        <h2 className="font-semibold text-lg mb-3">Tasks</h2>
+        <DashboardTaskSection tasks={tasks} sections={allSections} />
       </div>
     </div>
   );
