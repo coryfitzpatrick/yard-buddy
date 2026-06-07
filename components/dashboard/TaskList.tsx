@@ -103,7 +103,7 @@ function TaskCard({
             <Circle className="w-5 h-5 text-gray-300 hover:text-green-500 transition-colors" />
           </button>
           <div className="flex-1 min-w-0">
-            {multiYard && task.yardSection && (
+            {task.yardSection && (
               <div className="text-xs text-green-700 font-medium mb-1">
                 {task.yardSection.yard.name === task.yardSection.name
                   ? task.yardSection.name
