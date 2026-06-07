@@ -4,9 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowRight, Pencil } from "lucide-react";
-import { SectionCard } from "@/components/yard/SectionCard";
 import { YardDeleteButton } from "@/components/yard/YardDeleteButton";
-import { YardTasksSection } from "@/components/yard/YardTasksSection";
 
 export default async function YardPage() {
   const session = await auth();
@@ -15,31 +13,11 @@ export default async function YardPage() {
   const yards = await db.yard.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "asc" },
-    include: {
-      sections: {
-        orderBy: { createdAt: "asc" },
-        include: {
-          tasks: {
-            where: { status: { not: "skipped" } },
-            orderBy: { createdAt: "desc" },
-            select: {
-              id: true,
-              title: true,
-              description: true,
-              priority: true,
-              status: true,
-              scheduledStart: true,
-              scheduledEnd: true,
-              overdueNote: true,
-              stillWorthDoing: true,
-              product: true,
-              applicationRate: true,
-              spreaderSetting: true,
-              yardSectionId: true,
-            },
-          },
-        },
-      },
+    select: {
+      id: true,
+      name: true,
+      zipCode: true,
+      _count: { select: { sections: true } },
     },
   });
 
@@ -64,13 +42,18 @@ export default async function YardPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-8">
-          {yards.map((yard: (typeof yards)[number]) => (
-            <div key={yard.id}>
-              <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="space-y-4">
+          {yards.map((yard) => (
+            <div key={yard.id} className="rounded-lg border border-gray-200 bg-white p-4">
+              <div className="flex items-start justify-between gap-2">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">{yard.name}</h2>
-                  <p className="text-sm text-gray-400">ZIP {yard.zipCode}</p>
+                  <p className="text-sm text-gray-400">
+                    ZIP {yard.zipCode}
+                    {yard._count.sections > 0 && (
+                      <> &middot; {yard._count.sections} section{yard._count.sections !== 1 ? "s" : ""}</>
+                    )}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap justify-end">
                   <Link href={`/yard/${yard.id}`}>
@@ -91,36 +74,6 @@ export default async function YardPage() {
                   <YardDeleteButton yardId={yard.id} yardName={yard.name} />
                 </div>
               </div>
-              {yard.sections.length === 0 ? (
-                <p className="text-sm text-gray-400 pl-1">No sections yet.</p>
-              ) : (
-                <>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {yard.sections.map((section: (typeof yard)["sections"][number]) => (
-                      <SectionCard key={section.id} section={section} />
-                    ))}
-                  </div>
-                  <YardTasksSection
-                    sections={yard.sections.map((s: (typeof yard)["sections"][number]) => ({
-                      id: s.id,
-                      name: s.name,
-                    }))}
-                    tasks={yard.sections.flatMap((s: (typeof yard)["sections"][number]) =>
-                      s.tasks.map((t) => ({
-                        ...t,
-                        scheduledStart: t.scheduledStart?.toISOString() ?? null,
-                        scheduledEnd: t.scheduledEnd?.toISOString() ?? null,
-                        yardSection: {
-                          id: s.id,
-                          name: s.name,
-                          areaType: s.areaType,
-                          yard: { name: yard.name },
-                        },
-                      }))
-                    )}
-                  />
-                </>
-              )}
             </div>
           ))}
         </div>
