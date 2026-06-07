@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 import { Pencil, Trash2, Ruler, Sprout, ArrowRight } from "lucide-react";
 import { AREA_CONFIG } from "./AreaTypeSelector";
 import type { AreaType } from "@/types";
@@ -19,7 +20,7 @@ interface Section {
 
 export function SectionCard({ section }: { section: Section }) {
   const router = useRouter();
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const areaCfg = section.areaType ? AREA_CONFIG[section.areaType as AreaType] : null;
@@ -29,10 +30,12 @@ export function SectionCard({ section }: { section: Section }) {
     setDeleting(true);
     try {
       const res = await fetch(`/api/yard/${section.yardId}/sections/${section.id}`, { method: "DELETE" });
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        setOpen(false);
+        router.refresh();
+      }
     } finally {
       setDeleting(false);
-      setConfirmDelete(false);
     }
   }
 
@@ -53,20 +56,17 @@ export function SectionCard({ section }: { section: Section }) {
               <Pencil className="w-4 h-4" />
             </Button>
           </Link>
-          {confirmDelete ? (
-            <>
-              <Button variant="ghost" size="sm" className="h-8 text-xs text-red-600 hover:bg-red-50 px-2" onClick={handleDelete} disabled={deleting}>
-                {deleting ? "Deleting…" : "Confirm"}
-              </Button>
-              <Button variant="ghost" size="sm" className="h-8 text-xs px-2" onClick={() => setConfirmDelete(false)}>Cancel</Button>
-            </>
-          ) : (
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => setConfirmDelete(true)}>
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-400 hover:text-red-500"
+            onClick={() => setOpen(true)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
       </div>
+
       <div className="text-sm text-gray-500 space-y-1">
         <div className="flex items-center gap-1.5">
           <Sprout className="w-3.5 h-3.5" />
@@ -79,11 +79,21 @@ export function SectionCard({ section }: { section: Section }) {
           </div>
         )}
       </div>
+
       <Link href={`/yard/${section.yardId}/sections/${section.id}`} className="mt-auto">
         <Button variant="outline" size="sm" className="w-full">
           <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
         </Button>
       </Link>
+
+      <DeleteConfirmModal
+        open={open}
+        onOpenChange={setOpen}
+        title={`Delete "${section.name}"?`}
+        description="This cannot be undone. The section and all its analyses and tasks will be permanently deleted."
+        onConfirm={handleDelete}
+        deleting={deleting}
+      />
     </div>
   );
 }

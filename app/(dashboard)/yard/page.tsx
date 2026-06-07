@@ -72,7 +72,7 @@ export default async function YardPage() {
                   <h2 className="text-lg font-semibold text-gray-900">{yard.name}</h2>
                   <p className="text-sm text-gray-400">ZIP {yard.zipCode}</p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                <div className="flex items-center gap-2 flex-wrap justify-end">
                   <Link href={`/yard/${yard.id}`}>
                     <Button variant="outline" size="sm">
                       <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
@@ -88,7 +88,7 @@ export default async function YardPage() {
                       <Plus className="w-3.5 h-3.5 mr-1" /> Add Section
                     </Button>
                   </Link>
-                  <YardDeleteButton yardId={yard.id} />
+                  <YardDeleteButton yardId={yard.id} yardName={yard.name} />
                 </div>
               </div>
               {yard.sections.length === 0 ? (
