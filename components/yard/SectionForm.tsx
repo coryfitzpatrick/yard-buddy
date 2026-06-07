@@ -22,12 +22,6 @@ interface Props {
   initialData?: Partial<YardSectionFormInput & { id: string }>;
 }
 
-interface LotInfo {
-  lotSqft: number | null;
-  buildingSqft: number | null;
-  usableSqft: number | null;
-  message?: string;
-}
 
 const AREA_NAME_MAP: Record<AreaType, string> = {
   front: "Front Yard", back: "Back Yard",
@@ -63,11 +57,33 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
   const [identifyError, setIdentifyError] = useState<string | null>(null);
   const [identified, setIdentified] = useState<{ confidence: string; explanation: string } | null>(null);
 
-  // Lot size lookup
+  // Lot size lookup + controlled size input
   const [streetAddress, setStreetAddress] = useState("");
   const [lookingUp, setLookingUp] = useState(false);
-  const [lotInfo, setLotInfo] = useState<LotInfo | null>(null);
-  const [lookupError, setLookupError] = useState<string | null>(null);
+  const [lookupNote, setLookupNote] = useState<string | null>(null);
+  const [sizeUnit, setSizeUnit] = useState<"sqft" | "acres">("sqft");
+  const [sizeDisplay, setSizeDisplay] = useState(
+    initialData?.yardSizeSqft ? String(initialData.yardSizeSqft) : ""
+  );
+
+  const SQFT_PER_ACRE = 43560;
+  function toSqft(display: string, unit: "sqft" | "acres"): number | undefined {
+    const n = parseFloat(display);
+    if (isNaN(n) || n <= 0) return undefined;
+    return unit === "acres" ? Math.round(n * SQFT_PER_ACRE) : Math.round(n);
+  }
+  function toDisplaySize(sqft: number, unit: "sqft" | "acres"): string {
+    return unit === "acres" ? (sqft / SQFT_PER_ACRE).toFixed(3) : String(sqft);
+  }
+  function handleSizeInput(raw: string) {
+    setSizeDisplay(raw);
+    setValue("yardSizeSqft", toSqft(raw, sizeUnit) as never);
+  }
+  function handleUnitChange(next: "sqft" | "acres") {
+    const cur = toSqft(sizeDisplay, sizeUnit);
+    setSizeUnit(next);
+    if (cur) setSizeDisplay(toDisplaySize(cur, next));
+  }
 
   async function identifyGrass(file: File) {
     setIdentifying(true);
@@ -111,8 +127,7 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
   async function lookupYardSize() {
     if (!streetAddress.trim()) return;
     setLookingUp(true);
-    setLotInfo(null);
-    setLookupError(null);
+    setLookupNote(null);
     try {
       const res = await fetch("/api/lookup-yard-size", {
         method: "POST",
@@ -120,27 +135,25 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
         body: JSON.stringify({ address: `${streetAddress}, ${zipCode}` }),
       });
       const data = await res.json();
-      if (data.lotSqft) {
-        setLotInfo({ lotSqft: data.lotSqft, buildingSqft: data.buildingSqft ?? null, usableSqft: data.usableSqft ?? null });
+      const sqft = data.usableSqft ?? data.lotSqft;
+      if (sqft) {
+        setSizeDisplay(toDisplaySize(sqft, sizeUnit));
+        setValue("yardSizeSqft", sqft as never);
+        if (data.usableSqft && data.buildingSqft) {
+          setLookupNote(
+            `Lot: ~${data.lotSqft.toLocaleString()} sq ft · Home: ~${data.buildingSqft.toLocaleString()} sq ft · Lawn: ~${data.usableSqft.toLocaleString()} sq ft — adjust below for just this section`
+          );
+        } else {
+          setLookupNote(`Lot: ~${data.lotSqft.toLocaleString()} sq ft — adjust below for just this section`);
+        }
       } else {
-        setLookupError(data.message ?? "Size not found — enter manually");
+        setLookupNote(data.message ?? "Size not found — enter manually");
       }
     } catch {
-      setLookupError("Lookup failed — enter manually");
+      setLookupNote("Lookup failed — enter manually");
     } finally {
       setLookingUp(false);
     }
-  }
-
-  function lotGuidanceText(): string {
-    if (!lotInfo?.lotSqft) return "";
-    const lot = lotInfo.lotSqft.toLocaleString();
-    if (lotInfo.usableSqft && lotInfo.buildingSqft) {
-      const home = lotInfo.buildingSqft.toLocaleString();
-      const lawn = lotInfo.usableSqft.toLocaleString();
-      return `Your lot: ~${lot} sq ft · Home: ~${home} sq ft · Lawn: ~${lawn} sq ft — enter this section's portion below`;
-    }
-    return `Your lot: ~${lot} sq ft — enter this section's portion below`;
   }
 
   async function onSubmit(data: YardSectionInput) {
@@ -155,7 +168,11 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
         body: JSON.stringify(data),
       });
       if (!res.ok) { setError("Failed to save. Please try again."); return; }
-      router.push(`/yard/${yardId}`);
+      if (isEdit) {
+        router.push(`/analyze?sectionId=${initialData!.id}`);
+      } else {
+        router.push(`/yard/${yardId}`);
+      }
       router.refresh();
     } catch {
       setError("Network error. Please check your connection.");
@@ -275,14 +292,37 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
               {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             </Button>
           </div>
-          {lotInfo && <p className="text-sm text-green-700 font-medium">{lotGuidanceText()}</p>}
-          {lookupError && <p className="text-sm text-gray-500">{lookupError}</p>}
+          {lookupNote && (
+            <p className={`text-sm font-medium ${lookupNote.startsWith("Lot:") ? "text-green-700" : "text-gray-500"}`}>
+              {lookupNote}
+            </p>
+          )}
         </div>
 
         <div className="space-y-1">
-          <Label>Section Size (sq ft)</Label>
-          <Input type="number" placeholder="e.g. 2000" {...register("yardSizeSqft")} />
-          <p className="text-sm text-gray-400">Enter just this section's area — helps calculate product amounts</p>
+          <Label>Section Size</Label>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              placeholder={sizeUnit === "sqft" ? "e.g. 2000" : "e.g. 0.046"}
+              value={sizeDisplay}
+              onChange={(e) => handleSizeInput(e.target.value)}
+              min="0"
+              step={sizeUnit === "acres" ? "0.001" : "1"}
+            />
+            <Select value={sizeUnit} onValueChange={(v) => handleUnitChange(v as "sqft" | "acres")}>
+              <SelectTrigger className="w-28 shrink-0"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sqft">sq ft</SelectItem>
+                <SelectItem value="acres">acres</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <p className="text-sm text-gray-400">
+            {lookupNote?.startsWith("Lot:")
+              ? "Adjust to just this section's share of the lawn"
+              : "Optional — helps calculate product amounts"}
+          </p>
         </div>
 
         <div className="space-y-1">
@@ -307,7 +347,7 @@ export function SectionForm({ yardId, zipCode, initialData }: Props) {
       </div>
 
       <div className="flex gap-3 pt-2">
-        <Button type="button" variant="outline" onClick={() => router.push(`/yard/${yardId}`)}>Cancel</Button>
+        <Button type="button" variant="outline" onClick={() => router.push(isEdit ? `/yard/${yardId}/sections/${initialData!.id}` : `/yard/${yardId}`)}>Cancel</Button>
         <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
           {isSubmitting ? "Saving…" : isEdit ? "Save Changes" : "Add Section"}
         </Button>
