@@ -39,7 +39,7 @@ export default async function YardPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {yards.map((yard) => (
+          {yards.map((yard: (typeof yards)[number]) => (
             <div key={yard.id}>
               <div className="flex items-start justify-between gap-2 mb-3">
                 <div>
@@ -69,7 +69,7 @@ export default async function YardPage() {
                 <p className="text-sm text-gray-400 pl-1">No sections yet.</p>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {yard.sections.map((section) => (
+                  {yard.sections.map((section: (typeof yard)["sections"][number]) => (
                     <SectionCard key={section.id} section={section} />
                   ))}
                 </div>

@@ -28,7 +28,7 @@ export default async function DashboardPage() {
 
   if (yards.length === 0) redirect("/yard/setup");
 
-  const sectionIds = yards.flatMap((y) => y.sections.map((s) => s.id));
+  const sectionIds = yards.flatMap((y: (typeof yards)[number]) => y.sections.map((s: (typeof yards)[number]["sections"][number]) => s.id));
 
   const tasks = await db.lawnTask.findMany({
     where: { yardSectionId: { in: sectionIds } },
@@ -40,11 +40,11 @@ export default async function DashboardPage() {
     },
   });
 
-  const yardSummaries = yards.map((yard) => ({
+  const yardSummaries = yards.map((yard: (typeof yards)[number]) => ({
     id: yard.id,
     name: yard.name,
     zipCode: yard.zipCode,
-    sections: yard.sections.map((s) => ({
+    sections: yard.sections.map((s: (typeof yards)[number]["sections"][number]) => ({
       id: s.id,
       name: s.name,
       areaType: s.areaType,
@@ -52,8 +52,8 @@ export default async function DashboardPage() {
     })),
   }));
 
-  const allSections = yards.flatMap((y) =>
-    y.sections.map((s) => ({
+  const allSections = yards.flatMap((y: (typeof yards)[number]) =>
+    y.sections.map((s: (typeof yards)[number]["sections"][number]) => ({
       id: s.id,
       name: s.name,
       yardId: y.id,
