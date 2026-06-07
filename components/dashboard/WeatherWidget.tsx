@@ -6,25 +6,43 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WeatherData } from "@/types";
 import { Droplets, Wind, CloudRain } from "lucide-react";
 
-export function WeatherWidget({ zip }: { zip: string }) {
+export function WeatherWidget({ zip }: { zip: string | null }) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/weather?zip=${zip}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.error) return;
-        setWeather(d);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    setWeather(null);
+    setLoading(true);
+
+    if (zip) {
+      fetch(`/api/weather?zip=${zip}`)
+        .then((r) => r.json())
+        .then((d) => { if (!d.error) setWeather(d); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+      return;
+    }
+
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+      setLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        fetch(`/api/weather?lat=${coords.latitude}&lon=${coords.longitude}`)
+          .then((r) => r.json())
+          .then((d) => { if (!d.error) setWeather(d); })
+          .catch(() => {})
+          .finally(() => setLoading(false));
+      },
+      () => setLoading(false),
+      { timeout: 8000 }
+    );
   }, [zip]);
 
   if (loading) {
-    return (
-      <div className="h-28 rounded-xl bg-gradient-to-br from-sky-300 to-blue-400 animate-pulse" />
-    );
+    return <div className="h-28 rounded-xl bg-gradient-to-br from-sky-300 to-blue-400 animate-pulse" />;
   }
   if (!weather) return null;
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { YardCarousel } from "./YardCarousel";
 import { DashboardTaskSection } from "./DashboardTaskSection";
+import { WeatherWidget } from "./WeatherWidget";
 
 interface YardCardSection {
   id: string;
@@ -89,6 +90,8 @@ export function DashboardInteractiveSection({ yards, tasks, allSections, weather
           onSelect={setSelectedYardId}
         />
       </div>
+
+      <WeatherWidget zip={selectedYard?.zipCode ?? null} />
 
       <div>
         <h2 className="font-semibold text-lg mb-3">

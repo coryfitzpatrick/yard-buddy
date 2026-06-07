@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
-import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { DashboardInteractiveSection } from "@/components/dashboard/DashboardInteractiveSection";
 import { Greeting } from "@/components/dashboard/Greeting";
 
@@ -79,13 +78,9 @@ export default async function DashboardPage() {
     }))
   );
 
-  const primaryZip = yards[0].zipCode;
-
   return (
     <div className="px-4 py-6 pb-20 sm:pb-6 space-y-6">
       <Greeting name={session.user.name?.split(" ")[0] ?? "there"} />
-
-      <WeatherWidget zip={primaryZip} />
 
       <DashboardInteractiveSection
         yards={yardSummaries}

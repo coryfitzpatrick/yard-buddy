@@ -3,21 +3,13 @@ import { WeatherData } from "@/types";
 const BASE = "https://api.openweathermap.org/data/2.5";
 const KEY = process.env.OPENWEATHERMAP_API_KEY!;
 
-export async function getWeatherByZip(zip: string, country = "us"): Promise<WeatherData> {
-  const [current, forecast] = await Promise.all([
-    fetch(`${BASE}/weather?zip=${zip},${country}&appid=${KEY}&units=imperial`).then((r) => r.json()),
-    fetch(`${BASE}/forecast?zip=${zip},${country}&appid=${KEY}&units=imperial&cnt=24`).then((r) => r.json()),
-  ]);
-
-  if (current.cod !== 200) {
-    throw new Error(`Weather API error: ${current.message ?? current.cod}`);
-  }
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildWeatherData(current: any, forecast: any, fallbackLocation: string): WeatherData {
   const dailyMap = new Map<string, { high: number; low: number; description: string; precipChance: number }>();
   for (const item of forecast.list ?? []) {
     const date = item.dt_txt.split(" ")[0];
     const existing = dailyMap.get(date);
-    const pop = (item.pop ?? 0) * 100; // OpenWeatherMap returns 0-1 probability
+    const pop = (item.pop ?? 0) * 100;
     if (!existing) {
       dailyMap.set(date, {
         high: item.main.temp_max,
@@ -35,7 +27,6 @@ export async function getWeatherByZip(zip: string, country = "us"): Promise<Weat
     }
   }
 
-  // Get precipitation chance for today/current period
   const currentPrecipChance = forecast.list?.[0]?.pop != null
     ? Math.round(forecast.list[0].pop * 100)
     : 0;
@@ -46,7 +37,7 @@ export async function getWeatherByZip(zip: string, country = "us"): Promise<Weat
     description: current.weather[0].description,
     icon: current.weather[0].icon,
     windSpeed: Math.round(current.wind.speed),
-    location: current.name ?? zip,
+    location: current.name ?? fallbackLocation,
     precipitationChance: currentPrecipChance,
     forecast: Array.from(dailyMap.entries())
       .slice(0, 5)
@@ -58,6 +49,26 @@ export async function getWeatherByZip(zip: string, country = "us"): Promise<Weat
         precipChance: Math.round(data.precipChance),
       })),
   };
+}
+
+export async function getWeatherByZip(zip: string, country = "us"): Promise<WeatherData> {
+  const [current, forecast] = await Promise.all([
+    fetch(`${BASE}/weather?zip=${zip},${country}&appid=${KEY}&units=imperial`).then((r) => r.json()),
+    fetch(`${BASE}/forecast?zip=${zip},${country}&appid=${KEY}&units=imperial&cnt=24`).then((r) => r.json()),
+  ]);
+
+  if (current.cod !== 200) throw new Error(`Weather API error: ${current.message ?? current.cod}`);
+  return buildWeatherData(current, forecast, zip);
+}
+
+export async function getWeatherByLatLon(lat: number, lon: number): Promise<WeatherData> {
+  const [current, forecast] = await Promise.all([
+    fetch(`${BASE}/weather?lat=${lat}&lon=${lon}&appid=${KEY}&units=imperial`).then((r) => r.json()),
+    fetch(`${BASE}/forecast?lat=${lat}&lon=${lon}&appid=${KEY}&units=imperial&cnt=24`).then((r) => r.json()),
+  ]);
+
+  if (current.cod !== 200) throw new Error(`Weather API error: ${current.message ?? current.cod}`);
+  return buildWeatherData(current, forecast, `${lat.toFixed(2)},${lon.toFixed(2)}`);
 }
 
 export function formatForecastForClaude(
