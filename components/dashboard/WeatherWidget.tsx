@@ -1,18 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WeatherData } from "@/types";
-import { Droplets, Wind, CloudRain, Loader2 } from "lucide-react";
+import { Droplets, Wind, CloudRain, Loader2, MapPinOff, RefreshCw } from "lucide-react";
 
 export function WeatherWidget({ zip }: { zip: string | null }) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [geoBlocked, setGeoBlocked] = useState(false);
+
+  const fetchByCoords = useCallback((lat: number, lon: number) => {
+    return fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+      .then((r) => r.json())
+      .then((d) => { if (!d.error) setWeather(d); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const requestGeolocation = useCallback(() => {
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setGeoBlocked(false);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => fetchByCoords(coords.latitude, coords.longitude),
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) setGeoBlocked(true);
+        setLoading(false);
+      },
+      { timeout: 8000 }
+    );
+  }, [fetchByCoords]);
 
   useEffect(() => {
     setLoading(true);
-    // Keep previous weather visible while fetching — avoids height collapse
+    setGeoBlocked(false);
 
     if (zip) {
       fetch(`/api/weather?zip=${zip}`)
@@ -23,28 +49,37 @@ export function WeatherWidget({ zip }: { zip: string | null }) {
       return;
     }
 
-    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setLoading(false);
-      return;
-    }
+    requestGeolocation();
+  }, [zip, requestGeolocation]);
 
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        fetch(`/api/weather?lat=${coords.latitude}&lon=${coords.longitude}`)
-          .then((r) => r.json())
-          .then((d) => { if (!d.error) setWeather(d); })
-          .catch(() => {})
-          .finally(() => setLoading(false));
-      },
-      () => setLoading(false),
-      { timeout: 8000 }
-    );
-  }, [zip]);
-
-  // Initial load with no data yet — skeleton matches card height
+  // Initial load — centered spinner in a box matching card height
   if (loading && !weather) {
     return (
-      <div className="rounded-xl bg-gradient-to-br from-sky-300 to-blue-400 animate-pulse min-h-[13rem]" />
+      <div className="rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 min-h-[13rem] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-white/80" />
+      </div>
+    );
+  }
+
+  // Geolocation blocked, no yard selected, no weather
+  if (geoBlocked && !zip && !weather) {
+    return (
+      <div className="rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white p-5 flex flex-col items-center justify-center gap-3 min-h-[8rem] text-center">
+        <MapPinOff className="w-7 h-7 opacity-80" />
+        <div>
+          <p className="font-medium text-sm">Location access is blocked</p>
+          <p className="text-xs opacity-80 mt-0.5">
+            Enable location in your browser settings to see local weather,
+            or select a yard above.
+          </p>
+        </div>
+        <button
+          onClick={requestGeolocation}
+          className="flex items-center gap-1.5 text-xs font-medium bg-white/20 hover:bg-white/30 transition-colors rounded-full px-3 py-1.5"
+        >
+          <RefreshCw className="w-3 h-3" /> Try Again
+        </button>
+      </div>
     );
   }
 
