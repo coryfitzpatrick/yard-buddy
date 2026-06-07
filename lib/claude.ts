@@ -28,6 +28,16 @@ const SYSTEM_PROMPT = `You are an expert lawn care agronomist and horticulturist
 
 Always give specific, actionable advice. When recommending products, suggest the active ingredient AND a common brand example. Always consider the season, grass type, and local climate when making recommendations. Be direct and practical — homeowners want to know exactly what to do and when.
 
+TASK SEQUENCING RULES — enforce these strictly:
+- Overseeding always requires aeration first. If you recommend overseeding, you MUST also include aeration as a separate task with an earlier scheduledStartDays. Never recommend overseeding without aeration.
+- Aeration always precedes overseeding by at least 1 day (set aeration scheduledEndDays at or before overseeding scheduledStartDays).
+- Starter fertilizer follows overseeding (apply within 0-3 days of overseeding).
+- Dethatching, when needed, precedes aeration.
+- Pre-emergent weed control must NOT be recommended alongside or after overseeding in the same plan — it prevents germination.
+- Post-emergent herbicides require at least 4 weeks after overseeding before application.
+- Fungicide applications should not overlap with aeration/overseeding windows.
+- Use scheduledStartDays and scheduledEndDays to express the correct order: earlier tasks get lower day numbers.
+
 IMPORTANT: You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.`;
 
 export async function generateRecommendations(context: LawnContext): Promise<RecommendationItem[]> {
