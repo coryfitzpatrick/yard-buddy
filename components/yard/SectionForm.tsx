@@ -39,8 +39,6 @@ export function SectionForm({ yardId, initialData }: Props) {
         areaType: initialData?.areaType as AreaType | undefined,
         grassType: (initialData?.grassType as YardSectionInput["grassType"]) ?? "unknown",
         soilMoisture: initialData?.soilMoisture as YardSectionInput["soilMoisture"] | undefined,
-        spreaderType: initialData?.spreaderType as YardSectionInput["spreaderType"] | undefined,
-        spreaderModel: initialData?.spreaderModel ?? undefined,
         notes: initialData?.notes ?? undefined,
       },
     });
@@ -112,19 +110,6 @@ export function SectionForm({ yardId, initialData }: Props) {
               <SelectItem value="dry">Dry</SelectItem>
               <SelectItem value="moderate">Moderate</SelectItem>
               <SelectItem value="moist">Moist</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1">
-          <Label>Spreader Type</Label>
-          <Select defaultValue={initialData?.spreaderType ?? undefined} onValueChange={(v) => setValue("spreaderType", v as YardSectionInput["spreaderType"])}>
-            <SelectTrigger><SelectValue placeholder="Select spreader" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="broadcast">Broadcast / Rotary</SelectItem>
-              <SelectItem value="drop">Drop Spreader</SelectItem>
-              <SelectItem value="handheld">Handheld Spreader</SelectItem>
-              <SelectItem value="liquid">Liquid / Hose-end Sprayer</SelectItem>
-              <SelectItem value="none">None / Hand Apply</SelectItem>
             </SelectContent>
           </Select>
         </div>

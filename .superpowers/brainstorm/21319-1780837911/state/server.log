@@ -1,0 +1,6 @@
+{"type":"server-started","port":53027,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:53027","screen_dir":"/Users/cory/Projects/yard-buddy/.superpowers/brainstorm/21319-1780837911/content","state_dir":"/Users/cory/Projects/yard-buddy/.superpowers/brainstorm/21319-1780837911/state"}
+{"type":"screen-added","file":"/Users/cory/Projects/yard-buddy/.superpowers/brainstorm/21319-1780837911/content/task-grouping.html"}
+{"type":"screen-added","file":"/Users/cory/Projects/yard-buddy/.superpowers/brainstorm/21319-1780837911/content/date-format.html"}
+{"type":"screen-added","file":"/Users/cory/Projects/yard-buddy/.superpowers/brainstorm/21319-1780837911/content/past-due.html"}
+{"type":"screen-added","file":"/Users/cory/Projects/yard-buddy/.superpowers/brainstorm/21319-1780837911/content/waiting-1.html"}
+{"type":"server-stopped","reason":"idle timeout"}

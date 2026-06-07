@@ -61,9 +61,11 @@ export function YardSetupForm() {
       defaultValues: { name: "Front Yard", grassType: "unknown" },
     });
 
+  const [spreaderType, setSpreaderType] = useState<string>("");
+  const [spreaderModel, setSpreaderModel] = useState<string>("");
+
   const areaType = watch("areaType") as AreaType | undefined;
   const grassType = watch("grassType") as YardSectionInput["grassType"] | undefined;
-  const spreaderType = watch("spreaderType");
 
   const photoRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -165,7 +167,12 @@ export function YardSetupForm() {
         const yardRes = await fetch("/api/yard", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: propertyName, zipCode }),
+          body: JSON.stringify({
+            name: propertyName,
+            zipCode,
+            spreaderType: spreaderType || undefined,
+            spreaderModel: spreaderModel || undefined,
+          }),
         });
         if (!yardRes.ok) { setError("Failed to save property. Please try again."); return; }
         const yard = await yardRes.json();
@@ -176,6 +183,19 @@ export function YardSetupForm() {
         setError("Network error. Please check your connection.");
         return;
       }
+    } else if (spreaderType) {
+      try {
+        await fetch(`/api/yard/${yardId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: createdPropertyName || propertyName,
+            zipCode,
+            spreaderType: spreaderType || undefined,
+            spreaderModel: spreaderModel || undefined,
+          }),
+        });
+      } catch { /* spreader update is best-effort */ }
     }
 
     try {
@@ -412,7 +432,7 @@ export function YardSetupForm() {
                 </div>
                 <div className="space-y-1">
                   <Label>Spreader Type</Label>
-                  <Select onValueChange={(v) => setValue("spreaderType", v as YardSectionInput["spreaderType"])}>
+                  <Select value={spreaderType || undefined} onValueChange={(v) => setSpreaderType(v ?? "")}>
                     <SelectTrigger><SelectValue placeholder="Select spreader" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="broadcast">Broadcast / Rotary</SelectItem>
@@ -425,11 +445,11 @@ export function YardSetupForm() {
                 </div>
                 <div className="space-y-1">
                   <Label>Spreader Model (optional)</Label>
-                  <Input placeholder="e.g. Scotts EdgeGuard DLX" {...register("spreaderModel")} />
+                  <Input placeholder="e.g. Scotts EdgeGuard DLX" value={spreaderModel} onChange={(e) => setSpreaderModel(e.target.value)} />
                   {spreaderType && SPREADER_BRANDS[spreaderType]?.length > 0 && (
                     <div className="flex flex-wrap gap-1 pt-1">
                       {SPREADER_BRANDS[spreaderType].map((brand) => (
-                        <button key={brand} type="button" onClick={() => setValue("spreaderModel", brand)}
+                        <button key={brand} type="button" onClick={() => setSpreaderModel(brand)}
                           className="text-xs px-2 py-0.5 rounded-full border border-green-300 text-green-700 hover:bg-green-50 transition-colors">
                           {brand}
                         </button>
@@ -456,8 +476,8 @@ export function YardSetupForm() {
                   {!!watch("yardSizeSqft") && (
                     <div><span className="font-medium">Size:</span> {String(watch("yardSizeSqft"))} sq ft</div>
                   )}
-                  {!!watch("spreaderType") && (
-                    <div><span className="font-medium">Spreader:</span> {String(watch("spreaderType"))}</div>
+                  {!!spreaderType && (
+                    <div><span className="font-medium">Spreader:</span> {spreaderType}</div>
                   )}
                 </div>
               </div>

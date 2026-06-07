@@ -15,8 +15,6 @@ interface Section {
   areaType: string | null;
   grassType: string;
   yardSizeSqft: number | null;
-  spreaderType: string | null;
-  spreaderModel: string | null;
 }
 
 export function SectionCard({ section }: { section: Section }) {

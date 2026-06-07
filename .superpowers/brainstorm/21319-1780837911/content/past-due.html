@@ -1,0 +1,143 @@
+<h2>How should overdue tasks be handled?</h2>
+<p class="subtitle">The AI knows whether missing the window matters — some tasks are still worth doing late, others should just be skipped. How do we surface that?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:12px;">
+
+        <!-- Normal tasks above -->
+        <div style="opacity:.4;margin-bottom:10px;">
+          <div style="background:white;border:1px solid #fee2e2;border-radius:8px;padding:8px 10px;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:11px;">Apply fungicide</div>
+            <div style="color:#888;font-size:10px;">Jun 10 – 12</div>
+          </div>
+        </div>
+
+        <div style="border-top:1px dashed #d1d5db;padding-top:10px;">
+          <div style="font-weight:700;color:#9ca3af;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">⏰ Overdue</div>
+
+          <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;margin-bottom:5px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+              <div style="font-weight:600;font-size:11px;color:#374151;">Fertilize front yard</div>
+              <div style="background:#fef9c3;color:#854d0e;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;white-space:nowrap;margin-left:6px;">Still worth doing</div>
+            </div>
+            <div style="color:#9ca3af;font-size:10px;">Was: Jun 8 – 14 · A bit late but still effective</div>
+          </div>
+
+          <div style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+              <div style="font-weight:600;font-size:11px;color:#9ca3af;text-decoration:line-through;">Apply pre-emergent</div>
+              <div style="background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;white-space:nowrap;margin-left:6px;">Skip it</div>
+            </div>
+            <div style="color:#9ca3af;font-size:10px;">Was: May 28 – Jun 5 · Window closed — wait until fall</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Overdue section at the bottom with "Still worth doing" / "Skip it" badges</h3>
+      <p>Past-due tasks collapse into a section below active tasks. Each gets a clear verdict badge. Skippable tasks are visually dimmed and struck through. Clean separation from actionable work.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:12px;">
+
+        <div style="opacity:.4;margin-bottom:10px;">
+          <div style="background:white;border:1px solid #fee2e2;border-radius:8px;padding:8px 10px;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:11px;">Apply fungicide</div>
+            <div style="color:#888;font-size:10px;">Jun 10 – 12</div>
+          </div>
+        </div>
+
+        <div style="border-top:1px dashed #d1d5db;padding-top:10px;">
+          <div style="font-weight:700;color:#9ca3af;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">⏰ Overdue</div>
+
+          <!-- Still worth doing — appears like a normal task but flagged -->
+          <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:8px 10px;margin-bottom:5px;">
+            <div style="font-weight:600;font-size:11px;color:#374151;margin-bottom:2px;">Fertilize front yard</div>
+            <div style="color:#b45309;font-size:10px;font-weight:600;margin-bottom:2px;">⚠️ Late — but still effective if done today</div>
+            <div style="color:#9ca3af;font-size:10px;">Was: Jun 8 – 14</div>
+          </div>
+
+          <!-- Skip it — collapsed/dismissed style -->
+          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;opacity:.65;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-weight:600;font-size:11px;color:#9ca3af;text-decoration:line-through;">Apply pre-emergent</div>
+                <div style="color:#9ca3af;font-size:10px;">Window closed — skip until fall</div>
+              </div>
+              <button style="font-size:9px;color:#6b7280;border:1px solid #e5e7eb;background:white;border-radius:4px;padding:2px 6px;cursor:pointer;">Dismiss</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Inline warning + dismiss button for skippable tasks</h3>
+      <p>"Still worth doing" tasks show an amber warning so you act fast. Truly closed tasks get a Dismiss button to clear them. More expressive but slightly busier.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:12px;">
+
+        <div style="opacity:.4;margin-bottom:10px;">
+          <div style="background:white;border:1px solid #fee2e2;border-radius:8px;padding:8px 10px;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:11px;">Apply fungicide</div>
+            <div style="color:#888;font-size:10px;">Jun 10 – 12</div>
+          </div>
+        </div>
+
+        <!-- Single collapsible overdue area -->
+        <div style="border-top:1px dashed #d1d5db;padding-top:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="font-weight:700;color:#9ca3af;font-size:10px;text-transform:uppercase;letter-spacing:.5px;">⏰ 2 overdue tasks</div>
+            <div style="font-size:10px;color:#6b7280;text-decoration:underline;">Review ▾</div>
+          </div>
+
+          <div style="margin-top:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+            <div style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-weight:600;font-size:11px;color:#374151;">Fertilize front yard</div>
+                  <div style="color:#9ca3af;font-size:10px;">Was: Jun 8 – 14</div>
+                </div>
+                <div style="display:flex;gap:4px;">
+                  <button style="font-size:9px;color:#16a34a;border:1px solid #dcfce7;background:#f0fdf4;border-radius:4px;padding:2px 6px;cursor:pointer;">Do it</button>
+                  <button style="font-size:9px;color:#6b7280;border:1px solid #e5e7eb;background:white;border-radius:4px;padding:2px 6px;cursor:pointer;">Skip</button>
+                </div>
+              </div>
+            </div>
+            <div style="padding:8px 10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-weight:600;font-size:11px;color:#9ca3af;">Apply pre-emergent</div>
+                  <div style="color:#9ca3af;font-size:10px;">Was: May 28 – Jun 5 · Window closed</div>
+                </div>
+                <div style="display:flex;gap:4px;">
+                  <button style="font-size:9px;color:#16a34a;border:1px solid #dcfce7;background:#f0fdf4;border-radius:4px;padding:2px 6px;cursor:pointer;opacity:.4;">Do it</button>
+                  <button style="font-size:9px;color:#6b7280;border:1px solid #e5e7eb;background:white;border-radius:4px;padding:2px 6px;cursor:pointer;">Skip</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Collapsed "N overdue" summary with Do it / Skip actions</h3>
+      <p>Overdue tasks are hidden behind a collapsible count. Expanding reveals each with "Do it" or "Skip" buttons — the AI pre-dims "Do it" when the window is truly closed. Out of the way but explicit.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Click to select, then let me know in the terminal.</p>

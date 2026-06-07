@@ -1,0 +1,120 @@
+<h2>How should tasks be grouped on the dashboard?</h2>
+<p class="subtitle">Each approach changes how weather-aware scheduling is surfaced to the user.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:12px;">
+        <div style="background:#fef2f2;border-left:3px solid #ef4444;padding:8px 10px;border-radius:4px;margin-bottom:8px;">
+          <div style="font-weight:700;color:#ef4444;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">⚡ Do Now</div>
+          <div style="background:white;border-radius:4px;padding:6px 8px;margin-bottom:4px;border:1px solid #fee2e2;">
+            <div style="font-weight:600;font-size:11px;">Apply fungicide</div>
+            <div style="color:#888;font-size:10px;">Rain expected Thu–Fri — treat today</div>
+          </div>
+          <div style="background:white;border-radius:4px;padding:6px 8px;border:1px solid #fee2e2;">
+            <div style="font-weight:600;font-size:11px;">Pull crabgrass</div>
+            <div style="color:#888;font-size:10px;">Spreading fast — act now</div>
+          </div>
+        </div>
+        <div style="background:#f0fdf4;border-left:3px solid #22c55e;padding:8px 10px;border-radius:4px;margin-bottom:8px;">
+          <div style="font-weight:700;color:#16a34a;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">📅 This Week</div>
+          <div style="background:white;border-radius:4px;padding:6px 8px;margin-bottom:4px;border:1px solid #dcfce7;">
+            <div style="font-weight:600;font-size:11px;">Fertilize front yard</div>
+            <div style="color:#888;font-size:10px;">Best window: Sat–Sun (no rain)</div>
+          </div>
+        </div>
+        <div style="background:#f8fafc;border-left:3px solid #94a3b8;padding:8px 10px;border-radius:4px;">
+          <div style="font-weight:700;color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">🗓 Coming Up</div>
+          <div style="background:white;border-radius:4px;padding:6px 8px;border:1px solid #e2e8f0;">
+            <div style="font-weight:600;font-size:11px;">Aerate back yard</div>
+            <div style="color:#888;font-size:10px;">~2 weeks — soil too dry now</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Buckets (Do Now / This Week / Coming Up)</h3>
+      <p>Tasks grouped into rolling time buckets. Weather drives which bucket each task lands in. Clean and easy to scan — you immediately see what needs attention today.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:12px;">
+        <div style="margin-bottom:10px;">
+          <div style="font-weight:700;color:#374151;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Today · Tue Jun 10</div>
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:6px;padding:7px 10px;margin-bottom:3px;">
+            <div style="font-weight:600;font-size:11px;">Apply fungicide</div>
+            <div style="color:#6b7280;font-size:10px;">Treat before Thursday rain</div>
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-weight:700;color:#374151;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Sat Jun 14</div>
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:6px;padding:7px 10px;margin-bottom:3px;">
+            <div style="font-weight:600;font-size:11px;">Fertilize front yard</div>
+            <div style="color:#6b7280;font-size:10px;">Clear day, ideal application window</div>
+          </div>
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:6px;padding:7px 10px;">
+            <div style="font-weight:600;font-size:11px;">Aerate back yard</div>
+            <div style="color:#6b7280;font-size:10px;">Good soil moisture by weekend</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:700;color:#374151;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Late June</div>
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:6px;padding:7px 10px;">
+            <div style="font-weight:600;font-size:11px;">Overseed bare patches</div>
+            <div style="color:#6b7280;font-size:10px;">After summer heat breaks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Calendar dates (actual days)</h3>
+      <p>AI assigns a specific recommended date to each task based on the weather forecast. Tasks beyond the forecast window get approximate labels ("Late June"). Feels more concrete and actionable.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:12px;">
+        <div style="background:#fef2f2;border-radius:6px;padding:8px 10px;margin-bottom:8px;">
+          <div style="font-weight:700;color:#ef4444;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">⚡ Urgent — Do Now</div>
+          <div style="background:white;border:1px solid #fee2e2;border-radius:4px;padding:6px 8px;margin-bottom:4px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:600;font-size:11px;">Apply fungicide</div>
+              <div style="background:#fef2f2;color:#ef4444;font-size:9px;font-weight:600;padding:2px 6px;border-radius:10px;">Today</div>
+            </div>
+            <div style="color:#888;font-size:10px;margin-top:2px;">Rain Thu–Fri will spread spores</div>
+          </div>
+        </div>
+        <div style="background:#fff7ed;border-radius:6px;padding:8px 10px;margin-bottom:8px;">
+          <div style="font-weight:700;color:#ea580c;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">🔶 High priority</div>
+          <div style="background:white;border:1px solid #fed7aa;border-radius:4px;padding:6px 8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:600;font-size:11px;">Fertilize front yard</div>
+              <div style="background:#fff7ed;color:#ea580c;font-size:9px;font-weight:600;padding:2px 6px;border-radius:10px;">Sat Jun 14</div>
+            </div>
+            <div style="color:#888;font-size:10px;margin-top:2px;">Clear window, no rain forecast</div>
+          </div>
+        </div>
+        <div style="background:#f0fdf4;border-radius:6px;padding:8px 10px;">
+          <div style="font-weight:700;color:#16a34a;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">🟢 Routine</div>
+          <div style="background:white;border:1px solid #dcfce7;border-radius:4px;padding:6px 8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:600;font-size:11px;">Aerate back yard</div>
+              <div style="background:#f0fdf4;color:#16a34a;font-size:9px;font-weight:600;padding:2px 6px;border-radius:10px;">~2 weeks</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Priority groups with dates on each task</h3>
+      <p>Groups by urgency (Urgent / High / Routine) rather than time, but each task shows its specific recommended date. Combines priority-first scanning with precise scheduling.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Click an option to select it, then let me know in the terminal.</p>

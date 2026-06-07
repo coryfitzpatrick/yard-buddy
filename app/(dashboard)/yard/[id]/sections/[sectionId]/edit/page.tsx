@@ -37,8 +37,6 @@ export default async function EditSectionPage({
           yardSizeSqft: section.yardSizeSqft ?? undefined,
           soilPh: section.soilPh ?? undefined,
           soilMoisture: section.soilMoisture as "dry" | "moderate" | "moist" | undefined,
-          spreaderType: section.spreaderType as import("@/lib/validations/yard").YardSectionInput["spreaderType"],
-          spreaderModel: section.spreaderModel ?? undefined,
           notes: section.notes ?? undefined,
         }}
       />

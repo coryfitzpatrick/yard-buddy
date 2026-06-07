@@ -67,6 +67,8 @@ model Yard {
   state              String?
   latitude           Float?
   longitude          Float?
+  spreaderType       String?
+  spreaderModel      String?
   weatherRefreshedAt DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
@@ -85,8 +87,6 @@ model YardSection {
   grassType     String         @default("unknown")
   soilPh        Float?
   soilMoisture  String?
-  spreaderType  String?
-  spreaderModel String?
   notes         String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt

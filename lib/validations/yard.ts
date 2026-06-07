@@ -7,6 +7,8 @@ export const yardSchema = z.object({
   state: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
+  spreaderType: z.enum(["broadcast", "drop", "handheld", "liquid", "none"]).optional(),
+  spreaderModel: z.string().optional(),
 });
 
 export type YardInput = z.infer<typeof yardSchema>;
@@ -27,8 +29,6 @@ export const yardSectionSchema = z.object({
     z.number().min(4).max(9).optional()
   ),
   soilMoisture: z.enum(["dry", "moderate", "moist"]).optional(),
-  spreaderType: z.enum(["broadcast", "drop", "handheld", "liquid", "none"]).optional(),
-  spreaderModel: z.string().optional(),
   notes: z.string().max(500).optional(),
 });
 

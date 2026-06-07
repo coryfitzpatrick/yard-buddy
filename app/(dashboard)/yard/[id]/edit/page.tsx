@@ -16,7 +16,7 @@ export default async function EditYardPage({
   const { id } = await params;
   const yard = await db.yard.findFirst({
     where: { id, userId: session.user.id },
-    select: { id: true, name: true, zipCode: true },
+    select: { id: true, name: true, zipCode: true, spreaderType: true, spreaderModel: true },
   });
   if (!yard) notFound();
 
@@ -29,7 +29,15 @@ export default async function EditYardPage({
         <ChevronLeft className="w-4 h-4" /> {yard.name}
       </Link>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Property</h1>
-      <YardEditForm yardId={id} initialData={{ name: yard.name, zipCode: yard.zipCode }} />
+      <YardEditForm
+        yardId={id}
+        initialData={{
+          name: yard.name,
+          zipCode: yard.zipCode,
+          spreaderType: yard.spreaderType ?? undefined,
+          spreaderModel: yard.spreaderModel ?? undefined,
+        }}
+      />
     </div>
   );
 }

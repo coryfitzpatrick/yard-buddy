@@ -11,20 +11,26 @@ type YardFormInput = z.input<typeof yardSchema>;
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Props {
   yardId: string;
-  initialData: { name: string; zipCode: string };
+  initialData: { name: string; zipCode: string; spreaderType?: string; spreaderModel?: string };
 }
 
 export function YardEditForm({ yardId, initialData }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } =
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } =
     useForm<YardFormInput, unknown, YardInput>({
       resolver: zodResolver(yardSchema),
-      defaultValues: { name: initialData.name, zipCode: initialData.zipCode },
+      defaultValues: {
+        name: initialData.name,
+        zipCode: initialData.zipCode,
+        spreaderType: initialData.spreaderType as YardInput["spreaderType"],
+        spreaderModel: initialData.spreaderModel,
+      },
     });
 
   async function onSubmit(data: YardInput) {
@@ -57,6 +63,28 @@ export function YardEditForm({ yardId, initialData }: Props) {
         <Label>ZIP Code</Label>
         <Input placeholder="90210" maxLength={5} {...register("zipCode")} />
         {errors.zipCode && <p className="text-sm text-red-500">{errors.zipCode.message}</p>}
+      </div>
+
+      <div className="space-y-1">
+        <Label>Spreader Type</Label>
+        <Select
+          defaultValue={initialData.spreaderType}
+          onValueChange={(v) => setValue("spreaderType", v as YardInput["spreaderType"])}
+        >
+          <SelectTrigger><SelectValue placeholder="Select spreader" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="broadcast">Broadcast / Rotary</SelectItem>
+            <SelectItem value="drop">Drop Spreader</SelectItem>
+            <SelectItem value="handheld">Handheld Spreader</SelectItem>
+            <SelectItem value="liquid">Liquid / Hose-end Sprayer</SelectItem>
+            <SelectItem value="none">None / Hand Apply</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-1">
+        <Label>Spreader Model <span className="text-gray-400 font-normal">(optional)</span></Label>
+        <Input placeholder="e.g. Scotts EdgeGuard DLX" {...register("spreaderModel")} />
       </div>
 
       <div className="flex gap-3 pt-2">

@@ -1,0 +1,131 @@
+<h2>How should the date window appear on each task?</h2>
+<p class="subtitle">All show the same idea — a window with a hard cutoff — just formatted differently.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:14px;display:flex;flex-direction:column;gap:8px;">
+
+        <div style="background:white;border:1px solid #fee2e2;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Apply fungicide</div>
+            <div style="background:#fef2f2;color:#dc2626;font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;margin-left:8px;">Do by Jun 12</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;">Treat before Thursday rain arrives</div>
+        </div>
+
+        <div style="background:white;border:1px solid #fed7aa;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Fertilize front yard</div>
+            <div style="background:#fff7ed;color:#ea580c;font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;margin-left:8px;">Do by Jun 18</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;">Apply before next rain cycle</div>
+        </div>
+
+        <div style="background:white;border:1px solid #dcfce7;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Aerate back yard</div>
+            <div style="background:#f0fdf4;color:#16a34a;font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;margin-left:8px;">Do by Jun 28</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;">Before summer heat peaks</div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — "Do by" cutoff date only</h3>
+      <p>Single deadline. Simple and clear — tells you the latest you should act, letting you pick the day yourself. Best when the window is obvious or implied by context.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:14px;display:flex;flex-direction:column;gap:8px;">
+
+        <div style="background:white;border:1px solid #fee2e2;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Apply fungicide</div>
+            <div style="background:#fef2f2;color:#dc2626;font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;margin-left:8px;">Jun 10 – 12</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;">Treat before Thursday rain arrives</div>
+        </div>
+
+        <div style="background:white;border:1px solid #fed7aa;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Fertilize front yard</div>
+            <div style="background:#fff7ed;color:#ea580c;font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;margin-left:8px;">Jun 14 – 18</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;">Clear window, no rain forecast</div>
+        </div>
+
+        <div style="background:white;border:1px solid #dcfce7;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Aerate back yard</div>
+            <div style="background:#f0fdf4;color:#16a34a;font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;margin-left:8px;">Jun 22 – 28</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;">Wait for soil moisture to drop</div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Date range (start – cutoff)</h3>
+      <p>Shows the full window — earliest recommended start through the hard cutoff. Most informative: you know both when to begin and when it's too late. Ideal when timing genuinely matters on both ends.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:12px;font-family:sans-serif;padding:14px;display:flex;flex-direction:column;gap:8px;">
+
+        <div style="background:white;border:1px solid #fee2e2;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Apply fungicide</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;margin-bottom:6px;">Treat before Thursday rain arrives</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="height:6px;flex:1;background:#e5e7eb;border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:20%;background:#22c55e;border-radius:3px;"></div>
+            </div>
+            <div style="color:#dc2626;font-size:9px;font-weight:700;white-space:nowrap;">Cutoff Jun 12</div>
+          </div>
+        </div>
+
+        <div style="background:white;border:1px solid #fed7aa;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Fertilize front yard</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;margin-bottom:6px;">Clear window, no rain forecast</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="height:6px;flex:1;background:#e5e7eb;border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:55%;background:#22c55e;border-radius:3px;"></div>
+            </div>
+            <div style="color:#ea580c;font-size:9px;font-weight:700;white-space:nowrap;">Cutoff Jun 18</div>
+          </div>
+        </div>
+
+        <div style="background:white;border:1px solid #dcfce7;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-weight:600;font-size:12px;color:#111;">Aerate back yard</div>
+          </div>
+          <div style="color:#6b7280;font-size:10px;margin-bottom:6px;">Wait for soil moisture to drop</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="height:6px;flex:1;background:#e5e7eb;border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:80%;background:#22c55e;border-radius:3px;"></div>
+            </div>
+            <div style="color:#16a34a;font-size:9px;font-weight:700;white-space:nowrap;">Cutoff Jun 28</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Progress bar + cutoff date</h3>
+      <p>A visual urgency bar shows how much of the window remains, plus the hard cutoff date. More expressive — you feel the urgency at a glance — but adds complexity to the card.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Click to select, then let me know in the terminal.</p>

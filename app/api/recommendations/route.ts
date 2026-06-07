@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { userId: session.user.id } },
-    include: { yard: { select: { zipCode: true } } },
+    include: { yard: { select: { zipCode: true, spreaderType: true } } },
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       zipCode: section.yard.zipCode,
       areaType: section.areaType,
       yardSizeSqft: section.yardSizeSqft,
-      spreaderType: section.spreaderType,
+      spreaderType: section.yard.spreaderType,
       soilPh: section.soilPh,
       soilMoisture: section.soilMoisture ?? undefined,
       weatherSummary,
