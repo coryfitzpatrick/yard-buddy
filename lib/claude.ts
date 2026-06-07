@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { GrassType, AnalysisResult, RecommendationItem } from "@/types";
+import { buildSectionAnalysisPrompt } from "@/lib/ai/analysis-prompt";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -14,6 +15,17 @@ export interface LawnContext {
   weatherSummary?: string;
   forecastText?: string;
   notes?: string | null;
+  // Section-aware enrichment fields
+  sectionName?: string;
+  streetAddress?: string | null;
+  lotSqft?: number | null;
+  weatherData?: {
+    temp: number;
+    humidity: number;
+    condition: string;
+    recentRainfall: number;
+    forecast: Array<{ day: string; high: number; low: number; condition: string; chanceOfRain: number }>;
+  };
 }
 
 const SYSTEM_PROMPT = `You are an expert lawn care agronomist and horticulturist with 20+ years of experience helping homeowners maintain healthy lawns across all US climate zones. You have deep knowledge of:
@@ -111,10 +123,37 @@ export async function analyzeImages(
     source: { type: "url" as const, url },
   }));
 
+  // Build section-aware system prompt when enriched context is available
+  const systemPrompt = context.weatherData
+    ? buildSectionAnalysisPrompt({
+        section: {
+          name: context.sectionName ?? context.areaType ?? "Lawn Section",
+          grassType: context.grassType,
+          soilPh: context.soilPh,
+          sunExposure: context.areaType ?? null,
+          squareFootage: context.yardSizeSqft,
+          streetAddress: context.streetAddress,
+          lotSize: context.lotSqft,
+        },
+        weather: context.weatherData,
+      }).systemPrompt + `
+
+ADDITIONAL CONTEXT FOR JSON RESPONSE:
+You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.
+
+DEDUPLICATION RULE — never recommend the same type of treatment more than once. If multiple issues both call for the same treatment, combine them into a single task.
+
+TASK SEQUENCING RULES:
+- Aeration before overseeding: only if compaction/thatch > 0.5" is evident.
+- Pre-emergent herbicides completely prevent seed germination — NEVER recommend them with overseeding.
+- Post-emergent herbicides: minimum 4 weeks gap from overseeding.
+- Use scheduledStartDays/scheduledEndDays to reflect correct task order.`
+    : SYSTEM_PROMPT;
+
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
-    system: SYSTEM_PROMPT,
+    system: systemPrompt,
     messages: [
       {
         role: "user",
