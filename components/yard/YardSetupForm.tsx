@@ -53,6 +53,8 @@ export function YardSetupForm() {
   const grassType = watch("grassType") as YardProfileInput["grassType"] | undefined;
   const spreaderType = watch("spreaderType");
   const [identifying, setIdentifying] = useState(false);
+  const [identifyPhase, setIdentifyPhase] = useState<"uploading" | "analyzing">("uploading");
+  const [identifyError, setIdentifyError] = useState<string | null>(null);
   const [identified, setIdentified] = useState<{ confidence: string; explanation: string } | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
 
@@ -102,22 +104,33 @@ export function YardSetupForm() {
   async function identifyGrass(file: File) {
     setIdentifying(true);
     setIdentified(null);
+    setIdentifyError(null);
+    setIdentifyPhase("uploading");
     try {
       const fd = new FormData();
       fd.append("file", file);
       const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
-      if (!uploadRes.ok) return;
+      if (!uploadRes.ok) {
+        setIdentifyError("Upload failed — check your connection and try again.");
+        return;
+      }
       const { url } = await uploadRes.json();
 
+      setIdentifyPhase("analyzing");
       const identifyRes = await fetch("/api/identify-grass", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageUrl: url }),
       });
-      if (!identifyRes.ok) return;
+      if (!identifyRes.ok) {
+        setIdentifyError("Analysis failed — please try again.");
+        return;
+      }
       const result = await identifyRes.json();
       setValue("grassType", result.grassType);
       setIdentified({ confidence: result.confidence, explanation: result.explanation });
+    } catch {
+      setIdentifyError("Something went wrong — please try again.");
     } finally {
       setIdentifying(false);
     }
@@ -231,13 +244,14 @@ export function YardSetupForm() {
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
+                  e.target.value = ""; // reset so the same file can be re-selected
                   if (file) identifyGrass(file);
                 }}
               />
               {identifying ? (
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-500 py-2">
                   <Loader2 className="w-4 h-4 animate-spin text-green-500" />
-                  Analyzing your grass...
+                  {identifyPhase === "uploading" ? "Uploading photo…" : "Analyzing your grass…"}
                 </div>
               ) : identified ? (
                 <div className="text-left space-y-1">
@@ -252,6 +266,18 @@ export function YardSetupForm() {
                     className="text-xs text-green-600 underline mt-1"
                   >
                     Try a different photo
+                  </button>
+                </div>
+              ) : identifyError ? (
+                <div className="text-left space-y-2">
+                  <p className="text-xs text-red-500">{identifyError}</p>
+                  <button
+                    type="button"
+                    onClick={() => photoRef.current?.click()}
+                    className="flex items-center gap-2 text-sm text-green-600 font-medium hover:text-green-700"
+                  >
+                    <Camera className="w-4 h-4" />
+                    Try again
                   </button>
                 </div>
               ) : (
