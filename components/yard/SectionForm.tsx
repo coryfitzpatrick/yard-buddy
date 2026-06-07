@@ -196,6 +196,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
       <div className="space-y-1">
         <Label>Section Name</Label>
         <Input placeholder="Front Yard" {...register("name")} />
+        {errors.name && <p className="text-sm text-red-500">{errors.name.message || "Section name is required"}</p>}
       </div>
 
       {/* Grass type identification */}
@@ -264,7 +265,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
           )}
         </div>
         <GrassTypeSelector value={grassType} onChange={(v) => { setValue("grassType", v); setIdentified(null); }} />
-        {errors.grassType && <p className="text-sm text-red-500">{errors.grassType.message}</p>}
+        {errors.grassType && <p className="text-sm text-red-500">{errors.grassType.message || "Please select a grass type"}</p>}
       </div>
 
       <div className="space-y-4">
@@ -330,13 +331,13 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
               ? "Adjust to just this section's share of the lawn"
               : "Optional — helps calculate product amounts"}
           </p>
-          {errors.yardSizeSqft && <p className="text-sm text-red-500">{errors.yardSizeSqft.message}</p>}
+          {errors.yardSizeSqft && <p className="text-sm text-red-500">{errors.yardSizeSqft.message || "Enter a size between 1 and 500,000 sq ft"}</p>}
         </div>
 
         <div className="space-y-1">
           <Label>Soil pH</Label>
           <Input type="number" step="0.1" min="4" max="9" placeholder="6.5" {...register("soilPh")} />
-          {errors.soilPh && <p className="text-sm text-red-500">{errors.soilPh.message}</p>}
+          {errors.soilPh && <p className="text-sm text-red-500">{errors.soilPh.message || "Soil pH must be between 4 and 9"}</p>}
         </div>
         <div className="space-y-1">
           <Label>Soil Moisture</Label>
