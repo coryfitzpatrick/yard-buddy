@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { generateRecommendations } from "@/lib/claude";
-import { getWeatherByZip } from "@/lib/weather";
+import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
+
+function addDays(date: Date, days: number): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -18,12 +24,15 @@ export async function GET(req: NextRequest) {
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   let weatherSummary: string | undefined;
+  let forecastText: string | undefined;
   try {
     const weather = await getWeatherByZip(section.yard.zipCode);
     weatherSummary = `${weather.temp}°F, ${weather.description}, ${weather.humidity}% humidity, ${weather.precipitationChance}% chance of rain`;
+    forecastText = formatForecastForClaude(weather.forecast);
   } catch { /* weather is optional context */ }
 
   try {
+    const today = new Date();
     const recommendations = await generateRecommendations({
       grassType: section.grassType as import("@/types").GrassType,
       zipCode: section.yard.zipCode,
@@ -33,6 +42,7 @@ export async function GET(req: NextRequest) {
       soilPh: section.soilPh,
       soilMoisture: section.soilMoisture ?? undefined,
       weatherSummary,
+      forecastText,
       notes: section.notes,
     });
 
@@ -45,6 +55,13 @@ export async function GET(req: NextRequest) {
         product: r.productSuggestion,
         applicationRate: r.applicationRate,
         spreaderSetting: r.spreaderSetting,
+        scheduledStart: typeof r.scheduledStartDays === "number"
+          ? addDays(today, r.scheduledStartDays)
+          : null,
+        scheduledEnd: typeof r.scheduledEndDays === "number"
+          ? addDays(today, r.scheduledEndDays)
+          : null,
+        weatherCondition: r.weatherCondition ?? null,
       })),
     });
 
