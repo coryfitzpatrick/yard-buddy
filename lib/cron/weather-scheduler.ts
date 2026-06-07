@@ -1,3 +1,5 @@
+import type { WeatherCondition } from "@/types";
+
 interface ForecastDay {
   date: string;
   precipChance: number;
@@ -13,7 +15,7 @@ function addDays(date: Date, days: number): Date {
 }
 
 export function computeNewWindow(
-  condition: string,
+  condition: WeatherCondition,
   forecast: ForecastDay[],
   originalWindowDays: number,
   today: Date = new Date()
@@ -39,7 +41,7 @@ export function computeNewWindow(
     }
 
     case "soil_moist": {
-      for (let i = 0; i < forecast.length - 1; i++) {
+      for (let i = 0; i < forecast.length; i++) {
         if (forecast[i].precipChance > 50) {
           const start = addDays(base, i + 1);
           return { scheduledStart: start, scheduledEnd: addDays(start, originalWindowDays - 1) };

@@ -80,6 +80,20 @@ describe("computeNewWindow", () => {
     it("returns null when no rainy day exists", () => {
       expect(computeNewWindow("soil_moist", ALL_DRY, 3, TODAY)).toBeNull();
     });
+
+    it("finds window when rainy day is at end of forecast", () => {
+      const forecast = [
+        { ...MIXED_FORECAST[0], precipChance: 5 },
+        { ...MIXED_FORECAST[1], precipChance: 5 },
+        { ...MIXED_FORECAST[2], precipChance: 5 },
+        { ...MIXED_FORECAST[3], precipChance: 5 },
+        { ...MIXED_FORECAST[4], precipChance: 75 },
+      ];
+      const result = computeNewWindow("soil_moist", forecast, 2, TODAY);
+      expect(result).not.toBeNull();
+      // Rainy day is index 4, so start = today + 5 = Jun 15
+      expect(dateStr(result!.scheduledStart)).toBe("2026-06-15");
+    });
   });
 
   describe("any", () => {
