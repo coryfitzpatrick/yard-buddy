@@ -37,11 +37,19 @@ interface DigestTask {
   scheduledEnd?: Date | null;
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function formatDateRange(start: Date, end: Date): string {
-  const startMonth = start.toLocaleString("en-US", { month: "short" });
-  const endMonth = end.toLocaleString("en-US", { month: "short" });
-  const startDay = start.getDate();
-  const endDay = end.getDate();
+  const startMonth = start.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+  const endMonth = end.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+  const startDay = start.getUTCDate();
+  const endDay = end.getUTCDate();
   if (startMonth === endMonth) return `${startMonth} ${startDay} - ${endDay}`;
   return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
 }
@@ -66,9 +74,9 @@ export function buildDigestEmail(opts: {
         ${overdueTasks
           .map(
             (t) => `<div style="border:1px solid #fee2e2;border-radius:8px;padding:12px 16px;margin-bottom:8px;background:#fafafa;">
-            <div style="font-weight:600;color:#111;">${t.title}</div>
-            ${t.overdueNote ? `<div style="color:#6b7280;font-size:14px;margin-top:4px;">${t.overdueNote}</div>` : ""}
-            <div style="color:#9ca3af;font-size:12px;margin-top:4px;">${t.sectionName}</div>
+            <div style="font-weight:600;color:#111;">${escapeHtml(t.title)}</div>
+            ${t.overdueNote ? `<div style="color:#6b7280;font-size:14px;margin-top:4px;">${escapeHtml(t.overdueNote)}</div>` : ""}
+            <div style="color:#9ca3af;font-size:12px;margin-top:4px;">${escapeHtml(t.sectionName)}</div>
           </div>`
           )
           .join("")}`
@@ -85,10 +93,10 @@ export function buildDigestEmail(opts: {
                 : "";
             return `<div style="border:1px solid #dcfce7;border-radius:8px;padding:12px 16px;margin-bottom:8px;background:#fafafa;">
               <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="font-weight:600;color:#111;">${t.title}</div>
+                <div style="font-weight:600;color:#111;">${escapeHtml(t.title)}</div>
                 ${dateLabel ? `<div style="color:#16a34a;font-size:12px;font-weight:600;">${dateLabel}</div>` : ""}
               </div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:4px;">${t.sectionName}</div>
+              <div style="color:#9ca3af;font-size:12px;margin-top:4px;">${escapeHtml(t.sectionName)}</div>
             </div>`;
           })
           .join("")}`
@@ -98,7 +106,7 @@ export function buildDigestEmail(opts: {
 <html>
 <body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
   <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Buddy</h1>
-  <p style="color:#6b7280;margin-top:0;">Hi ${userName},</p>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
   <p style="color:#374151;">Here is what needs attention for your lawn:</p>
   ${overdueHtml}
   ${upcomingHtml}
