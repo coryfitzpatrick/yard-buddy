@@ -38,7 +38,10 @@ export async function POST(req: NextRequest) {
     .from("lawn-photos")
     .upload(path, bytes, { contentType: file.type });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("Supabase storage upload error:", JSON.stringify(error));
+    return NextResponse.json({ error: error.message, cause: error.cause }, { status: 500 });
+  }
 
   const { data: { publicUrl } } = supabase.storage.from("lawn-photos").getPublicUrl(path);
   return NextResponse.json({ url: publicUrl });
