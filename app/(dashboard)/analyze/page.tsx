@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 
-interface YardSection { id: string; name: string; areaType: string | null; grassType: string; }
+interface YardSection { id: string; name: string; areaType: string | null; grassType: string; analyses: { healthScore: number }[]; }
 interface Yard { id: string; name: string; zipCode: string; sections: YardSection[]; }
 
 export default function AnalyzePage() {
@@ -158,6 +158,8 @@ export default function AnalyzePage() {
                   const areaCfg = s.areaType ? AREA_CONFIG[s.areaType as AreaType] : null;
                   const Icon = areaCfg?.icon;
                   const sel = selectedSectionId === s.id;
+                  const score = s.analyses[0]?.healthScore ?? null;
+                  const scoreColor = score === null ? "" : score >= 75 ? "text-green-600" : score >= 50 ? "text-yellow-600" : "text-red-500";
                   return (
                     <button
                       key={s.id}
@@ -174,9 +176,14 @@ export default function AnalyzePage() {
                           {s.name}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-400 capitalize mt-0.5">
-                        {s.grassType.replace(/_/g, " ")}
-                      </span>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-xs text-gray-400 capitalize">
+                          {s.grassType.replace(/_/g, " ")}
+                        </span>
+                        {score !== null && (
+                          <span className={cn("text-xs font-semibold", scoreColor)}>{score}/100</span>
+                        )}
+                      </div>
                     </button>
                   );
                 })}

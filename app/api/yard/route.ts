@@ -10,7 +10,18 @@ export async function GET() {
   const yards = await db.yard.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "asc" },
-    include: { sections: { orderBy: { createdAt: "asc" } } },
+    include: {
+      sections: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          analyses: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: { healthScore: true },
+          },
+        },
+      },
+    },
   });
   return NextResponse.json(yards);
 }
