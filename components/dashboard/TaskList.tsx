@@ -120,10 +120,10 @@ function TaskCard({
             </div>
             <p className="text-sm text-gray-500 leading-relaxed">{task.description}</p>
             {task.product && (
-              <div className="mt-2 flex items-center gap-1 text-xs text-gray-400">
-                <Package className="w-3 h-3" />
-                <span>{task.product}</span>
-                {task.applicationRate && <span>· {task.applicationRate}</span>}
+              <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-600">
+                <Package className="w-3.5 h-3.5 shrink-0 text-green-600" />
+                <span className="font-medium">{task.product}</span>
+                {task.applicationRate && <span className="text-gray-400">· {task.applicationRate}</span>}
               </div>
             )}
           </div>

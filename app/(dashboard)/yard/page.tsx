@@ -57,7 +57,7 @@ export default async function YardPage() {
                 </div>
                 <div className="flex items-center gap-2 flex-wrap justify-end">
                   <Link href={`/yard/${yard.id}`}>
-                    <Button variant="outline" size="sm">
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
                       <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
                     </Button>
                   </Link>

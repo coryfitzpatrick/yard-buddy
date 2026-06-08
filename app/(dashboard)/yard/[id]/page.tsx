@@ -142,6 +142,11 @@ export default async function YardDetailPage({
                           <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
                         </Button>
                       </Link>
+                      <Link href={`/yard/${yard.id}/sections/${section.id}/edit`}>
+                        <Button variant="outline" size="sm">
+                          <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
+                        </Button>
+                      </Link>
                       <Link href={`/analyze?sectionId=${section.id}`}>
                         <Button variant="outline" size="sm">
                           <Camera className="w-3.5 h-3.5 mr-1" /> Analyze

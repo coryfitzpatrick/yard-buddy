@@ -404,7 +404,11 @@ export function YardSetupForm() {
                       {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                     </Button>
                   </div>
-                  {lookupNote && <p className="text-sm text-gray-500">{lookupNote}</p>}
+                  {lookupNote && (
+                    <p className={`text-sm font-medium ${lookupNote.startsWith("Lot:") ? "text-green-700" : "text-gray-500"}`}>
+                      {lookupNote}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1">
                   <Label>Section Size</Label>

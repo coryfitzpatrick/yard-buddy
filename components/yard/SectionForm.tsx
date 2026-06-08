@@ -359,9 +359,9 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
           {errors.potassiumPpm && <p className="text-sm text-red-500">{errors.potassiumPpm.message || "Must be a positive number"}</p>}
         </div>
         <div className="space-y-1">
-          <Label>Soil Test Kit / Lab <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Label>Soil Test Source <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
           <Input placeholder="e.g. Lowe's test kit, UGA Extension Lab" {...register("soilTestSource")} />
-          <p className="text-sm text-gray-400">Works with results from any kit or lab</p>
+          <p className="text-sm text-gray-400">Where did your soil numbers come from? Helps us give better context.</p>
           {errors.soilTestSource && <p className="text-sm text-red-500">{errors.soilTestSource.message}</p>}
         </div>
         <div className="space-y-1">
