@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PhotoUpload } from "@/components/analysis/PhotoUpload";
 import { AnalysisResults } from "@/components/analysis/AnalysisResults";
 import type { AnalysisResult, AreaType } from "@/types";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
@@ -110,7 +110,14 @@ export default function AnalyzePage() {
           {/* Step 1: yard picker — only shown when multiple yards */}
           {yards.length > 1 && (
             <div className="mb-6">
-              <p className="text-sm font-medium text-gray-700 mb-3">Which yard?</p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-gray-700">Which yard?</p>
+                <Link href="/yard/setup">
+                  <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">
+                    <Plus className="w-3 h-3" /> Add Yard
+                  </Button>
+                </Link>
+              </div>
               <div className="flex gap-3 flex-wrap">
                 {yards.map((yard) => {
                   const sel = yard.id === selectedYardId;
@@ -132,6 +139,17 @@ export default function AnalyzePage() {
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* Add Yard link for single-yard users */}
+          {yards.length === 1 && (
+            <div className="flex justify-end mb-4">
+              <Link href="/yard/setup">
+                <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">
+                  <Plus className="w-3 h-3" /> Add Yard
+                </Button>
+              </Link>
             </div>
           )}
 
