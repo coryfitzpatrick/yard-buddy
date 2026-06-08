@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { WhyYardBuddy } from "@/components/home/WhyYardBuddy";
+import { ScreenshotSection } from "@/components/home/ScreenshotSection";
 
 const FEATURES = [
   "AI-powered lawn diagnosis from photos",
@@ -47,6 +48,7 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+      <ScreenshotSection />
       <WhyYardBuddy />
     </div>
   );

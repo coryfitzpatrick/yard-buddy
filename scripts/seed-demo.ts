@@ -136,7 +136,7 @@ async function main() {
   const frontAnalysis2 = await db.lawnAnalysis.create({
     data: {
       yardSectionId: frontYard.id,
-      imageUrls: [`${BASE_URL}/healthy-front.jpg`],
+      imageUrls: [`${BASE_URL}/fair-lawn.jpg`],
       healthScore: 74,
       issues: ["occasional dry patches near mailbox post", "minor thatch buildup"],
       summary:
@@ -149,7 +149,7 @@ async function main() {
   const frontAnalysis3 = await db.lawnAnalysis.create({
     data: {
       yardSectionId: frontYard.id,
-      imageUrls: [`${BASE_URL}/perfect-lawn.jpg`],
+      imageUrls: [`${BASE_URL}/lush-green.jpg`],
       healthScore: 88,
       issues: ["minor dollar spot in low-drainage corner"],
       summary:
