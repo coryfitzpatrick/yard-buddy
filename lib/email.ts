@@ -121,3 +121,25 @@ export function buildDigestEmail(opts: {
 
   return { subject, html };
 }
+
+export function buildPasswordResetEmail(opts: {
+  userName: string;
+  resetUrl: string;
+}): { subject: string; html: string } {
+  const { userName, resetUrl } = opts;
+  return {
+    subject: "Reset your Yard Buddy password",
+    html: `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Buddy</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">We received a request to reset your password. Click the button below to choose a new one. This link expires in 1 hour.</p>
+  <div style="text-align:center;margin:32px 0;">
+    <a href="${resetUrl}" style="background:#16a34a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Reset Password</a>
+  </div>
+  <p style="color:#9ca3af;font-size:12px;">If you didn't request a password reset, you can safely ignore this email.</p>
+</body>
+</html>`,
+  };
+}
