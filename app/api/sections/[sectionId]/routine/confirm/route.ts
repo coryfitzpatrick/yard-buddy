@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import type { WeatherCondition } from "@/types";
 
+const VALID_PRIORITIES = new Set(["urgent", "high", "medium", "low"]);
+
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
@@ -57,18 +59,18 @@ export async function POST(
       db.lawnTask.create({
         data: {
           yardSectionId: sectionId,
-          title: t.title,
-          description: t.description,
-          priority: t.priority,
+          title: String(t.title ?? "").slice(0, 200),
+          description: String(t.description ?? "").slice(0, 1000),
+          priority: VALID_PRIORITIES.has(t.priority) ? t.priority : "medium",
           product: t.productSuggestion ?? null,
           applicationRate: t.applicationRate ?? null,
           spreaderSetting: t.spreaderSetting ?? null,
           taskMode: "maintenance",
           scheduledStart: typeof t.scheduledStartDays === "number"
-            ? addDays(today, t.scheduledStartDays)
+            ? addDays(today, Math.min(Math.max(0, t.scheduledStartDays), 365))
             : null,
           scheduledEnd: typeof t.scheduledEndDays === "number"
-            ? addDays(today, t.scheduledEndDays)
+            ? addDays(today, Math.min(Math.max(0, t.scheduledEndDays), 365))
             : null,
           weatherCondition: t.weatherCondition ?? null,
         },

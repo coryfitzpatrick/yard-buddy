@@ -256,7 +256,8 @@ export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Pro
               <Button
                 size="sm"
                 onClick={preview}
-                className="bg-green-700 hover:bg-green-800 text-white"
+                disabled={!mowing.trim() && !watering.trim() && !fertilizer.trim()}
+                className="bg-green-700 hover:bg-green-800 text-white disabled:opacity-50"
               >
                 Preview reminders
               </Button>
