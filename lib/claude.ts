@@ -21,6 +21,7 @@ export interface LawnContext {
   notes?: string | null;
   currentRoutine?: string | null;
   routineMode?: boolean;
+  priorHealthScore?: number;
   // Section-aware enrichment fields
   sectionName?: string;
   streetAddress?: string | null;
@@ -103,6 +104,7 @@ ${context.soilMoisture ? `Soil Moisture: ${context.soilMoisture}` : ""}
 ${context.forecastText ? `5-Day Weather Forecast:\n${context.forecastText}` : context.weatherSummary ? `Current Weather: ${context.weatherSummary}` : ""}
 ${context.notes ? `Notes: ${context.notes.slice(0, 500)}` : ""}
 ${context.currentRoutine ? `Homeowner's Current Routine:\n${context.currentRoutine.slice(0, 500)}` : ""}
+${context.priorHealthScore !== undefined ? `Prior lawn health score: ${context.priorHealthScore}/100. Apply HEALTHY LAWN MODE if >= 75.` : ""}
 ${context.routineMode ? "\nROUTINE REMINDER MODE: Generate maintenance-only reminder tasks based on the routine above." : ""}
 
 Return a JSON array of 3-6 recommendations. Each item must follow this exact structure:

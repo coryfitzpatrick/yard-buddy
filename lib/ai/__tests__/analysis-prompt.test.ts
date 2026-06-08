@@ -91,4 +91,57 @@ describe('buildSectionAnalysisPrompt', () => {
     expect(systemPrompt).toContain("HEALTHY LAWN MODE");
     expect(systemPrompt).toContain("taskMode");
   });
+
+  it("includes currentRoutine in prompt when provided", () => {
+    const { systemPrompt } = buildSectionAnalysisPrompt({
+      section: {
+        name: "Front Yard",
+        grassType: "bermuda",
+        soilPh: null,
+        nitrogenPpm: null,
+        phosphorusPpm: null,
+        potassiumPpm: null,
+        soilTestSource: null,
+        sunExposure: null,
+        squareFootage: null,
+        streetAddress: null,
+        currentRoutine: "Mowing: Weekly at 3.5 inches\nWatering: Tue/Thu/Sat mornings",
+      },
+      weather: {
+        temp: 75,
+        humidity: 50,
+        condition: "Clear",
+        recentRainfall: 0,
+        forecast: [],
+      },
+    });
+    expect(systemPrompt).toContain("Current Routine:");
+    expect(systemPrompt).toContain("Mowing: Weekly at 3.5 inches");
+  });
+
+  it("omits currentRoutine from prompt when null", () => {
+    const { systemPrompt } = buildSectionAnalysisPrompt({
+      section: {
+        name: "Front Yard",
+        grassType: "bermuda",
+        soilPh: null,
+        nitrogenPpm: null,
+        phosphorusPpm: null,
+        potassiumPpm: null,
+        soilTestSource: null,
+        sunExposure: null,
+        squareFootage: null,
+        streetAddress: null,
+        currentRoutine: null,
+      },
+      weather: {
+        temp: 75,
+        humidity: 50,
+        condition: "Clear",
+        recentRainfall: 0,
+        forecast: [],
+      },
+    });
+    expect(systemPrompt).not.toContain("Current Routine:");
+  });
 })

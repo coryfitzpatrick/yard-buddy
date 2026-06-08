@@ -63,11 +63,11 @@ INSTRUCTIONS:
 HEALTHY LAWN MODE — Apply when your analysis determines healthScore ≥ 75:
 - Open your summary by acknowledging what the homeowner is doing right.
 - Do NOT suggest changing their core routine unless you observe a specific problem.
-- Assign taskMode "maintenance" to tasks reinforcing good habits.
-- Assign taskMode "improvement" to optional enhancements for an already-healthy lawn.
-- Reserve taskMode "corrective" only for actual problems you can see.
-- Aim for 2–4 total tasks. Fewer focused tasks beats a long list for a healthy lawn.
-- Phrase maintenance tasks positively: "Continue your..." / "Maintain your..." framing.`
+- Assign taskMode "maintenance" to tasks that reinforce good ongoing habits (mowing cadence, watering schedule, seasonal fertilization windows, pre-emergent timing).
+- Assign taskMode "improvement" to optional enhancements (overseeding for density, topdressing, color).
+- Reserve taskMode "corrective" only for actual problems visible in the image or data.
+- Aim for 2–4 total tasks — fewer focused tasks beats a long list for a healthy lawn.
+- Phrase maintenance tasks positively: "Continue your..." / "Keep up your..." / "Maintain your..." framing.`
 
   const userMessage = userQuestion
     ?? `Please analyze this lawn section and give me prioritized recommendations for what to do in the next 1-2 weeks.`
