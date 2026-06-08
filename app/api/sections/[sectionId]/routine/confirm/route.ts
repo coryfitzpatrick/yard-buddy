@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import type { WeatherCondition } from "@/types";
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -14,7 +15,7 @@ interface ConfirmedTask {
   priority: string;
   scheduledStartDays: number;
   scheduledEndDays: number;
-  weatherCondition: string;
+  weatherCondition: WeatherCondition;
   product?: string;
   applicationRate?: string;
   spreaderSetting?: string;
@@ -29,6 +30,16 @@ export async function POST(
 
   const { sectionId } = await params;
   const { routine, tasks }: { routine: string | null; tasks: ConfirmedTask[] } = await req.json();
+
+  if (!Array.isArray(tasks)) {
+    return NextResponse.json({ error: "tasks must be an array" }, { status: 400 });
+  }
+  if (tasks.length > 20) {
+    return NextResponse.json({ error: "Too many tasks" }, { status: 400 });
+  }
+  if (typeof routine === "string" && routine.length > 1000) {
+    return NextResponse.json({ error: "routine too long" }, { status: 400 });
+  }
 
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { userId: session.user.id } },

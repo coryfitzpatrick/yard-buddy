@@ -16,6 +16,12 @@ export async function POST(
   const { sectionId } = await params;
   const { mowing, watering, fertilizer } = await req.json();
 
+  const toStr = (v: unknown): string | undefined =>
+    typeof v === "string" ? v.slice(0, 300) : undefined;
+  const mowingStr   = toStr(mowing);
+  const wateringStr = toStr(watering);
+  const fertStr     = toStr(fertilizer);
+
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { userId: session.user.id } },
     include: { yard: { select: { zipCode: true, spreaderType: true } } },
@@ -23,9 +29,9 @@ export async function POST(
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const routineParts = [
-    mowing ? `Mowing: ${mowing}` : null,
-    watering ? `Watering: ${watering}` : null,
-    fertilizer ? `Fertilizer & treatments: ${fertilizer}` : null,
+    mowingStr ? `Mowing: ${mowingStr}` : null,
+    wateringStr ? `Watering: ${wateringStr}` : null,
+    fertStr ? `Fertilizer & treatments: ${fertStr}` : null,
   ].filter(Boolean);
   const currentRoutine = routineParts.length > 0 ? routineParts.join("\n") : null;
 
@@ -40,24 +46,28 @@ export async function POST(
     forecastText = formatForecastForClaude(weather.forecast);
   } catch { /* weather is optional */ }
 
-  const tasks = await generateRecommendations({
-    grassType: section.grassType as import("@/types").GrassType,
-    zipCode: section.yard.zipCode,
-    areaType: section.areaType,
-    yardSizeSqft: section.yardSizeSqft,
-    spreaderType: section.yard.spreaderType,
-    soilPh: section.soilPh,
-    nitrogenPpm: section.nitrogenPpm,
-    phosphorusPpm: section.phosphorusPpm,
-    potassiumPpm: section.potassiumPpm,
-    soilTestSource: section.soilTestSource,
-    soilMoisture: section.soilMoisture ?? undefined,
-    weatherSummary,
-    forecastText,
-    notes: section.notes,
-    currentRoutine,
-    routineMode: true,
-  });
-
-  return NextResponse.json({ tasks });
+  try {
+    const tasks = await generateRecommendations({
+      grassType: section.grassType as import("@/types").GrassType,
+      zipCode: section.yard.zipCode,
+      areaType: section.areaType,
+      yardSizeSqft: section.yardSizeSqft,
+      spreaderType: section.yard.spreaderType,
+      soilPh: section.soilPh,
+      nitrogenPpm: section.nitrogenPpm,
+      phosphorusPpm: section.phosphorusPpm,
+      potassiumPpm: section.potassiumPpm,
+      soilTestSource: section.soilTestSource,
+      soilMoisture: section.soilMoisture ?? undefined,
+      weatherSummary,
+      forecastText,
+      notes: section.notes,
+      currentRoutine,
+      routineMode: true,
+    });
+    return NextResponse.json({ tasks });
+  } catch (err) {
+    console.error("Routine preview failed:", err);
+    return NextResponse.json({ error: "Preview failed. Please try again." }, { status: 500 });
+  }
 }
