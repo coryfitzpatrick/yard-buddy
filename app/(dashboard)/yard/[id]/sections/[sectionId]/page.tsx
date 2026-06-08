@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Camera, Pencil } from "lucide-react";
+import { ChevronLeft, Camera, Pencil, Images } from "lucide-react";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
@@ -54,6 +54,8 @@ export default async function SectionDetailPage({
   const areaCfg = section.areaType ? AREA_CONFIG[section.areaType as AreaType] : null;
   const AreaIcon = areaCfg?.icon;
   const latestAnalysis = section.analyses[0] ?? null;
+
+  const totalPhotoCount = section.analyses.reduce((sum, a) => sum + a.imageUrls.length, 0);
 
   const chartData = [...section.analyses].reverse().map((a) => ({
     date: a.createdAt.toISOString(),
@@ -151,6 +153,17 @@ export default async function SectionDetailPage({
                   />
                 </a>
               ))}
+            </div>
+          )}
+          {totalPhotoCount > 0 && (
+            <div className="pt-1">
+              <Link
+                href={`/yard/${yardId}/sections/${sectionId}/photos`}
+                className="inline-flex items-center gap-1.5 text-sm text-green-700 hover:text-green-800 font-medium"
+              >
+                <Images className="w-4 h-4" />
+                View photo history ({totalPhotoCount})
+              </Link>
             </div>
           )}
         </div>
