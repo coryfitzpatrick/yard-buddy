@@ -22,6 +22,7 @@ model User {
   accounts             Account[]
   sessions             Session[]
   yards                Yard[]
+  passwordResets       PasswordResetToken[]
 }
 
 model Account {
@@ -150,4 +151,15 @@ model LawnTask {
   @@index([yardSectionId])
   @@index([analysisId])
   @@index([status, scheduledEnd])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
