@@ -27,12 +27,19 @@ export async function POST(req: NextRequest) {
 
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { userId: session.user.id } },
-    include: { yard: { select: { zipCode: true, spreaderType: true } } },
+    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true } } },
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   let weatherSummary: string | undefined;
   let forecastText: string | undefined;
+  let enrichedWeather: {
+    temp: number;
+    humidity: number;
+    condition: string;
+    recentRainfall: number;
+    forecast: Array<{ day: string; high: number; low: number; condition: string; chanceOfRain: number }>;
+  } | undefined;
   try {
     const weather = await Promise.race([
       getWeatherByZip(section.yard.zipCode),
@@ -40,6 +47,22 @@ export async function POST(req: NextRequest) {
     ]);
     weatherSummary = `${weather.temp}°F, ${weather.description}, ${weather.humidity}% humidity, ${weather.precipitationChance}% chance of rain`;
     forecastText = formatForecastForClaude(weather.forecast);
+
+    // Map WeatherData shape to the enriched format expected by buildSectionAnalysisPrompt
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    enrichedWeather = {
+      temp: weather.temp,
+      humidity: weather.humidity,
+      condition: weather.description,
+      recentRainfall: 0, // OpenWeatherMap free tier doesn't expose 7-day accumulation
+      forecast: weather.forecast.map((f, i) => ({
+        day: i === 0 ? "Today" : dayNames[new Date(f.date + "T12:00:00").getDay()],
+        high: f.high,
+        low: f.low,
+        condition: f.description,
+        chanceOfRain: f.precipChance,
+      })),
+    };
   } catch { /* weather is optional context */ }
 
   try {
@@ -51,10 +74,19 @@ export async function POST(req: NextRequest) {
       yardSizeSqft: section.yardSizeSqft,
       spreaderType: section.yard.spreaderType,
       soilPh: section.soilPh,
+      nitrogenPpm: section.nitrogenPpm,
+      phosphorusPpm: section.phosphorusPpm,
+      potassiumPpm: section.potassiumPpm,
+      soilTestSource: section.soilTestSource,
       soilMoisture: section.soilMoisture ?? undefined,
       weatherSummary,
       forecastText,
       notes: section.notes,
+      // Section-aware enrichment
+      sectionName: section.name,
+      streetAddress: section.yard.streetAddress,
+      sunExposure: null, // YardSection.sunExposure not yet in schema; passes null rather than wrong areaType
+      weatherData: enrichedWeather,
     });
 
     result.recommendations = deduplicateRecommendations(result.recommendations);

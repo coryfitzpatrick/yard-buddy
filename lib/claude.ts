@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { GrassType, AnalysisResult, RecommendationItem } from "@/types";
+import { buildSectionAnalysisPrompt } from "@/lib/ai/analysis-prompt";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -10,10 +11,25 @@ export interface LawnContext {
   yardSizeSqft?: number | null;
   spreaderType?: string | null;
   soilPh?: number | null;
+  nitrogenPpm?: number | null;
+  phosphorusPpm?: number | null;
+  potassiumPpm?: number | null;
+  soilTestSource?: string | null;
   soilMoisture?: string | null;
   weatherSummary?: string;
   forecastText?: string;
   notes?: string | null;
+  // Section-aware enrichment fields
+  sectionName?: string;
+  streetAddress?: string | null;
+  sunExposure?: string | null;
+  weatherData?: {
+    temp: number;
+    humidity: number;
+    condition: string;
+    recentRainfall: number;
+    forecast: Array<{ day: string; high: number; low: number; condition: string; chanceOfRain: number }>;
+  };
 }
 
 const SYSTEM_PROMPT = `You are an expert lawn care agronomist and horticulturist with 20+ years of experience helping homeowners maintain healthy lawns across all US climate zones. You have deep knowledge of:
@@ -63,7 +79,7 @@ ${context.areaType ? `Yard Area: ${context.areaType.replace(/_/g, " ")} (${
 })` : ""}
 ${context.yardSizeSqft ? `Yard Size: ${context.yardSizeSqft} sq ft` : ""}
 ${context.spreaderType ? `Spreader: ${context.spreaderType}` : ""}
-${context.soilPh ? `Soil pH: ${context.soilPh}` : ""}
+${context.soilPh ? `Soil pH: ${context.soilPh}` : ""}${context.nitrogenPpm != null ? `\n- Nitrogen (N): ${context.nitrogenPpm} ppm` : ''}${context.phosphorusPpm != null ? `\n- Phosphorus (P): ${context.phosphorusPpm} ppm` : ''}${context.potassiumPpm != null ? `\n- Potassium (K): ${context.potassiumPpm} ppm` : ''}${context.soilTestSource ? `\n- Soil test from: ${context.soilTestSource}` : ''}
 ${context.soilMoisture ? `Soil Moisture: ${context.soilMoisture}` : ""}
 ${context.forecastText ? `5-Day Weather Forecast:\n${context.forecastText}` : context.weatherSummary ? `Current Weather: ${context.weatherSummary}` : ""}
 ${context.notes ? `Notes: ${context.notes.slice(0, 500)}` : ""}
@@ -111,10 +127,40 @@ export async function analyzeImages(
     source: { type: "url" as const, url },
   }));
 
+  // Build section-aware system prompt when enriched context is available
+  const systemPrompt = context.weatherData
+    ? buildSectionAnalysisPrompt({
+        section: {
+          name: context.sectionName ?? context.areaType ?? "Lawn Section",
+          grassType: context.grassType,
+          soilPh: context.soilPh,
+          nitrogenPpm: context.nitrogenPpm,
+          phosphorusPpm: context.phosphorusPpm,
+          potassiumPpm: context.potassiumPpm,
+          soilTestSource: context.soilTestSource,
+          sunExposure: context.sunExposure ?? null,
+          squareFootage: context.yardSizeSqft,
+          streetAddress: context.streetAddress,
+        },
+        weather: context.weatherData,
+      }).systemPrompt + `
+
+ADDITIONAL CONTEXT FOR JSON RESPONSE:
+You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.
+
+DEDUPLICATION RULE — never recommend the same type of treatment more than once. If multiple issues both call for the same treatment, combine them into a single task.
+
+TASK SEQUENCING RULES:
+- Aeration before overseeding: only if compaction/thatch > 0.5" is evident.
+- Pre-emergent herbicides completely prevent seed germination — NEVER recommend them with overseeding.
+- Post-emergent herbicides: minimum 4 weeks gap from overseeding.
+- Use scheduledStartDays/scheduledEndDays to reflect correct task order.`
+    : SYSTEM_PROMPT;
+
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
-    system: SYSTEM_PROMPT,
+    system: systemPrompt,
     messages: [
       {
         role: "user",
