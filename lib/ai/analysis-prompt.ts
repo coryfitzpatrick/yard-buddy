@@ -2,6 +2,10 @@ type SectionInput = {
   name: string
   grassType?: string | null
   soilPh?: number | null
+  nitrogenPpm?: number | null
+  phosphorusPpm?: number | null
+  potassiumPpm?: number | null
+  soilTestSource?: string | null
   sunExposure?: string | null
   squareFootage?: number | null
   streetAddress?: string | null
@@ -31,6 +35,10 @@ export function buildSectionAnalysisPrompt({ section, weather, userQuestion }: P
 LAWN PROFILE:
 - Grass type: ${section.grassType ?? 'unknown — ask if important'}
 - Soil pH: ${section.soilPh != null ? section.soilPh : 'not tested yet — mention testing if relevant'}
+- Nitrogen (N): ${section.nitrogenPpm != null ? `${section.nitrogenPpm} ppm` : 'not tested'}
+- Phosphorus (P): ${section.phosphorusPpm != null ? `${section.phosphorusPpm} ppm` : 'not tested'}
+- Potassium (K): ${section.potassiumPpm != null ? `${section.potassiumPpm} ppm` : 'not tested'}
+${section.soilTestSource ? `- Soil test from: ${section.soilTestSource}` : ''}
 - Sun exposure: ${section.sunExposure ?? 'unknown'}
 - Size: ${section.squareFootage != null ? `${section.squareFootage} sq ft` : 'unknown'}
 - Location: ${section.streetAddress ?? 'unknown — use general US guidance'}

@@ -11,6 +11,10 @@ export interface LawnContext {
   yardSizeSqft?: number | null;
   spreaderType?: string | null;
   soilPh?: number | null;
+  nitrogenPpm?: number | null;
+  phosphorusPpm?: number | null;
+  potassiumPpm?: number | null;
+  soilTestSource?: string | null;
   soilMoisture?: string | null;
   weatherSummary?: string;
   forecastText?: string;
@@ -130,6 +134,10 @@ export async function analyzeImages(
           name: context.sectionName ?? context.areaType ?? "Lawn Section",
           grassType: context.grassType,
           soilPh: context.soilPh,
+          nitrogenPpm: context.nitrogenPpm,
+          phosphorusPpm: context.phosphorusPpm,
+          potassiumPpm: context.potassiumPpm,
+          soilTestSource: context.soilTestSource,
           sunExposure: context.sunExposure ?? null,
           squareFootage: context.yardSizeSqft,
           streetAddress: context.streetAddress,

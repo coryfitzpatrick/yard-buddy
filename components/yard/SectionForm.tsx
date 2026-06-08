@@ -47,6 +47,10 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
         grassType: (initialData?.grassType as YardSectionInput["grassType"]) ?? "unknown",
         soilMoisture: initialData?.soilMoisture as YardSectionInput["soilMoisture"] | undefined,
         soilPh: initialData?.soilPh as never,
+        nitrogenPpm: initialData?.nitrogenPpm as never,
+        phosphorusPpm: initialData?.phosphorusPpm as never,
+        potassiumPpm: initialData?.potassiumPpm as never,
+        soilTestSource: initialData?.soilTestSource ?? undefined,
         notes: initialData?.notes ?? undefined,
         yardSizeSqft: (initialData?.yardSizeSqft ?? (lotSqft && !initialData ? (lotSqft - (buildingSqft ?? 0)) || lotSqft : undefined)) as never,
       },
@@ -338,6 +342,27 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
           <Label>Soil pH</Label>
           <Input type="number" step="0.1" min="4" max="9" placeholder="6.5" {...register("soilPh")} />
           {errors.soilPh && <p className="text-sm text-red-500">{errors.soilPh.message || "Soil pH must be between 4 and 9"}</p>}
+        </div>
+        <div className="space-y-1">
+          <Label>Nitrogen (N) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Input type="number" step="0.1" min="0" placeholder="e.g. 42" {...register("nitrogenPpm")} />
+          {errors.nitrogenPpm && <p className="text-sm text-red-500">{errors.nitrogenPpm.message || "Must be a positive number"}</p>}
+        </div>
+        <div className="space-y-1">
+          <Label>Phosphorus (P) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Input type="number" step="0.1" min="0" placeholder="e.g. 28" {...register("phosphorusPpm")} />
+          {errors.phosphorusPpm && <p className="text-sm text-red-500">{errors.phosphorusPpm.message || "Must be a positive number"}</p>}
+        </div>
+        <div className="space-y-1">
+          <Label>Potassium (K) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Input type="number" step="0.1" min="0" placeholder="e.g. 180" {...register("potassiumPpm")} />
+          {errors.potassiumPpm && <p className="text-sm text-red-500">{errors.potassiumPpm.message || "Must be a positive number"}</p>}
+        </div>
+        <div className="space-y-1">
+          <Label>Soil Test Kit / Lab <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Input placeholder="e.g. Lowe's test kit, UGA Extension Lab" {...register("soilTestSource")} />
+          <p className="text-sm text-gray-400">Works with results from any kit or lab</p>
+          {errors.soilTestSource && <p className="text-sm text-red-500">{errors.soilTestSource.message}</p>}
         </div>
         <div className="space-y-1">
           <Label>Soil Moisture</Label>

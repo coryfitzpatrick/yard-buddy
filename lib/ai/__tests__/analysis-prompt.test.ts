@@ -49,4 +49,19 @@ describe('buildSectionAnalysisPrompt', () => {
     expect(systemPrompt.toLowerCase()).toContain('region')
     expect(systemPrompt.toLowerCase()).toContain('atlanta')
   })
+
+  it('includes NPK soil data in prompt when provided', () => {
+    const sectionWithNpk = {
+      ...baseSection,
+      nitrogenPpm: 42,
+      phosphorusPpm: 28,
+      potassiumPpm: 180,
+      soilTestSource: "UGA Extension Lab",
+    }
+    const { systemPrompt } = buildSectionAnalysisPrompt({ section: sectionWithNpk, weather: baseWeather })
+    expect(systemPrompt).toContain('42')
+    expect(systemPrompt).toContain('28')
+    expect(systemPrompt).toContain('180')
+    expect(systemPrompt).toContain('UGA Extension Lab')
+  })
 })

@@ -31,6 +31,19 @@ export const yardSectionSchema = z.object({
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().min(4).max(9).optional()
   ),
+  nitrogenPpm: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().min(0).optional()
+  ),
+  phosphorusPpm: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().min(0).optional()
+  ),
+  potassiumPpm: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().min(0).optional()
+  ),
+  soilTestSource: z.string().max(200).optional(),
   soilMoisture: z.enum(["dry", "moderate", "moist"]).optional(),
   notes: z.string().max(500).optional(),
 });

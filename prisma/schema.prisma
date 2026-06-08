@@ -88,8 +88,14 @@ model YardSection {
   areaType      String?
   yardSizeSqft  Int?
   grassType     String         @default("unknown")
-  soilPh        Float?
-  soilMoisture  String?
+  soilPh            Float?
+  nitrogenPpm       Float?
+  phosphorusPpm     Float?
+  potassiumPpm      Float?
+  organicMatterPct  Float?
+  soilTestSource    String?
+  soilTestedAt      DateTime?
+  soilMoisture      String?
   notes         String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt

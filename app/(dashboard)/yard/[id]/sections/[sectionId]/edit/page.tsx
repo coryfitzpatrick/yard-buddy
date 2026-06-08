@@ -39,6 +39,10 @@ export default async function EditSectionPage({
           grassType: section.grassType as import("@/lib/validations/yard").YardSectionInput["grassType"],
           yardSizeSqft: section.yardSizeSqft ?? undefined,
           soilPh: section.soilPh ?? undefined,
+          nitrogenPpm: section.nitrogenPpm ?? undefined,
+          phosphorusPpm: section.phosphorusPpm ?? undefined,
+          potassiumPpm: section.potassiumPpm ?? undefined,
+          soilTestSource: section.soilTestSource ?? undefined,
           soilMoisture: section.soilMoisture as "dry" | "moderate" | "moist" | undefined,
           notes: section.notes ?? undefined,
         }}
