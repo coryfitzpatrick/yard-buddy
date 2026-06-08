@@ -8,6 +8,7 @@ import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
 import { TaskList } from "@/components/dashboard/TaskList";
+import { RoutineCaptureCard } from "@/components/sections/RoutineCaptureCard";
 import { format } from "date-fns";
 
 export default async function SectionDetailPage({
@@ -236,6 +237,15 @@ export default async function SectionDetailPage({
           </h2>
           <TaskList tasks={serializedTasks} multiYard={false} />
         </div>
+      )}
+
+      {/* Routine capture — shown when lawn is healthy */}
+      {latestAnalysis && latestAnalysis.healthScore >= 75 && (
+        <RoutineCaptureCard
+          sectionId={section.id}
+          grassType={section.grassType}
+          initialRoutine={section.currentRoutine}
+        />
       )}
     </div>
   );
