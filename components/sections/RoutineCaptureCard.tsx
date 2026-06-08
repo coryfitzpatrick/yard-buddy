@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,11 @@ function TaskPreviewCard({
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
+
+  useEffect(() => {
+    setTitle(task.title);
+    setDescription(task.description);
+  }, [task.title, task.description]);
 
   function commit() {
     onEdit(title.trim() || task.title, description.trim() || task.description);
@@ -109,6 +115,7 @@ function TaskPreviewCard({
 }
 
 export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(!initialRoutine);
   const [state, setState] = useState<CardState>(initialRoutine ? "saved" : "form");
   const [mowing, setMowing] = useState("");
@@ -116,10 +123,12 @@ export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Pro
   const [fertilizer, setFertilizer] = useState("");
   const [tasks, setTasks] = useState<EditableTask[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState("Generating your reminders...");
 
   const grassLabel = grassType.replace(/_/g, " ");
 
   async function preview() {
+    setLoadingMessage("Generating your reminders...");
     setState("loading");
     setError(null);
     try {
@@ -145,6 +154,7 @@ export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Pro
   }
 
   async function confirm() {
+    setLoadingMessage("Saving your reminders...");
     setState("loading");
     setError(null);
     try {
@@ -164,6 +174,7 @@ export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Pro
       if (!res.ok) throw new Error("Failed");
       setState("saved");
       setOpen(false);
+      router.refresh();
     } catch {
       setError("Could not save. Please try again.");
       setState("preview");
@@ -185,6 +196,7 @@ export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Pro
       <CardContent className="p-4">
         <button
           type="button"
+          aria-expanded={open}
           className="flex items-center justify-between w-full text-left"
           onClick={() => setOpen((o) => !o)}
         >
@@ -256,7 +268,7 @@ export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Pro
         )}
 
         {open && state === "loading" && (
-          <p className="mt-4 text-sm text-green-700 animate-pulse">Generating your reminders...</p>
+          <p className="mt-4 text-sm text-green-700 animate-pulse">{loadingMessage}</p>
         )}
 
         {open && state === "preview" && (
@@ -276,7 +288,7 @@ export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Pro
               {tasks.length === 0 && (
                 <p className="text-xs text-gray-400 italic">
                   All tasks removed —{" "}
-                  <button className="underline" onClick={() => setState("form")}>
+                  <button type="button" className="underline" onClick={() => setState("form")}>
                     go back to adjust your inputs
                   </button>
                   .
@@ -310,6 +322,7 @@ export function RoutineCaptureCard({ sectionId, grassType, initialRoutine }: Pro
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>Your routine is saved. Future analyses will build around it.</span>
             <button
+              type="button"
               className="underline ml-auto shrink-0"
               onClick={() => {
                 setState("form");

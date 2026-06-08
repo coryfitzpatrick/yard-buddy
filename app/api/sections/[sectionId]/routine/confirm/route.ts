@@ -16,7 +16,7 @@ interface ConfirmedTask {
   scheduledStartDays: number;
   scheduledEndDays: number;
   weatherCondition: WeatherCondition;
-  product?: string;
+  productSuggestion?: string;
   applicationRate?: string;
   spreaderSetting?: string;
 }
@@ -60,7 +60,7 @@ export async function POST(
           title: t.title,
           description: t.description,
           priority: t.priority,
-          product: t.product ?? null,
+          product: t.productSuggestion ?? null,
           applicationRate: t.applicationRate ?? null,
           spreaderSetting: t.spreaderSetting ?? null,
           taskMode: "maintenance",
