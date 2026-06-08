@@ -98,7 +98,9 @@ Return a JSON array of 3-6 recommendations. Each item must follow this exact str
   "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
   "applicationRate": "string (optional, e.g. '3 lbs per 1000 sq ft')",
   "spreaderSetting": "string (optional, e.g. 'Scotts: 4, Andersons: 12')",
-  "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional)
+  "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional),
+  "taskMode": "corrective" | "maintenance" | "improvement"
+    (corrective = fixing a problem; maintenance = ongoing care; improvement = optional upgrade for a healthy lawn)
 }
 
 For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic windows. Example: if rain is Thursday-Friday, schedule a fungicide application for today-Wednesday (scheduledStartDays: 0, scheduledEndDays: 2) with weatherCondition "no_rain_48h". Use "any" only for tasks where weather does not matter (e.g. mowing, edging).`,
@@ -209,7 +211,9 @@ Return this exact JSON structure:
       "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
       "applicationRate": "string (optional)",
       "spreaderSetting": "string (optional)",
-      "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional)
+      "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional),
+      "taskMode": "corrective" | "maintenance" | "improvement"
+        (corrective = fixing a problem; maintenance = ongoing care; improvement = optional upgrade for a healthy lawn)
     }
   ]
 }

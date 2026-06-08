@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
             product: r.productSuggestion,
             applicationRate: r.applicationRate,
             spreaderSetting: r.spreaderSetting,
+            taskMode: r.taskMode ?? null,
             scheduledStart: typeof r.scheduledStartDays === "number"
               ? addDays(today, r.scheduledStartDays)
               : null,

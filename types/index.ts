@@ -38,6 +38,7 @@ export type LawnIssue =
 
 export type TaskStatus = "pending" | "completed" | "skipped";
 export type TaskPriority = "urgent" | "high" | "medium" | "low";
+export type TaskMode = "corrective" | "maintenance" | "improvement";
 
 export interface WeatherData {
   temp: number;
@@ -79,4 +80,5 @@ export interface RecommendationItem {
   applicationRate?: string;
   spreaderSetting?: string;
   spreaderType?: SpreadType;
+  taskMode?: TaskMode;
 }
