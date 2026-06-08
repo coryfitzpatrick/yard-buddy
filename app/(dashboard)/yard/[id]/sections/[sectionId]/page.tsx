@@ -46,6 +46,7 @@ export default async function SectionDetailPage({
           applicationRate: true,
           spreaderSetting: true,
           taskMode: true,
+          productSearchQuery: true,
           yardSectionId: true,
         },
       },
