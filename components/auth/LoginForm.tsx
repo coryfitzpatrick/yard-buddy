@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 import { loginSchema, LoginInput } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +51,12 @@ export function LoginForm() {
             {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
           </div>
           <div className="space-y-1">
-            <Label htmlFor="password">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link href="/forgot-password" className="text-xs text-green-600 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <Input id="password" type="password" {...register("password")} />
             {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
           </div>
