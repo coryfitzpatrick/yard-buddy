@@ -9,6 +9,7 @@ type SectionInput = {
   sunExposure?: string | null
   squareFootage?: number | null
   streetAddress?: string | null
+  currentRoutine?: string | null
   irrigationType?: string | null
 }
 
@@ -41,7 +42,7 @@ LAWN PROFILE:
 - Sun exposure: ${section.sunExposure ?? 'unknown'}
 - Size: ${section.squareFootage != null ? `${section.squareFootage} sq ft` : 'unknown'}
 - Location: ${section.streetAddress ?? 'unknown — use general US guidance'}
-- Irrigation: ${section.irrigationType ?? 'unknown'}
+- Irrigation: ${section.irrigationType ?? 'unknown'}${section.currentRoutine ? `\n- Current Routine: ${section.currentRoutine.slice(0, 500)}` : ''}
 
 CURRENT CONDITIONS (${section.streetAddress ?? 'user location'}):
 - Temperature: ${weather.temp}°F
@@ -57,7 +58,16 @@ INSTRUCTIONS:
 4. Flag if the soil pH is outside the ideal range for this grass type and recommend an amendment.
 5. Be specific about application rates per square footage when relevant.
 6. Match recommendations to the correct seasonal timing for this region (not a one-size-fits-all national calendar).
-7. Keep the response practical — no more than 3-4 prioritized action items plus any photo observations.`
+7. Keep the response practical — no more than 3-4 prioritized action items plus any photo observations.
+
+HEALTHY LAWN MODE — Apply when your analysis determines healthScore ≥ 75:
+- Open your summary by acknowledging what the homeowner is doing right.
+- Do NOT suggest changing their core routine unless you observe a specific problem.
+- Assign taskMode "maintenance" to tasks reinforcing good habits.
+- Assign taskMode "improvement" to optional enhancements for an already-healthy lawn.
+- Reserve taskMode "corrective" only for actual problems you can see.
+- Aim for 2–4 total tasks. Fewer focused tasks beats a long list for a healthy lawn.
+- Phrase maintenance tasks positively: "Continue your..." / "Maintain your..." framing.`
 
   const userMessage = userQuestion
     ?? `Please analyze this lawn section and give me prioritized recommendations for what to do in the next 1-2 weeks.`

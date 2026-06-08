@@ -19,6 +19,8 @@ export interface LawnContext {
   weatherSummary?: string;
   forecastText?: string;
   notes?: string | null;
+  currentRoutine?: string | null;
+  routineMode?: boolean;
   // Section-aware enrichment fields
   sectionName?: string;
   streetAddress?: string | null;
@@ -55,6 +57,23 @@ TASK SEQUENCING RULES — only include prerequisite tasks when the conditions ac
 - Post-emergent herbicides: do not recommend within 4-8 weeks of overseeding (product dependent — use 4 weeks as a safe minimum).
 - Use scheduledStartDays and scheduledEndDays to reflect correct task order: tasks that must happen first get lower day numbers.
 
+HEALTHY LAWN MODE — Apply when your analysis determines healthScore ≥ 75:
+- Open your summary by acknowledging what the homeowner is doing right.
+- Do NOT suggest changing their core routine unless you observe a specific problem.
+- Assign taskMode "maintenance" to tasks that reinforce good ongoing habits (mowing cadence, watering schedule, seasonal fertilization windows, pre-emergent timing).
+- Assign taskMode "improvement" to optional enhancements (overseeding for density, topdressing, color).
+- Reserve taskMode "corrective" only for actual problems visible in the image or data.
+- Aim for 2–4 total tasks — fewer focused tasks beats a long list for a healthy lawn.
+- Phrase maintenance tasks positively: "Continue your..." / "Keep up your..." / "Maintain your..." framing.
+
+ROUTINE REMINDER MODE — Apply when the prompt includes "ROUTINE REMINDER MODE":
+- Generate maintenance-only reminder tasks based on the homeowner's stated routine.
+- Set taskMode to "maintenance" for every task.
+- Do not generate corrective tasks — the lawn is healthy and the goal is a personalized reminder schedule.
+- Phrase tasks as confirmations of what they're already doing: "Continue mowing at X", "Maintain watering on Y schedule".
+
+For all other lawns (healthScore < 75), assign taskMode "corrective" to problem-fixing tasks and "maintenance" to any routine upkeep tasks included alongside corrections.
+
 IMPORTANT: You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.`;
 
 export async function generateRecommendations(context: LawnContext): Promise<RecommendationItem[]> {
@@ -83,6 +102,8 @@ ${context.soilPh ? `Soil pH: ${context.soilPh}` : ""}${context.nitrogenPpm != nu
 ${context.soilMoisture ? `Soil Moisture: ${context.soilMoisture}` : ""}
 ${context.forecastText ? `5-Day Weather Forecast:\n${context.forecastText}` : context.weatherSummary ? `Current Weather: ${context.weatherSummary}` : ""}
 ${context.notes ? `Notes: ${context.notes.slice(0, 500)}` : ""}
+${context.currentRoutine ? `Homeowner's Current Routine:\n${context.currentRoutine.slice(0, 500)}` : ""}
+${context.routineMode ? "\nROUTINE REMINDER MODE: Generate maintenance-only reminder tasks based on the routine above." : ""}
 
 Return a JSON array of 3-6 recommendations. Each item must follow this exact structure:
 {
@@ -143,6 +164,7 @@ export async function analyzeImages(
           sunExposure: context.sunExposure ?? null,
           squareFootage: context.yardSizeSqft,
           streetAddress: context.streetAddress,
+          currentRoutine: context.currentRoutine ?? null,
         },
         weather: context.weatherData,
       }).systemPrompt + `
@@ -189,6 +211,7 @@ ${context.soilPh ? `- Soil pH: ${context.soilPh}` : ""}
 ${context.soilMoisture ? `- Soil Moisture: ${context.soilMoisture}` : ""}
 ${context.forecastText ? `- 5-Day Forecast:\n${context.forecastText}` : context.weatherSummary ? `- Weather: ${context.weatherSummary}` : ""}
 ${context.notes ? `- Notes: ${context.notes.slice(0, 500)}` : ""}
+${context.currentRoutine ? `- Current Routine: ${context.currentRoutine.slice(0, 500)}` : ""}
 
 Return this exact JSON structure:
 {

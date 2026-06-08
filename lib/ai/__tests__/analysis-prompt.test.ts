@@ -64,4 +64,31 @@ describe('buildSectionAnalysisPrompt', () => {
     expect(systemPrompt).toContain('180')
     expect(systemPrompt).toContain('UGA Extension Lab')
   })
+
+  it("includes healthy lawn mode instructions", () => {
+    const { systemPrompt } = buildSectionAnalysisPrompt({
+      section: {
+        name: "Front Yard",
+        grassType: "bermuda",
+        soilPh: null,
+        nitrogenPpm: null,
+        phosphorusPpm: null,
+        potassiumPpm: null,
+        soilTestSource: null,
+        sunExposure: null,
+        squareFootage: null,
+        streetAddress: null,
+        currentRoutine: null,
+      },
+      weather: {
+        temp: 75,
+        humidity: 50,
+        condition: "Clear",
+        recentRainfall: 0,
+        forecast: [],
+      },
+    });
+    expect(systemPrompt).toContain("HEALTHY LAWN MODE");
+    expect(systemPrompt).toContain("taskMode");
+  });
 })
