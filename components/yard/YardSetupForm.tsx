@@ -176,7 +176,7 @@ export function YardSetupForm() {
             buildingSqft: lotData?.buildingSqft ?? undefined,
           }),
         });
-        if (!yardRes.ok) { setError("Failed to save property. Please try again."); return; }
+        if (!yardRes.ok) { setError("Failed to save yard. Please try again."); return; }
         const yard = await yardRes.json();
         yardId = yard.id;
         setCreatedYardId(yard.id);
@@ -276,7 +276,7 @@ export function YardSetupForm() {
             {step === 0 && (
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <Label>Property Name</Label>
+                  <Label>Yard Name</Label>
                   <Input value={propertyName} onChange={(e) => setPropertyName(e.target.value)} placeholder="My Home" />
                 </div>
                 <div className="space-y-1">
@@ -289,7 +289,7 @@ export function YardSetupForm() {
 
             {step === 1 && (
               <div className="space-y-4">
-                <p className="text-sm text-gray-500">Which part of your property are we setting up?</p>
+                <p className="text-sm text-gray-500">Which part of your yard are we setting up?</p>
                 <AreaTypeSelector
                   value={areaType}
                   onChange={(v) => {

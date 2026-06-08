@@ -54,7 +54,7 @@ export function YardEditForm({ yardId, initialData }: Props) {
       {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
       <div className="space-y-1">
-        <Label>Property Name</Label>
+        <Label>Yard Name</Label>
         <Input placeholder="My Home" {...register("name")} />
         {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
       </div>

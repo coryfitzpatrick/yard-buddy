@@ -110,7 +110,7 @@ export default function AnalyzePage() {
           {/* Step 1: yard picker — only shown when multiple yards */}
           {yards.length > 1 && (
             <div className="mb-6">
-              <p className="text-sm font-medium text-gray-700 mb-3">Which property?</p>
+              <p className="text-sm font-medium text-gray-700 mb-3">Which yard?</p>
               <div className="flex gap-3 flex-wrap">
                 {yards.map((yard) => {
                   const sel = yard.id === selectedYardId;

@@ -20,7 +20,7 @@ export function ScreenshotSection() {
       <div className="text-center mb-4">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">See it in action</h2>
         <p className="text-base text-gray-500 max-w-xl mx-auto">
-          These screenshots show a sample property. Your results will reflect your actual lawn,
+          These screenshots show a sample yard. Your results will reflect your actual lawn,
           grass type, and local conditions.
         </p>
       </div>
