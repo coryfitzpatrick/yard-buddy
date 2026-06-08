@@ -46,6 +46,7 @@ export default async function YardDetailPage({
               product: true,
               applicationRate: true,
               spreaderSetting: true,
+              taskMode: true,
             },
           },
         },

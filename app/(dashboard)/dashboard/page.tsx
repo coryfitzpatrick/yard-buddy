@@ -42,6 +42,7 @@ export default async function DashboardPage() {
       product: true,
       applicationRate: true,
       spreaderSetting: true,
+      taskMode: true,
       yardSection: {
         select: { id: true, name: true, areaType: true, yard: { select: { name: true } } },
       },
