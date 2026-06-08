@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
           name: true,
           notificationsEnabled: true,
           lastNotifiedAt: true,
+          notifyDaysAhead: true,
         },
       },
       sections: {
@@ -195,7 +196,7 @@ export async function GET(req: NextRequest) {
     const upcomingTasks = allPendingTasks.filter((t) => {
       if (!t.scheduledStart || t.stillWorthDoing !== null) return false;
       const daysUntilStart = (t.scheduledStart.getTime() - today.getTime()) / 86400000;
-      return daysUntilStart >= 0 && daysUntilStart <= 3;
+      return daysUntilStart >= 0 && daysUntilStart <= user.notifyDaysAhead;
     });
 
     if (overdueTasks.length === 0 && upcomingTasks.length === 0) continue;
