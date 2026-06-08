@@ -16,6 +16,7 @@ model User {
   passwordHash         String?
   notificationsEnabled Boolean   @default(true)
   lastNotifiedAt       DateTime?
+  notifyDaysAhead      Int       @default(3)
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
   accounts             Account[]
