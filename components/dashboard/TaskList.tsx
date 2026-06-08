@@ -10,6 +10,7 @@ import {
   RotateCcw,
   ChevronDown,
   ChevronUp,
+  CalendarCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ interface Task {
   product: string | null;
   applicationRate: string | null;
   spreaderSetting: string | null;
+  taskMode: string | null;
   yardSection?: {
     id: string;
     name: string;
@@ -193,6 +195,31 @@ function OverdueSection({
   );
 }
 
+function MaintenanceSection({
+  tasks,
+  multiYard,
+  onToggle,
+}: {
+  tasks: Task[];
+  multiYard: boolean;
+  onToggle: (id: string, current: string) => void;
+}) {
+  if (tasks.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wide mb-2 text-green-700 flex items-center gap-1.5">
+        <CalendarCheck className="w-3.5 h-3.5" />
+        Keep it up
+      </h3>
+      <div className="space-y-2">
+        {tasks.map((task) => (
+          <TaskCard key={task.id} task={task} multiYard={multiYard} onToggle={onToggle} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function TaskList({
   tasks: initial,
   multiYard = false,
@@ -237,7 +264,9 @@ export function TaskList({
 
   // Tasks stay in pending until the cron assesses them (sets stillWorthDoing).
   // A task with a past scheduledEnd but stillWorthDoing === null remains in pending, not overdue.
-  const pending = tasks.filter((t) => t.status === "pending" && t.stillWorthDoing === null);
+  const allPending = tasks.filter((t) => t.status === "pending" && t.stillWorthDoing === null);
+  const maintenancePending = allPending.filter((t) => t.taskMode === "maintenance");
+  const pending = allPending.filter((t) => t.taskMode !== "maintenance");
   const overdue = tasks.filter((t) => t.status === "pending" && t.stillWorthDoing !== null);
   const completed = tasks.filter((t) => t.status === "completed");
 
@@ -282,7 +311,13 @@ export function TaskList({
         );
       })}
 
-      {groups.length === 0 && overdue.length === 0 && (
+      <MaintenanceSection
+        tasks={maintenancePending}
+        multiYard={multiYard}
+        onToggle={(id) => patchTask(id, "completed")}
+      />
+
+      {groups.length === 0 && maintenancePending.length === 0 && overdue.length === 0 && (
         <div className="text-center py-8 text-gray-400">
           <CheckCircle2 className="mx-auto w-10 h-10 mb-2 text-green-300" />
           <p className="text-sm">All caught up! Analyze your lawn for new tasks.</p>

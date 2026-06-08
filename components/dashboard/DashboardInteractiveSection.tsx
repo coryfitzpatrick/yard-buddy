@@ -41,6 +41,7 @@ interface Task {
   product: string | null;
   applicationRate: string | null;
   spreaderSetting: string | null;
+  taskMode: string | null;
   yardSection?: {
     id: string;
     name: string;
