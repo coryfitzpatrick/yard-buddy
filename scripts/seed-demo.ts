@@ -2,7 +2,7 @@
  * Seed realistic demo data for homepage screenshots.
  * Run with: npx tsx scripts/seed-demo.ts
  *
- * Creates (or reuses) a demo user and populates a full property
+ * Creates (or reuses) a demo user and populates two full properties
  * with sections, analyses, and tasks that look great in screenshots.
  *
  * Set DEMO_EMAIL env var to target a specific account (default: demo@yardbuddy.app)
@@ -16,6 +16,10 @@ const db = new PrismaClient();
 const DEMO_EMAIL = process.env.DEMO_EMAIL ?? "demo@yardbuddy.app";
 const DEMO_NAME = "Alex Henderson";
 const YARD_NAME = "Henderson Property";
+const YARD2_NAME = "Rivera Property";
+
+const BASE_URL =
+  "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/v2";
 
 function daysAgo(n: number) {
   return new Date(Date.now() - n * 24 * 60 * 60 * 1000);
@@ -32,10 +36,11 @@ async function main() {
   });
   console.log(`User: ${user.id}`);
 
-  // Remove any existing demo yard so we start fresh each run
+  // Remove any existing demo yards so we start fresh each run
   await db.yard.deleteMany({ where: { userId: user.id, name: YARD_NAME } });
+  await db.yard.deleteMany({ where: { userId: user.id, name: YARD2_NAME } });
 
-  // ── Yard ───────────────────────────────────────────────────────────────────
+  // ── Yard 1: Henderson Property (Atlanta, GA) ───────────────────────────────
   const yard = await db.yard.create({
     data: {
       userId: user.id,
@@ -52,9 +57,9 @@ async function main() {
       spreaderModel: "Scotts Turf Builder EdgeGuard DLX",
     },
   });
-  console.log(`Yard: ${yard.id}`);
+  console.log(`Yard 1: ${yard.id}`);
 
-  // ── Sections ──────────────────────────────────────────────────────────────
+  // ── Sections — Henderson ───────────────────────────────────────────────────
   const frontYard = await db.yardSection.create({
     data: {
       yardId: yard.id,
@@ -118,9 +123,7 @@ async function main() {
   const frontAnalysis1 = await db.lawnAnalysis.create({
     data: {
       yardSectionId: frontYard.id,
-      imageUrls: [
-        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/front-spring.jpg",
-      ],
+      imageUrls: [`${BASE_URL}/patchy.jpg`],
       healthScore: 62,
       issues: ["thin coverage near driveway edge", "early signs of crabgrass", "low nitrogen"],
       summary:
@@ -133,9 +136,7 @@ async function main() {
   const frontAnalysis2 = await db.lawnAnalysis.create({
     data: {
       yardSectionId: frontYard.id,
-      imageUrls: [
-        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/front-recovering.jpg",
-      ],
+      imageUrls: [`${BASE_URL}/recovering.jpg`],
       healthScore: 74,
       issues: ["occasional dry patches near mailbox post", "minor thatch buildup"],
       summary:
@@ -148,9 +149,7 @@ async function main() {
   const frontAnalysis3 = await db.lawnAnalysis.create({
     data: {
       yardSectionId: frontYard.id,
-      imageUrls: [
-        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/front-healthy.jpg",
-      ],
+      imageUrls: [`${BASE_URL}/healthy-front.jpg`],
       healthScore: 88,
       issues: ["minor dollar spot in low-drainage corner"],
       summary:
@@ -164,9 +163,7 @@ async function main() {
   const backAnalysis1 = await db.lawnAnalysis.create({
     data: {
       yardSectionId: backYard.id,
-      imageUrls: [
-        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/back-yard.jpg",
-      ],
+      imageUrls: [`${BASE_URL}/back-yard.jpg`],
       healthScore: 79,
       issues: ["wear damage in play area", "uneven growth near fence line"],
       summary:
@@ -180,9 +177,7 @@ async function main() {
   const sideAnalysis1 = await db.lawnAnalysis.create({
     data: {
       yardSectionId: sideShadyYard.id,
-      imageUrls: [
-        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/side-fescue.jpg",
-      ],
+      imageUrls: [`${BASE_URL}/side-yard.jpg`],
       healthScore: 71,
       issues: ["moss encroachment in densest shade", "low soil pH limiting nutrient uptake"],
       summary:
@@ -192,7 +187,7 @@ async function main() {
     },
   });
 
-  console.log("Analyses created.");
+  console.log("Henderson analyses created.");
 
   // ── Tasks — Front Yard ────────────────────────────────────────────────────
   await db.lawnTask.createMany({
@@ -355,11 +350,213 @@ async function main() {
     ],
   });
 
-  console.log("Tasks created.");
+  console.log("Henderson tasks created.");
+
+  // ── Yard 2: Rivera Property (Austin, TX) ──────────────────────────────────
+  const yard2 = await db.yard.create({
+    data: {
+      userId: user.id,
+      name: YARD2_NAME,
+      zipCode: "78701",
+      streetAddress: "2847 Shoal Creek Blvd",
+      city: "Austin",
+      state: "TX",
+      latitude: 30.2849,
+      longitude: -97.7341,
+      lotSqft: 9200,
+      buildingSqft: 1950,
+      spreaderType: "broadcast",
+      spreaderModel: "Earthway 2150 Commercial",
+    },
+  });
+  console.log(`Yard 2: ${yard2.id}`);
+
+  // ── Sections — Rivera ──────────────────────────────────────────────────────
+  const rivera_front = await db.yardSection.create({
+    data: {
+      yardId: yard2.id,
+      name: "Front Yard",
+      areaType: "front",
+      grassType: "zoysia",
+      yardSizeSqft: 1800,
+      soilPh: 6.9,
+      soilMoisture: "moderate",
+      notes: "Full sun, slight slope away from house. HOA requires uniform green coverage.",
+    },
+  });
+
+  const rivera_back = await db.yardSection.create({
+    data: {
+      yardId: yard2.id,
+      name: "Back Yard",
+      areaType: "back",
+      grassType: "st_augustine",
+      yardSizeSqft: 3200,
+      soilPh: 6.6,
+      soilMoisture: "moderate",
+      notes: "Covered patio takes up 400 sq ft. Rest gets partial afternoon shade from live oaks.",
+    },
+  });
+
+  const rivera_right = await db.yardSection.create({
+    data: {
+      yardId: yard2.id,
+      name: "Right Side",
+      areaType: "right_side",
+      grassType: "st_augustine",
+      yardSizeSqft: 620,
+      soilPh: 6.4,
+      soilMoisture: "moist",
+      notes: "Narrow strip between house and fence. Gets afternoon shade, tends to stay moist.",
+    },
+  });
+
+  console.log(`Rivera sections: ${rivera_front.id}, ${rivera_back.id}, ${rivera_right.id}`);
+
+  // ── Analyses — Rivera Front Yard ──────────────────────────────────────────
+  const riveraFrontAnalysis = await db.lawnAnalysis.create({
+    data: {
+      yardSectionId: rivera_front.id,
+      imageUrls: [`${BASE_URL}/zoysia.jpg`],
+      healthScore: 68,
+      issues: ["broadleaf weed pressure along HOA border", "drought stress from July heat", "thin coverage on slope"],
+      summary:
+        "The zoysia front yard is holding its own through the Austin summer heat but is showing drought stress along the slope where irrigation coverage is weakest. Broadleaf weeds — primarily dollar weed and spurge — are moving in along the HOA border strip. The HOA uniform-coverage requirement means we need to address the thin areas on the slope proactively. A targeted post-emergent and deep watering schedule adjustment will be the priority this cycle.",
+      rawResponse: "",
+      createdAt: daysAgo(45),
+    },
+  });
+
+  // ── Analyses — Rivera Back Yard ───────────────────────────────────────────
+  const riveraBackAnalysis = await db.lawnAnalysis.create({
+    data: {
+      yardSectionId: rivera_back.id,
+      imageUrls: [`${BASE_URL}/back-yard-2.jpg`],
+      healthScore: 81,
+      issues: ["early chinch bug activity near patio edge"],
+      summary:
+        "St. Augustine is performing well under the live oaks — the partial shade is actually ideal for this grass type in the Austin heat. Early chinch bug signs are visible along the sunny patio edge where the grass transitions to full sun: yellowing in irregular patches that don't respond to watering. Catching this early is critical. A bifenthrin-based insecticide application now will prevent the kind of widespread damage that's common in Austin summers. Rest of the back yard looks healthy.",
+      rawResponse: "",
+      createdAt: daysAgo(20),
+    },
+  });
+
+  // ── Analyses — Rivera Right Side ──────────────────────────────────────────
+  const riveraRightAnalysis = await db.lawnAnalysis.create({
+    data: {
+      yardSectionId: rivera_right.id,
+      imageUrls: [`${BASE_URL}/lush-lawn.jpg`],
+      healthScore: 55,
+      issues: ["shade stress causing thin coverage", "moss and algae encroachment", "poor drainage keeping soil too wet"],
+      summary:
+        "This narrow strip is struggling — the combination of afternoon shade from the fence and the house retaining moisture is creating conditions that favor moss and algae over St. Augustine. The grass is visibly thin, and in the dampest zones near the downspout, moss has taken over almost entirely. St. Augustine can handle shade better than most warm-season grasses, but this level of moisture plus shade is too much. Improving drainage with a channel near the downspout and treating moss with a ferrous sulfate solution will help, but realistic expectations: this area will always require more maintenance than open sections.",
+      rawResponse: "",
+      createdAt: daysAgo(20),
+    },
+  });
+
+  console.log("Rivera analyses created.");
+
+  // ── Tasks — Rivera Front Yard ─────────────────────────────────────────────
+  await db.lawnTask.createMany({
+    data: [
+      {
+        yardSectionId: rivera_front.id,
+        analysisId: riveraFrontAnalysis.id,
+        title: "Post-emergent broadleaf weed control",
+        description:
+          "Spot-treat dollar weed and spurge along the HOA border with a broadleaf herbicide safe for zoysia. Southern AG Lawn Weed Killer with Trimec (~$18 at Calloway's Nursery) or Ortho Weed B Gon Chickweed, Clover & Oxalis Killer (~$14 at Home Depot). Apply at 1.5 fl oz per gallon, use a backpack sprayer to avoid drifting onto ornamentals. Best applied when temps are under 90°F — early morning in Austin summer.",
+        priority: "high",
+        status: "completed",
+        product: "Southern AG Lawn Weed Killer with Trimec",
+        applicationRate: "1.5 fl oz / gallon",
+        scheduledStart: daysAgo(40),
+        scheduledEnd: daysAgo(38),
+        completedAt: daysAgo(39),
+        createdAt: daysAgo(45),
+        updatedAt: daysAgo(39),
+      },
+      {
+        yardSectionId: rivera_front.id,
+        analysisId: riveraFrontAnalysis.id,
+        title: "Adjust irrigation coverage on slope",
+        description:
+          "The slope area is getting inadequate irrigation — likely a head alignment issue. Run each zone manually and check for gaps on the downhill side. Adjust heads or add a rotary nozzle to the zone covering the slope. Target 1 inch/week in two split applications (0.5 inch twice weekly) to push water deeper without runoff. Rainbird 5000 rotary heads (~$8 each at SprinklerWarehouse) are a cost-effective upgrade for slope zones.",
+        priority: "medium",
+        status: "pending",
+        product: "Rainbird 5000 Series Rotary Head",
+        scheduledStart: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        scheduledEnd: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000),
+        createdAt: daysAgo(45),
+        updatedAt: daysAgo(45),
+      },
+    ],
+  });
+
+  // ── Tasks — Rivera Back Yard ──────────────────────────────────────────────
+  await db.lawnTask.createMany({
+    data: [
+      {
+        yardSectionId: rivera_back.id,
+        analysisId: riveraBackAnalysis.id,
+        title: "Chinch bug treatment — patio perimeter",
+        description:
+          "Apply a granular bifenthrin insecticide to the 300 sq ft sunny transition zone at the patio edge where chinch bugs are active. Bifen LP Granules (~$35/25 lbs at Arbico Organics or SiteOne) applied at 1.15 lbs/1,000 sq ft and watered in immediately. Use your Earthway 2150 at setting 15. Follow up in 21 days if damage continues. Avoid applying within 48 hours of rain to prevent runoff into the creek buffer.",
+        priority: "high",
+        status: "pending",
+        product: "Bifen LP Granules (7.9% Bifenthrin)",
+        applicationRate: "1.15 lbs / 1,000 sq ft",
+        spreaderSetting: "15",
+        scheduledStart: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        scheduledEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000),
+        createdAt: daysAgo(20),
+        updatedAt: daysAgo(20),
+      },
+    ],
+  });
+
+  // ── Tasks — Rivera Right Side ─────────────────────────────────────────────
+  await db.lawnTask.createMany({
+    data: [
+      {
+        yardSectionId: rivera_right.id,
+        analysisId: riveraRightAnalysis.id,
+        title: "Install drainage channel at downspout",
+        description:
+          "The downspout is depositing water directly onto the strip, keeping it saturated. Install a 6-foot NDS channel drain (~$45 at Home Depot) to redirect flow toward the back fence. Dig a 4-inch trench, set the channel with a slight grade toward the fence, and connect to a dry creek bed or pop-up emitter at the fence line. This is the single highest-impact fix for this section.",
+        priority: "high",
+        status: "pending",
+        product: "NDS 6-ft Channel Drain Kit",
+        scheduledStart: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+        scheduledEnd: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000),
+        createdAt: daysAgo(20),
+        updatedAt: daysAgo(20),
+      },
+      {
+        yardSectionId: rivera_right.id,
+        analysisId: riveraRightAnalysis.id,
+        title: "Moss treatment with ferrous sulfate",
+        description:
+          "Apply ferrous sulfate (iron sulfate) at 3 oz per 1,000 sq ft mixed in 3 gallons of water over the mossy zones — approximately 200 sq ft. Bonide Moss & Algae Killer (~$16/qt at Calloway's) is a ready-to-spray option. Will blacken and kill moss within 1-2 weeks. Rake dead moss out and overseed bare patches with Floratam St. Augustine plugs (~$30/tray) once drainage is improved. Do not apply before the drainage fix — water pooling will bring moss back immediately.",
+        priority: "medium",
+        status: "pending",
+        product: "Bonide Moss & Algae Killer (Ferrous Sulfate)",
+        applicationRate: "3 oz / 1,000 sq ft",
+        scheduledStart: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        scheduledEnd: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+        createdAt: daysAgo(20),
+        updatedAt: daysAgo(20),
+      },
+    ],
+  });
+
+  console.log("Rivera tasks created.");
   console.log("\n✓ Demo seed complete!");
   console.log(`  User:    ${DEMO_EMAIL}`);
-  console.log(`  Yard:    ${YARD_NAME} (${yard.id})`);
-  console.log(`  Sections: Front Yard, Back Yard, Left Side Yard, Back Patio Border`);
+  console.log(`  Yard 1:  ${YARD_NAME} (${yard.id})`);
+  console.log(`           Sections: Front Yard, Back Yard, Left Side Yard, Back Patio Border`);
+  console.log(`  Yard 2:  ${YARD2_NAME} (${yard2.id})`);
+  console.log(`           Sections: Front Yard, Back Yard, Right Side`);
   console.log(`\nLog in with email ${DEMO_EMAIL} to see the data.`);
   console.log(`(No password set — use magic link or add one manually if needed.)`);
 }
