@@ -91,7 +91,14 @@ export default function AnalyzePage() {
 
   return (
     <div className="container max-w-2xl py-8 px-4">
-      <h1 className="text-3xl font-bold text-green-700 mb-1">Analyze Your Lawn</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="text-3xl font-bold text-green-700">Analyze Your Lawn</h1>
+        <Link href="/yard/setup">
+          <Button className="bg-green-600 hover:bg-green-700">
+            <Plus className="w-4 h-4" />Add Yard
+          </Button>
+        </Link>
+      </div>
       <p className="text-gray-500 mb-6">Upload photos and get AI-powered diagnosis and recommendations.</p>
 
       {loading ? (
@@ -110,14 +117,7 @@ export default function AnalyzePage() {
           {/* Step 1: yard picker — only shown when multiple yards */}
           {yards.length > 1 && (
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-gray-700">Which yard?</p>
-                <Link href="/yard/setup">
-                  <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">
-                    <Plus className="w-3 h-3" /> Add Yard
-                  </Button>
-                </Link>
-              </div>
+              <p className="text-sm font-medium text-gray-700 mb-3">Which yard?</p>
               <div className="flex gap-3 flex-wrap">
                 {yards.map((yard) => {
                   const sel = yard.id === selectedYardId;
@@ -139,17 +139,6 @@ export default function AnalyzePage() {
                   );
                 })}
               </div>
-            </div>
-          )}
-
-          {/* Add Yard link for single-yard users */}
-          {yards.length === 1 && (
-            <div className="flex justify-end mb-4">
-              <Link href="/yard/setup">
-                <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">
-                  <Plus className="w-3 h-3" /> Add Yard
-                </Button>
-              </Link>
             </div>
           )}
 
