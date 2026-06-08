@@ -124,7 +124,7 @@ async function main() {
     data: {
       yardSectionId: frontYard.id,
       imageUrls: [`${BASE_URL}/recovering.jpg`],
-      healthScore: 62,
+      healthScore: 32,
       issues: ["thin coverage near driveway edge", "early signs of crabgrass", "low nitrogen"],
       summary:
         "The bermuda is coming out of dormancy but showing low density near the driveway where salt runoff likely occurred over winter. There's early-stage crabgrass pressure on the south-facing slope — pre-emergent window is closing. Nitrogen levels are low for this growth stage; a starter application would accelerate green-up significantly. Overall health is fair, with a clear recovery path if treated in the next 2 weeks.",
