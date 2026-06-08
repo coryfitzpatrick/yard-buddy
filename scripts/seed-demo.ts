@@ -119,7 +119,7 @@ async function main() {
     data: {
       yardSectionId: frontYard.id,
       imageUrls: [
-        "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
+        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/front-spring.jpg",
       ],
       healthScore: 62,
       issues: ["thin coverage near driveway edge", "early signs of crabgrass", "low nitrogen"],
@@ -134,7 +134,7 @@ async function main() {
     data: {
       yardSectionId: frontYard.id,
       imageUrls: [
-        "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=800",
+        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/front-recovering.jpg",
       ],
       healthScore: 74,
       issues: ["occasional dry patches near mailbox post", "minor thatch buildup"],
@@ -149,7 +149,7 @@ async function main() {
     data: {
       yardSectionId: frontYard.id,
       imageUrls: [
-        "https://images.unsplash.com/photo-1558904541-efa843a96f01?w=800",
+        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/front-healthy.jpg",
       ],
       healthScore: 88,
       issues: ["minor dollar spot in low-drainage corner"],
@@ -165,7 +165,7 @@ async function main() {
     data: {
       yardSectionId: backYard.id,
       imageUrls: [
-        "https://images.unsplash.com/photo-1585320806297-9794b3e4aaae?w=800",
+        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/back-yard.jpg",
       ],
       healthScore: 79,
       issues: ["wear damage in play area", "uneven growth near fence line"],
@@ -181,7 +181,7 @@ async function main() {
     data: {
       yardSectionId: sideShadyYard.id,
       imageUrls: [
-        "https://images.unsplash.com/photo-1622372738946-62e02505feb3?w=800",
+        "https://mdifuduuqpofnkqmlkgw.supabase.co/storage/v1/object/public/lawn-photos/demo/side-fescue.jpg",
       ],
       healthScore: 71,
       issues: ["moss encroachment in densest shade", "low soil pH limiting nutrient uptake"],
