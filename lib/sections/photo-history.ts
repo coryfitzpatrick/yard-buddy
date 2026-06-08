@@ -1,7 +1,7 @@
-type Photo = {
+export type Photo = {
   id: string
   url: string
-  createdAt: Date
+  createdAt: Date | string
   analysis?: string | null
 }
 

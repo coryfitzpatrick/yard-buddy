@@ -1,13 +1,6 @@
 'use client'
 
-import { groupPhotosByMonth } from '@/lib/sections/photo-history'
-
-type Photo = {
-  id: string
-  url: string
-  createdAt: Date
-  analysis?: string | null
-}
+import { groupPhotosByMonth, type Photo } from '@/lib/sections/photo-history'
 
 type Props = {
   photos: Photo[]

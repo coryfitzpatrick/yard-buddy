@@ -32,7 +32,7 @@ export default async function SectionPhotosPage({
     analysis.imageUrls.map((url, i) => ({
       id: `${analysis.id}-${i}`,
       url,
-      createdAt: analysis.createdAt,
+      createdAt: analysis.createdAt.toISOString(),
       analysis: analysis.summary,
     }))
   );
