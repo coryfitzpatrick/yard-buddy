@@ -46,7 +46,7 @@ export function YardCarousel({ yards, selectedYardId, onSelect }: Props) {
             <div className="flex items-start justify-between gap-1 mb-1">
               <span
                 className={cn(
-                  "font-semibold text-sm leading-tight",
+                  "font-semibold text-sm leading-tight line-clamp-1 min-w-0 flex-1",
                   selected ? "text-green-900" : "text-gray-900"
                 )}
               >
