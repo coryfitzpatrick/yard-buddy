@@ -91,17 +91,15 @@ export default function AnalyzePage() {
 
   return (
     <div className="container max-w-2xl py-8 px-4">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-green-700">Analyze Your Lawn</h1>
-          <p className="text-gray-500 mt-1">Upload photos and get AI-powered diagnosis and recommendations.</p>
-        </div>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="text-3xl font-bold text-green-700">Analyze Your Lawn</h1>
         <Link href="/yard/setup">
-          <Button className="bg-green-600 hover:bg-green-700 shrink-0">
+          <Button className="bg-green-600 hover:bg-green-700">
             <Plus className="w-4 h-4" />Add Yard
           </Button>
         </Link>
       </div>
+      <p className="text-gray-500 mb-6">Upload photos and get AI-powered diagnosis and recommendations.</p>
 
       {loading ? (
         <div className="flex items-center gap-2 text-gray-400 py-4">
