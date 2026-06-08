@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
   CalendarCheck,
+  ShoppingCart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,7 @@ interface Task {
   applicationRate: string | null;
   spreaderSetting: string | null;
   taskMode: string | null;
+  productSearchQuery: string | null;
   yardSection?: {
     id: string;
     name: string;
@@ -124,6 +126,17 @@ function TaskCard({
                 <Package className="w-3.5 h-3.5 shrink-0 text-green-600" />
                 <span className="font-medium">{task.product}</span>
                 {task.applicationRate && <span className="text-gray-400">· {task.applicationRate}</span>}
+                {task.productSearchQuery && (
+                  <a
+                    href={`https://www.google.com/search?tbm=shop&q=${encodeURIComponent(task.productSearchQuery)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Shop"
+                    className="ml-auto shrink-0 text-gray-400 hover:text-green-600 transition-colors"
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" />
+                  </a>
+                )}
               </div>
             )}
           </div>
