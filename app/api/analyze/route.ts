@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       weatherSummary,
       forecastText,
       notes: section.notes,
-      currentRoutine: (section as typeof section & { currentRoutine?: string | null }).currentRoutine ?? null,
+      currentRoutine: section.currentRoutine,
       // Section-aware enrichment
       sectionName: section.name,
       streetAddress: section.yard.streetAddress,
