@@ -25,6 +25,11 @@ describe('soilDataSchema', () => {
     expect(result.success).toBe(false)
   })
 
+  it('rejects pH below practical range', () => {
+    const result = soilDataSchema.safeParse({ soilPh: 3 })
+    expect(result.success).toBe(false)
+  })
+
   it('accepts empty object — user has no soil data', () => {
     const result = soilDataSchema.safeParse({})
     expect(result.success).toBe(true)

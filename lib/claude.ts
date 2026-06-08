@@ -79,7 +79,7 @@ ${context.areaType ? `Yard Area: ${context.areaType.replace(/_/g, " ")} (${
 })` : ""}
 ${context.yardSizeSqft ? `Yard Size: ${context.yardSizeSqft} sq ft` : ""}
 ${context.spreaderType ? `Spreader: ${context.spreaderType}` : ""}
-${context.soilPh ? `Soil pH: ${context.soilPh}` : ""}
+${context.soilPh ? `Soil pH: ${context.soilPh}` : ""}${context.nitrogenPpm != null ? `\n- Nitrogen (N): ${context.nitrogenPpm} ppm` : ''}${context.phosphorusPpm != null ? `\n- Phosphorus (P): ${context.phosphorusPpm} ppm` : ''}${context.potassiumPpm != null ? `\n- Potassium (K): ${context.potassiumPpm} ppm` : ''}${context.soilTestSource ? `\n- Soil test from: ${context.soilTestSource}` : ''}
 ${context.soilMoisture ? `Soil Moisture: ${context.soilMoisture}` : ""}
 ${context.forecastText ? `5-Day Weather Forecast:\n${context.forecastText}` : context.weatherSummary ? `Current Weather: ${context.weatherSummary}` : ""}
 ${context.notes ? `Notes: ${context.notes.slice(0, 500)}` : ""}

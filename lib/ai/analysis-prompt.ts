@@ -37,8 +37,7 @@ LAWN PROFILE:
 - Soil pH: ${section.soilPh != null ? section.soilPh : 'not tested yet — mention testing if relevant'}
 - Nitrogen (N): ${section.nitrogenPpm != null ? `${section.nitrogenPpm} ppm` : 'not tested'}
 - Phosphorus (P): ${section.phosphorusPpm != null ? `${section.phosphorusPpm} ppm` : 'not tested'}
-- Potassium (K): ${section.potassiumPpm != null ? `${section.potassiumPpm} ppm` : 'not tested'}
-${section.soilTestSource ? `- Soil test from: ${section.soilTestSource}` : ''}
+- Potassium (K): ${section.potassiumPpm != null ? `${section.potassiumPpm} ppm` : 'not tested'}${section.soilTestSource ? `\n- Soil test from: ${section.soilTestSource}` : ''}
 - Sun exposure: ${section.sunExposure ?? 'unknown'}
 - Size: ${section.squareFootage != null ? `${section.squareFootage} sq ft` : 'unknown'}
 - Location: ${section.streetAddress ?? 'unknown — use general US guidance'}
