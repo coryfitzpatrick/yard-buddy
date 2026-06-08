@@ -22,22 +22,30 @@ export async function POST(req: NextRequest) {
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    await db.passwordResetToken.create({
+    const tokenRecord = await db.passwordResetToken.create({
       data: { userId: user.id, token, expiresAt },
     });
 
-    const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
+    const baseUrl = process.env.NEXTAUTH_URL
+      ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
     const { subject, html } = buildPasswordResetEmail({
       userName: user.name ?? "there",
       resetUrl,
     });
 
-    await resend.emails.send({
-      from: "Yard Buddy <noreply@yardbuddy.app>",
-      to: parsed.data.email,
-      subject,
-      html,
-    });
+    try {
+      await resend.emails.send({
+        from: "Yard Buddy <noreply@yardbuddy.app>",
+        to: parsed.data.email,
+        subject,
+        html,
+      });
+    } catch (err) {
+      console.error("Failed to send password reset email:", err);
+      await db.passwordResetToken.delete({ where: { id: tokenRecord.id } });
+      // Still return ok to prevent enumeration; token has been cleaned up.
+    }
   }
 
   return NextResponse.json({ ok: true });

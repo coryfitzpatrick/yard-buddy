@@ -17,10 +17,12 @@ export async function PUT(req: NextRequest) {
     );
   }
 
-  const user = await db.user.findUniqueOrThrow({
+  const user = await db.user.findUnique({
     where: { id: session.user.id },
     select: { passwordHash: true },
   });
+
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   if (!user.passwordHash) {
     return NextResponse.json(

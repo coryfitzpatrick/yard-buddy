@@ -17,10 +17,10 @@ export async function POST(req: NextRequest) {
 
   const record = await db.passwordResetToken.findUnique({
     where: { token },
-    include: { user: { select: { id: true } } },
+    include: { user: { select: { id: true, passwordHash: true } } },
   });
 
-  if (!record || record.expiresAt < new Date()) {
+  if (!record || record.expiresAt < new Date() || !record.user.passwordHash) {
     return NextResponse.json(
       { error: "Reset link is invalid or has expired. Please request a new one." },
       { status: 400 }
