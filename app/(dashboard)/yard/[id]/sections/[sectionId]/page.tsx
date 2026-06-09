@@ -8,8 +8,7 @@ import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
 import { TaskList } from "@/components/dashboard/TaskList";
-import { RoutineCaptureCard } from "@/components/sections/RoutineCaptureCard";
-import { WateringCard } from "@/components/sections/WateringCard";
+import { PersonalizedRemindersCard } from "@/components/sections/PersonalizedRemindersCard";
 import { format } from "date-fns";
 
 export default async function SectionDetailPage({
@@ -29,8 +28,6 @@ export default async function SectionDetailPage({
         select: {
           id: true,
           name: true,
-          wateringDaysPerWeek: true,
-          wateringMinutesPerSession: true,
         },
       },
       analyses: {
@@ -184,17 +181,6 @@ export default async function SectionDetailPage({
         </div>
       )}
 
-      <WateringCard
-        sectionId={sectionId}
-        yardId={yardId}
-        initialSchedule={section.wateringSchedule}
-        initialDeviates={section.wateringDeviates}
-        hasYardSchedule={
-          section.yard.wateringDaysPerWeek != null &&
-          section.yard.wateringMinutesPerSession != null
-        }
-      />
-
       {/* Past analyses */}
       {section.analyses.length > 1 && (
         <details className="bg-white border border-gray-200 rounded-xl mb-8">
@@ -249,6 +235,13 @@ export default async function SectionDetailPage({
         </details>
       )}
 
+      <PersonalizedRemindersCard
+        yardId={yardId}
+        sectionId={sectionId}
+        mowingSchedule={section.mowingSchedule ?? null}
+        wateringSchedule={section.wateringSchedule ?? null}
+      />
+
       {/* Tasks */}
       {serializedTasks.length > 0 && (
         <div>
@@ -257,15 +250,6 @@ export default async function SectionDetailPage({
           </h2>
           <TaskList tasks={serializedTasks} multiYard={false} />
         </div>
-      )}
-
-      {/* Routine capture — shown when lawn is healthy */}
-      {latestAnalysis && latestAnalysis.healthScore >= 75 && (
-        <RoutineCaptureCard
-          sectionId={section.id}
-          grassType={section.grassType}
-          initialRoutine={section.currentRoutine}
-        />
       )}
     </div>
   );
