@@ -121,13 +121,13 @@ export function buildDigestEmail(opts: {
         .map((r) => {
           const lines: string[] = [];
           if (r.mowing) {
-            const timeStr = r.mowing.time ? ` at ${formatDisplayTime(r.mowing.time)}` : "";
-            const heightStr = r.mowing.inches ? ` &middot; ${r.mowing.inches} in` : "";
+            const timeStr = r.mowing.time ? ` at ${escapeHtml(formatDisplayTime(r.mowing.time))}` : "";
+            const heightStr = r.mowing.inches ? ` &middot; ${escapeHtml(r.mowing.inches)} in` : "";
             lines.push(`<div style="color:#374151;font-size:14px;">&#x2702;&#xFE0F; Mow${timeStr}${heightStr}</div>`);
           }
           if (r.watering) {
-            const timeStr = r.watering.time ? ` at ${formatDisplayTime(r.watering.time)}` : "";
-            const minStr = r.watering.minutes ? ` &middot; ${r.watering.minutes} min` : "";
+            const timeStr = r.watering.time ? ` at ${escapeHtml(formatDisplayTime(r.watering.time))}` : "";
+            const minStr = r.watering.minutes ? ` &middot; ${escapeHtml(r.watering.minutes)} min` : "";
             lines.push(`<div style="color:#374151;font-size:14px;">&#x1F4A7; Water${timeStr}${minStr}</div>`);
           }
           return `<div style="border:1px solid #bae6fd;border-radius:8px;padding:12px 16px;margin-bottom:8px;background:#f0f9ff;">

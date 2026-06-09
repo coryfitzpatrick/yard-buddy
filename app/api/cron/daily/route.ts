@@ -307,5 +307,5 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, processed: yards.length });
+  return NextResponse.json({ ok: true, processed: userMap.size });
 }
