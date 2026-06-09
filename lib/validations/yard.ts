@@ -12,6 +12,14 @@ export const yardSchema = z.object({
   streetAddress: z.string().optional(),
   lotSqft: z.number().int().positive().optional(),
   buildingSqft: z.number().int().positive().optional(),
+  wateringDaysPerWeek: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().min(1).max(7).optional()
+  ),
+  wateringMinutesPerSession: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().min(1).max(120).optional()
+  ),
 });
 
 export type YardInput = z.infer<typeof yardSchema>;
