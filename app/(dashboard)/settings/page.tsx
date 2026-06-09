@@ -11,7 +11,13 @@ export default async function SettingsPage() {
 
   const user = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
-    select: { notificationsEnabled: true, notifyDaysAhead: true, passwordHash: true },
+    select: {
+      notificationsEnabled: true,
+      notifyDaysAhead: true,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: true,
+      passwordHash: true,
+    },
   });
 
   return (
@@ -27,6 +33,8 @@ export default async function SettingsPage() {
           <NotificationPreferences
             initialEnabled={user.notificationsEnabled}
             initialDaysAhead={user.notifyDaysAhead}
+            initialReminderEnabled={user.reminderNotificationsEnabled}
+            initialReminderDaysBefore={user.reminderDaysBefore}
           />
         </div>
 

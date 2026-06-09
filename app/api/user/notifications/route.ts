@@ -20,6 +20,8 @@ export async function PUT(req: Request) {
     data: {
       notificationsEnabled: parsed.data.notificationsEnabled,
       notifyDaysAhead: parsed.data.notifyDaysAhead,
+      reminderNotificationsEnabled: parsed.data.reminderNotificationsEnabled,
+      reminderDaysBefore: parsed.data.reminderDaysBefore,
     },
   });
 

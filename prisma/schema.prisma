@@ -16,9 +16,11 @@ model User {
   passwordHash         String?
   notificationsEnabled Boolean   @default(true)
   lastNotifiedAt       DateTime?
-  notifyDaysAhead      Int       @default(3)
-  weatherWidgetCollapsed  Boolean   @default(false)
-  createdAt            DateTime  @default(now())
+  notifyDaysAhead              Int       @default(3)
+  reminderNotificationsEnabled Boolean   @default(true)
+  reminderDaysBefore           Int       @default(0)
+  weatherWidgetCollapsed       Boolean   @default(false)
+  createdAt                    DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
   accounts             Account[]
   sessions             Session[]
