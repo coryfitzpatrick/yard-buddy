@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Plus, Camera, Pencil, ArrowRight } from "lucide-react";
+import { ChevronLeft, Plus, Camera, Pencil, ArrowRight, Droplets } from "lucide-react";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
@@ -110,6 +110,25 @@ export default async function YardDetailPage({
         </div>
       ) : (
         <>
+          {(() => {
+            const sectionsWithRecs = yard.sections.filter(
+              (s) => s.wateringDeviates !== null && s.wateringDeviates !== undefined
+            );
+            const deviating = sectionsWithRecs.filter((s) => s.wateringDeviates === true);
+            if (sectionsWithRecs.length === 0) return null;
+            return (
+              <div
+                className={`flex items-center gap-2 text-sm mb-4 px-1 ${
+                  deviating.length === 0 ? "text-green-700" : "text-amber-700"
+                }`}
+              >
+                <Droplets className="w-4 h-4 shrink-0" />
+                {deviating.length === 0
+                  ? "Watering schedule works well across all sections ✓"
+                  : `${deviating.length} section${deviating.length > 1 ? "s" : ""} may need watering adjustments`}
+              </div>
+            );
+          })()}
           <div className="space-y-4">
             {yard.sections.map((section: NonNullable<typeof yard>["sections"][number]) => {
               const areaCfg = section.areaType ? AREA_CONFIG[section.areaType as AreaType] : null;
@@ -131,6 +150,9 @@ export default async function YardDetailPage({
                       <div className="flex items-center gap-2">
                         {AreaIcon && <AreaIcon className="w-4 h-4 text-gray-400" />}
                         <h2 className="font-semibold text-gray-900 text-lg">{section.name}</h2>
+                        {section.wateringDeviates === true && (
+                          <Droplets className="w-3.5 h-3.5 text-amber-500 shrink-0" aria-label="Watering adjustment suggested" />
+                        )}
                       </div>
                       <p className="text-sm text-gray-400 capitalize mt-0.5">
                         {section.grassType.replace(/_/g, " ")}
