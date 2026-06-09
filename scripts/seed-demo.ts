@@ -55,6 +55,8 @@ async function main() {
       buildingSqft: 2800,
       spreaderType: "broadcast",
       spreaderModel: "Scotts Turf Builder EdgeGuard DLX",
+      wateringDaysPerWeek: 3,
+      wateringMinutesPerSession: 25,
     },
   });
   console.log(`Yard 1: ${yard.id}`);
@@ -75,6 +77,8 @@ async function main() {
       soilTestSource: "UGA Cooperative Extension Lab",
       soilMoisture: "moderate",
       notes: "Gets full sun all day. Slight slope toward the street drains well.",
+      wateringSchedule: "Water 3 days per week, 25 minutes per session — consistent with the yard schedule. Bermuda in full sun needs about 1–1.25 inches per week during Atlanta's summer. Water early morning to minimize evaporation and reduce fungal pressure. The slope drains well so no runoff concerns at this duration.",
+      wateringDeviates: false,
     },
   });
 
@@ -88,6 +92,8 @@ async function main() {
       soilPh: 6.5,
       soilMoisture: "moderate",
       notes: "Full sun. Kids play area near the deck needs extra wear recovery.",
+      wateringSchedule: "Water 3 days per week, 25 minutes per session — matches the yard schedule. The compacted play zone near the deck may need a supplemental pass during heat waves since hardpan soil sheds water faster; consider a brief hand-water of that 200 sq ft zone on off days if you see wilting.",
+      wateringDeviates: false,
     },
   });
 
@@ -101,6 +107,8 @@ async function main() {
       soilPh: 6.2,
       soilMoisture: "moist",
       notes: "Shaded by the neighbor's oak most of the day. Fescue holds better here than bermuda.",
+      wateringSchedule: "Water 2 days per week, 20 minutes per session — less than the yard's standard schedule. The oak canopy dramatically reduces evaporation and the soil is already staying moist. Matching the 3-day bermuda schedule here would keep the soil too wet and accelerate the moss encroachment you're already fighting along the fence.",
+      wateringDeviates: true,
     },
   });
 
@@ -114,6 +122,8 @@ async function main() {
       soilPh: 6.4,
       soilMoisture: "moderate",
       notes: "Decorative border around the patio. Partial shade in the afternoon.",
+      wateringSchedule: "Water 2 days per week, 20 minutes per session — reduced from the yard schedule. St. Augustine in partial shade retains moisture significantly longer than the full-sun bermuda sections. Watering at the 3-day bermuda rate here would keep the border chronically wet and invite fungal issues at the patio edge.",
+      wateringDeviates: true,
     },
   });
 
@@ -202,6 +212,7 @@ async function main() {
         priority: "high",
         status: "completed",
         product: "Scotts Halts Crabgrass Preventer",
+        productSearchQuery: "Scotts Halts Crabgrass Preventer 10 lb",
         applicationRate: "2.87 lbs / 1,000 sq ft",
         spreaderSetting: "4.5",
         scheduledStart: daysAgo(80),
@@ -219,8 +230,9 @@ async function main() {
         priority: "high",
         status: "completed",
         product: "Milorganite 6-4-0 Organic Fertilizer",
-        applicationRate: "36 lbs / 2,200 sq ft",
-        spreaderSetting: "7.5",
+        productSearchQuery: "Milorganite 6-4-0 organic fertilizer 36 lb",
+        applicationRate: "1 bag (36 lbs) covers 2,200–2,500 sq ft",
+        spreaderSetting: "5.5",
         scheduledStart: daysAgo(75),
         scheduledEnd: daysAgo(73),
         completedAt: daysAgo(74),
@@ -251,6 +263,7 @@ async function main() {
         priority: "high",
         status: "pending",
         product: "Spectracide Immunox Multi-Purpose Fungicide",
+        productSearchQuery: "Spectracide Immunox fungicide concentrate 16 oz",
         applicationRate: "2 fl oz / gallon, 1 gallon / 150 sq ft",
         scheduledStart: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
         scheduledEnd: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
@@ -266,6 +279,7 @@ async function main() {
         priority: "medium",
         status: "pending",
         product: "Lesco 34-0-6 Slow-Release Fertilizer",
+        productSearchQuery: "Lesco 34-0-6 slow release fertilizer 50 lb",
         applicationRate: "2.94 lbs / 1,000 sq ft",
         spreaderSetting: "4.0",
         scheduledStart: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -288,6 +302,7 @@ async function main() {
         priority: "medium",
         status: "pending",
         product: "Bermuda Grass Plugs",
+        productSearchQuery: "bermuda grass plugs tray 18 count",
         scheduledStart: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
         scheduledEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         createdAt: daysAgo(34),
@@ -302,6 +317,7 @@ async function main() {
         priority: "medium",
         status: "completed",
         product: "Jonathan Green 22-0-6 Summer Fertilizer",
+        productSearchQuery: "Jonathan Green 22-0-6 summer fertilizer",
         applicationRate: "4.5 lbs / 1,000 sq ft",
         spreaderSetting: "5.5",
         scheduledStart: daysAgo(30),
@@ -325,6 +341,7 @@ async function main() {
         priority: "high",
         status: "completed",
         product: "Pennington Fast Acting Lime",
+        productSearchQuery: "Pennington Fast Acting Lime 30 lb",
         applicationRate: "32.8 lbs / 820 sq ft",
         completedAt: daysAgo(50),
         scheduledStart: daysAgo(53),
@@ -341,6 +358,7 @@ async function main() {
         priority: "medium",
         status: "pending",
         product: "Jonathan Green Black Beauty Ultra Shade Mix",
+        productSearchQuery: "Jonathan Green Black Beauty Ultra grass seed 7 lb",
         applicationRate: "8 lbs / 1,000 sq ft",
         scheduledStart: new Date(Date.now() + 75 * 24 * 60 * 60 * 1000),
         scheduledEnd: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
@@ -367,6 +385,8 @@ async function main() {
       buildingSqft: 1950,
       spreaderType: "broadcast",
       spreaderModel: "Earthway 2150 Commercial",
+      wateringDaysPerWeek: 3,
+      wateringMinutesPerSession: 30,
     },
   });
   console.log(`Yard 2: ${yard2.id}`);
@@ -379,9 +399,11 @@ async function main() {
       areaType: "front",
       grassType: "zoysia",
       yardSizeSqft: 1800,
-      soilPh: 6.9,
+      soilPh: 6.4,
       soilMoisture: "moderate",
       notes: "Full sun, slight slope away from house. HOA requires uniform green coverage.",
+      wateringSchedule: "Water 3 days per week, 30 minutes per session — matches the yard schedule, but split each zone into two passes (15 min, pause 30 min, 15 min) to allow absorption on the slope and prevent runoff before the irrigation heads can fix coverage. Zoysia builds strong drought tolerance with deep infrequent watering; don't increase frequency during heat waves — increase duration instead.",
+      wateringDeviates: false,
     },
   });
 
@@ -395,6 +417,8 @@ async function main() {
       soilPh: 6.6,
       soilMoisture: "moderate",
       notes: "Covered patio takes up 400 sq ft. Rest gets partial afternoon shade from live oaks.",
+      wateringSchedule: "Water 2 days per week, 25 minutes per session — less than the yard schedule. The live oak canopy provides meaningful shade that reduces evaporation, and St. Augustine handles light drought stress better than it handles chronic wetness. With chinch bug activity at the patio edge, keeping soil consistently moist would worsen conditions; dry-down periods between waterings are beneficial right now.",
+      wateringDeviates: true,
     },
   });
 
@@ -408,6 +432,8 @@ async function main() {
       soilPh: 6.4,
       soilMoisture: "moist",
       notes: "Narrow strip between house and fence. Gets afternoon shade, tends to stay moist.",
+      wateringSchedule: "Skip irrigation entirely until the downspout drainage issue is resolved. The downspout already keeps this strip saturated — any additional water will worsen the moss and algae taking over near the fence. Once the channel drain is installed and the soil can dry between rain events, reassess: likely 1 day per week at most for this section.",
+      wateringDeviates: true,
     },
   });
 
@@ -469,6 +495,7 @@ async function main() {
         priority: "high",
         status: "completed",
         product: "Southern AG Lawn Weed Killer with Trimec",
+        productSearchQuery: "Southern AG Lawn Weed Killer Trimec 32 oz",
         applicationRate: "1.5 fl oz / gallon",
         scheduledStart: daysAgo(40),
         scheduledEnd: daysAgo(38),
@@ -485,6 +512,7 @@ async function main() {
         priority: "medium",
         status: "pending",
         product: "Rainbird 5000 Series Rotary Head",
+        productSearchQuery: "Rain Bird 5000 series rotor sprinkler head 4 pack",
         scheduledStart: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         scheduledEnd: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000),
         createdAt: daysAgo(45),
@@ -505,6 +533,7 @@ async function main() {
         priority: "high",
         status: "pending",
         product: "Bifen LP Granules (7.9% Bifenthrin)",
+        productSearchQuery: "Bifen LP granules bifenthrin insecticide 25 lb",
         applicationRate: "1.15 lbs / 1,000 sq ft",
         spreaderSetting: "15",
         scheduledStart: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
@@ -527,6 +556,7 @@ async function main() {
         priority: "high",
         status: "pending",
         product: "NDS 6-ft Channel Drain Kit",
+        productSearchQuery: "NDS channel drain kit 6 foot trench drain",
         scheduledStart: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
         scheduledEnd: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000),
         createdAt: daysAgo(20),
@@ -541,6 +571,7 @@ async function main() {
         priority: "medium",
         status: "pending",
         product: "Bonide Moss & Algae Killer (Ferrous Sulfate)",
+        productSearchQuery: "Bonide Moss Algae Killer ferrous sulfate ready to spray",
         applicationRate: "3 oz / 1,000 sq ft",
         scheduledStart: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
         scheduledEnd: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
