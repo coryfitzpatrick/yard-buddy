@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getWeatherByZip } from "@/lib/weather";
 import { computeNewWindow } from "@/lib/cron/weather-scheduler";
 import { assessOverdueTasks } from "@/lib/cron/overdue-assessor";
+import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
 import { resend, buildDigestEmail, generateUnsubscribeToken } from "@/lib/email";
 
 function addDays(date: Date, days: number): Date {
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
 
   const today = startOfToday();
 
-  // 1. Fetch yards with pending tasks
+  // 1. Fetch yards with pending tasks (for task processing + notifications)
   const yards = await db.yard.findMany({
     where: {
       sections: { some: { tasks: { some: { status: "pending" } } } },
@@ -44,6 +45,8 @@ export async function GET(req: NextRequest) {
           email: true,
           name: true,
           notificationsEnabled: true,
+          reminderNotificationsEnabled: true,
+          reminderDaysBefore: true,
           lastNotifiedAt: true,
           notifyDaysAhead: true,
         },
@@ -66,7 +69,55 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  // 2. Fetch weather per unique ZIP
+  // 2. Fetch users with reminder notifications enabled who have scheduled sections
+  // (may overlap with task users — we deduplicate later)
+  const reminderUsers = await db.user.findMany({
+    where: {
+      reminderNotificationsEnabled: true,
+      yards: {
+        some: {
+          sections: {
+            some: {
+              OR: [
+                { mowingSchedule: { not: null } },
+                { wateringSchedule: { not: null } },
+              ],
+            },
+          },
+        },
+      },
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      notificationsEnabled: true,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: true,
+      lastNotifiedAt: true,
+      notifyDaysAhead: true,
+      yards: {
+        select: {
+          name: true,
+          sections: {
+            where: {
+              OR: [
+                { mowingSchedule: { not: null } },
+                { wateringSchedule: { not: null } },
+              ],
+            },
+            select: {
+              name: true,
+              mowingSchedule: true,
+              wateringSchedule: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // 3. Fetch weather per unique ZIP
   const weatherByZip = new Map<string, Awaited<ReturnType<typeof getWeatherByZip>>>();
   const uniqueZips = [...new Set(yards.map((y) => y.zipCode))];
   await Promise.all(
@@ -77,7 +128,7 @@ export async function GET(req: NextRequest) {
     })
   );
 
-  // 3. Recalculate windows and collect newly overdue tasks
+  // 4. Recalculate windows and collect newly overdue tasks
   type YardSections = typeof yards[0]["sections"];
   type SectionTasks = YardSections[0]["tasks"];
 
@@ -99,7 +150,6 @@ export async function GET(req: NextRequest) {
       for (const task of section.tasks) {
         const condition = task.weatherCondition ?? "any";
 
-        // Check for newly overdue (window closed, not yet assessed)
         if (task.scheduledEnd && isBefore(task.scheduledEnd, today) && task.stillWorthDoing === null) {
           newlyOverdue.push(task);
           continue;
@@ -140,7 +190,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // 4. Assess newly overdue tasks per section
+  // 5. Assess newly overdue tasks per section
   for (const [, { tasks, grassType, zip }] of overdueBySection) {
     const weather = weatherByZip.get(zip);
     const weatherSummary = weather
@@ -171,51 +221,72 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // 5. Send email digests
+  // 6. Send email digests — tasks + schedule reminders combined per user
   const baseUrl =
     process.env.NEXTAUTH_URL ??
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
-  const processedUserIds = new Set<string>();
+  // Build a unified map: userId → user data (task users take precedence for task content)
+  type TaskUser = typeof yards[0]["user"];
+  type ReminderUser = typeof reminderUsers[0];
+
+  const userMap = new Map<string, { taskUser?: TaskUser; reminderUser?: ReminderUser }>();
 
   for (const yard of yards) {
-    const user = yard.user;
-    if (processedUserIds.has(user.id)) continue;
-    processedUserIds.add(user.id);
+    const existing = userMap.get(yard.user.id) ?? {};
+    userMap.set(yard.user.id, { ...existing, taskUser: yard.user });
+  }
+  for (const ru of reminderUsers) {
+    const existing = userMap.get(ru.id) ?? {};
+    userMap.set(ru.id, { ...existing, reminderUser: ru });
+  }
 
-    if (!user.notificationsEnabled) continue;
+  for (const [userId, { taskUser, reminderUser }] of userMap) {
+    const user = taskUser ?? reminderUser!;
     if (!user.email) continue;
     if (user.lastNotifiedAt && sameDay(user.lastNotifiedAt, today)) continue;
 
-    const allPendingTasks = await db.lawnTask.findMany({
-      where: { yardSection: { yard: { userId: user.id } }, status: "pending" },
-      include: { yardSection: { select: { name: true } } },
-    });
+    // Collect task content
+    let overdueTasks: Array<{ title: string; sectionName: string; overdueNote: string | null }> = [];
+    let upcomingTasks: Array<{ title: string; sectionName: string; scheduledStart: Date | null; scheduledEnd: Date | null }> = [];
 
-    const overdueTasks = allPendingTasks.filter((t) => t.stillWorthDoing === true);
-    const upcomingTasks = allPendingTasks.filter((t) => {
-      if (!t.scheduledStart || t.stillWorthDoing !== null) return false;
-      const daysUntilStart = (t.scheduledStart.getTime() - today.getTime()) / 86400000;
-      return daysUntilStart >= 0 && daysUntilStart <= user.notifyDaysAhead;
-    });
+    if (user.notificationsEnabled) {
+      const allPendingTasks = await db.lawnTask.findMany({
+        where: { yardSection: { yard: { userId } }, status: "pending" },
+        include: { yardSection: { select: { name: true } } },
+      });
 
-    if (overdueTasks.length === 0 && upcomingTasks.length === 0) continue;
+      overdueTasks = allPendingTasks
+        .filter((t) => t.stillWorthDoing === true)
+        .map((t) => ({ title: t.title, sectionName: t.yardSection?.name ?? "", overdueNote: t.overdueNote }));
 
-    const unsubToken = generateUnsubscribeToken(user.id);
+      upcomingTasks = allPendingTasks
+        .filter((t) => {
+          if (!t.scheduledStart || t.stillWorthDoing !== null) return false;
+          const daysUntilStart = (t.scheduledStart.getTime() - today.getTime()) / 86400000;
+          return daysUntilStart >= 0 && daysUntilStart <= user.notifyDaysAhead;
+        })
+        .map((t) => ({ title: t.title, sectionName: t.yardSection?.name ?? "", scheduledStart: t.scheduledStart, scheduledEnd: t.scheduledEnd }));
+    }
+
+    // Collect reminder content
+    let scheduledReminders: Awaited<ReturnType<typeof getTodayReminders>> = [];
+
+    if (user.reminderNotificationsEnabled && reminderUser) {
+      const sections = reminderUser.yards.flatMap((y) =>
+        y.sections.map((s) => ({ name: s.name, yardName: y.name, mowingSchedule: s.mowingSchedule, wateringSchedule: s.wateringSchedule }))
+      );
+      scheduledReminders = getTodayReminders(sections, today, user.reminderDaysBefore);
+    }
+
+    if (overdueTasks.length === 0 && upcomingTasks.length === 0 && scheduledReminders.length === 0) continue;
+
+    const unsubToken = generateUnsubscribeToken(userId);
     const { subject, html } = buildDigestEmail({
       userName: user.name?.split(" ")[0] ?? "there",
-      overdueTasks: overdueTasks.map((t) => ({
-        title: t.title,
-        sectionName: t.yardSection?.name ?? "",
-        overdueNote: t.overdueNote,
-      })),
-      upcomingTasks: upcomingTasks.map((t) => ({
-        title: t.title,
-        sectionName: t.yardSection?.name ?? "",
-        scheduledStart: t.scheduledStart,
-        scheduledEnd: t.scheduledEnd,
-      })),
-      scheduledReminders: [],
+      overdueTasks,
+      upcomingTasks,
+      scheduledReminders,
       dashboardUrl: `${baseUrl}/dashboard`,
       unsubscribeUrl: `${baseUrl}/api/notifications/unsubscribe?token=${unsubToken}`,
     });
@@ -228,11 +299,11 @@ export async function GET(req: NextRequest) {
         html,
       });
       await db.user.update({
-        where: { id: user.id },
+        where: { id: userId },
         data: { lastNotifiedAt: new Date() },
       });
     } catch (err) {
-      console.error("Email send failed for user:", user.id, err);
+      console.error("Email send failed for user:", userId, err);
     }
   }
 
