@@ -438,7 +438,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
           <Textarea placeholder="Shady areas, problem spots…" {...register("notes")} />
           {errors.notes && <p className="text-sm text-red-500">{errors.notes.message}</p>}
         </div>
-        <div className="space-y-4 border-t border-gray-100 pt-4">
+        <div id="schedule" className="space-y-4 border-t border-gray-100 pt-4">
           <h3 className="text-sm font-semibold text-gray-700">Personalized Reminders</h3>
 
           <div className="space-y-2">
