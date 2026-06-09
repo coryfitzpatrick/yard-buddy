@@ -38,7 +38,7 @@ export default async function YardPage() {
       wateringMinutesPerSession: true,
       mowingSchedule: true,
       wateringSchedule: true,
-      _count: { select: { sections: true } },
+      sections: { orderBy: { createdAt: "asc" }, select: { id: true, name: true } },
     },
   });
 
@@ -74,8 +74,8 @@ export default async function YardPage() {
                   <h2 className="text-lg font-semibold text-gray-900">{yard.name}</h2>
                   <p className="text-sm text-gray-400">
                     ZIP {yard.zipCode}
-                    {yard._count.sections > 0 && (
-                      <> &middot; {yard._count.sections} section{yard._count.sections !== 1 ? "s" : ""}</>
+                    {yard.sections.length > 0 && (
+                      <> &middot; {yard.sections.length} section{yard.sections.length !== 1 ? "s" : ""}</>
                     )}
                   </p>
                   {(yard.spreaderType || yard.spreaderModel || yard.wateringDaysPerWeek || yard.wateringMinutesPerSession) && (
@@ -122,6 +122,17 @@ export default async function YardPage() {
                   <YardDeleteButton yardId={yard.id} yardName={yard.name} />
                 </div>
               </div>
+              {yard.sections.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100 mt-1">
+                  {yard.sections.map((section) => (
+                    <Link key={section.id} href={`/yard/${yard.id}/sections/${section.id}`}>
+                      <Button variant="outline" size="sm" className="text-xs h-7 px-2.5">
+                        <ArrowRight className="w-3 h-3 mr-1" />{section.name}
+                      </Button>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           );})}
         </div>
