@@ -16,7 +16,15 @@ export default async function EditYardPage({
   const { id } = await params;
   const yard = await db.yard.findFirst({
     where: { id, userId: session.user.id },
-    select: { id: true, name: true, zipCode: true, spreaderType: true, spreaderModel: true },
+    select: {
+      id: true,
+      name: true,
+      zipCode: true,
+      spreaderType: true,
+      spreaderModel: true,
+      wateringDaysPerWeek: true,
+      wateringMinutesPerSession: true,
+    },
   });
   if (!yard) notFound();
 
@@ -36,6 +44,8 @@ export default async function EditYardPage({
           zipCode: yard.zipCode,
           spreaderType: yard.spreaderType ?? undefined,
           spreaderModel: yard.spreaderModel ?? undefined,
+          wateringDaysPerWeek: yard.wateringDaysPerWeek ?? undefined,
+          wateringMinutesPerSession: yard.wateringMinutesPerSession ?? undefined,
         }}
       />
     </div>

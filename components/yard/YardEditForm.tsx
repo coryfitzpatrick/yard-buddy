@@ -15,7 +15,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface Props {
   yardId: string;
-  initialData: { name: string; zipCode: string; spreaderType?: string; spreaderModel?: string };
+  initialData: {
+    name: string;
+    zipCode: string;
+    spreaderType?: string;
+    spreaderModel?: string;
+    wateringDaysPerWeek?: number;
+    wateringMinutesPerSession?: number;
+  };
 }
 
 export function YardEditForm({ yardId, initialData }: Props) {
@@ -30,6 +37,8 @@ export function YardEditForm({ yardId, initialData }: Props) {
         zipCode: initialData.zipCode,
         spreaderType: initialData.spreaderType as YardInput["spreaderType"],
         spreaderModel: initialData.spreaderModel,
+        wateringDaysPerWeek: initialData.wateringDaysPerWeek,
+        wateringMinutesPerSession: initialData.wateringMinutesPerSession,
       },
     });
 
@@ -85,6 +94,28 @@ export function YardEditForm({ yardId, initialData }: Props) {
       <div className="space-y-1">
         <Label>Spreader Model <span className="text-gray-400 font-normal">(optional)</span></Label>
         <Input placeholder="e.g. Scotts EdgeGuard DLX" {...register("spreaderModel")} />
+      </div>
+
+      <div className="space-y-1">
+        <Label>Watering days per week <span className="text-gray-400 font-normal">(optional)</span></Label>
+        <Input
+          type="number"
+          min="1"
+          max="7"
+          placeholder="3"
+          {...register("wateringDaysPerWeek")}
+        />
+      </div>
+
+      <div className="space-y-1">
+        <Label>Minutes per watering session <span className="text-gray-400 font-normal">(optional)</span></Label>
+        <Input
+          type="number"
+          min="1"
+          max="120"
+          placeholder="20"
+          {...register("wateringMinutesPerSession")}
+        />
       </div>
 
       <div className="flex gap-3 pt-2">
