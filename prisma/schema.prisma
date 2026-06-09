@@ -103,7 +103,7 @@ model YardSection {
   notes         String?
   currentRoutine    String?
   wateringSchedule  String?
-  wateringDeviates  Boolean?
+  mowingSchedule    String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   yard          Yard           @relation(fields: [yardId], references: [id], onDelete: Cascade)
