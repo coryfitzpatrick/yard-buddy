@@ -45,6 +45,8 @@ export default async function EditSectionPage({
           soilTestSource: section.soilTestSource ?? undefined,
           soilMoisture: section.soilMoisture as "dry" | "moderate" | "moist" | undefined,
           notes: section.notes ?? undefined,
+          mowingSchedule: section.mowingSchedule ?? undefined,
+          wateringSchedule: section.wateringSchedule ?? undefined,
         }}
       />
     </div>

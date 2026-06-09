@@ -52,6 +52,8 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
         potassiumPpm: initialData?.potassiumPpm as never,
         soilTestSource: initialData?.soilTestSource ?? undefined,
         notes: initialData?.notes ?? undefined,
+        mowingSchedule: initialData?.mowingSchedule ?? undefined,
+        wateringSchedule: initialData?.wateringSchedule ?? undefined,
         yardSizeSqft: (initialData?.yardSizeSqft ?? (lotSqft && !initialData ? (lotSqft - (buildingSqft ?? 0)) || lotSqft : undefined)) as never,
       },
     });
@@ -380,9 +382,31 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
           <Textarea placeholder="Shady areas, problem spots…" {...register("notes")} />
           {errors.notes && <p className="text-sm text-red-500">{errors.notes.message}</p>}
         </div>
+        <div className="space-y-4 border-t border-gray-100 pt-4">
+          <h3 className="text-sm font-semibold text-gray-700">Personalized Reminders</h3>
+          <div className="space-y-1">
+            <Label htmlFor="mowingSchedule">Mowing schedule</Label>
+            <Input
+              id="mowingSchedule"
+              placeholder="e.g. Weekly at 3.5 inches"
+              {...register("mowingSchedule")}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="wateringSchedule">Watering schedule</Label>
+            <Input
+              id="wateringSchedule"
+              placeholder="e.g. Mon/Wed/Fri mornings, 20 min per zone"
+              {...register("wateringSchedule")}
+            />
+          </div>
+          <p className="text-xs text-gray-400">
+            These are your own notes — they won&apos;t affect AI analysis.
+          </p>
+        </div>
       </div>
 
-      {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
+      {error &&<div className="rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
       {Object.keys(errors).length > 0 && (
         <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
           Please fix the errors above before saving.
