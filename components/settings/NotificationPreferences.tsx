@@ -101,7 +101,7 @@ export function NotificationPreferences({
             How far in advance to include upcoming tasks in your digest.
           </p>
           <Select value={daysAhead} onValueChange={(v) => { if (v != null) setDaysAhead(v); }}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48" disabled={saving}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -139,7 +139,7 @@ export function NotificationPreferences({
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-900">Send reminder</Label>
           <Select value={reminderDaysBefore} onValueChange={(v) => { if (v != null) setReminderDaysBefore(v); }}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48" disabled={saving}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
