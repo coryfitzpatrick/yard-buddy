@@ -81,7 +81,7 @@ export function DashboardInteractiveSection({ yards, tasks, allSections, weather
   return (
     <div className="space-y-6">
       <div>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 mb-3">
           <h2 className="font-semibold text-lg">My Yards</h2>
           <Link href="/yard" className="text-sm text-green-700 hover:underline">
             Manage →
