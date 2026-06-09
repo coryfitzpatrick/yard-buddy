@@ -17,11 +17,15 @@ export function ForgotPasswordForm() {
   });
 
   async function onSubmit(data: ForgotPasswordInput) {
-    await fetch("/api/auth/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    try {
+      await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // Never reveal whether the address exists or whether the request reached the server.
+    }
     setSubmitted(true);
   }
 
