@@ -4,6 +4,10 @@ import path from "path";
 export default defineConfig({
   test: {
     environment: "node",
+    env: {
+      RESEND_API_KEY: "test",
+      AUTH_SECRET: "test-secret-for-vitest",
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
