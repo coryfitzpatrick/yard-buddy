@@ -20,6 +20,12 @@ export default async function YardDetailPage({
   if (!session?.user?.id) redirect("/login");
 
   const { id } = await params;
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { weatherWidgetCollapsed: true },
+  });
+
   const yard = await db.yard.findFirst({
     where: { id, userId: session.user.id },
     include: {
@@ -96,7 +102,10 @@ export default async function YardDetailPage({
       </div>
 
       <div className="mb-6">
-        <WeatherWidget zip={yard.zipCode} />
+        <WeatherWidget
+          zip={yard.zipCode}
+          initialCollapsed={user?.weatherWidgetCollapsed ?? false}
+        />
       </div>
 
       {yard.sections.length === 0 ? (
