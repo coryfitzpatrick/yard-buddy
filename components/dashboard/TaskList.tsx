@@ -351,15 +351,45 @@ export function TaskList({
           <div className="space-y-2 mt-2">
             {completed.map((task) => (
               <Card key={task.id} className="opacity-60">
-                <CardContent className="p-3 flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                  <span className="text-sm line-through text-gray-400 flex-1">{task.title}</span>
-                  <button
-                    onClick={() => patchTask(task.id, "pending")}
-                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-600 transition-colors shrink-0"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" /> Undo
-                  </button>
+                <CardContent className="p-4">
+                  <div className="flex gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1 flex-wrap">
+                        <span className="font-medium text-base line-through text-gray-400">{task.title}</span>
+                        <button
+                          onClick={() => patchTask(task.id, "pending")}
+                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-600 transition-colors shrink-0"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" /> Undo
+                        </button>
+                      </div>
+                      <p className="text-sm text-gray-400 leading-relaxed">{task.description}</p>
+                      {task.product && (
+                        <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-400">
+                          <Package className="w-3.5 h-3.5 shrink-0" />
+                          <span>{task.product}</span>
+                          {task.applicationRate && (
+                            <span className="text-gray-300">· {task.applicationRate}</span>
+                          )}
+                          {task.productSearchQuery && (
+                            <a
+                              href={`https://www.google.com/search?tbm=shop&q=${encodeURIComponent(task.productSearchQuery)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="Shop"
+                              className="ml-auto shrink-0 text-gray-300 hover:text-green-600 transition-colors"
+                            >
+                              <ShoppingCart className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      )}
+                      {task.spreaderSetting && (
+                        <p className="text-xs text-gray-400 mt-1">Spreader: {task.spreaderSetting}</p>
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
