@@ -32,6 +32,10 @@ export default async function YardPage() {
       id: true,
       name: true,
       zipCode: true,
+      spreaderType: true,
+      spreaderModel: true,
+      wateringDaysPerWeek: true,
+      wateringMinutesPerSession: true,
       mowingSchedule: true,
       wateringSchedule: true,
       _count: { select: { sections: true } },
@@ -74,6 +78,16 @@ export default async function YardPage() {
                       <> &middot; {yard._count.sections} section{yard._count.sections !== 1 ? "s" : ""}</>
                     )}
                   </p>
+                  {(yard.spreaderType || yard.spreaderModel || yard.wateringDaysPerWeek || yard.wateringMinutesPerSession) && (
+                    <div className="text-xs text-gray-500 mt-1.5 space-y-0.5">
+                      {(yard.spreaderType || yard.spreaderModel) && (
+                        <p>{[yard.spreaderType && `Spreader: ${yard.spreaderType.charAt(0).toUpperCase() + yard.spreaderType.slice(1)}`, yard.spreaderModel].filter(Boolean).join(" · ")}</p>
+                      )}
+                      {(yard.wateringDaysPerWeek || yard.wateringMinutesPerSession) && (
+                        <p>{[yard.wateringDaysPerWeek ? `${yard.wateringDaysPerWeek}x/week` : null, yard.wateringMinutesPerSession ? `${yard.wateringMinutesPerSession} min/session` : null].filter(Boolean).join(" · ")}</p>
+                      )}
+                    </div>
+                  )}
                   {(yardMow || yardWater) && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {yardMow && (

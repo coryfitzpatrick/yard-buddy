@@ -227,6 +227,31 @@ export default async function YardDetailPage({
                     <p className="text-sm text-gray-400">No analyses yet — tap Analyze to get started.</p>
                   )}
 
+                  {/* Soil & section details */}
+                  {(section.soilPh || section.soilMoisture || section.nitrogenPpm || section.phosphorusPpm || section.potassiumPpm || section.soilTestSource || section.notes) && (
+                    <div className="text-xs text-gray-500 space-y-1 border-t border-gray-100 pt-2">
+                      {(section.soilPh || section.soilMoisture) && (
+                        <p>
+                          {[
+                            section.soilPh ? `pH ${section.soilPh}` : null,
+                            section.soilMoisture ? `${section.soilMoisture.charAt(0).toUpperCase() + section.soilMoisture.slice(1)} moisture` : null,
+                          ].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                      {(section.nitrogenPpm || section.phosphorusPpm || section.potassiumPpm) && (
+                        <p>
+                          {[
+                            section.nitrogenPpm ? `N: ${section.nitrogenPpm} ppm` : null,
+                            section.phosphorusPpm ? `P: ${section.phosphorusPpm} ppm` : null,
+                            section.potassiumPpm ? `K: ${section.potassiumPpm} ppm` : null,
+                          ].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                      {section.soilTestSource && <p>Source: {section.soilTestSource}</p>}
+                      {section.notes && <p className="italic truncate">"{section.notes}"</p>}
+                    </div>
+                  )}
+
                   {(mowSummary || waterSummary) && (
                     <div className="flex flex-wrap gap-2 pt-1">
                       {mowSummary && (
