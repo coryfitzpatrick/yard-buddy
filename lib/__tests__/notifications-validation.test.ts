@@ -6,6 +6,8 @@ describe("notificationPrefsSchema", () => {
     const result = notificationPrefsSchema.safeParse({
       notificationsEnabled: true,
       notifyDaysAhead: 5,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 1,
     });
     expect(result.success).toBe(true);
   });
@@ -14,6 +16,8 @@ describe("notificationPrefsSchema", () => {
     const result = notificationPrefsSchema.safeParse({
       notificationsEnabled: false,
       notifyDaysAhead: 3,
+      reminderNotificationsEnabled: false,
+      reminderDaysBefore: 0,
     });
     expect(result.success).toBe(true);
   });
@@ -22,6 +26,8 @@ describe("notificationPrefsSchema", () => {
     const result = notificationPrefsSchema.safeParse({
       notificationsEnabled: true,
       notifyDaysAhead: 0,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 1,
     });
     expect(result.success).toBe(false);
   });
@@ -30,6 +36,8 @@ describe("notificationPrefsSchema", () => {
     const result = notificationPrefsSchema.safeParse({
       notificationsEnabled: true,
       notifyDaysAhead: 15,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 1,
     });
     expect(result.success).toBe(false);
   });
@@ -38,12 +46,58 @@ describe("notificationPrefsSchema", () => {
     const result = notificationPrefsSchema.safeParse({
       notificationsEnabled: true,
       notifyDaysAhead: 2.5,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 1,
     });
     expect(result.success).toBe(false);
   });
 
   it("rejects missing notificationsEnabled", () => {
-    const result = notificationPrefsSchema.safeParse({ notifyDaysAhead: 3 });
+    const result = notificationPrefsSchema.safeParse({
+      notifyDaysAhead: 3,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 1,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts reminderDaysBefore of 0 (send on day)", () => {
+    const result = notificationPrefsSchema.safeParse({
+      notificationsEnabled: true,
+      notifyDaysAhead: 5,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 0,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts reminderDaysBefore of 1 (send day before)", () => {
+    const result = notificationPrefsSchema.safeParse({
+      notificationsEnabled: true,
+      notifyDaysAhead: 5,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 1,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects reminderDaysBefore above 1", () => {
+    const result = notificationPrefsSchema.safeParse({
+      notificationsEnabled: true,
+      notifyDaysAhead: 5,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 2,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects non-integer reminderDaysBefore", () => {
+    const result = notificationPrefsSchema.safeParse({
+      notificationsEnabled: true,
+      notifyDaysAhead: 5,
+      reminderNotificationsEnabled: true,
+      reminderDaysBefore: 0.5,
+    });
     expect(result.success).toBe(false);
   });
 });
