@@ -9,6 +9,7 @@ import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
 import { TaskList } from "@/components/dashboard/TaskList";
 import { RoutineCaptureCard } from "@/components/sections/RoutineCaptureCard";
+import { WateringCard } from "@/components/sections/WateringCard";
 import { format } from "date-fns";
 
 export default async function SectionDetailPage({
@@ -24,7 +25,14 @@ export default async function SectionDetailPage({
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { id: yardId, userId: session.user.id } },
     include: {
-      yard: { select: { id: true, name: true } },
+      yard: {
+        select: {
+          id: true,
+          name: true,
+          wateringDaysPerWeek: true,
+          wateringMinutesPerSession: true,
+        },
+      },
       analyses: {
         orderBy: { createdAt: "desc" },
         select: { id: true, healthScore: true, issues: true, summary: true, createdAt: true, imageUrls: true },
@@ -175,6 +183,17 @@ export default async function SectionDetailPage({
           No analyses yet. Tap Analyze to get started.
         </div>
       )}
+
+      <WateringCard
+        sectionId={sectionId}
+        yardId={yardId}
+        initialSchedule={section.wateringSchedule}
+        initialDeviates={section.wateringDeviates}
+        hasYardSchedule={
+          section.yard.wateringDaysPerWeek != null &&
+          section.yard.wateringMinutesPerSession != null
+        }
+      />
 
       {/* Past analyses */}
       {section.analyses.length > 1 && (
