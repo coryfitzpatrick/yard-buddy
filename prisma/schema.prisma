@@ -79,6 +79,8 @@ model Yard {
   spreaderModel      String?
   wateringDaysPerWeek       Int?
   wateringMinutesPerSession Int?
+  mowingSchedule            String?
+  wateringSchedule          String?
   weatherRefreshedAt DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt

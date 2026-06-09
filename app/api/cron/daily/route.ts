@@ -69,21 +69,18 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  // 2. Fetch users with reminder notifications enabled who have scheduled sections
-  // (may overlap with task users — we deduplicate later)
+  // 2. Fetch users with reminder notifications enabled who have any schedule
+  // (yard-level or section-level). May overlap with task users — deduplicated later.
   const reminderUsers = await db.user.findMany({
     where: {
       reminderNotificationsEnabled: true,
       yards: {
         some: {
-          sections: {
-            some: {
-              OR: [
-                { mowingSchedule: { not: null } },
-                { wateringSchedule: { not: null } },
-              ],
-            },
-          },
+          OR: [
+            { mowingSchedule: { not: null } },
+            { wateringSchedule: { not: null } },
+            { sections: { some: { OR: [{ mowingSchedule: { not: null } }, { wateringSchedule: { not: null } }] } } },
+          ],
         },
       },
     },
@@ -97,15 +94,18 @@ export async function GET(req: NextRequest) {
       lastNotifiedAt: true,
       notifyDaysAhead: true,
       yards: {
+        where: {
+          OR: [
+            { mowingSchedule: { not: null } },
+            { wateringSchedule: { not: null } },
+            { sections: { some: { OR: [{ mowingSchedule: { not: null } }, { wateringSchedule: { not: null } }] } } },
+          ],
+        },
         select: {
           name: true,
+          mowingSchedule: true,
+          wateringSchedule: true,
           sections: {
-            where: {
-              OR: [
-                { mowingSchedule: { not: null } },
-                { wateringSchedule: { not: null } },
-              ],
-            },
             select: {
               name: true,
               mowingSchedule: true,
@@ -274,7 +274,14 @@ export async function GET(req: NextRequest) {
 
     if (user.reminderNotificationsEnabled && reminderUser) {
       const sections = reminderUser.yards.flatMap((y) =>
-        y.sections.map((s) => ({ name: s.name, yardName: y.name, mowingSchedule: s.mowingSchedule, wateringSchedule: s.wateringSchedule }))
+        y.sections.map((s) => ({
+          name: s.name,
+          yardName: y.name,
+          mowingSchedule: s.mowingSchedule,
+          wateringSchedule: s.wateringSchedule,
+          yardMowingSchedule: y.mowingSchedule,
+          yardWateringSchedule: y.wateringSchedule,
+        }))
       );
       scheduledReminders = getTodayReminders(sections, today, user.reminderDaysBefore);
     }

@@ -24,6 +24,8 @@ export default async function EditYardPage({
       spreaderModel: true,
       wateringDaysPerWeek: true,
       wateringMinutesPerSession: true,
+      mowingSchedule: true,
+      wateringSchedule: true,
     },
   });
   if (!yard) notFound();
@@ -46,6 +48,8 @@ export default async function EditYardPage({
           spreaderModel: yard.spreaderModel ?? undefined,
           wateringDaysPerWeek: yard.wateringDaysPerWeek ?? undefined,
           wateringMinutesPerSession: yard.wateringMinutesPerSession ?? undefined,
+          mowingSchedule: yard.mowingSchedule ?? undefined,
+          wateringSchedule: yard.wateringSchedule ?? undefined,
         }}
       />
     </div>

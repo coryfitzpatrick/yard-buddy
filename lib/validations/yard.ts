@@ -20,6 +20,8 @@ export const yardSchema = z.object({
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().int().min(1).max(120).optional()
   ),
+  mowingSchedule: z.string().max(500).optional(),
+  wateringSchedule: z.string().max(500).optional(),
 });
 
 export type YardInput = z.infer<typeof yardSchema>;

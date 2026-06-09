@@ -6,6 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Plus, ArrowRight, Pencil } from "lucide-react";
 import { YardDeleteButton } from "@/components/yard/YardDeleteButton";
 
+function parseScheduleSummary(raw: string | null): { days: string; time: string; amount: string } | null {
+  if (!raw) return null;
+  try {
+    const p = JSON.parse(raw);
+    if (!p || !Array.isArray(p.days) || p.days.length === 0) return null;
+    const h = p.time ? Number(p.time.split(":")[0]) : null;
+    const m = p.time ? Number(p.time.split(":")[1]) : null;
+    return {
+      days: p.days.join(", "),
+      time: h !== null && m !== null ? `${h > 12 ? h - 12 : h || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}` : "",
+      amount: p.inches ?? "",
+    };
+  } catch { return null; }
+}
+
 export default async function YardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
@@ -17,6 +32,8 @@ export default async function YardPage() {
       id: true,
       name: true,
       zipCode: true,
+      mowingSchedule: true,
+      wateringSchedule: true,
       _count: { select: { sections: true } },
     },
   });
@@ -43,7 +60,10 @@ export default async function YardPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {yards.map((yard) => (
+          {yards.map((yard) => {
+            const yardMow = parseScheduleSummary(yard.mowingSchedule ?? null);
+            const yardWater = parseScheduleSummary(yard.wateringSchedule ?? null);
+            return (
             <div key={yard.id} className="rounded-lg border border-gray-200 bg-white p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -54,6 +74,20 @@ export default async function YardPage() {
                       <> &middot; {yard._count.sections} section{yard._count.sections !== 1 ? "s" : ""}</>
                     )}
                   </p>
+                  {(yardMow || yardWater) && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {yardMow && (
+                        <span className="inline-flex items-center text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2 py-0.5">
+                          ✂️ {yardMow.days}{yardMow.time ? ` · ${yardMow.time}` : ""}{yardMow.amount ? ` · ${yardMow.amount} in` : ""}
+                        </span>
+                      )}
+                      {yardWater && (
+                        <span className="inline-flex items-center text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5">
+                          💧 {yardWater.days}{yardWater.time ? ` · ${yardWater.time}` : ""}{yardWater.amount ? ` · ${yardWater.amount} min` : ""}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 flex-wrap justify-end">
                   <Link href={`/yard/${yard.id}`}>
@@ -75,7 +109,7 @@ export default async function YardPage() {
                 </div>
               </div>
             </div>
-          ))}
+          );})}
         </div>
       )}
     </div>

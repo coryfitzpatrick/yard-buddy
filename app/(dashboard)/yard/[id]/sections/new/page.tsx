@@ -12,7 +12,7 @@ export default async function NewSectionPage({ params }: { params: Promise<{ id:
   const { id } = await params;
   const yard = await db.yard.findFirst({
     where: { id, userId: session.user.id },
-    select: { id: true, name: true, zipCode: true, streetAddress: true, lotSqft: true, buildingSqft: true },
+    select: { id: true, name: true, zipCode: true, streetAddress: true, lotSqft: true, buildingSqft: true, mowingSchedule: true, wateringSchedule: true },
   });
   if (!yard) notFound();
 
@@ -27,6 +27,8 @@ export default async function NewSectionPage({ params }: { params: Promise<{ id:
         zipCode={yard.zipCode}
         lotSqft={yard.lotSqft ?? undefined}
         buildingSqft={yard.buildingSqft ?? undefined}
+        yardMowingSchedule={yard.mowingSchedule}
+        yardWateringSchedule={yard.wateringSchedule}
       />
     </div>
   );

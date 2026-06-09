@@ -128,6 +128,27 @@ export default async function YardDetailPage({
         />
       </div>
 
+      {(yard.mowingSchedule || yard.wateringSchedule) && (() => {
+        const yardMow = parseScheduleSummary(yard.mowingSchedule ?? null);
+        const yardWater = parseScheduleSummary(yard.wateringSchedule ?? null);
+        if (!yardMow && !yardWater) return null;
+        return (
+          <div className="mb-4 flex flex-wrap gap-2 items-center">
+            <span className="text-xs text-gray-400 font-medium">Yard defaults:</span>
+            {yardMow && (
+              <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2.5 py-1">
+                ✂️ {yardMow.days}{yardMow.time ? ` · ${yardMow.time}` : ""}{yardMow.amount ? ` · ${yardMow.amount} in` : ""}
+              </span>
+            )}
+            {yardWater && (
+              <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2.5 py-1">
+                💧 {yardWater.days}{yardWater.time ? ` · ${yardWater.time}` : ""}{yardWater.amount ? ` · ${yardWater.amount} min` : ""}
+              </span>
+            )}
+          </div>
+        );
+      })()}
+
       {yard.sections.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           <p className="mb-4">No sections yet. Add your first section to get started.</p>
@@ -144,8 +165,10 @@ export default async function YardDetailPage({
               const areaCfg = section.areaType ? AREA_CONFIG[section.areaType as AreaType] : null;
               const AreaIcon = areaCfg?.icon;
               const latestAnalysis = section.analyses[section.analyses.length - 1] ?? null;
-              const mowSummary = parseScheduleSummary(section.mowingSchedule ?? null);
-              const waterSummary = parseScheduleSummary(section.wateringSchedule ?? null);
+              const mowSummary = parseScheduleSummary(section.mowingSchedule ?? null) ?? parseScheduleSummary(yard.mowingSchedule ?? null);
+              const waterSummary = parseScheduleSummary(section.wateringSchedule ?? null) ?? parseScheduleSummary(yard.wateringSchedule ?? null);
+              const mowIsYardDefault = !parseScheduleSummary(section.mowingSchedule ?? null) && !!mowSummary;
+              const waterIsYardDefault = !parseScheduleSummary(section.wateringSchedule ?? null) && !!waterSummary;
               const chartData = section.analyses.map((a: (typeof section)["analyses"][number]) => ({
                 date: a.createdAt.toISOString(),
                 score: a.healthScore,
@@ -207,13 +230,13 @@ export default async function YardDetailPage({
                   {(mowSummary || waterSummary) && (
                     <div className="flex flex-wrap gap-2 pt-1">
                       {mowSummary && (
-                        <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2.5 py-1">
-                          ✂️ {mowSummary.days}{mowSummary.time ? ` · ${mowSummary.time}` : ""}{mowSummary.amount ? ` · ${mowSummary.amount} in` : ""}
+                        <span className={`inline-flex items-center gap-1 text-xs border rounded-full px-2.5 py-1 ${mowIsYardDefault ? "bg-gray-50 text-gray-500 border-gray-200" : "bg-green-50 text-green-700 border-green-200"}`}>
+                          ✂️ {mowSummary.days}{mowSummary.time ? ` · ${mowSummary.time}` : ""}{mowSummary.amount ? ` · ${mowSummary.amount} in` : ""}{mowIsYardDefault ? " (yard default)" : ""}
                         </span>
                       )}
                       {waterSummary && (
-                        <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2.5 py-1">
-                          💧 {waterSummary.days}{waterSummary.time ? ` · ${waterSummary.time}` : ""}{waterSummary.amount ? ` · ${waterSummary.amount} min` : ""}
+                        <span className={`inline-flex items-center gap-1 text-xs border rounded-full px-2.5 py-1 ${waterIsYardDefault ? "bg-gray-50 text-gray-500 border-gray-200" : "bg-blue-50 text-blue-700 border-blue-200"}`}>
+                          💧 {waterSummary.days}{waterSummary.time ? ` · ${waterSummary.time}` : ""}{waterSummary.amount ? ` · ${waterSummary.amount} min` : ""}{waterIsYardDefault ? " (yard default)" : ""}
                         </span>
                       )}
                     </div>

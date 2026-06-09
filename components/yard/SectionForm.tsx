@@ -56,6 +56,8 @@ interface Props {
   buildingSqft?: number;
   streetAddress?: string;
   initialData?: Partial<YardSectionFormInput & { id: string }>;
+  yardMowingSchedule?: string | null;
+  yardWateringSchedule?: string | null;
 }
 
 
@@ -65,7 +67,7 @@ const AREA_NAME_MAP: Record<AreaType, string> = {
   garden: "Garden", other: "My Yard",
 };
 
-export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData }: Props) {
+export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const isEdit = !!initialData?.id;
@@ -442,7 +444,20 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
           <h3 className="text-sm font-semibold text-gray-700">Personalized Reminders</h3>
 
           <div className="space-y-2">
-            <Label>Mowing schedule</Label>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <Label>Mowing schedule</Label>
+              {mowingDays.length === 0 && yardMowingSchedule && (() => {
+                try {
+                  const p = JSON.parse(yardMowingSchedule);
+                  if (Array.isArray(p.days) && p.days.length > 0) {
+                    const parts = [p.days.join(", ")];
+                    if (p.time) { const [h,m] = p.time.split(":").map(Number); parts.push(`${h > 12 ? h-12 : h||12}:${String(m).padStart(2,"0")} ${h >= 12 ? "PM" : "AM"}`); }
+                    if (p.inches) parts.push(`${p.inches} in`);
+                    return <span className="text-xs text-gray-400">Yard default: {parts.join(" · ")}</span>;
+                  }
+                } catch {}
+              })()}
+            </div>
             <div className="flex flex-wrap gap-1">
               {DAYS.map((day) => (
                 <button
@@ -486,7 +501,20 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
           </div>
 
           <div className="space-y-2">
-            <Label>Watering schedule</Label>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <Label>Watering schedule</Label>
+              {wateringDays.length === 0 && yardWateringSchedule && (() => {
+                try {
+                  const p = JSON.parse(yardWateringSchedule);
+                  if (Array.isArray(p.days) && p.days.length > 0) {
+                    const parts = [p.days.join(", ")];
+                    if (p.time) { const [h,m] = p.time.split(":").map(Number); parts.push(`${h > 12 ? h-12 : h||12}:${String(m).padStart(2,"0")} ${h >= 12 ? "PM" : "AM"}`); }
+                    if (p.inches) parts.push(`${p.inches} min`);
+                    return <span className="text-xs text-gray-400">Yard default: {parts.join(" · ")}</span>;
+                  }
+                } catch {}
+              })()}
+            </div>
             <div className="flex flex-wrap gap-1">
               {DAYS.map((day) => (
                 <button

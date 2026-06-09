@@ -81,12 +81,12 @@ describe("notificationPrefsSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects reminderDaysBefore above 1", () => {
+  it("rejects reminderDaysBefore above 3", () => {
     const result = notificationPrefsSchema.safeParse({
       notificationsEnabled: true,
       notifyDaysAhead: 5,
       reminderNotificationsEnabled: true,
-      reminderDaysBefore: 2,
+      reminderDaysBefore: 4,
     });
     expect(result.success).toBe(false);
   });

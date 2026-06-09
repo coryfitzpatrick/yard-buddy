@@ -20,6 +20,8 @@ export function getTodayReminders(
     yardName: string;
     mowingSchedule: string | null;
     wateringSchedule: string | null;
+    yardMowingSchedule?: string | null;
+    yardWateringSchedule?: string | null;
   }>,
   today: Date,
   daysBefore: number
@@ -34,20 +36,27 @@ export function getTodayReminders(
     let mowing: ScheduledReminder["mowing"] = null;
     let watering: ScheduledReminder["watering"] = null;
 
-    if (section.mowingSchedule) {
+    // Section schedule takes precedence; fall back to yard schedule
+    const effectiveMowing = hasScheduleDays(section.mowingSchedule)
+      ? section.mowingSchedule
+      : (section.yardMowingSchedule ?? null);
+    const effectiveWatering = hasScheduleDays(section.wateringSchedule)
+      ? section.wateringSchedule
+      : (section.yardWateringSchedule ?? null);
+
+    if (effectiveMowing) {
       try {
-        const p = JSON.parse(section.mowingSchedule);
+        const p = JSON.parse(effectiveMowing);
         if (Array.isArray(p.days) && p.days.includes(dayAbbr)) {
           mowing = { time: p.time ?? "", inches: p.inches ?? "" };
         }
       } catch { /* skip unparseable */ }
     }
 
-    if (section.wateringSchedule) {
+    if (effectiveWatering) {
       try {
-        const p = JSON.parse(section.wateringSchedule);
+        const p = JSON.parse(effectiveWatering);
         if (Array.isArray(p.days) && p.days.includes(dayAbbr)) {
-          // "inches" key stores watering minutes (SectionForm serialization)
           watering = { time: p.time ?? "", minutes: p.inches ?? "" };
         }
       } catch { /* skip unparseable */ }
@@ -59,4 +68,12 @@ export function getTodayReminders(
   }
 
   return reminders;
+}
+
+function hasScheduleDays(raw: string | null | undefined): boolean {
+  if (!raw) return false;
+  try {
+    const p = JSON.parse(raw);
+    return Array.isArray(p.days) && p.days.length > 0;
+  } catch { return false; }
 }
