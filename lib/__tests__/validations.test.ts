@@ -152,4 +152,36 @@ describe("yardSectionSchema", () => {
     const result = yardSectionSchema.safeParse({ ...base, soilMoisture: "soggy" });
     expect(result.success).toBe(false);
   });
+
+  it("accepts mowingSchedule as a short string", () => {
+    const result = yardSectionSchema.safeParse({ ...base, mowingSchedule: "Weekly at 3.5 inches" });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects mowingSchedule longer than 500 chars", () => {
+    const result = yardSectionSchema.safeParse({ ...base, mowingSchedule: "x".repeat(501) });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts mowingSchedule as absent", () => {
+    const result = yardSectionSchema.safeParse({ ...base });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.mowingSchedule).toBeUndefined();
+  });
+
+  it("accepts wateringSchedule as a short string", () => {
+    const result = yardSectionSchema.safeParse({ ...base, wateringSchedule: "Mon/Wed/Fri mornings, 20 min" });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects wateringSchedule longer than 500 chars", () => {
+    const result = yardSectionSchema.safeParse({ ...base, wateringSchedule: "x".repeat(501) });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts wateringSchedule as absent", () => {
+    const result = yardSectionSchema.safeParse({ ...base });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.wateringSchedule).toBeUndefined();
+  });
 });

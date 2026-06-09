@@ -54,6 +54,8 @@ export const yardSectionSchema = z.object({
   soilTestSource: z.string().max(200).optional(),
   soilMoisture: z.enum(["dry", "moderate", "moist"]).optional(),
   notes: z.string().max(500).optional(),
+  mowingSchedule: z.string().max(500).optional(),
+  wateringSchedule: z.string().max(500).optional(),
 });
 
 export type YardSectionInput = z.infer<typeof yardSectionSchema>;
