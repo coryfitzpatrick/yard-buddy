@@ -120,6 +120,7 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
       }}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient}`} />
+      <div className="absolute inset-0 bg-black/30" />
 
       {loading && (
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-20">
