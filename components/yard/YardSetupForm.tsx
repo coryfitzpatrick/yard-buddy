@@ -54,6 +54,8 @@ export function YardSetupForm() {
 
   const [spreaderType, setSpreaderType] = useState<string>("");
   const [spreaderModel, setSpreaderModel] = useState<string>("");
+  const [wateringDaysPerWeek, setWateringDaysPerWeek] = useState("");
+  const [wateringMinutesPerSession, setWateringMinutesPerSession] = useState("");
 
   const areaType = watch("areaType") as AreaType | undefined;
   const grassType = watch("grassType") as YardSectionInput["grassType"] | undefined;
@@ -174,6 +176,8 @@ export function YardSetupForm() {
             streetAddress: streetAddress || undefined,
             lotSqft: lotData?.lotSqft ?? undefined,
             buildingSqft: lotData?.buildingSqft ?? undefined,
+            wateringDaysPerWeek: wateringDaysPerWeek ? Number(wateringDaysPerWeek) : undefined,
+            wateringMinutesPerSession: wateringMinutesPerSession ? Number(wateringMinutesPerSession) : undefined,
           }),
         });
         if (!yardRes.ok) { setError("Failed to save yard. Please try again."); return; }
@@ -468,6 +472,29 @@ export function YardSetupForm() {
                       ))}
                     </div>
                   )}
+                </div>
+                <div className="space-y-1">
+                  <Label>Watering days per week <span className="text-gray-400 font-normal">(optional)</span></Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="7"
+                    placeholder="3"
+                    value={wateringDaysPerWeek}
+                    onChange={(e) => setWateringDaysPerWeek(e.target.value)}
+                  />
+                  <p className="text-sm text-gray-400">How many days per week do you currently water?</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Minutes per watering session <span className="text-gray-400 font-normal">(optional)</span></Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="120"
+                    placeholder="20"
+                    value={wateringMinutesPerSession}
+                    onChange={(e) => setWateringMinutesPerSession(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label>Additional Notes</Label>
