@@ -66,14 +66,16 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
   }, [zip, requestGeolocation]);
 
   const handleToggle = useCallback(() => {
-    const next = !collapsed;
-    setCollapsed(next);
-    fetch("/api/user/preferences", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ weatherWidgetCollapsed: next }),
-    }).catch(() => {});
-  }, [collapsed]);
+    setCollapsed((prev) => {
+      const next = !prev;
+      fetch("/api/user/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weatherWidgetCollapsed: next }),
+      }).catch(() => {});
+      return next;
+    });
+  }, []);
 
   if (loading && !weather) {
     return (
