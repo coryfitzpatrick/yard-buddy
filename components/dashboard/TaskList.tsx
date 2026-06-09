@@ -139,6 +139,9 @@ function TaskCard({
                 )}
               </div>
             )}
+            {task.spreaderSetting && (
+              <p className="text-xs text-gray-500 mt-1">Spreader: {task.spreaderSetting}</p>
+            )}
           </div>
         </div>
       </CardContent>
