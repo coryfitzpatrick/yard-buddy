@@ -200,8 +200,8 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
             </div>
 
             {weather.forecast.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-white/20 grid grid-cols-4 gap-2">
-                {weather.forecast.slice(0, 4).map((day) => (
+              <div className="mt-4 pt-3 border-t border-white/20 grid grid-cols-5 gap-2">
+                {weather.forecast.slice(0, 5).map((day) => (
                   <div key={day.date} className="text-center">
                     <div className="text-xs mb-1">
                       {new Date(day.date + "T12:00:00").toLocaleDateString("en-US", {

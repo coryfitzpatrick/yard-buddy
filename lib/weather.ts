@@ -54,7 +54,7 @@ function buildWeatherData(current: any, forecast: any, fallbackLocation: string)
 export async function getWeatherByZip(zip: string, country = "us"): Promise<WeatherData> {
   const [current, forecast] = await Promise.all([
     fetch(`${BASE}/weather?zip=${zip},${country}&appid=${KEY}&units=imperial`).then((r) => r.json()),
-    fetch(`${BASE}/forecast?zip=${zip},${country}&appid=${KEY}&units=imperial&cnt=24`).then((r) => r.json()),
+    fetch(`${BASE}/forecast?zip=${zip},${country}&appid=${KEY}&units=imperial&cnt=40`).then((r) => r.json()),
   ]);
 
   if (current.cod !== 200) throw new Error(`Weather API error: ${current.message ?? current.cod}`);
@@ -64,7 +64,7 @@ export async function getWeatherByZip(zip: string, country = "us"): Promise<Weat
 export async function getWeatherByLatLon(lat: number, lon: number): Promise<WeatherData> {
   const [current, forecast] = await Promise.all([
     fetch(`${BASE}/weather?lat=${lat}&lon=${lon}&appid=${KEY}&units=imperial`).then((r) => r.json()),
-    fetch(`${BASE}/forecast?lat=${lat}&lon=${lon}&appid=${KEY}&units=imperial&cnt=24`).then((r) => r.json()),
+    fetch(`${BASE}/forecast?lat=${lat}&lon=${lon}&appid=${KEY}&units=imperial&cnt=40`).then((r) => r.json()),
   ]);
 
   if (current.cod !== 200) throw new Error(`Weather API error: ${current.message ?? current.cod}`);
