@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { GrassType, AnalysisResult, RecommendationItem } from "@/types";
 import { buildSectionAnalysisPrompt } from "@/lib/ai/analysis-prompt";
+import { buildWateringPrompt, WateringPromptOpts } from "@/lib/ai/watering-prompt";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -260,4 +261,18 @@ For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic wind
   } catch {
     throw new Error(`Claude returned non-JSON response: ${cleaned.slice(0, 300)}`);
   }
+}
+
+export async function generateWateringRecommendation(
+  opts: WateringPromptOpts
+): Promise<{ schedule: string; deviates: boolean }> {
+  const msg = await client.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 256,
+    system:
+      "You are an expert lawn care agronomist. Given lawn section details, provide a concise watering schedule recommendation. Return valid JSON only — no markdown, no text outside the JSON object.",
+    messages: [{ role: "user", content: buildWateringPrompt(opts) }],
+  });
+  const text = msg.content[0].type === "text" ? msg.content[0].text.trim() : "";
+  return JSON.parse(text) as { schedule: string; deviates: boolean };
 }
