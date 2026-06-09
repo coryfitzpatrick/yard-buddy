@@ -110,6 +110,23 @@ No other interface changes. The component is used identically on both pages.
 - `app/(dashboard)/yard/[id]/page.tsx` — add `weatherWidgetCollapsed` to user select, pass as `initialCollapsed`
 - `app/(dashboard)/dashboard/page.tsx` or its interactive section — same
 
+## Mobile Considerations
+
+The widget must look good and function correctly at all viewport sizes. Key constraints:
+
+**Collapsed bar:**
+- Location name truncates with `truncate` on narrow screens — temp, description, and stats always visible
+- Stats row (`67% 💧 5 mph 💨 0% rain`) may wrap to a second line on very small screens (< 360px); use `flex-wrap` rather than cutting off data
+- Chevron touch target: minimum 44×44px tap area even though the icon is small — achieve with padding on the button element
+
+**Expanded state:**
+- 4-day forecast grid stays `grid-cols-4` — each cell is narrow but readable; day abbreviations ("Mon") and single temperatures fit fine at small widths
+- Photo background uses `bg-cover bg-center` so it crops gracefully on any aspect ratio
+- Humidity/wind/precip row: `flex-wrap gap-x-4 gap-y-1` so it wraps to two lines rather than overflowing on small screens
+
+**Touch:**
+- The entire header row (collapsed or expanded) is the tap target for toggle, not just the chevron icon
+
 ## Out of Scope
 
 - Per-yard collapsed state (global only)
