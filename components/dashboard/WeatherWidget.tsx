@@ -88,10 +88,10 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
   if (geoBlocked && !zip && !weather) {
     return (
       <div className="rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white p-5 flex flex-col items-center justify-center gap-3 min-h-[8rem] text-center">
-        <MapPinOff className="w-7 h-7 opacity-80" />
+        <MapPinOff className="w-7 h-7" />
         <div>
           <p className="font-medium text-sm">Location access is blocked</p>
-          <p className="text-xs opacity-80 mt-0.5">
+          <p className="text-xs mt-0.5">
             Enable location in your browser settings to see local weather,
             or select a yard above.
           </p>
@@ -139,7 +139,7 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
             {weather.location}
           </span>
           <span className="font-bold shrink-0">{weather.temp}°F</span>
-          <span className="capitalize opacity-90 text-sm shrink-0">
+          <span className="capitalize text-sm shrink-0">
             {weather.description}
           </span>
           <Image
@@ -149,15 +149,15 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
             height={24}
             className="w-6 h-6 shrink-0"
           />
-          <span className="flex items-center gap-1 text-sm opacity-90 shrink-0">
+          <span className="flex items-center gap-1 text-sm shrink-0">
             <Droplets className="w-3 h-3" />
             {weather.humidity}%
           </span>
-          <span className="flex items-center gap-1 text-sm opacity-90 shrink-0">
+          <span className="flex items-center gap-1 text-sm shrink-0">
             <Wind className="w-3 h-3" />
             {weather.windSpeed} mph
           </span>
-          <span className="flex items-center gap-1 text-sm opacity-90 shrink-0">
+          <span className="flex items-center gap-1 text-sm shrink-0">
             <CloudRain className="w-3 h-3" />
             {weather.precipitationChance}% rain
           </span>
@@ -175,7 +175,7 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
             <div className="flex items-center justify-between pt-3">
               <div>
                 <div className="text-4xl font-bold">{weather.temp}°F</div>
-                <div className="text-sm opacity-90 capitalize">
+                <div className="text-sm capitalize">
                   {weather.description}
                 </div>
               </div>
@@ -187,7 +187,7 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
                 className="w-16 h-16"
               />
             </div>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm opacity-90">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm">
               <span className="flex items-center gap-1">
                 <Droplets className="w-3 h-3" /> {weather.humidity}%
               </span>
@@ -203,16 +203,16 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
               <div className="mt-4 pt-3 border-t border-white/20 grid grid-cols-4 gap-2">
                 {weather.forecast.slice(0, 4).map((day) => (
                   <div key={day.date} className="text-center">
-                    <div className="text-xs opacity-75 mb-1">
+                    <div className="text-xs mb-1">
                       {new Date(day.date + "T12:00:00").toLocaleDateString("en-US", {
                         weekday: "short",
                       })}
                     </div>
-                    <div className="text-xs capitalize opacity-80 leading-tight mb-1 line-clamp-2">
+                    <div className="text-xs capitalize leading-tight mb-1 line-clamp-2">
                       {day.description}
                     </div>
                     <div className="text-sm font-semibold">{day.high}°</div>
-                    <div className="text-xs opacity-70">{day.low}°</div>
+                    <div className="text-xs">{day.low}°</div>
                   </div>
                 ))}
               </div>
