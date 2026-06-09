@@ -75,6 +75,7 @@ async function main() {
       soilTestSource: "UGA Cooperative Extension Lab",
       soilMoisture: "moderate",
       notes: "Gets full sun all day. Slight slope toward the street drains well.",
+      mowingSchedule: "Every 5-7 days at 1.5 inches during growing season. Mow in early morning before peak heat.",
     },
   });
 
@@ -88,6 +89,7 @@ async function main() {
       soilPh: 6.5,
       soilMoisture: "moderate",
       notes: "Full sun. Kids play area near the deck needs extra wear recovery.",
+      mowingSchedule: "Every 5-7 days at 1.5 inches. Skip the play zone near the deck if turf is actively recovering.",
     },
   });
 
@@ -101,6 +103,7 @@ async function main() {
       soilPh: 6.2,
       soilMoisture: "moist",
       notes: "Shaded by the neighbor's oak most of the day. Fescue holds better here than bermuda.",
+      mowingSchedule: "Every 10-14 days at 3.5 inches. Never remove more than 1/3 of blade length — fescue in shade grows slowly.",
     },
   });
 
@@ -114,6 +117,7 @@ async function main() {
       soilPh: 6.4,
       soilMoisture: "moderate",
       notes: "Decorative border around the patio. Partial shade in the afternoon.",
+      mowingSchedule: "Every 7-10 days at 3 inches. Edge along the patio border after each mow.",
     },
   });
 
@@ -382,6 +386,7 @@ async function main() {
       soilPh: 6.9,
       soilMoisture: "moderate",
       notes: "Full sun, slight slope away from house. HOA requires uniform green coverage.",
+      mowingSchedule: "Every 7-10 days at 2 inches during growing season. Zoysia is slow-growing — avoid scalping.",
     },
   });
 
@@ -395,6 +400,7 @@ async function main() {
       soilPh: 6.6,
       soilMoisture: "moderate",
       notes: "Covered patio takes up 400 sq ft. Rest gets partial afternoon shade from live oaks.",
+      mowingSchedule: "Every 7 days at 3.5 inches. Avoid mowing within 48 hours of insecticide application.",
     },
   });
 
@@ -408,6 +414,7 @@ async function main() {
       soilPh: 6.4,
       soilMoisture: "moist",
       notes: "Narrow strip between house and fence. Gets afternoon shade, tends to stay moist.",
+      mowingSchedule: "Every 10-14 days at 3.5 inches. Use a string trimmer rather than a mower in this narrow strip.",
     },
   });
 
