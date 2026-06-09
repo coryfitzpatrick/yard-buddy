@@ -8,6 +8,11 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { weatherWidgetCollapsed: true },
+  });
+
   const yards = await db.yard.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "asc" },
@@ -89,6 +94,7 @@ export default async function DashboardPage() {
         tasks={tasks}
         allSections={allSections}
         weatherRefreshedAt={weatherRefreshedAt}
+        initialWeatherCollapsed={user?.weatherWidgetCollapsed ?? false}
       />
     </div>
   );

@@ -56,9 +56,10 @@ interface Props {
   tasks: Task[];
   allSections: TaskSection[];
   weatherRefreshedAt: string | null;
+  initialWeatherCollapsed: boolean;
 }
 
-export function DashboardInteractiveSection({ yards, tasks, allSections, weatherRefreshedAt }: Props) {
+export function DashboardInteractiveSection({ yards, tasks, allSections, weatherRefreshedAt, initialWeatherCollapsed }: Props) {
   const [selectedYardId, setSelectedYardId] = useState<string | null>(null);
 
   const selectedYard = selectedYardId ? yards.find((y) => y.id === selectedYardId) ?? null : null;
@@ -93,7 +94,7 @@ export function DashboardInteractiveSection({ yards, tasks, allSections, weather
         />
       </div>
 
-      <WeatherWidget zip={selectedYard?.zipCode ?? null} />
+      <WeatherWidget zip={selectedYard?.zipCode ?? null} initialCollapsed={initialWeatherCollapsed} />
 
       <div>
         <h2 className="font-semibold text-lg mb-3">
