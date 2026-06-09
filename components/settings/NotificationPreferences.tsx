@@ -102,7 +102,7 @@ export function NotificationPreferences({
           </p>
           <Select value={daysAhead} onValueChange={(v) => { if (v != null) setDaysAhead(v); }}>
             <SelectTrigger className="w-48" disabled={saving}>
-              <SelectValue />
+              <SelectValue>{DAYS_OPTIONS.find((o) => o.value === daysAhead)?.label}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {DAYS_OPTIONS.map((opt) => (
@@ -140,7 +140,7 @@ export function NotificationPreferences({
           <Label className="text-sm font-medium text-gray-900">Send reminder</Label>
           <Select value={reminderDaysBefore} onValueChange={(v) => { if (v != null) setReminderDaysBefore(v); }}>
             <SelectTrigger className="w-48" disabled={saving}>
-              <SelectValue />
+              <SelectValue>{REMINDER_DAYS_OPTIONS.find((o) => o.value === reminderDaysBefore)?.label}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {REMINDER_DAYS_OPTIONS.map((opt) => (

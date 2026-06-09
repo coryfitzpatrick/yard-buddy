@@ -381,7 +381,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
               step={sizeUnit === "acres" ? "0.001" : "1"}
             />
             <Select value={sizeUnit} onValueChange={(v) => handleUnitChange(v as "sqft" | "acres")}>
-              <SelectTrigger className="w-28 shrink-0"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-28 shrink-0"><SelectValue>{sizeUnit === "sqft" ? "sq ft" : "acres"}</SelectValue></SelectTrigger>
               <SelectContent>
                 <SelectItem value="sqft">sq ft</SelectItem>
                 <SelectItem value="acres">acres</SelectItem>
@@ -467,7 +467,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
             </div>
             <div className="flex gap-2">
               <Select value={mowingTime} onValueChange={(v) => updateMowing(mowingDays, v ?? "", mowingInches)}>
-                <SelectTrigger className="flex-1 min-w-0"><SelectValue placeholder="Time" /></SelectTrigger>
+                <SelectTrigger className="flex-1 min-w-0"><SelectValue placeholder="Time">{TIME_OPTIONS.find((o) => o.value === mowingTime)?.label}</SelectValue></SelectTrigger>
                 <SelectContent>
                   {TIME_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
@@ -475,7 +475,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
                 </SelectContent>
               </Select>
               <Select value={mowingInches} onValueChange={(v) => updateMowing(mowingDays, mowingTime, v ?? "")}>
-                <SelectTrigger className="w-28 shrink-0"><SelectValue placeholder="Height" /></SelectTrigger>
+                <SelectTrigger className="w-28 shrink-0"><SelectValue placeholder="Height">{mowingInches ? `${mowingInches} in` : undefined}</SelectValue></SelectTrigger>
                 <SelectContent>
                   {MOWING_HEIGHTS.map((h) => (
                     <SelectItem key={h} value={h}>{h} in</SelectItem>
@@ -511,7 +511,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
             </div>
             <div className="flex gap-2">
               <Select value={wateringTime} onValueChange={(v) => updateWatering(wateringDays, v ?? "", wateringInches)}>
-                <SelectTrigger className="flex-1 min-w-0"><SelectValue placeholder="Time" /></SelectTrigger>
+                <SelectTrigger className="flex-1 min-w-0"><SelectValue placeholder="Time">{TIME_OPTIONS.find((o) => o.value === wateringTime)?.label}</SelectValue></SelectTrigger>
                 <SelectContent>
                   {TIME_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
@@ -519,7 +519,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
                 </SelectContent>
               </Select>
               <Select value={wateringInches} onValueChange={(v) => updateWatering(wateringDays, wateringTime, v ?? "")}>
-                <SelectTrigger className="w-28 shrink-0"><SelectValue placeholder="Duration" /></SelectTrigger>
+                <SelectTrigger className="w-28 shrink-0"><SelectValue placeholder="Duration">{wateringInches ? `${wateringInches} min` : undefined}</SelectValue></SelectTrigger>
                 <SelectContent>
                   {WATERING_MINUTES.map((a) => (
                     <SelectItem key={a} value={a}>{a} min</SelectItem>

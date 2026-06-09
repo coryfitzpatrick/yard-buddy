@@ -422,7 +422,7 @@ export function YardSetupForm() {
                     <Input type="number" placeholder={sizeUnit === "sqft" ? "5000" : "0.115"} value={sizeDisplay}
                       onChange={(e) => handleSizeInput(e.target.value)} min="0" step={sizeUnit === "acres" ? "0.001" : "1"} />
                     <Select value={sizeUnit} onValueChange={(v) => handleUnitChange(v as "sqft" | "acres")}>
-                      <SelectTrigger className="w-28 shrink-0"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="w-28 shrink-0"><SelectValue>{sizeUnit === "sqft" ? "sq ft" : "acres"}</SelectValue></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="sqft">sq ft</SelectItem>
                         <SelectItem value="acres">acres</SelectItem>
