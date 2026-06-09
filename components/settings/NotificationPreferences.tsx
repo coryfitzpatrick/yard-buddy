@@ -24,6 +24,8 @@ const DAYS_OPTIONS = [
 const REMINDER_DAYS_OPTIONS = [
   { value: "0", label: "Morning of" },
   { value: "1", label: "1 day before" },
+  { value: "2", label: "2 days before" },
+  { value: "3", label: "3 days before" },
 ];
 
 interface Props {
