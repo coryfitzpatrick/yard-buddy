@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import crypto from "crypto";
+import type { ScheduledReminder } from "@/lib/cron/reminder-scheduler";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -54,19 +55,30 @@ function formatDateRange(start: Date, end: Date): string {
   return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
 }
 
+function formatDisplayTime(time: string): string {
+  if (!time) return "";
+  const [h, m] = time.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const displayH = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  return `${displayH}:${m.toString().padStart(2, "0")} ${ampm}`;
+}
+
 export function buildDigestEmail(opts: {
   userName: string;
   overdueTasks: DigestTask[];
   upcomingTasks: DigestTask[];
+  scheduledReminders: ScheduledReminder[];
   dashboardUrl: string;
   unsubscribeUrl: string;
 }): { subject: string; html: string } {
-  const { userName, overdueTasks, upcomingTasks, dashboardUrl, unsubscribeUrl } = opts;
+  const { userName, overdueTasks, upcomingTasks, scheduledReminders, dashboardUrl, unsubscribeUrl } = opts;
 
   const subject =
     overdueTasks.length > 0
       ? `You have ${overdueTasks.length} overdue lawn task${overdueTasks.length > 1 ? "s" : ""} still worth doing`
-      : "Upcoming lawn tasks for the next few days";
+      : upcomingTasks.length > 0
+      ? "Upcoming lawn tasks for the next few days"
+      : "Today's lawn care reminder";
 
   const overdueHtml =
     overdueTasks.length > 0
@@ -102,6 +114,30 @@ export function buildDigestEmail(opts: {
           .join("")}`
       : "";
 
+  const remindersHtml =
+    scheduledReminders.length > 0
+      ? `<h2 style="color:#0369a1;font-size:16px;margin:24px 0 8px;">&#128197; Today&#x27;s Schedule</h2>
+      ${scheduledReminders
+        .map((r) => {
+          const lines: string[] = [];
+          if (r.mowing) {
+            const timeStr = r.mowing.time ? ` at ${formatDisplayTime(r.mowing.time)}` : "";
+            const heightStr = r.mowing.inches ? ` &middot; ${r.mowing.inches} in` : "";
+            lines.push(`<div style="color:#374151;font-size:14px;">&#x2702;&#xFE0F; Mow${timeStr}${heightStr}</div>`);
+          }
+          if (r.watering) {
+            const timeStr = r.watering.time ? ` at ${formatDisplayTime(r.watering.time)}` : "";
+            const minStr = r.watering.minutes ? ` &middot; ${r.watering.minutes} min` : "";
+            lines.push(`<div style="color:#374151;font-size:14px;">&#x1F4A7; Water${timeStr}${minStr}</div>`);
+          }
+          return `<div style="border:1px solid #bae6fd;border-radius:8px;padding:12px 16px;margin-bottom:8px;background:#f0f9ff;">
+            <div style="font-weight:600;color:#111;margin-bottom:6px;">${escapeHtml(r.sectionName)}</div>
+            ${lines.join("")}
+          </div>`;
+        })
+        .join("")}`
+      : "";
+
   const html = `<!DOCTYPE html>
 <html>
 <body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
@@ -110,6 +146,7 @@ export function buildDigestEmail(opts: {
   <p style="color:#374151;">Here is what needs attention for your lawn:</p>
   ${overdueHtml}
   ${upcomingHtml}
+  ${remindersHtml}
   <div style="text-align:center;margin:32px 0;">
     <a href="${dashboardUrl}" style="background:#16a34a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">View My Tasks</a>
   </div>

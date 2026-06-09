@@ -215,6 +215,7 @@ export async function GET(req: NextRequest) {
         scheduledStart: t.scheduledStart,
         scheduledEnd: t.scheduledEnd,
       })),
+      scheduledReminders: [],
       dashboardUrl: `${baseUrl}/dashboard`,
       unsubscribeUrl: `${baseUrl}/api/notifications/unsubscribe?token=${unsubToken}`,
     });
