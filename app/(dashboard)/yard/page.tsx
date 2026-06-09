@@ -38,7 +38,14 @@ export default async function YardPage() {
       wateringMinutesPerSession: true,
       mowingSchedule: true,
       wateringSchedule: true,
-      sections: { orderBy: { createdAt: "asc" }, select: { id: true, name: true } },
+      sections: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          name: true,
+          analyses: { orderBy: { createdAt: "desc" }, take: 1, select: { healthScore: true } },
+        },
+      },
     },
   });
 
@@ -124,13 +131,19 @@ export default async function YardPage() {
               </div>
               {yard.sections.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100 mt-1">
-                  {yard.sections.map((section) => (
-                    <Link key={section.id} href={`/yard/${yard.id}/sections/${section.id}`}>
-                      <Button variant="outline" size="sm" className="text-xs h-7 px-2.5">
-                        <ArrowRight className="w-3 h-3 mr-1" />{section.name}
-                      </Button>
-                    </Link>
-                  ))}
+                  {yard.sections.map((section) => {
+                    const score = section.analyses[0]?.healthScore ?? null;
+                    const scoreColor = score == null ? "text-gray-400" : score >= 70 ? "text-green-600" : score >= 40 ? "text-yellow-600" : "text-red-600";
+                    return (
+                      <Link key={section.id} href={`/yard/${yard.id}/sections/${section.id}`}>
+                        <Button variant="outline" size="sm" className="text-xs h-7 px-2.5 gap-1.5">
+                          <ArrowRight className="w-3 h-3" />
+                          {section.name}
+                          {score != null && <span className={`font-semibold ${scoreColor}`}>{score}</span>}
+                        </Button>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
