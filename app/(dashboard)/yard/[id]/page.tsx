@@ -11,6 +11,26 @@ import { YardTasksSection } from "@/components/yard/YardTasksSection";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { format } from "date-fns";
 
+function formatTime(time: string): string {
+  const [h, m] = time.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const displayH = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  return `${displayH}:${m.toString().padStart(2, "0")} ${ampm}`;
+}
+
+function parseScheduleSummary(raw: string | null): { days: string; time: string; amount: string } | null {
+  if (!raw) return null;
+  try {
+    const p = JSON.parse(raw);
+    if (!p || !Array.isArray(p.days) || p.days.length === 0) return null;
+    return {
+      days: p.days.join(", "),
+      time: p.time ? formatTime(p.time) : "",
+      amount: p.inches ?? "",
+    };
+  } catch { return null; }
+}
+
 export default async function YardDetailPage({
   params,
 }: {
@@ -124,6 +144,8 @@ export default async function YardDetailPage({
               const areaCfg = section.areaType ? AREA_CONFIG[section.areaType as AreaType] : null;
               const AreaIcon = areaCfg?.icon;
               const latestAnalysis = section.analyses[section.analyses.length - 1] ?? null;
+              const mowSummary = parseScheduleSummary(section.mowingSchedule ?? null);
+              const waterSummary = parseScheduleSummary(section.wateringSchedule ?? null);
               const chartData = section.analyses.map((a: (typeof section)["analyses"][number]) => ({
                 date: a.createdAt.toISOString(),
                 score: a.healthScore,
@@ -180,6 +202,21 @@ export default async function YardDetailPage({
                     </div>
                   ) : (
                     <p className="text-sm text-gray-400">No analyses yet — tap Analyze to get started.</p>
+                  )}
+
+                  {(mowSummary || waterSummary) && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {mowSummary && (
+                        <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2.5 py-1">
+                          ✂️ {mowSummary.days}{mowSummary.time ? ` · ${mowSummary.time}` : ""}{mowSummary.amount ? ` · ${mowSummary.amount} in` : ""}
+                        </span>
+                      )}
+                      {waterSummary && (
+                        <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2.5 py-1">
+                          💧 {waterSummary.days}{waterSummary.time ? ` · ${waterSummary.time}` : ""}{waterSummary.amount ? ` · ${waterSummary.amount} min` : ""}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               );
