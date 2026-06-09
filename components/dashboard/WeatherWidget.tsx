@@ -128,7 +128,7 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
         </div>
       )}
 
-      <div className="relative z-10 font-bold text-white">
+      <div className={`relative z-10 font-bold ${theme.textClass}`}>
         <button
           type="button"
           onClick={handleToggle}
