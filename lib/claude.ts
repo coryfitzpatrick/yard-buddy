@@ -274,5 +274,9 @@ export async function generateWateringRecommendation(
     messages: [{ role: "user", content: buildWateringPrompt(opts) }],
   });
   const text = msg.content[0].type === "text" ? msg.content[0].text.trim() : "";
-  return JSON.parse(text) as { schedule: string; deviates: boolean };
+  try {
+    return JSON.parse(text) as { schedule: string; deviates: boolean };
+  } catch {
+    throw new Error(`generateWateringRecommendation: Claude returned non-JSON: ${text.slice(0, 200)}`);
+  }
 }
