@@ -21,14 +21,28 @@ const DAYS_OPTIONS = [
   { value: "14", label: "2 weeks before" },
 ];
 
+const REMINDER_DAYS_OPTIONS = [
+  { value: "0", label: "Morning of" },
+  { value: "1", label: "1 day before" },
+];
+
 interface Props {
   initialEnabled: boolean;
   initialDaysAhead: number;
+  initialReminderEnabled: boolean;
+  initialReminderDaysBefore: number;
 }
 
-export function NotificationPreferences({ initialEnabled, initialDaysAhead }: Props) {
+export function NotificationPreferences({
+  initialEnabled,
+  initialDaysAhead,
+  initialReminderEnabled,
+  initialReminderDaysBefore,
+}: Props) {
   const [enabled, setEnabled] = useState(initialEnabled);
   const [daysAhead, setDaysAhead] = useState(String(initialDaysAhead));
+  const [reminderEnabled, setReminderEnabled] = useState(initialReminderEnabled);
+  const [reminderDaysBefore, setReminderDaysBefore] = useState(String(initialReminderDaysBefore));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +58,8 @@ export function NotificationPreferences({ initialEnabled, initialDaysAhead }: Pr
         body: JSON.stringify({
           notificationsEnabled: enabled,
           notifyDaysAhead: Number(daysAhead),
+          reminderNotificationsEnabled: reminderEnabled,
+          reminderDaysBefore: Number(reminderDaysBefore),
         }),
       });
       if (!res.ok) {
@@ -61,13 +77,14 @@ export function NotificationPreferences({ initialEnabled, initialDaysAhead }: Pr
 
   return (
     <div className="space-y-6">
+      {/* Task notifications */}
       <div className="flex items-center justify-between">
         <div>
           <Label htmlFor="notifications-toggle" className="text-sm font-medium text-gray-900">
-            Email reminders
+            Task reminders
           </Label>
           <p className="text-sm text-gray-500 mt-0.5">
-            Receive a daily digest when tasks are coming up or overdue.
+            Daily digest when AI-generated tasks are coming up or overdue.
           </p>
         </div>
         <Switch
@@ -83,12 +100,50 @@ export function NotificationPreferences({ initialEnabled, initialDaysAhead }: Pr
           <p className="text-sm text-gray-500">
             How far in advance to include upcoming tasks in your digest.
           </p>
-          <Select value={daysAhead} onValueChange={(v) => { if (v !== null) setDaysAhead(v); }}>
+          <Select value={daysAhead} onValueChange={(v) => { if (v != null) setDaysAhead(v); }}>
             <SelectTrigger className="w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {DAYS_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Divider */}
+      <div className="border-t border-gray-100" />
+
+      {/* Schedule reminders */}
+      <div className="flex items-center justify-between">
+        <div>
+          <Label htmlFor="reminder-toggle" className="text-sm font-medium text-gray-900">
+            Schedule reminders
+          </Label>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Email reminders for your mowing and watering schedule.
+          </p>
+        </div>
+        <Switch
+          id="reminder-toggle"
+          checked={reminderEnabled}
+          onCheckedChange={setReminderEnabled}
+        />
+      </div>
+
+      {reminderEnabled && (
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-900">Send reminder</Label>
+          <Select value={reminderDaysBefore} onValueChange={(v) => { if (v != null) setReminderDaysBefore(v); }}>
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {REMINDER_DAYS_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </SelectItem>
