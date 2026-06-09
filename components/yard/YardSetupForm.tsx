@@ -189,7 +189,7 @@ export function YardSetupForm() {
         setError("Network error. Please check your connection.");
         return;
       }
-    } else if (spreaderType) {
+    } else if (spreaderType || wateringDaysPerWeek || wateringMinutesPerSession) {
       try {
         await fetch(`/api/yard/${yardId}`, {
           method: "PATCH",
@@ -199,9 +199,11 @@ export function YardSetupForm() {
             zipCode,
             spreaderType: spreaderType || undefined,
             spreaderModel: spreaderModel || undefined,
+            wateringDaysPerWeek: wateringDaysPerWeek ? Number(wateringDaysPerWeek) : undefined,
+            wateringMinutesPerSession: wateringMinutesPerSession ? Number(wateringMinutesPerSession) : undefined,
           }),
         });
-      } catch { /* spreader update is best-effort */ }
+      } catch { /* best-effort yard update */ }
     }
 
     try {
