@@ -26,7 +26,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Maximum 4 images per analysis" }, { status: 400 });
   }
 
-  const validation = await validateLawnImages(imageUrls);
+  let validation: { valid: boolean; feedback: string | null };
+  try {
+    validation = await validateLawnImages(imageUrls);
+  } catch {
+    validation = { valid: true, feedback: null };
+  }
   if (!validation.valid) {
     return NextResponse.json(
       {
