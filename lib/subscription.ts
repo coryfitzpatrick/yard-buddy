@@ -9,8 +9,8 @@ export interface PlanLimits {
 }
 
 export type SubscriptionUser = {
-  plan: string;
-  planStatus: string;
+  plan: Plan | string;
+  planStatus: PlanStatus | string;
   trialEndsAt: Date | null;
   currentPeriodEnd?: Date | null;
   pausedUntil?: Date | null;

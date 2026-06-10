@@ -123,6 +123,14 @@ describe("canPause", () => {
   it("blocks pause when already paused", () => {
     expect(canPause(makeUser({ plan: "home_basic", planStatus: "paused" }))).toBe(false);
   });
+
+  it("blocks pause for user with planStatus trialing even if plan is different", () => {
+    expect(canPause(makeUser({ plan: "home_basic", planStatus: "trialing" }))).toBe(false);
+  });
+
+  it("blocks pause for user with plan trial even if planStatus is active", () => {
+    expect(canPause(makeUser({ plan: "trial", planStatus: "active" }))).toBe(false);
+  });
 });
 
 describe("getVisibleTasksArgs", () => {
@@ -153,6 +161,18 @@ describe("getDaysUntilDeletion", () => {
     const longExpired = makeUser({ trialEndsAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) });
     const days = getDaysUntilDeletion(longExpired);
     expect(days).toBeLessThanOrEqual(0);
+  });
+
+  it("returns positive number for canceled paid subscriber within 30-day grace using currentPeriodEnd", () => {
+    const canceledPaid = makeUser({
+      plan: "home_basic",
+      planStatus: "canceled",
+      trialEndsAt: null,
+      currentPeriodEnd: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    });
+    const days = getDaysUntilDeletion(canceledPaid);
+    expect(days).toBeGreaterThan(0);
+    expect(days).toBeLessThanOrEqual(30);
   });
 });
 
