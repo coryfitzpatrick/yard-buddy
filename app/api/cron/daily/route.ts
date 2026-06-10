@@ -5,6 +5,7 @@ import { computeNewWindow } from "@/lib/cron/weather-scheduler";
 import { assessOverdueTasks } from "@/lib/cron/overdue-assessor";
 import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
 import { resend, buildDigestEmail, buildTrialReminderEmail, generateUnsubscribeToken } from "@/lib/email";
+import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
   }
 
   const today = startOfToday();
+  const currentYear = today.getUTCFullYear();
 
   // 1. Fetch yards with pending tasks (for task processing + notifications)
   const yards = await db.yard.findMany({
@@ -49,6 +51,8 @@ export async function GET(req: NextRequest) {
           reminderDaysBefore: true,
           lastNotifiedAt: true,
           notifyDaysAhead: true,
+          gddNotificationsEnabled: true,
+          gddBestDayReminderDays: true,
         },
       },
       sections: {
@@ -188,6 +192,79 @@ export async function GET(req: NextRequest) {
       where: { id: yard.id },
       data: { weatherRefreshedAt: new Date() },
     });
+
+    // GDD enrichment — runs after window recalculation for this yard
+    const dailyGdd = computeDailyGdd(
+      weather.forecast[0]?.high ?? 0,
+      weather.forecast[0]?.low ?? 0,
+    );
+
+    const gddRecord = await db.gddRecord.upsert({
+      where: { yardId_year: { yardId: yard.id, year: currentYear } },
+      create: { yardId: yard.id, year: currentYear, cumulativeGdd: dailyGdd },
+      update: { cumulativeGdd: { increment: dailyGdd } },
+    });
+
+    const state = yard.state ?? "";
+
+    // Pre-emergent: cumulative GDD ≥ 50
+    if (!gddRecord.preEmergentFired && gddRecord.cumulativeGdd >= 50) {
+      for (const section of yard.sections) {
+        if (!isPreEmergentApplicable(section.grassType, state)) continue;
+        await db.lawnTask.updateMany({
+          where: {
+            yardSectionId: section.id,
+            status: "pending",
+            title: { contains: "pre-emergent", mode: "insensitive" },
+          },
+          data: { bestDay: today, gddThreshold: "pre_emergent" },
+        });
+      }
+      await db.gddRecord.update({
+        where: { id: gddRecord.id },
+        data: { preEmergentFired: true },
+      });
+    }
+
+    // Grubs: cumulative GDD ≥ 300
+    if (!gddRecord.grubsFired && gddRecord.cumulativeGdd >= 300) {
+      for (const section of yard.sections) {
+        if (!isGrubAlertApplicable(section.grassType, state)) continue;
+        await db.lawnTask.updateMany({
+          where: {
+            yardSectionId: section.id,
+            status: "pending",
+            title: { contains: "grub", mode: "insensitive" },
+          },
+          data: { bestDay: today, gddThreshold: "grubs" },
+        });
+      }
+      await db.gddRecord.update({
+        where: { id: gddRecord.id },
+        data: { grubsFired: true },
+      });
+    }
+
+    // Overseeding: avg temp < 65°F AND month Aug–Oct (0-indexed: 7–9)
+    const month = today.getUTCMonth();
+    const avgTemp = ((weather.forecast[0]?.high ?? 0) + (weather.forecast[0]?.low ?? 0)) / 2;
+    if (!gddRecord.overseedingFired && month >= 7 && month <= 9 && avgTemp < 65) {
+      for (const section of yard.sections) {
+        if (!isOverseedingApplicable(section.grassType)) continue;
+        await db.lawnTask.updateMany({
+          where: {
+            yardSectionId: section.id,
+            status: "pending",
+            title: { contains: "overseed", mode: "insensitive" },
+          },
+          data: { bestDay: today, gddThreshold: "overseeding" },
+        });
+      }
+      await db.gddRecord.update({
+        where: { id: gddRecord.id },
+        data: { overseedingFired: true },
+      });
+    }
   }
 
   // 5. Assess newly overdue tasks per section
@@ -248,7 +325,7 @@ export async function GET(req: NextRequest) {
 
     // Collect task content
     let overdueTasks: Array<{ title: string; sectionName: string; overdueNote: string | null }> = [];
-    let upcomingTasks: Array<{ title: string; sectionName: string; scheduledStart: Date | null; scheduledEnd: Date | null }> = [];
+    let upcomingTasks: Array<{ title: string; sectionName: string; scheduledStart: Date | null; scheduledEnd: Date | null; bestDay: Date | null }> = [];
 
     if (user.notificationsEnabled) {
       const allPendingTasks = await db.lawnTask.findMany({
@@ -262,11 +339,26 @@ export async function GET(req: NextRequest) {
 
       upcomingTasks = allPendingTasks
         .filter((t) => {
-          if (!t.scheduledStart || t.stillWorthDoing !== null) return false;
+          if (t.stillWorthDoing !== null) return false;
+
+          // GDD best-day logic — uses gddBestDayReminderDays instead of notifyDaysAhead
+          if (t.bestDay && t.gddThreshold && (user as typeof taskUser)?.gddNotificationsEnabled) {
+            const daysUntilBestDay = (t.bestDay.getTime() - today.getTime()) / 86400000;
+            return daysUntilBestDay >= 0 && daysUntilBestDay <= ((user as typeof taskUser)?.gddBestDayReminderDays ?? 0);
+          }
+
+          // Regular upcoming task logic
+          if (!t.scheduledStart) return false;
           const daysUntilStart = (t.scheduledStart.getTime() - today.getTime()) / 86400000;
           return daysUntilStart >= 0 && daysUntilStart <= user.notifyDaysAhead;
         })
-        .map((t) => ({ title: t.title, sectionName: t.yardSection?.name ?? "", scheduledStart: t.scheduledStart, scheduledEnd: t.scheduledEnd }));
+        .map((t) => ({
+          title: t.title,
+          sectionName: t.yardSection?.name ?? "",
+          scheduledStart: t.scheduledStart,
+          scheduledEnd: t.scheduledEnd,
+          bestDay: t.bestDay ?? null,
+        }));
     }
 
     // Collect reminder content
