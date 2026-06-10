@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: "Yard Analyzer <noreply@yardbuddy.app>",
+        from: "Yard Analyzer <noreply@yardanalyzer.com>",
         to: parsed.data.email,
         subject,
         html,
