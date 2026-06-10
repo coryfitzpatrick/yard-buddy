@@ -11,8 +11,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { plan: true, planStatus: true, trialEndsAt: true },
+    select: { plan: true, planStatus: true, trialEndsAt: true, termsAcceptedAt: true },
   });
+
+  if (!user?.termsAcceptedAt) {
+    redirect("/terms/accept");
+  }
 
   const isTrial = user?.planStatus === "trialing" || user?.plan === "trial";
   const trialDaysLeft = user?.trialEndsAt

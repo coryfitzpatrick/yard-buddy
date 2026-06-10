@@ -32,6 +32,7 @@ model User {
   pausedUntil          DateTime?
   cardExpiryWarningSentAt DateTime?
   lastPaymentFailedInvoiceId String?
+  termsAcceptedAt      DateTime?
   updatedAt            DateTime  @updatedAt
   accounts             Account[]
   sessions             Session[]

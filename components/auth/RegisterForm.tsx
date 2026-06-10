@@ -65,6 +65,23 @@ export function RegisterForm() {
               <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
             )}
           </div>
+          <div className="flex items-start gap-2 pt-1">
+            <input
+              id="acceptedTerms"
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-green-600"
+              {...register("acceptedTerms")}
+            />
+            <label htmlFor="acceptedTerms" className="text-sm text-gray-600">
+              I agree to the{" "}
+              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline font-medium">
+                Terms of Use
+              </a>
+            </label>
+          </div>
+          {errors.acceptedTerms && (
+            <p className="text-xs text-red-500">{errors.acceptedTerms.message}</p>
+          )}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Creating account..." : "Create account"}
           </Button>

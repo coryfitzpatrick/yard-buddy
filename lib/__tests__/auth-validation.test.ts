@@ -3,6 +3,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   changePasswordSchema,
+  registerSchema,
 } from "@/lib/validations/auth";
 
 describe("forgotPasswordSchema", () => {
@@ -75,5 +76,32 @@ describe("changePasswordSchema", () => {
         confirmPassword: "short",
       }).success
     ).toBe(false);
+  });
+});
+
+const VALID_REGISTER = {
+  name: "Alex",
+  email: "alex@example.com",
+  password: "password123",
+  confirmPassword: "password123",
+  acceptedTerms: true as const,
+};
+
+describe("registerSchema — acceptedTerms", () => {
+  it("accepts a valid registration with acceptedTerms: true", () => {
+    expect(registerSchema.safeParse(VALID_REGISTER).success).toBe(true);
+  });
+
+  it("rejects when acceptedTerms is false", () => {
+    expect(registerSchema.safeParse({ ...VALID_REGISTER, acceptedTerms: false }).success).toBe(false);
+  });
+
+  it("rejects when acceptedTerms is missing", () => {
+    const { acceptedTerms: _, ...without } = VALID_REGISTER;
+    expect(registerSchema.safeParse(without).success).toBe(false);
+  });
+
+  it("rejects when passwords do not match", () => {
+    expect(registerSchema.safeParse({ ...VALID_REGISTER, confirmPassword: "different" }).success).toBe(false);
   });
 });
