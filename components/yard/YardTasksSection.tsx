@@ -30,6 +30,29 @@ interface Task {
     areaType: string | null;
     yard: { name: string };
   };
+  mergedIds?: string[];
+  mergedSections?: string[];
+}
+
+function mergeDuplicateTasks(tasks: Task[]): Task[] {
+  const seen = new Map<string, Task>();
+  for (const task of tasks) {
+    const key = task.title.toLowerCase().trim();
+    const existing = seen.get(key);
+    if (!existing) {
+      seen.set(key, {
+        ...task,
+        mergedIds: [task.id],
+        mergedSections: [task.yardSection.name],
+      });
+    } else {
+      existing.mergedIds = [...(existing.mergedIds ?? [existing.id]), task.id];
+      existing.mergedSections = [...(existing.mergedSections ?? [existing.yardSection.name]), task.yardSection.name];
+    }
+  }
+  return Array.from(seen.values()).map((t) =>
+    (t.mergedIds?.length ?? 0) > 1 ? t : { ...t, mergedIds: undefined, mergedSections: undefined }
+  );
 }
 
 export function YardTasksSection({
@@ -46,7 +69,9 @@ export function YardTasksSection({
   const active = tasks.filter((t) => t.status !== "skipped");
   if (active.length === 0 && (hiddenTaskCount ?? 0) === 0) return null;
 
-  const filtered = activeId ? active.filter((t) => t.yardSection.id === activeId) : active;
+  const filtered = activeId
+    ? active.filter((t) => t.yardSection.id === activeId)
+    : mergeDuplicateTasks(active);
 
   return (
     <div className="mt-6 border-t pt-5">

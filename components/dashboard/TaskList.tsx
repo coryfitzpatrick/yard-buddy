@@ -38,6 +38,8 @@ interface Task {
     areaType: string | null;
     yard: { name: string };
   } | null;
+  mergedIds?: string[];
+  mergedSections?: string[];
 }
 
 const PRIORITY_ORDER: Record<string, number> = {
@@ -109,13 +111,17 @@ function TaskCard({
             <Circle className="w-5 h-5 text-gray-300 hover:text-green-500 transition-colors" />
           </button>
           <div className="flex-1 min-w-0">
-            {task.yardSection && (
+            {task.mergedSections ? (
+              <div className="text-xs text-green-700 font-medium mb-1">
+                {task.mergedSections.join(" · ")}
+              </div>
+            ) : task.yardSection ? (
               <div className="text-xs text-green-700 font-medium mb-1">
                 {task.yardSection.yard.name === task.yardSection.name
                   ? task.yardSection.name
                   : `${task.yardSection.yard.name} > ${task.yardSection.name}`}
               </div>
-            )}
+            ) : null}
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span className="font-medium text-base">{task.title}</span>
               {task.scheduledStart && task.scheduledEnd && (
@@ -250,17 +256,20 @@ export function TaskList({
   const [tasks, setTasks] = useState(initial);
 
   async function patchTask(id: string, status: string) {
-    const prev = tasks.find((t) => t.id === id)?.status ?? "pending";
-    setTasks((t) => t.map((task) => (task.id === id ? { ...task, status } : task)));
+    const target = tasks.find((t) => t.id === id);
+    const ids = target?.mergedIds ?? [id];
+    const prev = target?.status ?? "pending";
+    setTasks((t) => t.map((task) => (ids.includes(task.id) ? { ...task, status } : task)));
     try {
-      const res = await fetch(`/api/tasks/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      if (!res.ok) throw new Error("Failed");
+      await Promise.all(ids.map((tid) =>
+        fetch(`/api/tasks/${tid}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        }).then((r) => { if (!r.ok) throw new Error("Failed"); })
+      ));
     } catch {
-      setTasks((t) => t.map((task) => (task.id === id ? { ...task, status: prev } : task)));
+      setTasks((t) => t.map((task) => (ids.includes(task.id) ? { ...task, status: prev } : task)));
     }
   }
 
