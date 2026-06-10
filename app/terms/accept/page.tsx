@@ -18,8 +18,8 @@ export default function AcceptTermsPage() {
     try {
       const res = await fetch("/api/auth/accept-terms", { method: "POST" });
       if (!res.ok) throw new Error("Failed to save acceptance");
-      router.push("/dashboard");
       router.refresh();
+      router.push("/dashboard");
     } catch {
       setError("Something went wrong. Please try again.");
       setSubmitting(false);
