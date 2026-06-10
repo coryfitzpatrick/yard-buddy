@@ -76,7 +76,8 @@ export function getVisibleTasksArgs(user: SubscriptionUser): { take?: number } {
 
 export function getDaysUntilDeletion(user: SubscriptionUser): number | null {
   if (!isEffectivelyExpired(user)) return null;
-  const expiryDate = user.trialEndsAt ?? user.currentPeriodEnd ?? new Date(0);
+  const expiryDate = user.trialEndsAt ?? user.currentPeriodEnd;
+  if (!expiryDate) return null;
   const deleteAt = new Date(expiryDate.getTime() + 30 * 24 * 60 * 60 * 1000);
   return Math.ceil((deleteAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
 }

@@ -7,9 +7,10 @@ import {
   getVisibleTasksArgs,
   getDaysUntilDeletion,
   PLAN_LABELS,
+  type SubscriptionUser,
 } from "../subscription";
 
-const makeUser = (overrides: object) => ({
+const makeUser = (overrides: Partial<SubscriptionUser>) => ({
   plan: "trial",
   planStatus: "trialing",
   trialEndsAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
