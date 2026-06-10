@@ -362,9 +362,9 @@ export function TaskList({
                         <span className="font-medium text-base line-through text-gray-400">{task.title}</span>
                         <button
                           onClick={() => patchTask(task.id, "pending")}
-                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-600 transition-colors shrink-0"
+                          className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 border border-blue-200 rounded-full px-2.5 py-1 transition-colors shrink-0"
                         >
-                          <RotateCcw className="w-3.5 h-3.5" /> Undo
+                          <RotateCcw className="w-3 h-3" /> Undo
                         </button>
                       </div>
                       <p className="text-sm text-gray-400 leading-relaxed">{task.description}</p>
