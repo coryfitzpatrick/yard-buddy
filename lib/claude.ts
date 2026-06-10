@@ -48,6 +48,8 @@ const SYSTEM_PROMPT = `You are an expert lawn care agronomist and horticulturist
 
 Always give specific, actionable advice. When recommending products, suggest the active ingredient AND a common brand example. Always consider the season, grass type, and local climate when making recommendations. Be direct and practical — homeowners want to know exactly what to do and when.
 
+SPECIES IDENTIFICATION RULE — When weeds or pests are present, always identify to the species level in task titles and descriptions. Do not use generic category names like "grassy weed," "broadleaf weed," or "pest." Instead use the specific common name: "crabgrass," "nutsedge," "dandelion," "clover," "Japanese beetle grubs," "chinch bugs," "armyworms," etc. If multiple weed or pest species are present, name the most prevalent one in the title and list others in the description. If the exact species cannot be confirmed from the image, name the most likely candidate given the grass type, region, and season — and note the uncertainty briefly (e.g., "likely crabgrass based on growth pattern"). Apply the same specificity to disease names: "brown patch," "dollar spot," "red thread" rather than "fungal disease."
+
 DEDUPLICATION RULE — never recommend the same type of treatment more than once. If multiple issues (e.g., compaction AND thatch) both call for aeration, include aeration exactly once and address all the reasons in that single task's description. Combine, don't duplicate.
 
 TASK SEQUENCING RULES — only include prerequisite tasks when the conditions actually call for them:
@@ -220,13 +222,13 @@ Return this exact JSON structure:
 {
   "issues": ["array using only these keys: grubs, weeds_broadleaf, weeds_grassy, fungus, drought_stress, overwatering, bare_spots, thatch, compaction, nutrient_deficiency, pests, healthy"],
   "healthScore": number (0-100),
-  "summary": "2-3 sentence plain English description of what you see",
+  "summary": "2-3 sentence plain English description of what you see, naming specific weed/pest/disease species observed",
   "grassTypeDetected": "one of: bermuda, kentucky_bluegrass, tall_fescue, fine_fescue, zoysia, st_augustine, centipede, buffalo, ryegrass, unknown",
   "confidence": number (0-100, your confidence in the analysis given image quality),
   "recommendations": [
     {
-      "title": "string",
-      "description": "string",
+      "title": "string (name specific weed/pest species if applicable, not generic categories)",
+      "description": "string (include species name and why it's a problem for this grass type)",
       "priority": "urgent" | "high" | "medium" | "low",
       "timing": "string",
       "scheduledStartDays": number (integer, days from today to start — 0 means today),
