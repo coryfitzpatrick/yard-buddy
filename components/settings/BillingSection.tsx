@@ -51,6 +51,8 @@ export function BillingSection({
   const isPaused = planStatus === "paused";
   const isTrial = planStatus === "trialing" || plan === "trial";
   const isExpired = daysUntilDeletion !== null;
+  const isActivePaidPlan = !isTrial && planStatus === "active" && plan !== "trial";
+  const showSubscriptionControls = hasStripeSubscription || isActivePaidPlan;
 
   async function handlePause() {
     setBusy(true);
@@ -153,7 +155,7 @@ export function BillingSection({
                 <ExternalLink className="w-3.5 h-3.5" /> Manage billing
               </Button>
             </a>
-          ) : (
+          ) : !isTrial ? null : (
             <Link href="/pricing">
               <Button size="sm" className="bg-green-600 hover:bg-green-700">Upgrade plan</Button>
             </Link>
@@ -162,7 +164,7 @@ export function BillingSection({
       </div>
 
       {/* Change plan — only for active paid subscribers */}
-      {hasStripeSubscription && !isTrial && (
+      {showSubscriptionControls && !isTrial && (
         <div className="border-t border-gray-100 pt-4 space-y-3">
           <p className="text-sm font-medium text-gray-700">Change plan</p>
 
@@ -248,7 +250,7 @@ export function BillingSection({
       )}
 
       {/* Pause and Cancel — only for active paid subscribers */}
-      {hasStripeSubscription && !isTrial && (
+      {showSubscriptionControls && !isTrial && (
         <div className="border-t border-gray-100 pt-4 space-y-3">
           <p className="text-sm font-medium text-gray-700">Subscription options</p>
 
