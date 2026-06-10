@@ -3,6 +3,7 @@ import Image from "next/image";
 import { CheckCircle } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
 
 export const metadata = { title: "Pricing – Yard Analyzer" };
 
@@ -66,7 +67,10 @@ const PLANS = [
   },
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.id;
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
@@ -74,7 +78,10 @@ export default function PricingPage() {
           <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={28} height={28} className="rounded-full scale-x-[-1]" />
           <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
-        <Link href="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
+        {isLoggedIn
+          ? <Link href="/dashboard"><Button variant="ghost" size="sm">Dashboard</Button></Link>
+          : <Link href="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
+        }
       </nav>
 
       <main className="flex-1 max-w-6xl mx-auto px-4 py-16 w-full">
@@ -121,17 +128,23 @@ export default function PricingPage() {
               </ul>
 
               <div className="space-y-2">
-                <Link href={`/api/stripe/checkout?plan=${plan.key}&period=monthly`}>
+                <Link href={isLoggedIn
+                  ? `/api/stripe/checkout?plan=${plan.key}&period=monthly`
+                  : `/register?plan=${plan.key}&period=monthly`
+                }>
                   <Button
                     className={`w-full ${plan.highlight ? "bg-green-600 hover:bg-green-700" : ""}`}
                     variant={plan.highlight ? "default" : "outline"}
                   >
-                    Start free trial
+                    {isLoggedIn ? "Subscribe monthly" : "Start free trial"}
                   </Button>
                 </Link>
-                <Link href={`/api/stripe/checkout?plan=${plan.key}&period=annual`}>
+                <Link href={isLoggedIn
+                  ? `/api/stripe/checkout?plan=${plan.key}&period=annual`
+                  : `/register?plan=${plan.key}&period=annual`
+                }>
                   <Button variant="ghost" size="sm" className="w-full text-xs text-gray-500">
-                    or pay annually and save
+                    {isLoggedIn ? "Subscribe annually and save" : "or pay annually and save"}
                   </Button>
                 </Link>
               </div>
