@@ -49,4 +49,37 @@ describe("buildDigestEmail with scheduledReminders", () => {
     });
     expect(subject).toContain("reminder");
   });
+
+  it("shows Best day line when bestDay is set on upcoming task", () => {
+    const { html } = buildDigestEmail({
+      ...BASE_OPTS,
+      upcomingTasks: [
+        {
+          title: "Apply pre-emergent herbicide",
+          sectionName: "Front Yard",
+          scheduledStart: new Date("2026-06-10"),
+          scheduledEnd: new Date("2026-06-17"),
+          bestDay: new Date("2026-06-14T00:00:00.000Z"),
+        },
+      ],
+    });
+    expect(html).toContain("Best day:");
+    expect(html).toContain("Jun 14");
+  });
+
+  it("omits Best day line when bestDay is null", () => {
+    const { html } = buildDigestEmail({
+      ...BASE_OPTS,
+      upcomingTasks: [
+        {
+          title: "Apply fertilizer",
+          sectionName: "Front Yard",
+          scheduledStart: new Date("2026-06-10"),
+          scheduledEnd: new Date("2026-06-17"),
+          bestDay: null,
+        },
+      ],
+    });
+    expect(html).not.toContain("Best day:");
+  });
 });
