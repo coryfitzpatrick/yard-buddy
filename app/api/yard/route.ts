@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { yardSchema } from "@/lib/validations/yard";
+import { canCreateYard, getPlanLimits } from "@/lib/subscription";
 
 export async function GET() {
   const session = await auth();
@@ -33,6 +34,24 @@ export async function POST(req: Request) {
   const body = await req.json();
   const parsed = yardSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+
+  const subUser = await db.user.findUniqueOrThrow({
+    where: { id: session.user.id },
+    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true, pausedUntil: true },
+  });
+  const yardCount = await db.yard.count({ where: { userId: session.user.id } });
+
+  if (!canCreateYard(subUser, yardCount)) {
+    const limits = getPlanLimits(subUser);
+    const max = limits.maxYards;
+    return NextResponse.json(
+      {
+        error: "yard_limit_reached",
+        message: `Your plan allows up to ${max} yard${max !== 1 ? "s" : ""}. Upgrade to Home Plus or higher to add more yards.`,
+      },
+      { status: 403 }
+    );
+  }
 
   const yard = await db.yard.create({
     data: { ...parsed.data, userId: session.user.id },
