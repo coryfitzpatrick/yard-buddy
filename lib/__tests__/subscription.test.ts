@@ -134,6 +134,23 @@ describe("canPause", () => {
   });
 });
 
+describe("past_due planStatus", () => {
+  it("returns full plan limits when planStatus is past_due", () => {
+    const limits = getPlanLimits(makeUser({ plan: "home_basic", planStatus: "past_due" }));
+    expect(limits.maxYards).toBe(1);
+    expect(limits.maxAnalysesPerSectionPerMonth).toBe(2);
+    expect(limits.canRunAnalysis).toBe(true);
+  });
+
+  it("allows canRunAnalysis when planStatus is past_due", () => {
+    expect(canRunAnalysis(makeUser({ plan: "home_plus", planStatus: "past_due" }), 2)).toBe(true);
+  });
+
+  it("blocks canPause when planStatus is past_due", () => {
+    expect(canPause(makeUser({ plan: "home_basic", planStatus: "past_due" }))).toBe(false);
+  });
+});
+
 describe("getVisibleTasksArgs", () => {
   it("returns {take: 1} for trial user", () => {
     const args = getVisibleTasksArgs(makeUser({}));

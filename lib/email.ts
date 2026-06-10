@@ -220,3 +220,76 @@ export function buildPasswordResetEmail(opts: {
 </html>`,
   };
 }
+
+export function buildPaymentFailedEmail(opts: {
+  userName: string;
+  billingPortalUrl: string;
+  attemptCount: number;
+}): { subject: string; html: string } {
+  const { userName, billingPortalUrl, attemptCount } = opts;
+  const isFinal = attemptCount >= 4;
+  const subject = isFinal
+    ? "Action required: your Yard Analyzer subscription payment has failed"
+    : "Payment failed for your Yard Analyzer subscription";
+
+  const bodyText = isFinal
+    ? `We were unable to process your payment after multiple attempts. To avoid losing access to your lawn care history and tasks, please update your payment method now. Your subscription will be canceled if payment cannot be collected.`
+    : `We were unable to process your latest payment. We'll retry automatically — please update your payment method to make sure your subscription stays active.`;
+
+  const html = `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">${bodyText}</p>
+  <div style="text-align:center;margin:32px 0;">
+    <a href="${billingPortalUrl}" style="background:#dc2626;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Update payment method</a>
+  </div>
+  <p style="color:#9ca3af;font-size:12px;text-align:center;">
+    If you need help, reply to this email.
+  </p>
+</body>
+</html>`;
+
+  return { subject, html };
+}
+
+export function buildCardExpiringEmail(opts: {
+  userName: string;
+  cardLast4: string;
+  expiryMonth: number;
+  expiryYear: number;
+  nextBillingDate: Date;
+  billingPortalUrl: string;
+}): { subject: string; html: string } {
+  const { userName, cardLast4, expiryMonth, expiryYear, nextBillingDate, billingPortalUrl } = opts;
+  const billingDateStr = nextBillingDate.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+  const expiryStr = `${String(expiryMonth).padStart(2, "0")}/${String(expiryYear).slice(-2)}`;
+
+  const html = `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">
+    Your card ending in <strong>${escapeHtml(cardLast4)}</strong> (expires ${escapeHtml(expiryStr)}) will expire before your next billing date of <strong>${escapeHtml(billingDateStr)}</strong>.
+  </p>
+  <p style="color:#374151;">Please update your payment method to avoid any interruption to your Yard Analyzer subscription.</p>
+  <div style="text-align:center;margin:32px 0;">
+    <a href="${billingPortalUrl}" style="background:#16a34a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Update payment method</a>
+  </div>
+  <p style="color:#9ca3af;font-size:12px;text-align:center;">
+    If you need help, reply to this email.
+  </p>
+</body>
+</html>`;
+
+  return {
+    subject: `Your Yard Analyzer payment card (ending ${cardLast4}) expires ${expiryStr}`,
+    html,
+  };
+}

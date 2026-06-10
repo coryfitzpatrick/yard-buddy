@@ -30,6 +30,8 @@ model User {
   stripeSubscriptionId String?   @unique
   currentPeriodEnd     DateTime?
   pausedUntil          DateTime?
+  cardExpiryWarningSentAt DateTime?
+  lastPaymentFailedInvoiceId String?
   updatedAt            DateTime  @updatedAt
   accounts             Account[]
   sessions             Session[]
