@@ -5,6 +5,8 @@ export const notificationPrefsSchema = z.object({
   notifyDaysAhead: z.number().int().min(1).max(14),
   reminderNotificationsEnabled: z.boolean(),
   reminderDaysBefore: z.number().int().min(0).max(3),
+  gddNotificationsEnabled: z.boolean(),
+  gddBestDayReminderDays: z.number().int().min(0).max(7),
 });
 
 export type NotificationPrefsInput = z.infer<typeof notificationPrefsSchema>;

@@ -22,6 +22,8 @@ export async function PUT(req: Request) {
       notifyDaysAhead: parsed.data.notifyDaysAhead,
       reminderNotificationsEnabled: parsed.data.reminderNotificationsEnabled,
       reminderDaysBefore: parsed.data.reminderDaysBefore,
+      gddNotificationsEnabled: parsed.data.gddNotificationsEnabled,
+      gddBestDayReminderDays: parsed.data.gddBestDayReminderDays,
     },
   });
 

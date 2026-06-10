@@ -8,6 +8,8 @@ describe("notificationPrefsSchema", () => {
       notifyDaysAhead: 5,
       reminderNotificationsEnabled: true,
       reminderDaysBefore: 1,
+      gddNotificationsEnabled: true,
+      gddBestDayReminderDays: 0,
     });
     expect(result.success).toBe(true);
   });
@@ -18,6 +20,8 @@ describe("notificationPrefsSchema", () => {
       notifyDaysAhead: 3,
       reminderNotificationsEnabled: false,
       reminderDaysBefore: 0,
+      gddNotificationsEnabled: true,
+      gddBestDayReminderDays: 0,
     });
     expect(result.success).toBe(true);
   });
@@ -67,6 +71,8 @@ describe("notificationPrefsSchema", () => {
       notifyDaysAhead: 5,
       reminderNotificationsEnabled: true,
       reminderDaysBefore: 0,
+      gddNotificationsEnabled: true,
+      gddBestDayReminderDays: 0,
     });
     expect(result.success).toBe(true);
   });
@@ -77,6 +83,8 @@ describe("notificationPrefsSchema", () => {
       notifyDaysAhead: 5,
       reminderNotificationsEnabled: true,
       reminderDaysBefore: 1,
+      gddNotificationsEnabled: true,
+      gddBestDayReminderDays: 0,
     });
     expect(result.success).toBe(true);
   });
@@ -98,6 +106,41 @@ describe("notificationPrefsSchema", () => {
       reminderNotificationsEnabled: true,
       reminderDaysBefore: 0.5,
     });
+    expect(result.success).toBe(false);
+  });
+
+  const VALID_FULL = {
+    notificationsEnabled: true,
+    notifyDaysAhead: 3,
+    reminderNotificationsEnabled: true,
+    reminderDaysBefore: 0,
+    gddNotificationsEnabled: true,
+    gddBestDayReminderDays: 0,
+  };
+
+  it("accepts valid prefs with gdd fields present", () => {
+    const result = notificationPrefsSchema.safeParse(VALID_FULL);
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects gddBestDayReminderDays above 7", () => {
+    const result = notificationPrefsSchema.safeParse({ ...VALID_FULL, gddBestDayReminderDays: 8 });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects negative gddBestDayReminderDays", () => {
+    const result = notificationPrefsSchema.safeParse({ ...VALID_FULL, gddBestDayReminderDays: -1 });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects non-boolean gddNotificationsEnabled", () => {
+    const result = notificationPrefsSchema.safeParse({ ...VALID_FULL, gddNotificationsEnabled: "yes" });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects missing gddNotificationsEnabled", () => {
+    const { gddNotificationsEnabled: _, ...withoutGdd } = VALID_FULL;
+    const result = notificationPrefsSchema.safeParse(withoutGdd);
     expect(result.success).toBe(false);
   });
 });
