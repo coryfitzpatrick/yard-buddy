@@ -46,6 +46,7 @@ export function BillingSection({
   const [dialog, setDialog] = useState<Dialog>(null);
   const [changePlanKey, setChangePlanKey] = useState<string | null>(null);
   const [changePeriod, setChangePeriod] = useState<"monthly" | "annual">(currentPeriod);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const isPaused = planStatus === "paused";
   const isTrial = planStatus === "trialing" || plan === "trial";
@@ -53,27 +54,42 @@ export function BillingSection({
 
   async function handlePause() {
     setBusy(true);
-    await fetch("/api/stripe/pause", {
+    setActionError(null);
+    const res = await fetch("/api/stripe/pause", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ months: pauseMonths }),
     });
     setBusy(false);
+    if (!res.ok) {
+      setActionError("Failed to pause billing. Please try again.");
+      return;
+    }
     setDialog(null);
     window.location.reload();
   }
 
   async function handleResume() {
     setBusy(true);
-    await fetch("/api/stripe/pause", { method: "DELETE" });
+    setActionError(null);
+    const res = await fetch("/api/stripe/pause", { method: "DELETE" });
     setBusy(false);
+    if (!res.ok) {
+      setActionError("Failed to resume billing. Please try again.");
+      return;
+    }
     window.location.reload();
   }
 
   async function handleCancel() {
     setBusy(true);
-    await fetch("/api/stripe/cancel", { method: "POST" });
+    setActionError(null);
+    const res = await fetch("/api/stripe/cancel", { method: "POST" });
     setBusy(false);
+    if (!res.ok) {
+      setActionError("Failed to cancel subscription. Please try again.");
+      return;
+    }
     setDialog(null);
     window.location.reload();
   }
@@ -81,18 +97,28 @@ export function BillingSection({
   async function handleChangePlan() {
     if (!changePlanKey) return;
     setBusy(true);
-    await fetch("/api/stripe/change-plan", {
+    setActionError(null);
+    const res = await fetch("/api/stripe/change-plan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ plan: changePlanKey, period: changePeriod }),
     });
     setBusy(false);
+    if (!res.ok) {
+      setActionError("Failed to change plan. Please try again.");
+      return;
+    }
     setChangePlanKey(null);
     window.location.reload();
   }
 
   return (
     <div className="space-y-5">
+      {actionError && (
+        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          {actionError}
+        </div>
+      )}
       {/* Current plan status */}
       <div className="flex items-start justify-between gap-4">
         <div>

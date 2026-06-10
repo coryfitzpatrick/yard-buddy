@@ -31,12 +31,19 @@ export async function POST(req: NextRequest) {
     select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true, pausedUntil: true },
   });
 
+  // Verify section ownership before any rate-limit queries (prevents BOLA)
+  const section = await db.yardSection.findFirst({
+    where: { id: sectionId, yard: { userId: session.user.id } },
+    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true } } },
+  });
+  if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
   // Count analyses for this section in the current calendar month
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
   const monthlyCount = await db.lawnAnalysis.count({
-    where: { yardSectionId: sectionId, createdAt: { gte: startOfMonth } },
+    where: { yardSectionId: section.id, createdAt: { gte: startOfMonth } },
   });
 
   if (!canRunAnalysis(subUser, monthlyCount)) {
@@ -46,12 +53,6 @@ export async function POST(req: NextRequest) {
       : "Upgrade your plan to analyze your lawn with AI.";
     return NextResponse.json({ error: "analysis_limit_reached", message }, { status: 403 });
   }
-
-  const section = await db.yardSection.findFirst({
-    where: { id: sectionId, yard: { userId: session.user.id } },
-    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true } } },
-  });
-  if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   let weatherSummary: string | undefined;
   let forecastText: string | undefined;

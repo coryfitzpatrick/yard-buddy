@@ -61,8 +61,12 @@ export async function DELETE(_req: NextRequest) {
 
   const user = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
-    select: { stripeSubscriptionId: true },
+    select: { stripeSubscriptionId: true, planStatus: true },
   });
+
+  if (user.planStatus !== "paused") {
+    return NextResponse.json({ error: "Subscription is not paused" }, { status: 400 });
+  }
 
   if (!user.stripeSubscriptionId) {
     return NextResponse.json({ error: "No active subscription found" }, { status: 400 });

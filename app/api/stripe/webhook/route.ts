@@ -14,8 +14,7 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
   const priceId = sub.items.data[0]?.price.id ?? "";
   const plan = planFromPriceId(priceId);
   if (!plan) {
-    console.warn(`Webhook: unrecognized priceId ${priceId} for customer ${sub.customer}`);
-    return;
+    throw new Error(`Unrecognized priceId ${priceId} for customer ${sub.customer} — check STRIPE_PRICE_* env vars`);
   }
 
   let planStatus: string;
