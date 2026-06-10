@@ -252,11 +252,11 @@ export function buildPasswordResetEmail(opts: {
 }): { subject: string; html: string } {
   const { userName, resetUrl } = opts;
   return {
-    subject: "Reset your Yard Buddy password",
+    subject: "Reset your Yard Analyzer password",
     html: `<!DOCTYPE html>
 <html>
 <body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
-  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Buddy</h1>
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
   <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
   <p style="color:#374151;">We received a request to reset your password. Click the button below to choose a new one. This link expires in 1 hour.</p>
   <div style="text-align:center;margin:32px 0;">
@@ -333,7 +333,7 @@ export async function POST(req: NextRequest) {
     });
 
     await resend.emails.send({
-      from: "Yard Buddy <noreply@yardbuddy.app>",
+      from: "Yard Analyzer <noreply@yardbuddy.app>",
       to: parsed.data.email,
       subject,
       html,
@@ -590,8 +590,8 @@ export default function ForgotPasswordPage() {
     <div className="flex flex-col items-center gap-4 w-full max-w-md">
       <div className="text-center mb-2">
         <div className="flex items-center justify-center gap-1 mb-1">
-          <Image src="/gnome-buddy.png" alt="Yard Buddy" width={40} height={40} className="rounded-full scale-x-[-1]" />
-          <h1 className="text-3xl font-bold text-green-700">Yard Buddy</h1>
+          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={40} height={40} className="rounded-full scale-x-[-1]" />
+          <h1 className="text-3xl font-bold text-green-700">Yard Analyzer</h1>
         </div>
         <p className="text-sm text-gray-500">Your AI lawn care assistant</p>
       </div>
@@ -775,8 +775,8 @@ export default function ResetPasswordPage() {
     <div className="flex flex-col items-center gap-4 w-full max-w-md">
       <div className="text-center mb-2">
         <div className="flex items-center justify-center gap-1 mb-1">
-          <Image src="/gnome-buddy.png" alt="Yard Buddy" width={40} height={40} className="rounded-full scale-x-[-1]" />
-          <h1 className="text-3xl font-bold text-green-700">Yard Buddy</h1>
+          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={40} height={40} className="rounded-full scale-x-[-1]" />
+          <h1 className="text-3xl font-bold text-green-700">Yard Analyzer</h1>
         </div>
         <p className="text-sm text-gray-500">Your AI lawn care assistant</p>
       </div>

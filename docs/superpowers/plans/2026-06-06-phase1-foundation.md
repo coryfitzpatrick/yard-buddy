@@ -1,4 +1,4 @@
-# Yard Buddy Phase 1: Foundation Implementation Plan
+# Yard Analyzer Phase 1: Foundation Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -564,7 +564,7 @@ export function LoginForm() {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl">Welcome back</CardTitle>
-        <CardDescription>Sign in to your Yard Buddy account</CardDescription>
+        <CardDescription>Sign in to your Yard Analyzer account</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -701,7 +701,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col items-center gap-4 w-full max-w-md">
       <div className="text-center mb-2">
-        <h1 className="text-3xl font-bold text-green-700">🌿 Yard Buddy</h1>
+        <h1 className="text-3xl font-bold text-green-700">🌿 Yard Analyzer</h1>
         <p className="text-sm text-gray-500">Your AI lawn care assistant</p>
       </div>
       <LoginForm />
@@ -725,7 +725,7 @@ export default function RegisterPage() {
   return (
     <div className="flex flex-col items-center gap-4 w-full max-w-md">
       <div className="text-center mb-2">
-        <h1 className="text-3xl font-bold text-green-700">🌿 Yard Buddy</h1>
+        <h1 className="text-3xl font-bold text-green-700">🌿 Yard Analyzer</h1>
         <p className="text-sm text-gray-500">Your AI lawn care assistant</p>
       </div>
       <RegisterForm />
@@ -1862,7 +1862,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
           <Link href="/dashboard" className="flex items-center gap-2 font-bold text-green-700 text-lg">
-            <Leaf className="w-5 h-5" /> Yard Buddy
+            <Leaf className="w-5 h-5" /> Yard Analyzer
           </Link>
           <div className="hidden sm:flex items-center gap-1">
             <Link href="/dashboard">
@@ -2132,7 +2132,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
-        <span className="text-xl font-bold text-green-700">🌿 Yard Buddy</span>
+        <span className="text-xl font-bold text-green-700">🌿 Yard Analyzer</span>
         <div className="flex gap-2">
           <Link href="/login"><Button variant="ghost">Sign in</Button></Link>
           <Link href="/register"><Button className="bg-green-600 hover:bg-green-700">Get started free</Button></Link>

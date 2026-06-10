@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Mail } from "lucide-react";
 import { Footer } from "@/components/Footer";
 
-export const metadata = { title: "Contact Us – Yard Buddy" };
+export const metadata = { title: "Contact Us – Yard Analyzer" };
 
 const TOPICS = [
   {
@@ -25,8 +25,8 @@ export default function ContactPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
         <Link href="/" className="flex items-center gap-1">
-          <Image src="/gnome-buddy.png" alt="Yard Buddy" width={28} height={28} className="rounded-full scale-x-[-1]" />
-          <span className="text-lg font-bold text-green-700">Yard Buddy</span>
+          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={28} height={28} className="rounded-full scale-x-[-1]" />
+          <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
       </nav>
 
@@ -37,11 +37,11 @@ export default function ContactPage() {
         </p>
 
         <a
-          href="mailto:contact@yardbuddy.com"
+          href="mailto:contact@yardanalyzer.com"
           className="inline-flex items-center gap-3 bg-green-600 hover:bg-green-700 transition-colors text-white font-semibold rounded-lg px-6 py-4 text-base mb-12"
         >
           <Mail className="w-5 h-5" />
-          contact@yardbuddy.com
+          contact@yardanalyzer.com
         </a>
 
         <div className="space-y-4">

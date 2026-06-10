@@ -403,7 +403,7 @@ export function buildDigestEmail(opts: {
   const html = `<!DOCTYPE html>
 <html>
 <body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
-  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Buddy</h1>
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
   <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
   <p style="color:#374151;">Here is what needs attention for your lawn:</p>
   ${overdueHtml}
@@ -1088,7 +1088,7 @@ export async function GET(req: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: "Yard Buddy <onboarding@resend.dev>",
+        from: "Yard Analyzer <onboarding@resend.dev>",
         to: user.email,
         subject,
         html,

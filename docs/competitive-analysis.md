@@ -1,4 +1,4 @@
-# Yard Buddy Competitive Analysis
+# Yard Analyzer Competitive Analysis
 
 *Last updated: June 2026*
 
@@ -134,7 +134,7 @@ The lawn care app space splits into two distinct categories:
 
 ## Competitive Positioning Matrix
 
-| Feature | Yard Buddy | Yard Mastery | Grassmaster Gus | Lawn AI | Scotts MyLawn |
+| Feature | Yard Analyzer | Yard Mastery | Grassmaster Gus | Lawn AI | Scotts MyLawn |
 |---------|-----------|-------------|----------------|---------|---------------|
 | Section-level yard management | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Photo progression timeline | ✅ (planned) | ❌ | ❌ | ❌ | ❌ |
@@ -152,7 +152,7 @@ The lawn care app space splits into two distinct categories:
 
 ---
 
-## Where Yard Buddy Wins Clearly
+## Where Yard Analyzer Wins Clearly
 
 ### 1. Multi-section yard management
 No competitor has this. Every app treats "the lawn" as a single unit. Homeowners with large or varied properties — different grass on the shaded side vs. sunny side, front vs. back with different watering zones — have no good solution today. This is our structural moat.
@@ -161,10 +161,10 @@ No competitor has this. Every app treats "the lawn" as a single unit. Homeowners
 Competitors use rule-based systems or basic GPT-3.5 wrappers. Claude Sonnet/Opus reasons about complex, nuanced lawn conditions with actual agronomic knowledge. Section-specific, regionally-accurate, multi-brand advice that adapts to real forecast data is not something incumbents can replicate without fundamental rearchitecting.
 
 ### 3. No vendor lock-in
-Scotts pushes Scotts products. Sunday pushes Sunday products. Yard Mastery steers toward their soil kit. Yard Buddy recommends what's best for the user's lawn across all brands, including generics and organic options. This is a trust advantage that's easy to communicate.
+Scotts pushes Scotts products. Sunday pushes Sunday products. Yard Mastery steers toward their soil kit. Yard Analyzer recommends what's best for the user's lawn across all brands, including generics and organic options. This is a trust advantage that's easy to communicate.
 
 ### 4. No install friction (web-first)
-Every competitor requires a native app download. Yard Buddy works in the browser immediately. For homeowners who don't want another app, this is a real barrier-lowerer.
+Every competitor requires a native app download. Yard Analyzer works in the browser immediately. For homeowners who don't want another app, this is a real barrier-lowerer.
 
 ### 5. Photo progression tracking (planned)
 No competitor shows lawn health over time. Taking a photo is step one — showing how the lawn has *changed* over a season is the emotional proof that the app is working. This is a retention and referral driver.
@@ -189,7 +189,7 @@ Native apps have smoother animations, home screen widgets, and push notification
 
 ## Conclusion
 
-Yard Buddy has a defensible differentiation strategy built on three pillars that incumbents cannot easily copy:
+Yard Analyzer has a defensible differentiation strategy built on three pillars that incumbents cannot easily copy:
 
 1. **Data model advantage** — sections-within-yards is a unique structural concept competitors don't have
 2. **AI quality advantage** — Claude's reasoning is genuinely better; this compounds as we add more context

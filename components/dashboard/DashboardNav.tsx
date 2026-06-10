@@ -30,8 +30,8 @@ export function DashboardNav({ signOutAction }: Props) {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
           <Link href="/dashboard" className="flex items-center gap-1 font-bold text-green-700 text-lg">
-            <Image src="/gnome-buddy.png" alt="Yard Buddy" width={32} height={32} className="rounded-full scale-x-[-1]" />
-            Yard Buddy
+            <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={32} height={32} className="rounded-full scale-x-[-1]" />
+            Yard Analyzer
           </Link>
 
           {/* Desktop nav */}
@@ -75,8 +75,8 @@ export function DashboardNav({ signOutAction }: Props) {
         <SheetContent side="right" className="w-72 p-0">
           <SheetHeader className="px-5 pt-5 pb-3 border-b border-gray-100">
             <SheetTitle className="flex items-center gap-2 text-green-700">
-              <Image src="/gnome-buddy.png" alt="Yard Buddy" width={28} height={28} className="rounded-full scale-x-[-1]" />
-              Yard Buddy
+              <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={28} height={28} className="rounded-full scale-x-[-1]" />
+              Yard Analyzer
             </SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col p-3 gap-1">

@@ -300,7 +300,7 @@ export async function GET(req: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: "Yard Buddy <onboarding@resend.dev>",
+        from: "Yard Analyzer <onboarding@resend.dev>",
         to: user.email,
         subject,
         html,

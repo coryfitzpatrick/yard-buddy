@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Identify where every major competitor falls short and ship the specific features that make Yard Buddy the clear winner for homeowners who actually care about their lawns.
+**Goal:** Identify where every major competitor falls short and ship the specific features that make Yard Analyzer the clear winner for homeowners who actually care about their lawns.
 
-**Architecture:** Most differentiation comes from Claude's reasoning quality + Yard Buddy's multi-section data model — these are structural advantages that are very hard for incumbents to copy. The tasks below exploit these advantages and patch any gaps.
+**Architecture:** Most differentiation comes from Claude's reasoning quality + Yard Analyzer's multi-section data model — these are structural advantages that are very hard for incumbents to copy. The tasks below exploit these advantages and patch any gaps.
 
 **Tech Stack:** Next.js 15 App Router, TypeScript, Tailwind, shadcn/ui, Prisma, PostgreSQL (Supabase), Anthropic Claude API (claude-sonnet-4-6 / claude-opus-4-7), OpenWeatherMap, Supabase Storage, Zod.
 
@@ -23,7 +23,7 @@
 | **Scotts MyLawn** | 4-season calendar, rainfall tracking | Locked to Scotts products only; timing bugs (wrong region), background location tracking, technical loops on plan creation |
 | **Sunday Lawn Care** | Soil analysis → custom formulations mailed to you | Product subscription first, app second; eco-focus limits mainstream appeal |
 
-### Yard Buddy's Structural Advantages (Already Built or Planned)
+### Yard Analyzer's Structural Advantages (Already Built or Planned)
 
 1. **Multi-yard + multi-section data model** — No competitor has this. Every other app treats "the yard" as one undifferentiated blob.
 2. **Claude AI quality** — Competitors use GPT-3.5 wrappers or rule-based systems. Claude (Sonnet/Opus) reasons far better about nuanced lawn conditions.
@@ -264,7 +264,7 @@ git commit -m "feat: section-aware, multi-brand, regionally-accurate Claude anal
 
 ## Task 2: Photo Progression Timeline
 
-No competitor shows lawn health over time. Yard Buddy already stores photos per section — this feature surfaces them as a before/after health timeline. High emotional value: homeowners love seeing their lawn improve.
+No competitor shows lawn health over time. Yard Analyzer already stores photos per section — this feature surfaces them as a before/after health timeline. High emotional value: homeowners love seeing their lawn improve.
 
 **Files:**
 - Create: `lib/sections/photo-history.ts`
@@ -753,7 +753,7 @@ git commit -m "feat: expanded soil data (NPK) — accept any test kit, unlock Cl
 
 ## Task 4: Homepage Competitive Positioning
 
-Homeowners searching for "lawn care app" alternatives need to see clearly why Yard Buddy wins. This task adds a homepage section that directly addresses the top competitor weaknesses without being snarky.
+Homeowners searching for "lawn care app" alternatives need to see clearly why Yard Analyzer wins. This task adds a homepage section that directly addresses the top competitor weaknesses without being snarky.
 
 **Files:**
 - Modify: `app/page.tsx` (or `components/home/HeroSection.tsx` / landing page component)
@@ -765,7 +765,7 @@ cat app/page.tsx | head -80
 find components -name "*hero*" -o -name "*landing*" -o -name "*home*" | head -10
 ```
 
-- [ ] **Step 2: Add a "Why Yard Buddy" comparison section**
+- [ ] **Step 2: Add a "Why Yard Analyzer" comparison section**
 
 Find the right place in the homepage (after the hero, before or after features). Add a section that surfaces the top 4 differentiators as concrete benefits:
 
@@ -775,12 +775,12 @@ export function WhyYardBuddy() {
   const differentiators = [
     {
       heading: 'Your whole yard, section by section',
-      body: 'Front yard gets morning sun and struggles with weeds. Back yard is shaded with different grass. Most apps treat your yard as one blob. Yard Buddy tracks each section separately — different grass types, different schedules, different soil.',
+      body: 'Front yard gets morning sun and struggles with weeds. Back yard is shaded with different grass. Most apps treat your yard as one blob. Yard Analyzer tracks each section separately — different grass types, different schedules, different soil.',
       icon: '🗺️',
     },
     {
       heading: 'No kit to buy. Any soil test works.',
-      body: "Some apps lock you out of custom plans unless you buy their $30 kit. Yard Buddy works with results from any lab, any test strip, or any kit you already have. Enter your N-P-K numbers and get precise fertilizer recommendations immediately.",
+      body: "Some apps lock you out of custom plans unless you buy their $30 kit. Yard Analyzer works with results from any lab, any test strip, or any kit you already have. Enter your N-P-K numbers and get precise fertilizer recommendations immediately.",
       icon: '🧪',
     },
     {
@@ -798,7 +798,7 @@ export function WhyYardBuddy() {
   return (
     <section className="py-16 bg-muted/40">
       <div className="container max-w-4xl">
-        <h2 className="text-3xl font-bold text-center mb-2">Why Yard Buddy?</h2>
+        <h2 className="text-3xl font-bold text-center mb-2">Why Yard Analyzer?</h2>
         <p className="text-center text-muted-foreground mb-10">
           Personalized advice that actually matches your yard — not a generic plan pushed by a brand.
         </p>
@@ -822,7 +822,7 @@ Import and render `<WhyYardBuddy />` in `app/page.tsx` in the appropriate positi
 - [ ] **Step 3: Verify homepage renders correctly**
 
 Start dev server. Open `http://localhost:3000`. Confirm:
-- "Why Yard Buddy" section appears with 4 cards
+- "Why Yard Analyzer" section appears with 4 cards
 - Cards are readable on mobile (stack to 1 column)
 - No layout regressions to existing hero or feature sections
 
@@ -830,7 +830,7 @@ Start dev server. Open `http://localhost:3000`. Confirm:
 
 ```bash
 git add components/home/WhyYardBuddy.tsx app/page.tsx
-git commit -m "feat: homepage competitive positioning — Why Yard Buddy section"
+git commit -m "feat: homepage competitive positioning — Why Yard Analyzer section"
 ```
 
 ---

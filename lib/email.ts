@@ -141,7 +141,7 @@ export function buildDigestEmail(opts: {
   const html = `<!DOCTYPE html>
 <html>
 <body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
-  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Buddy</h1>
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
   <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
   <p style="color:#374151;">Here is what needs attention for your lawn:</p>
   ${overdueHtml}
@@ -165,11 +165,11 @@ export function buildPasswordResetEmail(opts: {
 }): { subject: string; html: string } {
   const { userName, resetUrl } = opts;
   return {
-    subject: "Reset your Yard Buddy password",
+    subject: "Reset your Yard Analyzer password",
     html: `<!DOCTYPE html>
 <html>
 <body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
-  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Buddy</h1>
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
   <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
   <p style="color:#374151;">We received a request to reset your password. Click the button below to choose a new one. This link expires in 1 hour.</p>
   <div style="text-align:center;margin:32px 0;">

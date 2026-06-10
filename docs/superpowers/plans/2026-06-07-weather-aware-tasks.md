@@ -846,7 +846,7 @@ export function buildDigestEmail(opts: {
   const html = `<!DOCTYPE html>
 <html>
 <body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
-  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Buddy</h1>
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
   <p style="color:#6b7280;margin-top:0;">Hi ${userName},</p>
   <p style="color:#374151;">Here is what needs attention for your lawn:</p>
   ${overdueHtml}
@@ -918,8 +918,8 @@ export async function GET(req: NextRequest) {
 <html>
 <body style="font-family:sans-serif;text-align:center;padding:64px 24px;color:#111;">
   <h1 style="color:#16a34a;">You are unsubscribed.</h1>
-  <p style="color:#6b7280;">You will no longer receive task reminder emails from Yard Buddy.</p>
-  <a href="${baseUrl}/dashboard" style="color:#16a34a;">Return to Yard Buddy</a>
+  <p style="color:#6b7280;">You will no longer receive task reminder emails from Yard Analyzer.</p>
+  <a href="${baseUrl}/dashboard" style="color:#16a34a;">Return to Yard Analyzer</a>
 </body>
 </html>`,
     { headers: { "Content-Type": "text/html" } }
@@ -1299,7 +1299,7 @@ export async function GET(req: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: "Yard Buddy <onboarding@resend.dev>",
+        from: "Yard Analyzer <onboarding@resend.dev>",
         to: user.email,
         subject,
         html,
@@ -1317,7 +1317,7 @@ export async function GET(req: NextRequest) {
 }
 ```
 
-Note: The `from` address uses Resend's test sender. Once `yardbuddy.com` is verified in Resend's dashboard, update to `"Yard Buddy <tasks@yardbuddy.com>"`.
+Note: The `from` address uses Resend's test sender. Once `yardanalyzer.com` is verified in Resend's dashboard, update to `"Yard Analyzer <tasks@yardanalyzer.com>"`.
 
 - [ ] **Step 4: Verify TypeScript compiles**
 
