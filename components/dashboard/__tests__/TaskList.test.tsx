@@ -1,8 +1,10 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup } from "@testing-library/react";
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import { TaskList } from "../TaskList";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 const baseTask = {
   id: "t1",
