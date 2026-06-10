@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { WhyYardBuddy } from "@/components/home/WhyYardBuddy";
 import { ScreenshotSection } from "@/components/home/ScreenshotSection";
+import { Footer } from "@/components/Footer";
 
 const FEATURES = [
   "AI-powered lawn diagnosis from photos",
@@ -50,6 +51,7 @@ export default function HomePage() {
       </div>
       <ScreenshotSection />
       <WhyYardBuddy />
+      <Footer />
     </div>
   );
 }
