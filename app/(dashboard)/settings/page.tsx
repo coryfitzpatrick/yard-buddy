@@ -18,6 +18,8 @@ export default async function SettingsPage() {
       notifyDaysAhead: true,
       reminderNotificationsEnabled: true,
       reminderDaysBefore: true,
+      gddNotificationsEnabled: true,
+      gddBestDayReminderDays: true,
       passwordHash: true,
       plan: true,
       planStatus: true,
@@ -87,6 +89,8 @@ export default async function SettingsPage() {
             initialDaysAhead={user.notifyDaysAhead}
             initialReminderEnabled={user.reminderNotificationsEnabled}
             initialReminderDaysBefore={user.reminderDaysBefore}
+            initialGddEnabled={user.gddNotificationsEnabled}
+            initialGddBestDayReminderDays={user.gddBestDayReminderDays}
           />
         </div>
 

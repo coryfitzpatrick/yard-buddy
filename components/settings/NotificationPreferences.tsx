@@ -28,11 +28,21 @@ const REMINDER_DAYS_OPTIONS = [
   { value: "3", label: "3 days before" },
 ];
 
+const GDD_REMINDER_OPTIONS = [
+  { value: "0", label: "On the best day" },
+  { value: "1", label: "1 day before" },
+  { value: "2", label: "2 days before" },
+  { value: "3", label: "3 days before" },
+  { value: "7", label: "1 week before" },
+];
+
 interface Props {
   initialEnabled: boolean;
   initialDaysAhead: number;
   initialReminderEnabled: boolean;
   initialReminderDaysBefore: number;
+  initialGddEnabled: boolean;
+  initialGddBestDayReminderDays: number;
 }
 
 export function NotificationPreferences({
@@ -40,11 +50,15 @@ export function NotificationPreferences({
   initialDaysAhead,
   initialReminderEnabled,
   initialReminderDaysBefore,
+  initialGddEnabled,
+  initialGddBestDayReminderDays,
 }: Props) {
   const [enabled, setEnabled] = useState(initialEnabled);
   const [daysAhead, setDaysAhead] = useState(String(initialDaysAhead));
   const [reminderEnabled, setReminderEnabled] = useState(initialReminderEnabled);
   const [reminderDaysBefore, setReminderDaysBefore] = useState(String(initialReminderDaysBefore));
+  const [gddEnabled, setGddEnabled] = useState(initialGddEnabled);
+  const [gddBestDayReminderDays, setGddBestDayReminderDays] = useState(String(initialGddBestDayReminderDays));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +76,8 @@ export function NotificationPreferences({
           notifyDaysAhead: Number(daysAhead),
           reminderNotificationsEnabled: reminderEnabled,
           reminderDaysBefore: Number(reminderDaysBefore),
+          gddNotificationsEnabled: gddEnabled,
+          gddBestDayReminderDays: Number(gddBestDayReminderDays),
         }),
       });
       if (!res.ok) {
@@ -146,6 +162,44 @@ export function NotificationPreferences({
             </SelectTrigger>
             <SelectContent>
               {REMINDER_DAYS_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Divider */}
+      <div className="border-t border-gray-100" />
+
+      {/* GDD best-day alerts */}
+      <div className="flex items-center justify-between">
+        <div>
+          <Label htmlFor="gdd-toggle" className="text-sm font-medium text-gray-900">
+            Best day alerts
+          </Label>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Alert when GDD thresholds indicate the optimal day for treatments like pre-emergent, grub control, or overseeding.
+          </p>
+        </div>
+        <Switch
+          id="gdd-toggle"
+          checked={gddEnabled}
+          onCheckedChange={setGddEnabled}
+        />
+      </div>
+
+      {gddEnabled && (
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-900">Alert me</Label>
+          <Select value={gddBestDayReminderDays} onValueChange={(v) => { if (v != null) setGddBestDayReminderDays(v); }}>
+            <SelectTrigger className="w-48" disabled={saving}>
+              <SelectValue>{GDD_REMINDER_OPTIONS.find((o) => o.value === gddBestDayReminderDays)?.label}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {GDD_REMINDER_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </SelectItem>
