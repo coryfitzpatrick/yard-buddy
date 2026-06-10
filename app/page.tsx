@@ -23,6 +23,7 @@ export default function HomePage() {
           <span className="text-xl font-bold text-green-700">Yard Buddy</span>
         </div>
         <div className="flex gap-2">
+          <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
           <Link href="/login"><Button variant="ghost">Sign in</Button></Link>
           <Link href="/register"><Button className="bg-green-600 hover:bg-green-700">Get started free</Button></Link>
         </div>
