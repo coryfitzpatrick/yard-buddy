@@ -21,6 +21,13 @@ model User {
   reminderDaysBefore           Int       @default(0)
   weatherWidgetCollapsed       Boolean   @default(false)
   createdAt                    DateTime  @default(now())
+  plan                 String    @default("trial")
+  planStatus           String    @default("trialing")
+  trialEndsAt          DateTime?
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  currentPeriodEnd     DateTime?
+  pausedUntil          DateTime?
   updatedAt            DateTime  @updatedAt
   accounts             Account[]
   sessions             Session[]

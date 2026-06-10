@@ -3,7 +3,9 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { NotificationPreferences } from "@/components/settings/NotificationPreferences";
 import { ChangePassword } from "@/components/settings/ChangePassword";
-import { Bell, Lock } from "lucide-react";
+import { BillingSection } from "@/components/settings/BillingSection";
+import { Bell, Lock, CreditCard } from "lucide-react";
+import { getDaysUntilDeletion, PLAN_LABELS, canPause } from "@/lib/subscription";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -17,14 +19,64 @@ export default async function SettingsPage() {
       reminderNotificationsEnabled: true,
       reminderDaysBefore: true,
       passwordHash: true,
+      plan: true,
+      planStatus: true,
+      trialEndsAt: true,
+      currentPeriodEnd: true,
+      pausedUntil: true,
+      stripeSubscriptionId: true,
     },
   });
+
+  const subUser = {
+    plan: user.plan,
+    planStatus: user.planStatus,
+    trialEndsAt: user.trialEndsAt,
+    currentPeriodEnd: user.currentPeriodEnd,
+    pausedUntil: user.pausedUntil,
+  };
+  const daysUntilDeletion = getDaysUntilDeletion(subUser);
+  const trialDaysLeft = user.trialEndsAt
+    ? Math.max(0, Math.ceil((user.trialEndsAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+    : null;
+  const canPauseSubscription = canPause(subUser);
+
+  // Determine billing period from active Stripe price ID
+  const { STRIPE_PRICES, stripe } = await import("@/lib/stripe");
+  let currentPeriod: "monthly" | "annual" = "monthly";
+  if (user.stripeSubscriptionId) {
+    const sub = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+    const activePriceId = sub.items.data[0]?.price.id ?? "";
+    for (const periods of Object.values(STRIPE_PRICES)) {
+      if (periods.annual === activePriceId) { currentPeriod = "annual"; break; }
+    }
+  }
 
   return (
     <div className="px-4 py-8 pb-20 sm:pb-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
 
       <div className="max-w-lg space-y-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <CreditCard className="w-5 h-5 text-green-600" />
+            <h2 className="text-lg font-semibold text-gray-900">Plan & Billing</h2>
+          </div>
+          <BillingSection
+            plan={user.plan}
+            planStatus={user.planStatus}
+            planLabel={PLAN_LABELS[user.plan] ?? user.plan}
+            daysUntilDeletion={daysUntilDeletion}
+            currentPeriodEnd={user.currentPeriodEnd?.toISOString() ?? null}
+            pausedUntil={user.pausedUntil?.toISOString() ?? null}
+            hasStripeSubscription={!!user.stripeSubscriptionId}
+            trialDaysLeft={trialDaysLeft}
+            canPauseSubscription={canPauseSubscription}
+            currentPlan={user.plan}
+            currentPeriod={currentPeriod}
+          />
+        </div>
+
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-4">
             <Bell className="w-5 h-5 text-green-600" />

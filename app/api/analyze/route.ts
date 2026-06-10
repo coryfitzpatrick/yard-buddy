@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { analyzeImages } from "@/lib/claude";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
 import { deduplicateRecommendations } from "@/lib/analysis-utils";
+import { canRunAnalysis, getPlanLimits } from "@/lib/subscription";
 
 export const maxDuration = 60;
 
@@ -25,11 +26,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Maximum 4 images per analysis" }, { status: 400 });
   }
 
+  const subUser = await db.user.findUniqueOrThrow({
+    where: { id: session.user.id },
+    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true, pausedUntil: true },
+  });
+
+  // Verify section ownership before any rate-limit queries (prevents BOLA)
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { userId: session.user.id } },
     include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true } } },
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Count analyses for this section in the current calendar month
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+  const monthlyCount = await db.lawnAnalysis.count({
+    where: { yardSectionId: section.id, createdAt: { gte: startOfMonth } },
+  });
+
+  if (!canRunAnalysis(subUser, monthlyCount)) {
+    const limits = getPlanLimits(subUser);
+    const message = limits.canRunAnalysis
+      ? `You have used all ${limits.maxAnalysesPerSectionPerMonth} analyses for this section this month. Your limit resets on the 1st of next month.`
+      : "Upgrade your plan to analyze your lawn with AI.";
+    return NextResponse.json({ error: "analysis_limit_reached", message }, { status: 403 });
+  }
 
   let weatherSummary: string | undefined;
   let forecastText: string | undefined;

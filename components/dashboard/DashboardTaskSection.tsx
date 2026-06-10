@@ -42,9 +42,10 @@ interface Props {
   tasks: Task[];
   sections: TaskSection[];
   weatherRefreshedAt: string | null;
+  hiddenTaskCount?: number;
 }
 
-export function DashboardTaskSection({ tasks, sections, weatherRefreshedAt }: Props) {
+export function DashboardTaskSection({ tasks, sections, weatherRefreshedAt, hiddenTaskCount }: Props) {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const filteredTasks =
@@ -102,6 +103,7 @@ export function DashboardTaskSection({ tasks, sections, weatherRefreshedAt }: Pr
             key={activeSection ?? "all"}
             tasks={filteredTasks}
             multiYard={multiYard && activeSection === null}
+            hiddenTaskCount={activeSection === null ? hiddenTaskCount : undefined}
           />
         </>
       )}

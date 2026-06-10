@@ -12,7 +12,9 @@ import {
   ChevronUp,
   CalendarCheck,
   ShoppingCart,
+  Lock,
 } from "lucide-react";
+import { LockedTaskCard } from "./LockedTaskCard";
 import { cn } from "@/lib/utils";
 
 interface Task {
@@ -239,9 +241,11 @@ function MaintenanceSection({
 export function TaskList({
   tasks: initial,
   multiYard = false,
+  hiddenTaskCount,
 }: {
   tasks: Task[];
   multiYard?: boolean;
+  hiddenTaskCount?: number;
 }) {
   const [tasks, setTasks] = useState(initial);
 
@@ -398,6 +402,18 @@ export function TaskList({
             ))}
           </div>
         </details>
+      )}
+
+      {(hiddenTaskCount ?? 0) > 0 && (
+        <div className="mt-4 space-y-2">
+          <p className="text-sm font-medium text-gray-400 flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5" />
+            {hiddenTaskCount} more recommendation{hiddenTaskCount !== 1 ? "s" : ""} — upgrade to see them
+          </p>
+          {Array.from({ length: Math.min(hiddenTaskCount!, 3) }).map((_, i) => (
+            <LockedTaskCard key={i} />
+          ))}
+        </div>
       )}
     </div>
   );

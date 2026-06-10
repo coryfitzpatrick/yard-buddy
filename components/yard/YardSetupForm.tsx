@@ -38,6 +38,7 @@ export function YardSetupForm() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [yardLimitReached, setYardLimitReached] = useState(false);
   const [createdYardId, setCreatedYardId] = useState<string | null>(null);
   const [createdPropertyName, setCreatedPropertyName] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -159,6 +160,7 @@ export function YardSetupForm() {
 
   async function onSubmit(sectionData: YardSectionInput) {
     setError(null);
+    setYardLimitReached(false);
 
     let yardId = createdYardId;
 
@@ -180,7 +182,16 @@ export function YardSetupForm() {
             wateringMinutesPerSession: wateringMinutesPerSession ? Number(wateringMinutesPerSession) : undefined,
           }),
         });
-        if (!yardRes.ok) { setError("Failed to save yard. Please try again."); return; }
+        if (!yardRes.ok) {
+          const data = await yardRes.json().catch(() => ({}));
+          if (data.error === "yard_limit_reached") {
+            setError(data.message);
+            setYardLimitReached(true);
+          } else {
+            setError("Failed to save yard. Please try again.");
+          }
+          return;
+        }
         const yard = await yardRes.json();
         yardId = yard.id;
         setCreatedYardId(yard.id);
@@ -277,7 +288,16 @@ export function YardSetupForm() {
           <p className="text-sm text-gray-400 mb-4">All details can be updated later.</p>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            {error && <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
+            {error && (
+              <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600 flex items-start justify-between gap-3">
+                <span>{error}</span>
+                {yardLimitReached && (
+                  <a href="/pricing" className="shrink-0 underline font-semibold hover:text-red-800 whitespace-nowrap">
+                    View plans
+                  </a>
+                )}
+              </div>
+            )}
 
             {step === 0 && (
               <div className="space-y-4">
