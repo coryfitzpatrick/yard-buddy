@@ -10,7 +10,7 @@ import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
 import { TaskList } from "@/components/dashboard/TaskList";
 import { PersonalizedRemindersCard } from "@/components/sections/PersonalizedRemindersCard";
 import { format } from "date-fns";
-import { getPlanLimits, getDaysUntilDeletion } from "@/lib/subscription";
+import { getPlanLimits, getDaysUntilDeletion, canRunAnalysis } from "@/lib/subscription";
 
 export default async function SectionDetailPage({
   params,
@@ -28,6 +28,19 @@ export default async function SectionDetailPage({
   });
   const limits = getPlanLimits(subscriptionUser);
   const daysUntilDeletion = getDaysUntilDeletion(subscriptionUser);
+
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+  const monthlyAnalysisCount = await db.lawnAnalysis.count({
+    where: { yardSectionId: sectionId, createdAt: { gte: startOfMonth } },
+  });
+
+  const analysisLimitReached = !canRunAnalysis(subscriptionUser, monthlyAnalysisCount);
+  const analysisLimitText =
+    limits.maxAnalysesPerSectionPerMonth === -1
+      ? null
+      : `${monthlyAnalysisCount} of ${limits.maxAnalysesPerSectionPerMonth} analyses used this month`;
 
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { id: yardId, userId: session.user.id } },
@@ -145,6 +158,22 @@ export default async function SectionDetailPage({
           </Link>
         </div>
       </div>
+      {analysisLimitReached ? (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 flex items-center justify-between gap-3 mb-4">
+          <span>
+            You have used all your analyses for this month.{" "}
+            <strong>Limit resets on the 1st of next month.</strong>
+          </span>
+          <a
+            href="/pricing"
+            className="shrink-0 text-green-700 font-semibold underline hover:text-green-900 whitespace-nowrap"
+          >
+            Upgrade for more
+          </a>
+        </div>
+      ) : analysisLimitText ? (
+        <p className="text-xs text-gray-400 mt-1 mb-4">{analysisLimitText}</p>
+      ) : null}
 
       {/* Health score + chart */}
       {latestAnalysis ? (

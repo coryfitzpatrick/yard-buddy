@@ -69,7 +69,12 @@ export default function AnalyzePage() {
         signal: controller.signal,
       });
       if (!res.ok) {
-        setAnalysisError("Analysis failed. Please try again.");
+        const data = await res.json().catch(() => ({}));
+        if (data.error === "analysis_limit_reached") {
+          setAnalysisError(data.message ?? "Analysis limit reached. Upgrade your plan to analyze more.");
+        } else {
+          setAnalysisError("Analysis failed. Please try again.");
+        }
         return;
       }
       const data = await res.json();
@@ -208,7 +213,14 @@ export default function AnalyzePage() {
             </div>
           )}
           {analysisError && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 mt-4">{analysisError}</div>
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 mt-4 flex items-start justify-between gap-3">
+              <span>{analysisError}</span>
+              {analysisError.toLowerCase().includes("limit") && (
+                <a href="/pricing" className="shrink-0 underline font-semibold hover:text-red-800 whitespace-nowrap">
+                  View plans
+                </a>
+              )}
+            </div>
           )}
           {result && (
             <div className="mt-6 space-y-4">
