@@ -2,15 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { Footer } from "@/components/Footer";
 
-export const metadata = { title: "Privacy Policy – Yard Buddy" };
+export const metadata = { title: "Privacy Policy – Yard Analyzer" };
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
         <Link href="/" className="flex items-center gap-1">
-          <Image src="/gnome-buddy.png" alt="Yard Buddy" width={28} height={28} className="rounded-full scale-x-[-1]" />
-          <span className="text-lg font-bold text-green-700">Yard Buddy</span>
+          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={28} height={28} className="rounded-full scale-x-[-1]" />
+          <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
       </nav>
 
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">2. How We Use Your Information</h2>
             <ul className="list-disc pl-5 space-y-1">
-              <li>To provide the Yard Buddy service, including AI-powered lawn analysis and personalized recommendations</li>
+              <li>To provide the Yard Analyzer service, including AI-powered lawn analysis and personalized recommendations</li>
               <li>To send you scheduled care reminders and account notifications by email</li>
               <li>To show weather-aware recommendations for your location</li>
               <li>To improve the product based on aggregated, anonymized usage patterns</li>
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">3. Third-Party Services</h2>
-            <p>Yard Buddy relies on the following providers to operate:</p>
+            <p>Yard Analyzer relies on the following providers to operate:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li><strong>Anthropic:</strong> photos and lawn data are sent to Anthropic's API for AI analysis. Anthropic's usage policies apply to this data.</li>
               <li><strong>Supabase:</strong> your data and uploaded photos are stored in Supabase's managed PostgreSQL and object storage.</li>
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">5. Your Rights</h2>
-            <p>You can access, update, or delete your account data at any time from the Settings page. To request a full export or permanent deletion of your data, email us at <a href="mailto:contact@yardbuddy.com" className="text-green-600 hover:underline">contact@yardbuddy.com</a>.</p>
+            <p>You can access, update, or delete your account data at any time from the Settings page. To request a full export or permanent deletion of your data, email us at <a href="mailto:contact@yardanalyzer.com" className="text-green-600 hover:underline">contact@yardanalyzer.com</a>.</p>
           </section>
 
           <section>
@@ -71,7 +71,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">7. Children's Privacy</h2>
-            <p>Yard Buddy is not directed at children under 13. We do not knowingly collect data from children. If you believe a child has provided us personal information, please contact us and we will remove it promptly.</p>
+            <p>Yard Analyzer is not directed at children under 13. We do not knowingly collect data from children. If you believe a child has provided us personal information, please contact us and we will remove it promptly.</p>
           </section>
 
           <section>
@@ -81,7 +81,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">9. Contact</h2>
-            <p>Questions about this privacy policy? Email us at <a href="mailto:contact@yardbuddy.com" className="text-green-600 hover:underline">contact@yardbuddy.com</a>.</p>
+            <p>Questions about this privacy policy? Email us at <a href="mailto:contact@yardanalyzer.com" className="text-green-600 hover:underline">contact@yardanalyzer.com</a>.</p>
           </section>
 
         </div>

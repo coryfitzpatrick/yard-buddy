@@ -14,7 +14,7 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Yard Buddy",
+  title: "Yard Analyzer",
   description: "AI-powered lawn care assistant",
 };
 

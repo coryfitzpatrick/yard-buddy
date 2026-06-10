@@ -1,11 +1,11 @@
 const DIFFERENTIATORS = [
   {
     heading: "Your whole yard, section by section",
-    body: "Front yard gets morning sun and struggles with weeds. Back yard is shaded with different grass. Most apps treat your yard as one blob. Yard Buddy tracks each section separately — different grass types, different schedules, different soil.",
+    body: "Front yard gets morning sun and struggles with weeds. Back yard is shaded with different grass. Most apps treat your yard as one blob. Yard Analyzer tracks each section separately — different grass types, different schedules, different soil.",
   },
   {
     heading: "No kit to buy. Any soil test works.",
-    body: "Some apps lock you out of custom plans unless you buy their $30 kit. Yard Buddy works with results from any lab, any test strip, or any kit you already have. Enter your N-P-K numbers and get precise fertilizer recommendations immediately.",
+    body: "Some apps lock you out of custom plans unless you buy their $30 kit. Yard Analyzer works with results from any lab, any test strip, or any kit you already have. Enter your N-P-K numbers and get precise fertilizer recommendations immediately.",
   },
   {
     heading: "Unbiased advice across all brands",
@@ -21,7 +21,7 @@ export function WhyYardBuddy() {
   return (
     <section className="max-w-5xl mx-auto px-6 py-16">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">Why Yard Buddy?</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-3">Why Yard Analyzer?</h2>
         <p className="text-lg text-gray-500 max-w-xl mx-auto">
           Personalized advice that actually matches your yard — not a generic plan pushed by a brand.
         </p>

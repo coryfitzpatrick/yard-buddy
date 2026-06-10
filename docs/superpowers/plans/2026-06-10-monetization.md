@@ -877,10 +877,10 @@ export function planFromPriceId(priceId: string): string {
 In the Stripe dashboard (https://dashboard.stripe.com), create the following products and prices, then copy the price IDs into environment variables:
 
 **Products to create:**
-- "Yard Buddy Starter" → monthly $7.99, annual $79.00
-- "Yard Buddy Home" → monthly $14.99, annual $139.00
-- "Yard Buddy Pro" → monthly $24.99, annual $229.00
-- "Yard Buddy Professional" → monthly $49.99, annual $449.00
+- "Yard Analyzer Starter" → monthly $7.99, annual $79.00
+- "Yard Analyzer Home" → monthly $14.99, annual $139.00
+- "Yard Analyzer Pro" → monthly $24.99, annual $229.00
+- "Yard Analyzer Professional" → monthly $49.99, annual $449.00
 
 For each product, add metadata: `plan = starter` (or home, pro, professional).
 
@@ -1152,7 +1152,7 @@ import { CheckCircle, X } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 
-export const metadata = { title: "Pricing – Yard Buddy" };
+export const metadata = { title: "Pricing – Yard Analyzer" };
 
 const PLANS = [
   {
@@ -1202,8 +1202,8 @@ export default function PricingPage({ searchParams }: { searchParams: Promise<{ 
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
         <Link href="/" className="flex items-center gap-1">
-          <Image src="/gnome-buddy.png" alt="Yard Buddy" width={28} height={28} className="rounded-full scale-x-[-1]" />
-          <span className="text-lg font-bold text-green-700">Yard Buddy</span>
+          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={28} height={28} className="rounded-full scale-x-[-1]" />
+          <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
         <Link href="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
       </nav>
@@ -1268,7 +1268,7 @@ export default function PricingPage({ searchParams }: { searchParams: Promise<{ 
 
         <div className="mt-12 text-center text-sm text-gray-400">
           <p>All plans include a 14-day free trial. Cancel anytime. Pause billing for winter.</p>
-          <p className="mt-1">Questions? <a href="mailto:contact@yardbuddy.com" className="underline text-green-600">contact@yardbuddy.com</a></p>
+          <p className="mt-1">Questions? <a href="mailto:contact@yardanalyzer.com" className="underline text-green-600">contact@yardanalyzer.com</a></p>
         </div>
       </main>
 

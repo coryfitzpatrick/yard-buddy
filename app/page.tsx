@@ -19,8 +19,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-1">
-          <Image src="/gnome-buddy.png" alt="Yard Buddy" width={32} height={32} className="rounded-full scale-x-[-1]" />
-          <span className="text-xl font-bold text-green-700">Yard Buddy</span>
+          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={32} height={32} className="rounded-full scale-x-[-1]" />
+          <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
         </div>
         <div className="flex gap-2">
           <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
