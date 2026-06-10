@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
-import { LayoutDashboard, Search, LogOut, Fence, Menu, Settings } from "lucide-react";
+import { LayoutDashboard, Search, LogOut, Fence, Menu, Settings, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/analyze", label: "Analyze", icon: Search },
   { href: "/yard", label: "Yards", icon: Fence },
+  { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
