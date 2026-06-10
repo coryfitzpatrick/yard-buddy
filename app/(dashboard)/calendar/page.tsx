@@ -16,9 +16,12 @@ export default async function CalendarPage({ searchParams }: PageProps) {
 
   const params = await searchParams;
 
-  const monthParam = /^\d{4}-\d{2}$/.test(params.month ?? "")
-    ? params.month!
-    : currentMonthParam();
+  const rawMonth = params.month ?? "";
+  const monthNum = parseInt(rawMonth.split("-")[1] ?? "0", 10);
+  const monthParam =
+    /^\d{4}-\d{2}$/.test(rawMonth) && monthNum >= 1 && monthNum <= 12
+      ? rawMonth
+      : currentMonthParam();
   const yardParam = params.yard ?? "";
   const sectionParam = params.section ?? "";
 
