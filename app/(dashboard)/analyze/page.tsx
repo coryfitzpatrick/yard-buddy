@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PhotoUpload } from "@/components/analysis/PhotoUpload";
 import { AnalysisResults } from "@/components/analysis/AnalysisResults";
 import type { AnalysisResult, AreaType } from "@/types";
-import { Loader2, ArrowRight, Plus } from "lucide-react";
+import { Loader2, ArrowRight, Plus, Camera } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
@@ -25,6 +25,7 @@ export default function AnalyzePage() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [analysisLimitReached, setAnalysisLimitReached] = useState(false);
+  const [invalidPhotos, setInvalidPhotos] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -54,10 +55,12 @@ export default function AnalyzePage() {
     setResult(null);
     setAnalysisError(null);
     setAnalysisLimitReached(false);
+    setInvalidPhotos(false);
   }
 
   async function handleUploaded(urls: string[]) {
     if (!selectedSectionId) return;
+    setInvalidPhotos(false);
     const controller = new AbortController();
     abortRef.current = controller;
     setAnalyzing(true);
@@ -73,7 +76,10 @@ export default function AnalyzePage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        if (data.error === "analysis_limit_reached") {
+        if (data.error === "invalid_photos") {
+          setAnalysisError(data.message ?? "Please take clear photos of your lawn.");
+          setInvalidPhotos(true);
+        } else if (data.error === "analysis_limit_reached") {
           setAnalysisError(data.message ?? "Analysis limit reached. Upgrade your plan to analyze more.");
           setAnalysisLimitReached(true);
         } else {
@@ -98,6 +104,7 @@ export default function AnalyzePage() {
     setAnalyzing(false);
     setAnalysisError(null);
     setAnalysisLimitReached(false);
+    setInvalidPhotos(false);
   }
 
   return (
@@ -175,7 +182,7 @@ export default function AnalyzePage() {
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => { setSelectedSectionId(s.id); setResult(null); setAnalysisError(null); setAnalysisLimitReached(false); }}
+                      onClick={() => { setSelectedSectionId(s.id); setResult(null); setAnalysisError(null); setAnalysisLimitReached(false); setInvalidPhotos(false); }}
                       className={cn(
                         "flex flex-col items-start rounded-lg border-2 px-3 py-2.5 text-left transition-all",
                         sel ? "border-green-600 bg-green-50" : "border-gray-200 bg-white hover:border-green-400"
@@ -219,8 +226,11 @@ export default function AnalyzePage() {
             </div>
           )}
           {analysisError && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 mt-4 flex items-start justify-between gap-3">
-              <span>{analysisError}</span>
+            <div className={`rounded-md p-3 text-sm mt-4 flex items-start justify-between gap-3 ${invalidPhotos ? "bg-amber-50 text-amber-800" : "bg-red-50 text-red-600"}`}>
+              <div className="flex items-start gap-2">
+                {invalidPhotos && <Camera className="w-4 h-4 mt-0.5 shrink-0 text-amber-600" />}
+                <span>{analysisError}</span>
+              </div>
               {analysisLimitReached && (
                 <a href="/pricing" className="shrink-0 underline font-semibold hover:text-red-800 whitespace-nowrap">
                   View plans

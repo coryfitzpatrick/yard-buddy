@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { analyzeImages } from "@/lib/claude";
+import { analyzeImages, validateLawnImages } from "@/lib/claude";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
 import { deduplicateRecommendations } from "@/lib/analysis-utils";
 import { canRunAnalysis, getPlanLimits } from "@/lib/subscription";
@@ -24,6 +24,17 @@ export async function POST(req: NextRequest) {
   }
   if (imageUrls.length > 4) {
     return NextResponse.json({ error: "Maximum 4 images per analysis" }, { status: 400 });
+  }
+
+  const validation = await validateLawnImages(imageUrls);
+  if (!validation.valid) {
+    return NextResponse.json(
+      {
+        error: "invalid_photos",
+        message: validation.feedback ?? "Please take clear photos of your lawn from above or at ground level.",
+      },
+      { status: 422 }
+    );
   }
 
   const subUser = await db.user.findUniqueOrThrow({
