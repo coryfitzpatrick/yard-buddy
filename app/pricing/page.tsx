@@ -89,7 +89,7 @@ export default async function PricingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-1">
+        <Link href={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-1">
           <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={28} height={28} className="rounded-full scale-x-[-1]" />
           <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
