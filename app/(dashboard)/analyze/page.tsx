@@ -24,6 +24,7 @@ export default function AnalyzePage() {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [analysisLimitReached, setAnalysisLimitReached] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function AnalyzePage() {
     setSelectedSectionId("");
     setResult(null);
     setAnalysisError(null);
+    setAnalysisLimitReached(false);
   }
 
   async function handleUploaded(urls: string[]) {
@@ -61,6 +63,7 @@ export default function AnalyzePage() {
     setAnalyzing(true);
     setResult(null);
     setAnalysisError(null);
+    setAnalysisLimitReached(false);
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
@@ -72,8 +75,10 @@ export default function AnalyzePage() {
         const data = await res.json().catch(() => ({}));
         if (data.error === "analysis_limit_reached") {
           setAnalysisError(data.message ?? "Analysis limit reached. Upgrade your plan to analyze more.");
+          setAnalysisLimitReached(true);
         } else {
           setAnalysisError("Analysis failed. Please try again.");
+          setAnalysisLimitReached(false);
         }
         return;
       }
@@ -92,6 +97,7 @@ export default function AnalyzePage() {
     abortRef.current?.abort();
     setAnalyzing(false);
     setAnalysisError(null);
+    setAnalysisLimitReached(false);
   }
 
   return (
@@ -169,7 +175,7 @@ export default function AnalyzePage() {
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => { setSelectedSectionId(s.id); setResult(null); setAnalysisError(null); }}
+                      onClick={() => { setSelectedSectionId(s.id); setResult(null); setAnalysisError(null); setAnalysisLimitReached(false); }}
                       className={cn(
                         "flex flex-col items-start rounded-lg border-2 px-3 py-2.5 text-left transition-all",
                         sel ? "border-green-600 bg-green-50" : "border-gray-200 bg-white hover:border-green-400"
@@ -215,7 +221,7 @@ export default function AnalyzePage() {
           {analysisError && (
             <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 mt-4 flex items-start justify-between gap-3">
               <span>{analysisError}</span>
-              {analysisError.toLowerCase().includes("limit") && (
+              {analysisLimitReached && (
                 <a href="/pricing" className="shrink-0 underline font-semibold hover:text-red-800 whitespace-nowrap">
                   View plans
                 </a>
