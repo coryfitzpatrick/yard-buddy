@@ -4,7 +4,7 @@ import { getWeatherByZip } from "@/lib/weather";
 import { computeNewWindow } from "@/lib/cron/weather-scheduler";
 import { assessOverdueTasks } from "@/lib/cron/overdue-assessor";
 import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
-import { resend, buildDigestEmail, buildTrialReminderEmail, generateUnsubscribeToken } from "@/lib/email";
+import { resend, buildDigestEmail, buildTrialReminderEmail, buildCardExpiringEmail, generateUnsubscribeToken } from "@/lib/email";
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
 import { stripe } from "@/lib/stripe";
 import Stripe from "stripe";
@@ -562,7 +562,6 @@ export async function GET(req: NextRequest) {
         return_url: `${process.env.NEXTAUTH_URL ?? "https://yardanalyzer.app"}/settings`,
       });
 
-      const { buildCardExpiringEmail } = await import("@/lib/email");
       const { subject, html } = buildCardExpiringEmail({
         userName: subscriber.name ?? subscriber.email,
         cardLast4: last4,
@@ -581,7 +580,7 @@ export async function GET(req: NextRequest) {
 
       await db.user.update({
         where: { id: subscriber.id },
-        data: { cardExpiryWarningSentAt: today },
+        data: { cardExpiryWarningSentAt: new Date() },
       });
 
       console.log(`Card expiry warning sent to ${subscriber.email}`);

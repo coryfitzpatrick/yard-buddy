@@ -108,16 +108,23 @@ export async function POST(req: NextRequest) {
 
         const user = await db.user.findUnique({
           where: { stripeCustomerId: customerId },
-          select: { id: true, email: true, name: true, planStatus: true },
+          select: { id: true, email: true, name: true, planStatus: true, lastPaymentFailedInvoiceId: true },
         });
         if (!user) break;
 
+        // Idempotency: skip if we already processed this exact invoice attempt
+        if (user.lastPaymentFailedInvoiceId === invoice.id) break;
+
+        const updates: Parameters<typeof db.user.update>[0]["data"] = {
+          lastPaymentFailedInvoiceId: invoice.id,
+        };
+
+        // Only flip to past_due if currently active; re-retries leave status alone
         if (user.planStatus === "active") {
-          await db.user.update({
-            where: { id: user.id },
-            data: { planStatus: "past_due" },
-          });
+          updates.planStatus = "past_due";
         }
+
+        await db.user.update({ where: { id: user.id }, data: updates });
 
         const portalSession = await stripe.billingPortal.sessions.create({
           customer: customerId,
