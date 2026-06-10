@@ -6,6 +6,8 @@ import { assessOverdueTasks } from "@/lib/cron/overdue-assessor";
 import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
 import { resend, buildDigestEmail, buildTrialReminderEmail, generateUnsubscribeToken } from "@/lib/email";
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
+import { stripe } from "@/lib/stripe";
+import Stripe from "stripe";
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -505,6 +507,86 @@ export async function GET(req: NextRequest) {
       console.log(`Deleted expired account: ${user.email}`);
     } catch (err) {
       console.error(`Failed to delete user ${user.id}:`, err);
+    }
+  }
+
+  // === Card expiry warning ===
+  const expiryWarnCutoff = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000);
+  const upcomingBillingCutoff = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  const activeSubscribers = await db.user.findMany({
+    where: {
+      planStatus: { in: ["active", "past_due"] },
+      stripeCustomerId: { not: null },
+      stripeSubscriptionId: { not: null },
+      currentPeriodEnd: { lte: upcomingBillingCutoff, gte: today },
+      OR: [
+        { cardExpiryWarningSentAt: null },
+        { cardExpiryWarningSentAt: { lt: expiryWarnCutoff } },
+      ],
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      stripeCustomerId: true,
+      currentPeriodEnd: true,
+    },
+    take: 50,
+  });
+
+  for (const subscriber of activeSubscribers) {
+    try {
+      const customer = await stripe.customers.retrieve(subscriber.stripeCustomerId!, {
+        expand: ["invoice_settings.default_payment_method"],
+      });
+      if (customer.deleted) continue;
+
+      const pm = (customer as Stripe.Customer).invoice_settings?.default_payment_method;
+      if (!pm || typeof pm === "string") continue;
+      if (pm.type !== "card" || !pm.card) continue;
+
+      const { exp_month, exp_year, last4 } = pm.card;
+      const nextBilling = subscriber.currentPeriodEnd!;
+      const billingYear = nextBilling.getUTCFullYear();
+      const billingMonth = nextBilling.getUTCMonth() + 1;
+
+      const cardExpiresBeforeBilling =
+        exp_year < billingYear ||
+        (exp_year === billingYear && exp_month < billingMonth);
+
+      if (!cardExpiresBeforeBilling) continue;
+
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: subscriber.stripeCustomerId!,
+        return_url: `${process.env.NEXTAUTH_URL ?? "https://yardanalyzer.app"}/settings`,
+      });
+
+      const { buildCardExpiringEmail } = await import("@/lib/email");
+      const { subject, html } = buildCardExpiringEmail({
+        userName: subscriber.name ?? subscriber.email,
+        cardLast4: last4,
+        expiryMonth: exp_month,
+        expiryYear: exp_year,
+        nextBillingDate: nextBilling,
+        billingPortalUrl: portalSession.url,
+      });
+
+      await resend.emails.send({
+        from: "Yard Analyzer <noreply@yardanalyzer.app>",
+        to: subscriber.email,
+        subject,
+        html,
+      });
+
+      await db.user.update({
+        where: { id: subscriber.id },
+        data: { cardExpiryWarningSentAt: today },
+      });
+
+      console.log(`Card expiry warning sent to ${subscriber.email}`);
+    } catch (err) {
+      console.error(`Card expiry check failed for ${subscriber.email}:`, err);
     }
   }
 
