@@ -67,7 +67,9 @@ HEALTHY LAWN MODE — Apply when your analysis determines healthScore ≥ 75:
 - Assign taskMode "improvement" to optional enhancements (overseeding for density, topdressing, color).
 - Reserve taskMode "corrective" only for actual problems visible in the image or data.
 - Aim for 2–4 total tasks — fewer focused tasks beats a long list for a healthy lawn.
-- Phrase maintenance tasks positively: "Continue your..." / "Keep up your..." / "Maintain your..." framing.`
+- Phrase maintenance tasks positively: "Continue your..." / "Keep up your..." / "Maintain your..." framing.
+
+SPECIES IDENTIFICATION RULE — When weeds or pests are present, always identify to the species level in task titles and descriptions. Do not use generic category names like "grassy weed," "broadleaf weed," or "pest." Instead use the specific common name: "crabgrass," "nutsedge," "dandelion," "clover," "Japanese beetle grubs," "chinch bugs," "armyworms," etc. If multiple weed or pest species are present, name the most prevalent one in the title and list others in the description. If the exact species cannot be confirmed from the image, name the most likely candidate given the grass type, region, and season — and note the uncertainty briefly (e.g., "likely crabgrass based on growth pattern"). Apply the same specificity to disease names: "brown patch," "dollar spot," "red thread" rather than "fungal disease."`
 
   const userMessage = userQuestion
     ?? `Please analyze this lawn section and give me prioritized recommendations for what to do in the next 1-2 weeks.`

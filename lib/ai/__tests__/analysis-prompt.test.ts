@@ -144,4 +144,11 @@ describe('buildSectionAnalysisPrompt', () => {
     });
     expect(systemPrompt).not.toContain("Current Routine:");
   });
+
+  it("includes species identification rule in system prompt", () => {
+    const { systemPrompt } = buildSectionAnalysisPrompt({ section: baseSection, weather: baseWeather })
+    expect(systemPrompt).toContain("SPECIES IDENTIFICATION RULE")
+    expect(systemPrompt.toLowerCase()).toContain("crabgrass")
+    expect(systemPrompt.toLowerCase()).toContain("nutsedge")
+  })
 })
