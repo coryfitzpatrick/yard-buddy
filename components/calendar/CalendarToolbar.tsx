@@ -34,6 +34,7 @@ export function CalendarToolbar({ yards, selectedYard, selectedSection, month }:
     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-wrap gap-3">
       <div className="flex gap-2 flex-wrap">
         <select
+          aria-label="Select yard"
           value={selectedYard}
           onChange={(e) => pushParams({ yard: e.target.value, section: "" })}
           className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -45,6 +46,7 @@ export function CalendarToolbar({ yards, selectedYard, selectedSection, month }:
         </select>
 
         <select
+          aria-label="Select section"
           value={selectedSection}
           onChange={(e) => pushParams({ section: e.target.value })}
           className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
