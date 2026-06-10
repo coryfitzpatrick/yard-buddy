@@ -17,7 +17,12 @@ export async function POST(req: Request) {
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
   const user = await db.user.create({
-    data: { name: parsed.data.name, email: parsed.data.email, passwordHash },
+    data: {
+      name: parsed.data.name,
+      email: parsed.data.email,
+      passwordHash,
+      trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+    },
   });
 
   return NextResponse.json({ id: user.id, email: user.email }, { status: 201 });
