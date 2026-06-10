@@ -1,5 +1,5 @@
 export type Plan = "trial" | "home_basic" | "home_plus" | "professional" | "professional_plus";
-export type PlanStatus = "trialing" | "active" | "paused" | "expired" | "canceled";
+export type PlanStatus = "trialing" | "active" | "past_due" | "paused" | "expired" | "canceled";
 
 export interface PlanLimits {
   maxYards: number;                       // -1 = unlimited
