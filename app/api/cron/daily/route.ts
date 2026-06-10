@@ -199,71 +199,78 @@ export async function GET(req: NextRequest) {
       weather.forecast[0]?.low ?? 0,
     );
 
+    const existing = await db.gddRecord.findUnique({
+      where: { yardId_year: { yardId: yard.id, year: currentYear } },
+    });
+    const newCumulative = (existing?.cumulativeGdd ?? 0) + dailyGdd;
     const gddRecord = await db.gddRecord.upsert({
       where: { yardId_year: { yardId: yard.id, year: currentYear } },
       create: { yardId: yard.id, year: currentYear, cumulativeGdd: dailyGdd },
-      update: { cumulativeGdd: { increment: dailyGdd } },
+      update: { cumulativeGdd: newCumulative },
     });
 
     const state = yard.state ?? "";
 
     // Pre-emergent: cumulative GDD ≥ 50
     if (!gddRecord.preEmergentFired && gddRecord.cumulativeGdd >= 50) {
-      for (const section of yard.sections) {
-        if (!isPreEmergentApplicable(section.grassType, state)) continue;
-        await db.lawnTask.updateMany({
-          where: {
-            yardSectionId: section.id,
-            status: "pending",
-            title: { contains: "pre-emergent", mode: "insensitive" },
-          },
-          data: { bestDay: today, gddThreshold: "pre_emergent" },
-        });
-      }
-      await db.gddRecord.update({
-        where: { id: gddRecord.id },
-        data: { preEmergentFired: true },
-      });
+      const taskUpdates = yard.sections
+        .filter((section) => isPreEmergentApplicable(section.grassType, state))
+        .map((section) =>
+          db.lawnTask.updateMany({
+            where: {
+              yardSectionId: section.id,
+              status: "pending",
+              title: { contains: "pre-emergent", mode: "insensitive" },
+            },
+            data: { bestDay: today, gddThreshold: "pre_emergent" },
+          })
+        );
+      await db.$transaction([
+        ...taskUpdates,
+        db.gddRecord.update({ where: { id: gddRecord.id }, data: { preEmergentFired: true } }),
+      ]);
     }
 
     // Grubs: cumulative GDD ≥ 300
     if (!gddRecord.grubsFired && gddRecord.cumulativeGdd >= 300) {
-      for (const section of yard.sections) {
-        if (!isGrubAlertApplicable(section.grassType, state)) continue;
-        await db.lawnTask.updateMany({
-          where: {
-            yardSectionId: section.id,
-            status: "pending",
-            title: { contains: "grub", mode: "insensitive" },
-          },
-          data: { bestDay: today, gddThreshold: "grubs" },
-        });
-      }
-      await db.gddRecord.update({
-        where: { id: gddRecord.id },
-        data: { grubsFired: true },
-      });
+      const taskUpdates = yard.sections
+        .filter((section) => isGrubAlertApplicable(section.grassType, state))
+        .map((section) =>
+          db.lawnTask.updateMany({
+            where: {
+              yardSectionId: section.id,
+              status: "pending",
+              title: { contains: "grub", mode: "insensitive" },
+            },
+            data: { bestDay: today, gddThreshold: "grubs" },
+          })
+        );
+      await db.$transaction([
+        ...taskUpdates,
+        db.gddRecord.update({ where: { id: gddRecord.id }, data: { grubsFired: true } }),
+      ]);
     }
 
     // Overseeding: avg temp < 65°F AND month Aug–Oct (0-indexed: 7–9)
     const month = today.getUTCMonth();
     const avgTemp = ((weather.forecast[0]?.high ?? 0) + (weather.forecast[0]?.low ?? 0)) / 2;
     if (!gddRecord.overseedingFired && month >= 7 && month <= 9 && avgTemp < 65) {
-      for (const section of yard.sections) {
-        if (!isOverseedingApplicable(section.grassType)) continue;
-        await db.lawnTask.updateMany({
-          where: {
-            yardSectionId: section.id,
-            status: "pending",
-            title: { contains: "overseed", mode: "insensitive" },
-          },
-          data: { bestDay: today, gddThreshold: "overseeding" },
-        });
-      }
-      await db.gddRecord.update({
-        where: { id: gddRecord.id },
-        data: { overseedingFired: true },
-      });
+      const taskUpdates = yard.sections
+        .filter((section) => isOverseedingApplicable(section.grassType))
+        .map((section) =>
+          db.lawnTask.updateMany({
+            where: {
+              yardSectionId: section.id,
+              status: "pending",
+              title: { contains: "overseed", mode: "insensitive" },
+            },
+            data: { bestDay: today, gddThreshold: "overseeding" },
+          })
+        );
+      await db.$transaction([
+        ...taskUpdates,
+        db.gddRecord.update({ where: { id: gddRecord.id }, data: { overseedingFired: true } }),
+      ]);
     }
   }
 
@@ -342,9 +349,9 @@ export async function GET(req: NextRequest) {
           if (t.stillWorthDoing !== null) return false;
 
           // GDD best-day logic — uses gddBestDayReminderDays instead of notifyDaysAhead
-          if (t.bestDay && t.gddThreshold && (user as typeof taskUser)?.gddNotificationsEnabled) {
+          if (t.bestDay && t.gddThreshold && taskUser?.gddNotificationsEnabled) {
             const daysUntilBestDay = (t.bestDay.getTime() - today.getTime()) / 86400000;
-            return daysUntilBestDay >= 0 && daysUntilBestDay <= ((user as typeof taskUser)?.gddBestDayReminderDays ?? 0);
+            return daysUntilBestDay >= 0 && daysUntilBestDay <= (taskUser.gddBestDayReminderDays ?? 0);
           }
 
           // Regular upcoming task logic
