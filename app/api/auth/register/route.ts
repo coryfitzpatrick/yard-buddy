@@ -22,6 +22,7 @@ export async function POST(req: Request) {
       email: parsed.data.email,
       passwordHash,
       trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      termsAcceptedAt: new Date(),
     },
   });
 
