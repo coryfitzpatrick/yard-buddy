@@ -19,6 +19,8 @@ model User {
   notifyDaysAhead              Int       @default(3)
   reminderNotificationsEnabled Boolean   @default(true)
   reminderDaysBefore           Int       @default(0)
+  gddNotificationsEnabled      Boolean   @default(true)
+  gddBestDayReminderDays       Int       @default(0)
   weatherWidgetCollapsed       Boolean   @default(false)
   createdAt                    DateTime  @default(now())
   plan                 String    @default("trial")
@@ -93,6 +95,7 @@ model Yard {
   updatedAt          DateTime      @updatedAt
   user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   sections           YardSection[]
+  gddRecords         GddRecord[]
 
   @@index([userId])
 }
@@ -159,6 +162,8 @@ model LawnTask {
   spreaderSetting  String?
   taskMode         String?
   productSearchQuery String?
+  gddThreshold  String?
+  bestDay       DateTime?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   yardSection      YardSection   @relation(fields: [yardSectionId], references: [id], onDelete: Cascade)
@@ -178,4 +183,19 @@ model PasswordResetToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model GddRecord {
+  id               String   @id @default(cuid())
+  yardId           String
+  year             Int
+  cumulativeGdd    Float    @default(0)
+  preEmergentFired Boolean  @default(false)
+  grubsFired       Boolean  @default(false)
+  overseedingFired Boolean  @default(false)
+  lastUpdatedAt    DateTime @updatedAt
+
+  yard Yard @relation(fields: [yardId], references: [id], onDelete: Cascade)
+
+  @@unique([yardId, year])
 }
