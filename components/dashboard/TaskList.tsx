@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -254,6 +255,7 @@ export function TaskList({
   hiddenTaskCount?: number;
 }) {
   const [tasks, setTasks] = useState(initial);
+  const router = useRouter();
 
   async function patchTask(id: string, status: string) {
     const target = tasks.find((t) => t.id === id);
@@ -268,6 +270,7 @@ export function TaskList({
           body: JSON.stringify({ status }),
         }).then((r) => { if (!r.ok) throw new Error("Failed"); })
       ));
+      router.refresh();
     } catch {
       setTasks((t) => t.map((task) => (ids.includes(task.id) ? { ...task, status: prev } : task)));
     }
@@ -285,6 +288,7 @@ export function TaskList({
         body: JSON.stringify({ stillWorthDoing: null }),
       });
       if (!res.ok) throw new Error("Failed");
+      router.refresh();
     } catch {
       // Rollback
       setTasks((t) => t.map((task) => (task.id === id ? prev : task)));
