@@ -4,6 +4,7 @@ import { CheckCircle } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 
 export const metadata = { title: "Pricing – Yard Analyzer" };
 
@@ -71,6 +72,19 @@ export default async function PricingPage() {
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
 
+  let currentPlan: string | null = null;
+  let planStatus: string | null = null;
+  if (session?.user?.id) {
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true, planStatus: true },
+    });
+    currentPlan = user?.plan ?? null;
+    planStatus = user?.planStatus ?? null;
+  }
+
+  const isActivePaid = planStatus === "active" && currentPlan !== "trial";
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
@@ -87,7 +101,9 @@ export default async function PricingPage() {
       <main className="flex-1 max-w-6xl mx-auto px-4 py-16 w-full">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Simple, honest pricing</h1>
-          <p className="text-lg text-gray-500">Start free for 14 days. No credit card required.</p>
+          <p className="text-lg text-gray-500">
+            {isActivePaid ? "Upgrade, downgrade, or switch billing period anytime." : "Start free for 14 days. No credit card required."}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -128,25 +144,48 @@ export default async function PricingPage() {
               </ul>
 
               <div className="space-y-2">
-                <Link href={isLoggedIn
-                  ? `/api/stripe/checkout?plan=${plan.key}&period=monthly`
-                  : `/register?plan=${plan.key}&period=monthly`
-                }>
-                  <Button
-                    className={`w-full ${plan.highlight ? "bg-green-600 hover:bg-green-700" : ""}`}
-                    variant={plan.highlight ? "default" : "outline"}
-                  >
-                    {isLoggedIn ? "Subscribe monthly" : "Start free trial"}
-                  </Button>
-                </Link>
-                <Link href={isLoggedIn
-                  ? `/api/stripe/checkout?plan=${plan.key}&period=annual`
-                  : `/register?plan=${plan.key}&period=annual`
-                }>
-                  <Button variant="ghost" size="sm" className="w-full text-xs text-gray-500">
-                    {isLoggedIn ? "Subscribe annually and save" : "or pay annually and save"}
-                  </Button>
-                </Link>
+                {currentPlan === plan.key ? (
+                  <div className="w-full text-center text-sm font-semibold text-green-700 bg-green-50 border border-green-200 rounded-lg py-2">
+                    Your current plan
+                  </div>
+                ) : isActivePaid ? (
+                  <Link href={`/api/stripe/checkout?plan=${plan.key}&period=monthly`}>
+                    <Button
+                      className={`w-full ${plan.highlight ? "bg-green-600 hover:bg-green-700" : ""}`}
+                      variant={plan.highlight ? "default" : "outline"}
+                    >
+                      Switch to monthly
+                    </Button>
+                  </Link>
+                ) : isLoggedIn ? (
+                  <Link href={`/api/stripe/checkout?plan=${plan.key}&period=monthly`}>
+                    <Button
+                      className={`w-full ${plan.highlight ? "bg-green-600 hover:bg-green-700" : ""}`}
+                      variant={plan.highlight ? "default" : "outline"}
+                    >
+                      Subscribe monthly
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href={`/register?plan=${plan.key}&period=monthly`}>
+                    <Button
+                      className={`w-full ${plan.highlight ? "bg-green-600 hover:bg-green-700" : ""}`}
+                      variant={plan.highlight ? "default" : "outline"}
+                    >
+                      Start free trial
+                    </Button>
+                  </Link>
+                )}
+                {currentPlan !== plan.key && (
+                  <Link href={isLoggedIn
+                    ? `/api/stripe/checkout?plan=${plan.key}&period=annual`
+                    : `/register?plan=${plan.key}&period=annual`
+                  }>
+                    <Button variant="ghost" size="sm" className="w-full text-xs text-gray-500">
+                      {isActivePaid ? "Switch to annual and save" : isLoggedIn ? "Subscribe annually and save" : "or pay annually and save"}
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           ))}
