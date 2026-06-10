@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe, planFromPriceId } from "@/lib/stripe";
 import { db } from "@/lib/db";
+import { resend, buildPaymentFailedEmail } from "@/lib/email";
 
 async function updateUserFromSubscription(sub: Stripe.Subscription) {
   // Look up user by our stored customerId — never trust payload userId directly
@@ -19,11 +20,12 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
 
   let planStatus: string;
   switch (sub.status) {
-    case "trialing": planStatus = "trialing"; break;
-    case "active":   planStatus = "active";   break;
-    case "paused":   planStatus = "paused";   break;
-    case "canceled": planStatus = "canceled"; break;
-    default:         planStatus = "expired";
+    case "trialing":  planStatus = "trialing";  break;
+    case "active":    planStatus = "active";    break;
+    case "past_due":  planStatus = "past_due";  break;
+    case "paused":    planStatus = "paused";    break;
+    case "canceled":  planStatus = "canceled";  break;
+    default:          planStatus = "expired";
   }
 
   const pausedUntil = sub.pause_collection?.resumes_at
@@ -97,6 +99,44 @@ export async function POST(req: NextRequest) {
           const sub = await stripe.subscriptions.retrieve(subId);
           await updateUserFromSubscription(sub);
         }
+        break;
+      }
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+        const attemptCount = invoice.attempt_count ?? 1;
+
+        const user = await db.user.findUnique({
+          where: { stripeCustomerId: customerId },
+          select: { id: true, email: true, name: true, planStatus: true },
+        });
+        if (!user) break;
+
+        if (user.planStatus === "active") {
+          await db.user.update({
+            where: { id: user.id },
+            data: { planStatus: "past_due" },
+          });
+        }
+
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: customerId,
+          return_url: `${process.env.NEXTAUTH_URL ?? "https://yardanalyzer.app"}/settings`,
+        });
+
+        const { subject, html } = buildPaymentFailedEmail({
+          userName: user.name ?? user.email,
+          billingPortalUrl: portalSession.url,
+          attemptCount,
+        });
+
+        await resend.emails.send({
+          from: "Yard Analyzer <noreply@yardanalyzer.app>",
+          to: user.email,
+          subject,
+          html,
+        });
+
         break;
       }
     }
