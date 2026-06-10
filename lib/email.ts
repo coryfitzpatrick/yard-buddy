@@ -159,6 +159,41 @@ export function buildDigestEmail(opts: {
   return { subject, html };
 }
 
+export function buildTrialReminderEmail(opts: {
+  userName: string;
+  daysLeft: number;
+  pricingUrl: string;
+}): { subject: string; html: string } {
+  const { userName, daysLeft, pricingUrl } = opts;
+  const isLastDay = daysLeft <= 1;
+  const subject = isLastDay
+    ? "Your Yard Analyzer free trial ends tomorrow"
+    : `Your Yard Analyzer free trial ends in ${daysLeft} days`;
+
+  const html = `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">
+    ${isLastDay
+      ? "Your free trial ends <strong>tomorrow</strong>. After that you'll lose access to AI analysis and task recommendations."
+      : `Your free trial ends in <strong>${daysLeft} days</strong>. Subscribe now to keep your lawn care on track.`
+    }
+  </p>
+  <p style="color:#374151;">Plans start at <strong>$7.99/month</strong> — less than a bag of fertilizer.</p>
+  <div style="text-align:center;margin:32px 0;">
+    <a href="${pricingUrl}" style="background:#16a34a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">See plans &amp; pricing</a>
+  </div>
+  <p style="color:#9ca3af;font-size:12px;text-align:center;">
+    No credit card was required for your trial and your data is kept for 30 days after expiry.
+  </p>
+</body>
+</html>`;
+
+  return { subject, html };
+}
+
 export function buildPasswordResetEmail(opts: {
   userName: string;
   resetUrl: string;

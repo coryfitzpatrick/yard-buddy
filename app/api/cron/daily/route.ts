@@ -4,7 +4,7 @@ import { getWeatherByZip } from "@/lib/weather";
 import { computeNewWindow } from "@/lib/cron/weather-scheduler";
 import { assessOverdueTasks } from "@/lib/cron/overdue-assessor";
 import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
-import { resend, buildDigestEmail, generateUnsubscribeToken } from "@/lib/email";
+import { resend, buildDigestEmail, buildTrialReminderEmail, generateUnsubscribeToken } from "@/lib/email";
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -311,6 +311,44 @@ export async function GET(req: NextRequest) {
       });
     } catch (err) {
       console.error("Email send failed for user:", userId, err);
+    }
+  }
+
+  // === Trial expiry reminders (7 days out and 1 day out) ===
+  const pricingUrl = `${baseUrl}/pricing`;
+  const reminderDays = [7, 1];
+
+  for (const daysLeft of reminderDays) {
+    const targetDate = addDays(today, daysLeft);
+
+    const trialUsers = await db.user.findMany({
+      where: {
+        planStatus: "trialing",
+        trialEndsAt: {
+          gte: targetDate,
+          lt: addDays(targetDate, 1),
+        },
+      },
+      select: { id: true, email: true, name: true },
+    });
+
+    for (const user of trialUsers) {
+      if (!user.email) continue;
+      const { subject, html } = buildTrialReminderEmail({
+        userName: user.name?.split(" ")[0] ?? "there",
+        daysLeft,
+        pricingUrl,
+      });
+      try {
+        await resend.emails.send({
+          from: "Yard Analyzer <noreply@yardanalyzer.com>",
+          to: user.email,
+          subject,
+          html,
+        });
+      } catch (err) {
+        console.error(`Trial reminder (${daysLeft}d) failed for user ${user.id}:`, err);
+      }
     }
   }
 
