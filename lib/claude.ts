@@ -265,6 +265,57 @@ For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic wind
   }
 }
 
+export async function validateLawnImages(
+  imageUrls: string[]
+): Promise<{ valid: boolean; feedback: string | null }> {
+  const imageContent = imageUrls.map((url) => ({
+    type: "image" as const,
+    source: { type: "url" as const, url },
+  }));
+
+  const message = await client.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 200,
+    messages: [
+      {
+        role: "user",
+        content: [
+          ...imageContent,
+          {
+            type: "text" as const,
+            text: `Review these photos submitted for lawn analysis. Evaluate on three criteria:
+
+1. SUBJECT: Do the images show lawn, grass, or outdoor ground cover? (Not people, pets, buildings, indoor scenes, or unrelated subjects)
+2. QUALITY: Are the images clear and in focus, well-lit, and close enough to see the grass condition?
+3. VARIETY: If multiple images, do they show different angles or areas rather than identical shots?
+
+Return JSON only, no other text:
+{
+  "valid": true or false,
+  "feedback": null or "1-2 sentence explanation of what's wrong and how to fix it"
+}
+
+Set valid=true only when: all images are clearly of a lawn/grass area, quality is acceptable, and the set provides useful information.
+Set valid=false with feedback when: any image clearly isn't a lawn, all images are too blurry/dark to analyze, or all images are near-identical with no variety.`,
+          },
+        ],
+      },
+    ],
+  });
+
+  try {
+    const text = message.content[0]?.type === "text" ? message.content[0].text.trim() : "";
+    const json = JSON.parse(text.replace(/^```json\n?/, "").replace(/\n?```$/, ""));
+    return {
+      valid: json.valid === true,
+      feedback: typeof json.feedback === "string" ? json.feedback : null,
+    };
+  } catch {
+    // If Haiku returns unparseable output, allow the analysis to proceed
+    return { valid: true, feedback: null };
+  }
+}
+
 export async function generateWateringRecommendation(
   opts: WateringPromptOpts
 ): Promise<{ schedule: string; deviates: boolean }> {
