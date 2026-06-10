@@ -84,6 +84,7 @@ export default async function PricingPage() {
   }
 
   const isActivePaid = planStatus === "active" && currentPlan !== "trial";
+  const isTrial = planStatus === "trialing" || currentPlan === "trial";
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -102,23 +103,86 @@ export default async function PricingPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Simple, honest pricing</h1>
           <p className="text-lg text-gray-500">
-            {isActivePaid ? "Upgrade, downgrade, or switch billing period anytime." : "Start free for 14 days. No credit card required."}
+            {isActivePaid
+              ? "Upgrade, downgrade, or switch billing period anytime."
+              : "Try free for 14 days, then pick the plan that fits."}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+
+          {/* Free Trial card */}
+          {!isActivePaid && (
+            <div className={`rounded-2xl border p-6 flex flex-col ${
+              isTrial ? "border-green-500 ring-2 ring-green-500 relative" : "border-gray-200 bg-gray-50"
+            }`}>
+              {isTrial && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                  Your current plan
+                </div>
+              )}
+              <div className="mb-4">
+                <p className="font-semibold text-gray-900 text-lg">Free Trial</p>
+                <div className="mt-2">
+                  <span className="text-3xl font-bold text-gray-900">$0</span>
+                  <span className="text-gray-400 text-sm"> for 14 days</span>
+                </div>
+                <p className="text-xs text-gray-400 font-medium mt-0.5">No credit card required</p>
+              </div>
+
+              <ul className="space-y-2 mb-6 flex-1 text-sm text-gray-600">
+                <li className="font-semibold text-gray-900">1 yard</li>
+                <li className="font-medium text-gray-700">1 analysis per section</li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                  First AI task recommendation
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                  Preview of all features
+                </li>
+              </ul>
+
+              <div>
+                {isTrial ? (
+                  <div className="w-full text-center text-sm font-semibold text-green-700 bg-green-50 border border-green-200 rounded-lg py-2">
+                    Active now
+                  </div>
+                ) : isLoggedIn ? (
+                  <div className="w-full text-center text-sm text-gray-400 bg-gray-100 border border-gray-200 rounded-lg py-2">
+                    Trial not available
+                  </div>
+                ) : (
+                  <Link href="/register">
+                    <Button variant="outline" className="w-full">
+                      Start free trial
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Paid plan cards */}
           {PLANS.map((plan) => (
             <div
               key={plan.key}
-              className={`rounded-2xl border p-6 flex flex-col ${
-                plan.highlight
-                  ? "border-green-500 ring-2 ring-green-500 relative"
+              className={`rounded-2xl border p-6 flex flex-col relative ${
+                plan.highlight && !isActivePaid
+                  ? "border-green-500 ring-2 ring-green-500"
+                  : currentPlan === plan.key
+                  ? "border-green-500 ring-2 ring-green-500"
                   : "border-gray-200"
               }`}
             >
-              {plan.highlight && (
+              {plan.highlight && !isActivePaid && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
                   Most popular
+                </div>
+              )}
+              {currentPlan === plan.key && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                  Your plan
                 </div>
               )}
               <div className="mb-4">
@@ -146,14 +210,11 @@ export default async function PricingPage() {
               <div className="space-y-2">
                 {currentPlan === plan.key ? (
                   <div className="w-full text-center text-sm font-semibold text-green-700 bg-green-50 border border-green-200 rounded-lg py-2">
-                    Your current plan
+                    Current plan
                   </div>
                 ) : isActivePaid ? (
                   <Link href={`/api/stripe/checkout?plan=${plan.key}&period=monthly`}>
-                    <Button
-                      className={`w-full ${plan.highlight ? "bg-green-600 hover:bg-green-700" : ""}`}
-                      variant={plan.highlight ? "default" : "outline"}
-                    >
+                    <Button className="w-full" variant="outline">
                       Switch to monthly
                     </Button>
                   </Link>
@@ -167,22 +228,22 @@ export default async function PricingPage() {
                     </Button>
                   </Link>
                 ) : (
-                  <Link href={`/register?plan=${plan.key}&period=monthly`}>
+                  <Link href={`/register`}>
                     <Button
                       className={`w-full ${plan.highlight ? "bg-green-600 hover:bg-green-700" : ""}`}
                       variant={plan.highlight ? "default" : "outline"}
                     >
-                      Start free trial
+                      Subscribe monthly
                     </Button>
                   </Link>
                 )}
                 {currentPlan !== plan.key && (
                   <Link href={isLoggedIn
                     ? `/api/stripe/checkout?plan=${plan.key}&period=annual`
-                    : `/register?plan=${plan.key}&period=annual`
+                    : `/register`
                   }>
                     <Button variant="ghost" size="sm" className="w-full text-xs text-gray-500">
-                      {isActivePaid ? "Switch to annual and save" : isLoggedIn ? "Subscribe annually and save" : "or pay annually and save"}
+                      {isActivePaid ? "Switch to annual and save" : "or pay annually and save"}
                     </Button>
                   </Link>
                 )}
@@ -192,7 +253,7 @@ export default async function PricingPage() {
         </div>
 
         <div className="mt-12 text-center text-sm text-gray-400 space-y-1">
-          <p>All plans include a 14-day free trial. No credit card required to start.</p>
+          <p>No credit card required to start your free trial.</p>
           <p>Cancel or pause anytime from your settings. Your data is retained for 30 days after cancellation.</p>
           <p className="mt-2">Questions? <a href="mailto:contact@yardanalyzer.com" className="underline text-green-600">contact@yardanalyzer.com</a></p>
         </div>
