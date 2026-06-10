@@ -289,7 +289,7 @@ export function buildCardExpiringEmail(opts: {
 </html>`;
 
   return {
-    subject: `Your card on file for Yard Analyzer expires ${billingDateStr}`,
+    subject: `Your Yard Analyzer payment card (ending ${cardLast4}) expires ${expiryStr}`,
     html,
   };
 }

@@ -64,8 +64,9 @@ describe("buildCardExpiringEmail", () => {
     expect(html).toContain("Jul 15");
   });
 
-  it("has correct subject", () => {
+  it("has correct subject with card last4 and expiry", () => {
     const { subject } = buildCardExpiringEmail(opts);
-    expect(subject).toMatch(/card|expir/i);
+    expect(subject).toContain("4242");
+    expect(subject).toContain("07/26");
   });
 });
