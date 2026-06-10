@@ -10,6 +10,7 @@ import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
 import { YardTasksSection } from "@/components/yard/YardTasksSection";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { format } from "date-fns";
+import { getPlanLimits, getDaysUntilDeletion } from "@/lib/subscription";
 
 function formatTime(time: string): string {
   const [h, m] = time.split(":").map(Number);
@@ -41,9 +42,16 @@ export default async function YardDetailPage({
 
   const { id } = await params;
 
-  const user = await db.user.findUnique({
+  const user = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
-    select: { weatherWidgetCollapsed: true },
+    select: {
+      weatherWidgetCollapsed: true,
+      plan: true,
+      planStatus: true,
+      trialEndsAt: true,
+      currentPeriodEnd: true,
+      pausedUntil: true,
+    },
   });
 
   const yard = await db.yard.findFirst({
@@ -93,6 +101,12 @@ export default async function YardDetailPage({
     }))
   );
 
+  const limits = getPlanLimits(user);
+  const daysUntilDeletion = getDaysUntilDeletion(user);
+
+  const visibleTasks = limits.maxVisibleTasks === -1 ? allTasks : allTasks.slice(0, limits.maxVisibleTasks);
+  const hiddenTaskCount = limits.maxVisibleTasks === -1 ? 0 : Math.max(0, allTasks.length - limits.maxVisibleTasks);
+
   return (
     <div className="px-4 py-8 pb-20 sm:pb-8">
       <Link
@@ -101,6 +115,19 @@ export default async function YardDetailPage({
       >
         <ChevronLeft className="w-4 h-4" /> My Yards
       </Link>
+
+      {daysUntilDeletion !== null && (
+        <div className={`mb-4 rounded-lg px-4 py-3 text-sm ${
+          daysUntilDeletion <= 7
+            ? "bg-red-50 border border-red-200 text-red-700"
+            : "bg-amber-50 border border-amber-200 text-amber-700"
+        }`}>
+          {daysUntilDeletion > 0
+            ? <><strong>Your free trial has ended.</strong> Your data will be deleted in {daysUntilDeletion} day{daysUntilDeletion !== 1 ? "s" : ""} unless you <a href="/pricing" className="underline font-semibold">upgrade your plan</a>.</>
+            : <>Your free trial has ended and your data is scheduled for deletion. <a href="/pricing" className="underline font-semibold">Upgrade now</a> to keep your data.</>
+          }
+        </div>
+      )}
 
       <div className="flex items-start justify-between mb-8">
         <div>
@@ -271,7 +298,7 @@ export default async function YardDetailPage({
             })}
           </div>
 
-          <YardTasksSection sections={sections} tasks={allTasks} />
+          <YardTasksSection sections={sections} tasks={visibleTasks} hiddenTaskCount={hiddenTaskCount} />
         </>
       )}
     </div>

@@ -57,9 +57,10 @@ interface Props {
   allSections: TaskSection[];
   weatherRefreshedAt: string | null;
   initialWeatherCollapsed: boolean;
+  hiddenTaskCount?: number;
 }
 
-export function DashboardInteractiveSection({ yards, tasks, allSections, weatherRefreshedAt, initialWeatherCollapsed }: Props) {
+export function DashboardInteractiveSection({ yards, tasks, allSections, weatherRefreshedAt, initialWeatherCollapsed, hiddenTaskCount }: Props) {
   const [selectedYardId, setSelectedYardId] = useState<string | null>(null);
 
   const selectedYard = selectedYardId ? yards.find((y) => y.id === selectedYardId) ?? null : null;
@@ -100,7 +101,7 @@ export function DashboardInteractiveSection({ yards, tasks, allSections, weather
         <h2 className="font-semibold text-lg mb-3">
           {selectedYard ? `${selectedYard.name} Tasks` : "Tasks"}
         </h2>
-        <DashboardTaskSection tasks={displayTasks} sections={displaySections} weatherRefreshedAt={weatherRefreshedAt} />
+        <DashboardTaskSection tasks={displayTasks} sections={displaySections} weatherRefreshedAt={weatherRefreshedAt} hiddenTaskCount={selectedYardId === null ? hiddenTaskCount : undefined} />
       </div>
     </div>
   );

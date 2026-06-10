@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { DashboardInteractiveSection } from "@/components/dashboard/DashboardInteractiveSection";
 import { Greeting } from "@/components/dashboard/Greeting";
+import { getPlanLimits, getDaysUntilDeletion } from "@/lib/subscription";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -10,7 +11,14 @@ export default async function DashboardPage() {
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { weatherWidgetCollapsed: true },
+    select: {
+      weatherWidgetCollapsed: true,
+      plan: true,
+      planStatus: true,
+      trialEndsAt: true,
+      currentPeriodEnd: true,
+      pausedUntil: true,
+    },
   });
 
   const yards = await db.yard.findMany({
@@ -55,11 +63,16 @@ export default async function DashboardPage() {
     },
   });
 
-  const tasks = rawTasks.map((t) => ({
+  const allTasks = rawTasks.map((t) => ({
     ...t,
     scheduledStart: t.scheduledStart?.toISOString() ?? null,
     scheduledEnd: t.scheduledEnd?.toISOString() ?? null,
   }));
+
+  const limits = user ? getPlanLimits(user) : { maxVisibleTasks: -1 as const };
+  const daysUntilDeletion = user ? getDaysUntilDeletion(user) : null;
+  const tasks = limits.maxVisibleTasks === -1 ? allTasks : allTasks.slice(0, limits.maxVisibleTasks);
+  const hiddenTaskCount = limits.maxVisibleTasks === -1 ? 0 : Math.max(0, allTasks.length - limits.maxVisibleTasks);
 
   const yardSummaries = yards.map((yard: (typeof yards)[number]) => ({
     id: yard.id,
@@ -89,12 +102,26 @@ export default async function DashboardPage() {
     <div className="px-4 py-6 pb-20 sm:pb-6 space-y-6">
       <Greeting name={session.user.name?.split(" ")[0] ?? "there"} />
 
+      {daysUntilDeletion !== null && (
+        <div className={`rounded-lg px-4 py-3 text-sm ${
+          daysUntilDeletion <= 7
+            ? "bg-red-50 border border-red-200 text-red-700"
+            : "bg-amber-50 border border-amber-200 text-amber-700"
+        }`}>
+          {daysUntilDeletion > 0
+            ? <><strong>Your free trial has ended.</strong> Your data will be deleted in {daysUntilDeletion} day{daysUntilDeletion !== 1 ? "s" : ""} unless you <a href="/pricing" className="underline font-semibold">upgrade your plan</a>.</>
+            : <>Your free trial has ended and your data is scheduled for deletion. <a href="/pricing" className="underline font-semibold">Upgrade now</a> to keep your data.</>
+          }
+        </div>
+      )}
+
       <DashboardInteractiveSection
         yards={yardSummaries}
         tasks={tasks}
         allSections={allSections}
         weatherRefreshedAt={weatherRefreshedAt}
         initialWeatherCollapsed={user?.weatherWidgetCollapsed ?? false}
+        hiddenTaskCount={hiddenTaskCount}
       />
     </div>
   );

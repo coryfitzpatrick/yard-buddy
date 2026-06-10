@@ -35,14 +35,16 @@ interface Task {
 export function YardTasksSection({
   sections,
   tasks,
+  hiddenTaskCount,
 }: {
   sections: Section[];
   tasks: Task[];
+  hiddenTaskCount?: number;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const active = tasks.filter((t) => t.status !== "skipped");
-  if (active.length === 0) return null;
+  if (active.length === 0 && (hiddenTaskCount ?? 0) === 0) return null;
 
   const filtered = activeId ? active.filter((t) => t.yardSection.id === activeId) : active;
 
@@ -52,7 +54,12 @@ export function YardTasksSection({
         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Tasks</h3>
         <SectionFilterPills sections={sections} activeId={activeId} onSelect={setActiveId} />
       </div>
-      <TaskList key={activeId ?? "all"} tasks={filtered} multiYard={sections.length > 1 && activeId === null} />
+      <TaskList
+        key={activeId ?? "all"}
+        tasks={filtered}
+        multiYard={sections.length > 1 && activeId === null}
+        hiddenTaskCount={activeId === null ? hiddenTaskCount : undefined}
+      />
     </div>
   );
 }
