@@ -1,0 +1,29 @@
+{
+  "id": "overwatering",
+  "description": "Tall fescue with waterlogged soil and yellowing — must recommend reducing irrigation and improving drainage",
+  "profile": {
+    "grassType": "tall_fescue",
+    "zipCode": "45201",
+    "soilMoisture": "wet",
+    "weatherSummary": "72°F, humidity 82%, 3.5 inches of rain in the past 7 days",
+    "weatherData": {
+      "temp": 72,
+      "humidity": 82,
+      "condition": "Cloudy",
+      "recentRainfall": 3.5,
+      "forecast": [
+        { "day": "Today", "high": 72, "low": 60, "condition": "Cloudy", "chanceOfRain": 40 },
+        { "day": "Tomorrow", "high": 70, "low": 58, "condition": "Rain", "chanceOfRain": 70 },
+        { "day": "Day 3", "high": 68, "low": 57, "condition": "Cloudy", "chanceOfRain": 50 },
+        { "day": "Day 4", "high": 74, "low": 59, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Day 5", "high": 76, "low": 60, "condition": "Partly Cloudy", "chanceOfRain": 10 }
+      ]
+    },
+    "notes": "Yellow patches appearing in low areas of the yard, soil feels soggy underfoot, some standing water in corners"
+  },
+  "groundTruth": {
+    "mustInclude": ["drainage", "overwater", "reduce"],
+    "mustNotInclude": ["apply fertilizer now", "overseed immediately"],
+    "source": "https://extension.psu.edu/diagnosing-turfgrass-problems"
+  }
+}

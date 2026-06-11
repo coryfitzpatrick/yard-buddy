@@ -1,0 +1,29 @@
+{
+  "id": "grub-damage",
+  "description": "Kentucky bluegrass with active white grub infestation in late summer — must recommend correct insecticide and timing",
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "60601",
+    "weatherSummary": "78°F, humidity 58%, 0.2 inches rain in last 7 days",
+    "weatherData": {
+      "temp": 78,
+      "humidity": 58,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.2,
+      "forecast": [
+        { "day": "Today", "high": 78, "low": 62, "condition": "Partly Cloudy", "chanceOfRain": 10 },
+        { "day": "Tomorrow", "high": 80, "low": 64, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 3", "high": 82, "low": 65, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 4", "high": 79, "low": 63, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Day 5", "high": 75, "low": 60, "condition": "Cloudy", "chanceOfRain": 40 }
+      ]
+    },
+    "yardSizeSqft": 3500,
+    "notes": "Irregular brown patches that peel back like carpet, white C-shaped grubs found 2–3 inches below surface when digging, more than 5 grubs per square foot, spongy feel underfoot"
+  },
+  "groundTruth": {
+    "mustInclude": ["grub", "insecticide"],
+    "mustNotInclude": ["fertilize the damaged area now", "overseed immediately without treating grubs"],
+    "source": "https://extension.purdue.edu/extmedia/E/E-75-W.pdf"
+  }
+}

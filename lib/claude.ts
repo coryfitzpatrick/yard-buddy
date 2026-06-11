@@ -118,9 +118,23 @@ function buildContextWarnings(context: LawnContext): string {
   if (isCoolSeason && temp != null && temp > 85) {
     warnings.push(
       `⚠️ HEAT STRESS CONSTRAINT (MANDATORY): This cool-season grass (${context.grassType}) is under heat stress — air temperature is ${temp}°F. HARD RULES for this response:
-- Do NOT recommend high-nitrogen fertilizer (e.g., 28-0-0, 32-0-0, 34-0-0, or any ratio with N > 10 as the first number). High N during heat stress causes disease and turf damage.
-- If fertilization is mentioned at all, defer it to fall when temps drop below 75°F.
-- Focus on heat stress management: raise mowing height, reduce irrigation frequency but increase depth, avoid foot traffic.`
+- Do NOT recommend high-nitrogen fertilizer now or include specific high-N product codes (28-0, 32-0, 34-0, 30-0) anywhere in your response — not even as future planning examples.
+- If fertilization is mentioned, say only "defer to fall when temperatures drop below 75°F" without naming specific high-N products.
+- Focus on heat stress management: raise mowing height, deep infrequent irrigation, avoid foot traffic.`
+    );
+  }
+
+  const isDroughtStress = (context.soilMoisture === "dry") &&
+    (context.weatherData?.recentRainfall ?? 1) === 0 &&
+    (temp != null && temp > 85);
+  if (isDroughtStress) {
+    warnings.push(
+      `⚠️ DROUGHT STRESS CONSTRAINT (MANDATORY): This lawn is in acute drought stress — soil is dry, no recent rainfall, and temperature is ${temp}°F. HARD RULES for this response:
+- Priority #1 is rehydration: deep, infrequent irrigation (1–1.5 inches, early morning, 2–3 cycles/week).
+- Do NOT recommend fertilization of any kind — applying fertilizer to drought-stressed turf causes salt burn and amplifies stress.
+- Do NOT recommend herbicide applications — stressed turf cannot metabolize herbicides safely.
+- Defer all non-irrigation inputs (fertilizer, weed control, pre-emergent) until the lawn has fully recovered (2–3 weeks of normal growth).
+- Include the footprint/wilt test as a watering trigger: water when footprints remain visible 30 minutes after walking on the lawn.`
     );
   }
 

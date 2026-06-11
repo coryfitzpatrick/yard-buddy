@@ -1,0 +1,28 @@
+{
+  "id": "fall-preemergent",
+  "description": "Kentucky bluegrass in early fall — soil temps cooling through 70°F, window for winter annual pre-emergent (annual bluegrass, chickweed)",
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "43201",
+    "weatherSummary": "68°F air temp, early September, soil temperature around 70°F and falling",
+    "weatherData": {
+      "temp": 68,
+      "humidity": 60,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.4,
+      "forecast": [
+        { "day": "Today", "high": 68, "low": 52, "condition": "Partly Cloudy", "chanceOfRain": 15 },
+        { "day": "Tomorrow", "high": 70, "low": 54, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 3", "high": 72, "low": 55, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 4", "high": 66, "low": 50, "condition": "Partly Cloudy", "chanceOfRain": 25 },
+        { "day": "Day 5", "high": 64, "low": 48, "condition": "Cloudy", "chanceOfRain": 45 }
+      ]
+    },
+    "notes": "Lawn history of annual bluegrass (Poa annua) and common chickweed pressure in fall and winter"
+  },
+  "groundTruth": {
+    "mustInclude": ["pre-emergent", "annual bluegrass"],
+    "mustNotInclude": ["spring pre-emergent", "crabgrass pre-emergent now"],
+    "source": "https://extension.purdue.edu/extmedia/AY/AY-10.pdf"
+  }
+}

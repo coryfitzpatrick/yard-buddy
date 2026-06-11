@@ -1,0 +1,28 @@
+{
+  "id": "zoysia-spring",
+  "description": "Zoysiagrass in early spring before green-up — must wait for soil temp to reach 65°F before fertilizing",
+  "profile": {
+    "grassType": "zoysia",
+    "zipCode": "35203",
+    "weatherSummary": "62°F air temp, mid-March, lawn just showing first green patches — soil temp ~60°F",
+    "weatherData": {
+      "temp": 62,
+      "humidity": 55,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.5,
+      "forecast": [
+        { "day": "Today", "high": 62, "low": 45, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Tomorrow", "high": 64, "low": 47, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 3", "high": 68, "low": 48, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 4", "high": 70, "low": 50, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 5", "high": 65, "low": 46, "condition": "Partly Cloudy", "chanceOfRain": 30 }
+      ]
+    },
+    "notes": "First green patches appearing but lawn is not yet fully out of dormancy"
+  },
+  "groundTruth": {
+    "mustInclude": ["soil temperature", "65"],
+    "mustNotInclude": ["fertilize now", "apply nitrogen today", "fertilize this week"],
+    "source": "https://extension.uga.edu/publications/detail.html?number=B1073"
+  }
+}

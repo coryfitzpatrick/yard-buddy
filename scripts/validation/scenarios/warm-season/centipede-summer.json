@@ -1,0 +1,29 @@
+{
+  "id": "centipede-summer",
+  "description": "Centipedegrass in summer — must not over-fertilize; centipede has the lowest N requirement of any warm-season grass",
+  "profile": {
+    "grassType": "centipede",
+    "zipCode": "29401",
+    "weatherSummary": "85°F, humidity 72%, 0.5 inches rain last week",
+    "weatherData": {
+      "temp": 85,
+      "humidity": 72,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.5,
+      "forecast": [
+        { "day": "Today", "high": 85, "low": 68, "condition": "Partly Cloudy", "chanceOfRain": 30 },
+        { "day": "Tomorrow", "high": 87, "low": 70, "condition": "Thunderstorms", "chanceOfRain": 60 },
+        { "day": "Day 3", "high": 84, "low": 69, "condition": "Partly Cloudy", "chanceOfRain": 40 },
+        { "day": "Day 4", "high": 86, "low": 70, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Day 5", "high": 88, "low": 71, "condition": "Sunny", "chanceOfRain": 10 }
+      ]
+    },
+    "yardSizeSqft": 4000,
+    "notes": "Healthy established centipede lawn, no visible issues"
+  },
+  "groundTruth": {
+    "mustInclude": ["low nitrogen", "centipede"],
+    "mustNotInclude": ["3 lbs", "4 lbs", "high nitrogen", "heavy fertilization"],
+    "source": "https://hgic.clemson.edu/factsheet/centipedegrass-maintenance-calendar/"
+  }
+}

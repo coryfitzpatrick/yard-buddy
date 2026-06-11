@@ -158,20 +158,25 @@ const mowingHeightInRange: Rule = {
     // Only inspect sentences that contain mowing-specific language to avoid matching
     // water/irrigation depths (e.g. "apply 1 inch of water", "penetrate 6 inches deep")
     const mowingWords = /\b(?:mow(?:ing)?|cut(?:ting)?|blade|deck|grass\s+height|mowing\s+height|cutting\s+height)\b/i;
+    // Contexts where an inch measurement is NOT a mowing height
+    const nonMowingCtx = /\b(?:water|rain|irrigat|deep|penetrat|per\s+week|per\s+day|days?|week|month|topsoil|mulch|thatch)\b/i;
     const sentences = response.split(/(?:[.!?]\s+|\n)/);
     for (const sentence of sentences) {
       if (!mowingWords.test(sentence)) continue;
       const matches = [...sentence.matchAll(/(\d+(?:\.\d+)?)\s*(?:inch(?:es)?|"|in\b)/gi)];
       for (const match of matches) {
         const num = parseFloat(match[1]);
-        if (!isNaN(num) && num > 0 && num < 12) {
-          if (num < range[0] || num > range[1]) {
-            return {
-              ruleId: this.id,
-              pass: false,
-              reason: `Mowing height ${num}" is outside valid range ${range[0]}–${range[1]}" for ${scenario.profile.grassType}`,
-            };
-          }
+        if (isNaN(num) || num <= 0 || num >= 12) continue;
+        // Skip if the measurement appears in a non-mowing context within ±60 chars
+        const idx = match.index ?? 0;
+        const ctx = sentence.slice(Math.max(0, idx - 60), idx + match[0].length + 60);
+        if (nonMowingCtx.test(ctx)) continue;
+        if (num < range[0] || num > range[1]) {
+          return {
+            ruleId: this.id,
+            pass: false,
+            reason: `Mowing height ${num}" is outside valid range ${range[0]}–${range[1]}" for ${scenario.profile.grassType}`,
+          };
         }
       }
     }
