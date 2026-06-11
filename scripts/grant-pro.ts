@@ -2,6 +2,7 @@
  * Grant professional_plus/active status to specific accounts.
  * Run with: npx tsx scripts/grant-pro.ts
  */
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 
 const db = new PrismaClient();
@@ -14,6 +15,7 @@ const EMAILS = [
 const FAR_FUTURE = new Date("2099-12-31T23:59:59Z");
 
 async function main() {
+  console.log(`DB: ${process.env.DATABASE_URL?.replace(/\/\/.*@/, "//[credentials]@")}`);
   for (const email of EMAILS) {
     const user = await db.user.upsert({
       where: { email },

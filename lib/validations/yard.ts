@@ -20,8 +20,8 @@ export const yardSchema = z.object({
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().int().min(1).max(120).optional()
   ),
-  mowingSchedule: z.string().max(500).optional(),
-  wateringSchedule: z.string().max(500).optional(),
+  mowingSchedule: z.string().optional(),
+  wateringSchedule: z.string().optional(),
 });
 
 export type YardInput = z.infer<typeof yardSchema>;
@@ -55,9 +55,9 @@ export const yardSectionSchema = z.object({
   ),
   soilTestSource: z.string().max(200).optional(),
   soilMoisture: z.enum(["dry", "moderate", "moist"]).optional(),
-  notes: z.string().max(500).optional(),
-  mowingSchedule: z.string().max(500).optional(),
-  wateringSchedule: z.string().max(500).optional(),
+  notes: z.string().max(2000).optional(),
+  mowingSchedule: z.string().optional(),
+  wateringSchedule: z.string().optional(),
 });
 
 export type YardSectionInput = z.infer<typeof yardSectionSchema>;

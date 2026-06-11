@@ -133,13 +133,13 @@ describe("yardSectionSchema", () => {
     if (result.success) expect(result.data.soilPh).toBeUndefined();
   });
 
-  it("rejects notes longer than 500 chars", () => {
-    const result = yardSectionSchema.safeParse({ ...base, notes: "x".repeat(501) });
+  it("rejects notes longer than 2000 chars", () => {
+    const result = yardSectionSchema.safeParse({ ...base, notes: "x".repeat(2001) });
     expect(result.success).toBe(false);
   });
 
-  it("accepts notes at the 500-char limit", () => {
-    const result = yardSectionSchema.safeParse({ ...base, notes: "x".repeat(500) });
+  it("accepts notes at the 2000-char limit", () => {
+    const result = yardSectionSchema.safeParse({ ...base, notes: "x".repeat(2000) });
     expect(result.success).toBe(true);
   });
 
@@ -158,9 +158,9 @@ describe("yardSectionSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects mowingSchedule longer than 500 chars", () => {
+  it("accepts mowingSchedule longer than 500 chars (AI-generated text)", () => {
     const result = yardSectionSchema.safeParse({ ...base, mowingSchedule: "x".repeat(501) });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
   it("accepts mowingSchedule as absent", () => {
@@ -174,9 +174,9 @@ describe("yardSectionSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects wateringSchedule longer than 500 chars", () => {
+  it("accepts wateringSchedule longer than 500 chars (AI-generated text)", () => {
     const result = yardSectionSchema.safeParse({ ...base, wateringSchedule: "x".repeat(501) });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
   it("accepts wateringSchedule as absent", () => {

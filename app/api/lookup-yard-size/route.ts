@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const { address } = await req.json();
   if (!address?.trim()) return NextResponse.json({ error: "address required" }, { status: 400 });
 
-  const ua = "yard-buddy/1.0 (lawn care app; fitzmx6@gmail.com)";
+  const ua = "yard-analyzer/1.0 (lawn care app; contact@yardanalyzer.com)";
 
   // Geocode with Nominatim — get building footprint polygon
   const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&polygon_geojson=1&addressdetails=1`;

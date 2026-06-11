@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { db } from "@/lib/db";
 import { getWeatherByZip } from "@/lib/weather";
 import { computeNewWindow } from "@/lib/cron/weather-scheduler";
@@ -30,7 +31,12 @@ function sameDay(a: Date, b: Date): boolean {
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const expected = `Bearer ${process.env.CRON_SECRET}`;
+  const provided = authHeader ?? "";
+  const tokensMatch =
+    provided.length === expected.length &&
+    timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+  if (!tokensMatch) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -588,6 +594,11 @@ export async function GET(req: NextRequest) {
       console.error(`Card expiry check failed for ${subscriber.email}:`, err);
     }
   }
+
+  // Purge rate limit attempts older than 24h
+  await db.rateLimitAttempt.deleteMany({
+    where: { createdAt: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+  });
 
   return NextResponse.json({ ok: true, processed: userMap.size, deletedAccounts: deletedCount });
 }

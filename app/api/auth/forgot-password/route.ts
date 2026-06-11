@@ -3,8 +3,15 @@ import crypto from "crypto";
 import { db } from "@/lib/db";
 import { forgotPasswordSchema } from "@/lib/validations/auth";
 import { resend, buildPasswordResetEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  const { limited } = await checkRateLimit(`forgot-password:${getClientIp(req)}`, 5, 60 * 60 * 1000);
+  if (limited) {
+    // Return ok to avoid leaking rate limit status to email-enumeration attackers
+    return NextResponse.json({ ok: true });
+  }
+
   const body = await req.json();
   const parsed = forgotPasswordSchema.safeParse(body);
   if (!parsed.success) {
