@@ -1,0 +1,28 @@
+{
+  "id": "ryegrass-spring",
+  "description": "Perennial ryegrass in early spring — pre-emergent should cite soil temperature not calendar",
+  "profile": {
+    "grassType": "ryegrass",
+    "zipCode": "45201",
+    "weatherSummary": "52°F, early April",
+    "notes": "Crabgrass was a problem last summer",
+    "weatherData": {
+      "temp": 52,
+      "humidity": 65,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.2,
+      "forecast": [
+        { "day": "Today", "high": 52, "low": 38, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Tomorrow", "high": 55, "low": 40, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 3", "high": 58, "low": 42, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 4", "high": 60, "low": 44, "condition": "Partly Cloudy", "chanceOfRain": 10 },
+        { "day": "Day 5", "high": 57, "low": 43, "condition": "Partly Cloudy", "chanceOfRain": 25 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": ["soil temperature", "pre-emergent"],
+    "mustNotInclude": [],
+    "source": "https://www.purdue.edu/hla/sites/yardandgarden/crabgrass-control/"
+  }
+}

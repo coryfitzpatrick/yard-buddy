@@ -1,0 +1,28 @@
+{
+  "id": "high-ph",
+  "description": "High soil pH 7.8 — must recommend sulfur or acidifying amendment",
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "80202",
+    "soilPh": 7.8,
+    "weatherSummary": "72°F, spring",
+    "weatherData": {
+      "temp": 72,
+      "humidity": 40,
+      "condition": "Sunny",
+      "recentRainfall": 0,
+      "forecast": [
+        { "day": "Today", "high": 72, "low": 48, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Tomorrow", "high": 74, "low": 50, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 3", "high": 75, "low": 51, "condition": "Partly Cloudy", "chanceOfRain": 10 },
+        { "day": "Day 4", "high": 71, "low": 47, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Day 5", "high": 68, "low": 45, "condition": "Cloudy", "chanceOfRain": 30 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": ["sulfur", "pH"],
+    "mustNotInclude": [],
+    "source": "https://extension.psu.edu/soil-ph-and-lime-requirements"
+  }
+}

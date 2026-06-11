@@ -1,0 +1,28 @@
+{
+  "id": "bermuda-drought",
+  "description": "Bermudagrass in severe drought — must recommend irrigation",
+  "profile": {
+    "grassType": "bermuda",
+    "zipCode": "85001",
+    "soilMoisture": "dry",
+    "weatherSummary": "98°F, humidity 20%, no rain in 14 days",
+    "weatherData": {
+      "temp": 98,
+      "humidity": 20,
+      "condition": "Sunny",
+      "recentRainfall": 0,
+      "forecast": [
+        { "day": "Today", "high": 98, "low": 80, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Tomorrow", "high": 100, "low": 82, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 3", "high": 99, "low": 81, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 4", "high": 97, "low": 79, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 5", "high": 96, "low": 78, "condition": "Sunny", "chanceOfRain": 5 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": ["water", "irrigat"],
+    "mustNotInclude": ["fertilize", "weed control this week"],
+    "source": "https://extension.arizona.edu/sites/extension.arizona.edu/files/pubs/az1569-2011.pdf"
+  }
+}

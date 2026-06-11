@@ -1,0 +1,14 @@
+{
+  "id": "sparse-profile",
+  "description": "Minimal profile with unknown grass type — AI must acknowledge uncertainty",
+  "profile": {
+    "grassType": "unknown",
+    "zipCode": "10001",
+    "weatherSummary": "70°F, partly cloudy"
+  },
+  "groundTruth": {
+    "mustInclude": ["unknown", "identify", "uncertain", "not sure", "cannot determine"],
+    "mustNotInclude": [],
+    "source": "internal"
+  }
+}

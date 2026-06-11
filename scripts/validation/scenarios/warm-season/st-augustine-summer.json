@@ -1,0 +1,28 @@
+{
+  "id": "st-augustine-summer",
+  "description": "St. Augustine in humid summer — baseline warm-season humid scenario",
+  "profile": {
+    "grassType": "st_augustine",
+    "zipCode": "77001",
+    "weatherSummary": "88°F, humidity 85%, recent rain",
+    "soilMoisture": "moist",
+    "weatherData": {
+      "temp": 88,
+      "humidity": 85,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 1.2,
+      "forecast": [
+        { "day": "Today", "high": 88, "low": 74, "condition": "Partly Cloudy", "chanceOfRain": 40 },
+        { "day": "Tomorrow", "high": 87, "low": 73, "condition": "Thunderstorms", "chanceOfRain": 70 },
+        { "day": "Day 3", "high": 86, "low": 72, "condition": "Partly Cloudy", "chanceOfRain": 50 },
+        { "day": "Day 4", "high": 89, "low": 75, "condition": "Partly Cloudy", "chanceOfRain": 30 },
+        { "day": "Day 5", "high": 90, "low": 76, "condition": "Sunny", "chanceOfRain": 20 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": [],
+    "mustNotInclude": [],
+    "source": "https://edis.ifas.ufl.edu/publication/EP006"
+  }
+}

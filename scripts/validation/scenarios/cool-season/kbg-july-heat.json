@@ -1,0 +1,27 @@
+{
+  "id": "kbg-july-heat",
+  "description": "Kentucky Bluegrass in extreme July heat — must not recommend high-nitrogen fertilizer",
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "66101",
+    "weatherSummary": "92°F, humidity 45%, no rain in 7 days",
+    "weatherData": {
+      "temp": 92,
+      "humidity": 45,
+      "condition": "Clear",
+      "recentRainfall": 0,
+      "forecast": [
+        { "day": "Today", "high": 92, "low": 72, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Tomorrow", "high": 94, "low": 74, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 3", "high": 91, "low": 73, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 4", "high": 88, "low": 70, "condition": "Partly Cloudy", "chanceOfRain": 10 },
+        { "day": "Day 5", "high": 85, "low": 68, "condition": "Partly Cloudy", "chanceOfRain": 15 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": ["water", "stress", "heat"],
+    "mustNotInclude": ["28-0", "32-0", "high nitrogen", "fertilize now", "apply fertilizer this week"],
+    "source": "https://extension.psu.edu/lawn-fertilization-schedule"
+  }
+}

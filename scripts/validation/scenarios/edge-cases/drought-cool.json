@@ -1,0 +1,28 @@
+{
+  "id": "drought-cool",
+  "description": "Cool-season grass in drought — watering advice must be present",
+  "profile": {
+    "grassType": "tall_fescue",
+    "zipCode": "64101",
+    "soilMoisture": "dry",
+    "weatherSummary": "84°F, humidity 30%, no rain in 10 days",
+    "weatherData": {
+      "temp": 84,
+      "humidity": 30,
+      "condition": "Sunny",
+      "recentRainfall": 0,
+      "forecast": [
+        { "day": "Today", "high": 84, "low": 62, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Tomorrow", "high": 86, "low": 64, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 3", "high": 87, "low": 65, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 4", "high": 85, "low": 63, "condition": "Partly Cloudy", "chanceOfRain": 10 },
+        { "day": "Day 5", "high": 82, "low": 60, "condition": "Partly Cloudy", "chanceOfRain": 20 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": ["water", "irrigat"],
+    "mustNotInclude": [],
+    "source": "https://extension.psu.edu/watering-the-lawn"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "recently-seeded",
+  "description": "Recently seeded lawn — fertilization recommendation must include a waiting period",
+  "profile": {
+    "grassType": "tall_fescue",
+    "zipCode": "39201",
+    "notes": "Overseeded the lawn 2 weeks ago, seedlings just germinating",
+    "weatherSummary": "65°F, fall",
+    "weatherData": {
+      "temp": 65,
+      "humidity": 60,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.3,
+      "forecast": [
+        { "day": "Today", "high": 65, "low": 48, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Tomorrow", "high": 67, "low": 50, "condition": "Sunny", "chanceOfRain": 10 },
+        { "day": "Day 3", "high": 68, "low": 51, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 4", "high": 66, "low": 49, "condition": "Partly Cloudy", "chanceOfRain": 15 },
+        { "day": "Day 5", "high": 64, "low": 47, "condition": "Partly Cloudy", "chanceOfRain": 20 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": ["wait", "weeks", "established", "germina"],
+    "mustNotInclude": ["apply fertilizer now", "fertilize immediately"],
+    "source": "https://extension.psu.edu/seeding-a-new-lawn"
+  }
+}

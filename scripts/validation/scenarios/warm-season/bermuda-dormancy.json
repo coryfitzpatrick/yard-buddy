@@ -1,0 +1,27 @@
+{
+  "id": "bermuda-dormancy",
+  "description": "Bermudagrass in late November dormancy — must not recommend fertilization",
+  "profile": {
+    "grassType": "bermuda",
+    "zipCode": "30301",
+    "weatherSummary": "44°F, late November, grass dormant",
+    "weatherData": {
+      "temp": 44,
+      "humidity": 55,
+      "condition": "Clear",
+      "recentRainfall": 0,
+      "forecast": [
+        { "day": "Today", "high": 44, "low": 30, "condition": "Clear", "chanceOfRain": 0 },
+        { "day": "Tomorrow", "high": 46, "low": 32, "condition": "Clear", "chanceOfRain": 0 },
+        { "day": "Day 3", "high": 48, "low": 33, "condition": "Partly Cloudy", "chanceOfRain": 10 },
+        { "day": "Day 4", "high": 50, "low": 35, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Day 5", "high": 47, "low": 31, "condition": "Clear", "chanceOfRain": 0 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": ["dormant", "dormancy"],
+    "mustNotInclude": ["fertilize", "apply nitrogen", "feed your lawn"],
+    "source": "https://extension.uga.edu/publications/detail.html?number=C816"
+  }
+}

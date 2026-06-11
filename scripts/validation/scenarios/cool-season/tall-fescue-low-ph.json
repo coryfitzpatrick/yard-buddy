@@ -1,0 +1,29 @@
+{
+  "id": "tall-fescue-low-ph",
+  "description": "Tall fescue with pH 5.4 — must recommend lime or pH correction",
+  "profile": {
+    "grassType": "tall_fescue",
+    "zipCode": "27601",
+    "soilPh": 5.4,
+    "nitrogenPpm": 12,
+    "weatherSummary": "68°F, spring conditions",
+    "weatherData": {
+      "temp": 68,
+      "humidity": 60,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.5,
+      "forecast": [
+        { "day": "Today", "high": 68, "low": 48, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Tomorrow", "high": 72, "low": 50, "condition": "Sunny", "chanceOfRain": 10 },
+        { "day": "Day 3", "high": 70, "low": 49, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 4", "high": 73, "low": 52, "condition": "Sunny", "chanceOfRain": 0 },
+        { "day": "Day 5", "high": 74, "low": 53, "condition": "Partly Cloudy", "chanceOfRain": 15 }
+      ]
+    }
+  },
+  "groundTruth": {
+    "mustInclude": ["lime", "pH"],
+    "mustNotInclude": [],
+    "source": "https://extension.psu.edu/soil-ph-and-lime-requirements"
+  }
+}
