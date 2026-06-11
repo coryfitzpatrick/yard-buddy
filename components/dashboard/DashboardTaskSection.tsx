@@ -30,6 +30,7 @@ interface Task {
   spreaderSetting: string | null;
   taskMode: string | null;
   productSearchQuery: string | null;
+  additionalSectionIds?: string[];
   yardSection?: {
     id: string;
     name: string;
@@ -51,7 +52,11 @@ export function DashboardTaskSection({ tasks, sections, weatherRefreshedAt, hidd
   const filteredTasks =
     activeSection === null
       ? tasks
-      : tasks.filter((t) => t.yardSection?.id === activeSection);
+      : tasks.filter(
+          (t) =>
+            t.yardSection?.id === activeSection ||
+            t.additionalSectionIds?.includes(activeSection)
+        );
 
   const multiYard = sections.some((s) => s.showYardLabel);
 
