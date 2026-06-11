@@ -45,3 +45,6 @@ next-env.d.ts
 # git worktrees
 .worktrees/
 coverage/
+
+# Validation results
+scripts/validation/results/*.json
