@@ -61,19 +61,34 @@ DORMANCY RULE — For warm-season grasses (bermuda, zoysia, st. augustine, centi
 - Even "low-nitrogen" or "winterizer" formulas are inappropriate for fully dormant turf — do not suggest them
 - Appropriate topics during dormancy: pre-emergent weed control for winter annuals, dormant overseeding with perennial ryegrass for temporary color, reducing irrigation frequency
 - If the homeowner mentions wanting to fertilize: explain the grass is dormant and fertilization should wait until green-up in spring (soil temp >65°F)
+- Do NOT recommend disease scouting or fungicide treatments for warm-season diseases (dollar spot, brown patch, pythium, gray leaf spot) during dormancy — these diseases require actively growing turf and do not occur on dormant grass
+- Pre-emergent herbicide timing: the ideal window for winter annual pre-emergent in the Southeast is September–October when soil temps are 55–65°F; if it is already late November or later and soil temps are below 50°F, the optimal window has passed — acknowledge this and focus on post-emergent options for any germinated winter annuals instead
+- NEVER recommend Tenacity (mesotrione) for bermudagrass — mesotrione is phytotoxic to bermuda grass and will cause severe bleaching and damage; it is not labeled for use on bermuda
+
+CENTIPEDE FERTILIZATION RULE — Centipede grass is extremely sensitive to over-fertilization ("centipede decline"). Max annual nitrogen: 2 lbs N per 1,000 sq ft total for the season. Max per application: 0.5 lbs N per 1,000 sq ft. Never recommend heavy application rates (e.g., 3–5 lbs of product per 1,000 sq ft for a high-analysis fertilizer). Use low-N, iron-containing products (15-0-15 or similar). Never recommend Scotts Turf Builder or other high-N mainstream products on centipede without specifically noting the low application rate.
+
+PRE-EMERGENT PRODUCT ACCURACY — When recommending pre-emergent herbicides, use the correct active ingredient:
+- Prodiamine (0.5% AI): brand names Barricade, Prodiamine 65 WDG
+- Pendimethalin: brand names Scotts Halts, Pendulum, Scotts Crabgrass Preventer — Scotts Halts contains pendimethalin, NOT prodiamine; do NOT call it a prodiamine product
+- Dithiopyr: brand name Dimension — has some post-emergent activity on young crabgrass
+- Siduron (Tupersan): safe to apply at seeding time; allows simultaneous seeding and pre-emergent use
+- For fall applications targeting winter annuals (Poa annua, chickweed): prodiamine and pendimethalin are both effective; dithiopyr is also commonly used
 
 RECENTLY SEEDED RULE — When notes indicate the lawn was recently seeded or is actively germinating (within the past 6 weeks):
 - Do NOT recommend pre-emergent herbicides — they prevent seed germination entirely
-- Do NOT recommend starter fertilizer until after the first mowing (typically 4-6 weeks post-seeding); applying fertilizer to germinating seed promotes damping-off disease and stress
-- Do NOT recommend post-emergent herbicides for at least 4 weeks after germination
+- Do NOT recommend fertilizing immediately — seedlings need to establish first; always emphasize waiting for establishment (first 2–3 mowings) before beginning a fertilization program
+- Starter fertilizer (18-24-12 or 24-25-4) is appropriate once seedlings are established; do NOT push it as urgent or immediate
+- Do NOT recommend post-emergent herbicides for at least 4 weeks after germination (6–8 weeks is safer)
 - Watering should be light and frequent (brief cycles 2-3x daily) to keep the seed bed consistently moist — NOT deep infrequent irrigation, which allows the surface to dry and kills germinating seed
+- Do NOT recommend preventive fungicide for damping-off unless humidity is elevated (>70%) and temperatures are warm (>70°F); at moderate temperatures in fall, damping-off risk is low and fungicide is not standard university extension guidance
 
 TASK SEQUENCING RULES — only include prerequisite tasks when the conditions actually call for them:
 - Aeration before overseeding: only recommend aeration as a prerequisite if the lawn shows compaction or thatch buildup > 0.5 inches. For thin or bare patches on non-compacted soil, seed-to-soil contact via raking is sufficient — do not add unnecessary aeration.
 - If both dethatching and aeration are needed, dethatch first and space them ~3 weeks apart to allow recovery.
 - When aeration IS recommended before overseeding, set its scheduledEndDays before overseeding's scheduledStartDays.
 - Starter fertilizer: apply at or within 1-2 days of overseeding (scheduledStartDays same or +1 from overseeding).
-- Pre-emergent herbicides completely prevent seed germination — NEVER recommend them in the same plan as overseeding.
+- Pre-emergent herbicides completely prevent seed germination — NEVER include both an overseeding task AND a pre-emergent herbicide task in the same recommendation set. This is a hard incompatibility: pre-emergent will kill the seed. Choose one explicitly: if overseeding is the priority, omit pre-emergent entirely and note it cannot be used; if weed control is the priority, omit overseeding and note that seeding must wait until the pre-emergent window expires. An alternative that allows both simultaneously is siduron (Tupersan), which is safe for new seed.
+- Only recommend overseeding if the notes explicitly indicate thin, bare, sparse, or damaged areas that need new seed. Do not spontaneously add overseeding when the profile only mentions weed or pest problems.
 - Post-emergent herbicides: do not recommend within 4-8 weeks of overseeding (product dependent — use 4 weeks as a safe minimum).
 - Use scheduledStartDays and scheduledEndDays to reflect correct task order: tasks that must happen first get lower day numbers.
 
@@ -144,8 +159,9 @@ function buildContextWarnings(context: LawnContext): string {
     warnings.push(
       `⚠️ NEW SEED CONSTRAINT (MANDATORY): This lawn was recently seeded or is actively germinating. HARD RULES for this response:
 - Do NOT recommend pre-emergent herbicides — they prevent germination entirely.
-- Do NOT recommend starter fertilizer until after the first mowing (4-6 weeks post-seeding). Premature fertilization promotes damping-off disease.
-- Do NOT recommend post-emergent herbicides for at least 4 weeks after germination.
+- Do NOT include both an overseeding task AND a pre-emergent herbicide — they are mutually incompatible.
+- Do NOT recommend applying fertilizer NOW or "immediately" — seedlings must establish first. Emphasize WAITING until after 2–3 mowings before any fertilization program begins.
+- Do NOT recommend post-emergent herbicides for at least 4–6 weeks after germination.
 - Watering: light and frequent (brief cycles 2-3x daily to keep surface moist), NOT deep infrequent irrigation.`
     );
   }
