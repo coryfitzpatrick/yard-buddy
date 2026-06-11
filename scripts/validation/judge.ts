@@ -8,10 +8,11 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const JUDGE_SYSTEM = `You are a turfgrass expert with 20+ years of experience and deep knowledge of university extension recommendations. You evaluate AI-generated lawn care advice for agronomic accuracy.`;
 
 async function judgeScenario(scenario: Scenario): Promise<JudgeResult> {
-  const recs = await generateRecommendations(scenario.profile);
-  const responseText = JSON.stringify(recs, null, 2);
+  try {
+    const recs = await generateRecommendations(scenario.profile);
+    const responseText = JSON.stringify(recs, null, 2);
 
-  const prompt = `A homeowner's AI lawn care advisor produced the following recommendations.
+    const prompt = `A homeowner's AI lawn care advisor produced the following recommendations.
 
 ## Yard Profile
 ${JSON.stringify(scenario.profile, null, 2)}
@@ -38,24 +39,34 @@ Return ONLY valid JSON, no other text:
   "reasoning": "<2-3 sentence explanation>"
 }`;
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      { role: "system", content: JUDGE_SYSTEM },
-      { role: "user", content: prompt },
-    ],
-    temperature: 0,
-    response_format: { type: "json_object" },
-  });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: JUDGE_SYSTEM },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0,
+      response_format: { type: "json_object" },
+    });
 
-  const raw = completion.choices[0]?.message.content ?? "{}";
-  const parsed = JSON.parse(raw) as { score?: number; flags?: string[]; reasoning?: string };
-  return {
-    scenarioId: scenario.id,
-    score: parsed.score ?? 0,
-    flags: parsed.flags ?? [],
-    reasoning: parsed.reasoning ?? "",
-  };
+    const raw = completion.choices[0]?.message.content ?? "{}";
+    const parsed = JSON.parse(raw) as { score?: number; flags?: string[]; reasoning?: string };
+    return {
+      scenarioId: scenario.id,
+      score: parsed.score ?? 0,
+      flags: parsed.flags ?? [],
+      reasoning: parsed.reasoning ?? "",
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    process.stdout.write(`ERROR: ${message}\n`);
+    return {
+      scenarioId: scenario.id,
+      score: 0,
+      flags: [`error: ${message}`],
+      reasoning: "Scenario could not be evaluated due to an API error.",
+    };
+  }
 }
 
 export async function runJudge(scenarios: Scenario[]): Promise<{ results: JudgeResult[]; mean: number }> {
