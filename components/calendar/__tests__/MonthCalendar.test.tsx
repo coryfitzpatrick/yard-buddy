@@ -28,7 +28,7 @@ const task: CalendarTask = {
   yardName: "Front Yard",
 };
 
-const yards = [{ id: "y1", name: "Front Yard", sections: [{ id: "s1", name: "Main Lawn" }] }];
+const yards = [{ id: "y1", slug: "front-yard", name: "Front Yard", sections: [{ id: "s1", slug: "main-lawn", name: "Main Lawn" }] }];
 
 describe("MonthCalendar", () => {
   it("renders day of week headers", () => {

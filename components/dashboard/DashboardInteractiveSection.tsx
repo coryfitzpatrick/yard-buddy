@@ -15,6 +15,7 @@ interface YardCardSection {
 
 interface YardCard {
   id: string;
+  slug: string;
   name: string;
   zipCode: string;
   sections: YardCardSection[];

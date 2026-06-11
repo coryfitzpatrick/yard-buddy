@@ -27,7 +27,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
 
   const yards = await db.yard.findMany({
     where: { userId: session.user.id },
-    select: { id: true, name: true, sections: { select: { id: true, name: true } } },
+    select: { id: true, slug: true, name: true, sections: { select: { id: true, slug: true, name: true } } },
     orderBy: { name: "asc" },
   });
 
@@ -54,8 +54,8 @@ export default async function CalendarPage({ searchParams }: PageProps) {
     where: {
       yardSection: {
         yard: { userId: session.user.id },
-        ...(sectionParam ? { id: sectionParam } : {}),
-        ...(yardParam ? { yardId: yardParam } : {}),
+        ...(sectionParam ? { slug: sectionParam } : {}),
+        ...(yardParam ? { yard: { slug: yardParam } } : {}),
       },
       scheduledStart: { lte: gridEnd },
       scheduledEnd: { gte: gridStart },
@@ -70,7 +70,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
       product: true,
       productSearchQuery: true,
       yardSection: {
-        select: { id: true, name: true, yard: { select: { id: true, name: true } } },
+        select: { id: true, slug: true, name: true, yard: { select: { id: true, slug: true, name: true } } },
       },
     },
     orderBy: { scheduledStart: "asc" },
@@ -87,9 +87,9 @@ export default async function CalendarPage({ searchParams }: PageProps) {
       scheduledEnd: t.scheduledEnd!.toISOString(),
       product: t.product,
       productSearchQuery: t.productSearchQuery,
-      sectionId: t.yardSection.id,
+      sectionId: t.yardSection.slug,
       sectionName: t.yardSection.name,
-      yardId: t.yardSection.yard.id,
+      yardId: t.yardSection.yard.slug,
       yardName: t.yardSection.yard.name,
     }));
 

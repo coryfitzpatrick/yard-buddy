@@ -13,9 +13,15 @@ export default async function EditSectionPage({
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const { id, sectionId } = await params;
+  const { id: yardSlug, sectionId: sectionSlug } = await params;
+  const yard = await db.yard.findFirst({
+    where: { slug: yardSlug, userId: session.user.id },
+    select: { id: true },
+  });
+  if (!yard) notFound();
+
   const section = await db.yardSection.findFirst({
-    where: { id: sectionId, yard: { id, userId: session.user.id } },
+    where: { slug: sectionSlug, yardId: yard.id },
     include: { yard: { select: { name: true, zipCode: true, lotSqft: true, buildingSqft: true, streetAddress: true, mowingSchedule: true, wateringSchedule: true } } },
   });
   if (!section) notFound();
@@ -27,7 +33,8 @@ export default async function EditSectionPage({
       </Link>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit {section.name}</h1>
       <SectionForm
-        yardId={id}
+        yardId={yard.id}
+        yardSlug={yardSlug}
         zipCode={section.yard.zipCode}
         lotSqft={section.yard.lotSqft ?? undefined}
         buildingSqft={section.yard.buildingSqft ?? undefined}
@@ -36,6 +43,7 @@ export default async function EditSectionPage({
         yardWateringSchedule={section.yard.wateringSchedule}
         initialData={{
           id: section.id,
+          slug: section.slug,
           name: section.name,
           areaType: section.areaType as import("@/types").AreaType | undefined,
           grassType: section.grassType as import("@/lib/validations/yard").YardSectionInput["grassType"],

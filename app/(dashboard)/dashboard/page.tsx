@@ -76,6 +76,7 @@ export default async function DashboardPage() {
 
   const yardSummaries = yards.map((yard: (typeof yards)[number]) => ({
     id: yard.id,
+    slug: yard.slug,
     name: yard.name,
     zipCode: yard.zipCode,
     sections: yard.sections.map((s: (typeof yards)[number]["sections"][number]) => ({

@@ -51,11 +51,12 @@ function serializeSchedule(days: string[], time: string, inches: string): string
 
 interface Props {
   yardId: string;
+  yardSlug?: string;
   zipCode: string;
   lotSqft?: number;
   buildingSqft?: number;
   streetAddress?: string;
-  initialData?: Partial<YardSectionFormInput & { id: string }>;
+  initialData?: Partial<YardSectionFormInput & { id: string; slug: string }>;
   yardMowingSchedule?: string | null;
   yardWateringSchedule?: string | null;
 }
@@ -67,7 +68,7 @@ const AREA_NAME_MAP: Record<AreaType, string> = {
   garden: "Garden", other: "My Yard",
 };
 
-export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule }: Props) {
+export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const isEdit = !!initialData?.id;
@@ -231,7 +232,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
       if (!res.ok) { setError("Failed to save. Please try again."); return; }
       const saved = await res.json();
       if (isEdit) {
-        router.push(`/yard/${yardId}/sections/${initialData!.id}`);
+        router.push(`/yard/${yardSlug ?? yardId}/sections/${saved.slug ?? initialData!.id}`);
       } else {
         router.push(`/analyze?sectionId=${saved.id}`);
       }
@@ -570,7 +571,7 @@ export function SectionForm({ yardId, zipCode, lotSqft, buildingSqft, streetAddr
         </div>
       )}
       <div className="flex gap-3 pt-2">
-        <Button type="button" variant="outline" onClick={() => router.push(isEdit ? `/yard/${yardId}/sections/${initialData!.id}` : `/yard/${yardId}`)}>Cancel</Button>
+        <Button type="button" variant="outline" onClick={() => router.push(isEdit ? `/yard/${yardSlug ?? yardId}/sections/${initialData!.slug ?? initialData!.id}` : `/yard/${yardSlug ?? yardId}`)}>Cancel</Button>
         <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
           {isSubmitting ? "Saving…" : isEdit ? "Save Changes" : "Add Section"}
         </Button>

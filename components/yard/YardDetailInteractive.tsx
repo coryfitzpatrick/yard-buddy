@@ -12,6 +12,7 @@ import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 
 interface SectionSummary {
   id: string;
+  slug: string;
   name: string;
   areaType: string | null;
   grassType: string;
@@ -112,13 +113,13 @@ function SectionCard({
         </div>
         <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
           <Link
-            href={`/yard/${yardId}/sections/${section.id}/edit`}
+            href={`/yard/${yardId}/sections/${section.slug}/edit`}
             className="flex items-center gap-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 px-1.5 py-0.5 rounded-md hover:bg-gray-100 transition-colors"
           >
             <Pencil className="w-3 h-3" />
           </Link>
           <Link
-            href={`/yard/${yardId}/sections/${section.id}`}
+            href={`/yard/${yardId}/sections/${section.slug}`}
             className="flex items-center gap-0.5 text-xs font-medium text-green-600 hover:text-green-700 px-1.5 py-0.5 rounded-md hover:bg-green-100 transition-colors"
           >
             View <ArrowRight className="w-3 h-3" />
@@ -148,7 +149,7 @@ function SectionCard({
               {section.pendingTaskCount} task{section.pendingTaskCount !== 1 ? "s" : ""}
             </span>
           )}
-          <Link href={`/analyze?sectionId=${section.id}`}>
+          <Link href={`/analyze?sectionId=${section.id}`} onClick={(e) => e.stopPropagation()}>
             <Button size="sm" variant="outline" className="h-6 px-2 text-xs" tabIndex={-1}>
               <Camera className="w-3 h-3" />
             </Button>

@@ -16,6 +16,7 @@ interface YardCardSection {
 
 interface YardCard {
   id: string;
+  slug: string;
   name: string;
   zipCode: string;
   sections: YardCardSection[];
@@ -57,7 +58,7 @@ function YardCardItem({
           {yard.name}
         </span>
         <Link
-          href={`/yard/${yard.id}`}
+          href={`/yard/${yard.slug}`}
           onClick={(e) => e.stopPropagation()}
           className="shrink-0 flex items-center gap-0.5 text-xs font-medium text-green-600 hover:text-green-700 px-1.5 py-0.5 rounded-md hover:bg-green-100 transition-colors"
         >

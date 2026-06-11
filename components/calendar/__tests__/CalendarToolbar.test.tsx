@@ -14,8 +14,8 @@ vi.mock("next/navigation", () => ({
 afterEach(cleanup);
 
 const yards = [
-  { id: "y1", name: "Front Yard", sections: [{ id: "s1", name: "Main Lawn" }, { id: "s2", name: "Side Strip" }] },
-  { id: "y2", name: "Back Yard", sections: [{ id: "s3", name: "Garden Bed" }] },
+  { id: "y1", slug: "front-yard", name: "Front Yard", sections: [{ id: "s1", slug: "main-lawn", name: "Main Lawn" }, { id: "s2", slug: "side-strip", name: "Side Strip" }] },
+  { id: "y2", slug: "back-yard", name: "Back Yard", sections: [{ id: "s3", slug: "garden-bed", name: "Garden Bed" }] },
 ];
 
 describe("CalendarToolbar", () => {
@@ -32,7 +32,7 @@ describe("CalendarToolbar", () => {
   });
 
   it("renders only sections for the selected yard", () => {
-    render(<CalendarToolbar yards={yards} selectedYard="y1" selectedSection="" month="2026-04" />);
+    render(<CalendarToolbar yards={yards} selectedYard="front-yard" selectedSection="" month="2026-04" />);
     expect(screen.getByRole("option", { name: "Main Lawn" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Side Strip" })).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "Garden Bed" })).toBeNull();

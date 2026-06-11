@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { yardSchema } from "@/lib/validations/yard";
+import { uniqueSlug } from "@/lib/slug";
 
 async function getOwnedYard(id: string, userId: string) {
   return db.yard.findFirst({ where: { id, userId } });
@@ -19,7 +20,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const parsed = yardSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const updated = await db.yard.update({ where: { id }, data: parsed.data });
+  const existingSlugs = await db.yard.findMany({
+    where: { userId: session.user.id, id: { not: id } },
+    select: { slug: true },
+  }).then((rows) => rows.map((r) => r.slug));
+  const slug = uniqueSlug(parsed.data.name ?? yard.name, existingSlugs);
+
+  const updated = await db.yard.update({ where: { id }, data: { ...parsed.data, slug } });
   return NextResponse.json(updated);
 }
 

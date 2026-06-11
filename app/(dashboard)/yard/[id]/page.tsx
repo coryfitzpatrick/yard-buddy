@@ -30,7 +30,7 @@ export default async function YardDetailPage({
   });
 
   const yard = await db.yard.findFirst({
-    where: { id, userId: session.user.id },
+    where: { slug: id, userId: session.user.id },
     include: {
       sections: {
         orderBy: { createdAt: "asc" },
@@ -74,6 +74,7 @@ export default async function YardDetailPage({
 
   const sectionSummaries = yard.sections.map((s) => ({
     id: s.id,
+    slug: s.slug,
     name: s.name,
     areaType: s.areaType,
     grassType: s.grassType,

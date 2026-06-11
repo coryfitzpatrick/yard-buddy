@@ -11,6 +11,10 @@
 
 import { PrismaClient } from "@prisma/client";
 
+function slugify(name: string): string {
+  return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 const db = new PrismaClient();
 
 const DEMO_EMAIL = process.env.DEMO_EMAIL ?? "demo@yardanalyzer.com";
@@ -45,6 +49,7 @@ async function main() {
     data: {
       userId: user.id,
       name: YARD_NAME,
+      slug: slugify(YARD_NAME),
       zipCode: "30338",
       streetAddress: "142 Maple Ridge Dr",
       city: "Atlanta",
@@ -66,6 +71,7 @@ async function main() {
     data: {
       yardId: yard.id,
       name: "Front Yard",
+      slug: "front-yard",
       areaType: "front",
       grassType: "bermuda",
       yardSizeSqft: 2200,
@@ -86,6 +92,7 @@ async function main() {
     data: {
       yardId: yard.id,
       name: "Back Yard",
+      slug: "back-yard",
       areaType: "back",
       grassType: "bermuda",
       yardSizeSqft: 3800,
@@ -101,6 +108,7 @@ async function main() {
     data: {
       yardId: yard.id,
       name: "Left Side Yard",
+      slug: "left-side-yard",
       areaType: "left_side",
       grassType: "tall_fescue",
       yardSizeSqft: 820,
@@ -116,6 +124,7 @@ async function main() {
     data: {
       yardId: yard.id,
       name: "Back Patio Border",
+      slug: "back-patio-border",
       areaType: "garden",
       grassType: "st_augustine",
       yardSizeSqft: 440,
@@ -375,6 +384,7 @@ async function main() {
     data: {
       userId: user.id,
       name: YARD2_NAME,
+      slug: slugify(YARD2_NAME),
       zipCode: "78701",
       streetAddress: "2847 Shoal Creek Blvd",
       city: "Austin",
@@ -396,6 +406,7 @@ async function main() {
     data: {
       yardId: yard2.id,
       name: "Front Yard",
+      slug: "front-yard",
       areaType: "front",
       grassType: "zoysia",
       yardSizeSqft: 1800,
@@ -411,6 +422,7 @@ async function main() {
     data: {
       yardId: yard2.id,
       name: "Back Yard",
+      slug: "back-yard",
       areaType: "back",
       grassType: "st_augustine",
       yardSizeSqft: 3200,
@@ -426,6 +438,7 @@ async function main() {
     data: {
       yardId: yard2.id,
       name: "Right Side",
+      slug: "right-side",
       areaType: "right_side",
       grassType: "st_augustine",
       yardSizeSqft: 620,

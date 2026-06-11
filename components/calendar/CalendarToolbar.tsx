@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { formatMonthLabel, prevMonth, nextMonth } from "@/lib/calendar-utils";
 
 interface Props {
-  yards: { id: string; name: string; sections: { id: string; name: string }[] }[];
+  yards: { id: string; slug: string; name: string; sections: { id: string; slug: string; name: string }[] }[];
   selectedYard: string;
   selectedSection: string;
   month: string;
@@ -27,7 +27,7 @@ export function CalendarToolbar({ yards, selectedYard, selectedSection, month }:
     router.push(`/calendar?${params.toString()}`);
   }
 
-  const selectedYardObj = yards.find((y) => y.id === selectedYard);
+  const selectedYardObj = yards.find((y) => y.slug === selectedYard);
   const sectionOptions = selectedYardObj?.sections ?? [];
 
   return (
@@ -41,7 +41,7 @@ export function CalendarToolbar({ yards, selectedYard, selectedSection, month }:
         >
           <option value="">All Yards</option>
           {yards.map((y) => (
-            <option key={y.id} value={y.id}>{y.name}</option>
+            <option key={y.id} value={y.slug}>{y.name}</option>
           ))}
         </select>
 
@@ -54,7 +54,7 @@ export function CalendarToolbar({ yards, selectedYard, selectedSection, month }:
         >
           <option value="">All Sections</option>
           {sectionOptions.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
+            <option key={s.id} value={s.slug}>{s.name}</option>
           ))}
         </select>
       </div>

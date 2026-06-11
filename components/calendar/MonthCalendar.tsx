@@ -18,7 +18,7 @@ interface Props {
   tasks: CalendarTask[];
   month: string;
   gridStart: string;
-  yards: { id: string; name: string; sections: { id: string; name: string }[] }[];
+  yards: { id: string; slug: string; name: string; sections: { id: string; slug: string; name: string }[] }[];
   selectedYard: string;
   selectedSection: string;
 }

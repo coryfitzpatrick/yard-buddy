@@ -11,7 +11,7 @@ export default async function NewSectionPage({ params }: { params: Promise<{ id:
 
   const { id } = await params;
   const yard = await db.yard.findFirst({
-    where: { id, userId: session.user.id },
+    where: { slug: id, userId: session.user.id },
     select: { id: true, name: true, zipCode: true, streetAddress: true, lotSqft: true, buildingSqft: true, mowingSchedule: true, wateringSchedule: true },
   });
   if (!yard) notFound();
@@ -24,6 +24,7 @@ export default async function NewSectionPage({ params }: { params: Promise<{ id:
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Add Section to {yard.name}</h1>
       <SectionForm
         yardId={yard.id}
+        yardSlug={id}
         zipCode={yard.zipCode}
         lotSqft={yard.lotSqft ?? undefined}
         buildingSqft={yard.buildingSqft ?? undefined}

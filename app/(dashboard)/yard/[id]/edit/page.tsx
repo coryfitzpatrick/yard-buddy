@@ -15,7 +15,7 @@ export default async function EditYardPage({
 
   const { id } = await params;
   const yard = await db.yard.findFirst({
-    where: { id, userId: session.user.id },
+    where: { slug: id, userId: session.user.id },
     select: {
       id: true,
       name: true,
@@ -40,7 +40,8 @@ export default async function EditYardPage({
       </Link>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Property</h1>
       <YardEditForm
-        yardId={id}
+        yardId={yard.id}
+        yardSlug={id}
         initialData={{
           name: yard.name,
           zipCode: yard.zipCode,

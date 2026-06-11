@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { yardSectionSchema } from "@/lib/validations/yard";
+import { uniqueSlug } from "@/lib/slug";
 
 async function getOwnedSection(sectionId: string, userId: string) {
   return db.yardSection.findFirst({
@@ -24,7 +25,13 @@ export async function PATCH(
   const parsed = yardSectionSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const updated = await db.yardSection.update({ where: { id: sectionId }, data: parsed.data });
+  const existingSlugs = await db.yardSection.findMany({
+    where: { yardId: section.yardId, id: { not: sectionId } },
+    select: { slug: true },
+  }).then((rows) => rows.map((r) => r.slug));
+  const slug = uniqueSlug(parsed.data.name ?? section.name, existingSlugs);
+
+  const updated = await db.yardSection.update({ where: { id: sectionId }, data: { ...parsed.data, slug } });
   return NextResponse.json(updated);
 }
 

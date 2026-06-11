@@ -30,6 +30,7 @@ export default async function YardPage() {
     orderBy: { createdAt: "asc" },
     select: {
       id: true,
+      slug: true,
       name: true,
       zipCode: true,
       spreaderType: true,
@@ -42,6 +43,7 @@ export default async function YardPage() {
         orderBy: { createdAt: "asc" },
         select: {
           id: true,
+          slug: true,
           name: true,
           analyses: { orderBy: { createdAt: "desc" }, take: 1, select: { healthScore: true } },
         },
@@ -111,17 +113,17 @@ export default async function YardPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 flex-wrap justify-end">
-                  <Link href={`/yard/${yard.id}`}>
+                  <Link href={`/yard/${yard.slug}`}>
                     <Button size="sm" className="bg-green-600 hover:bg-green-700">
                       <ArrowRight className="w-3.5 h-3.5 mr-1" /> View
                     </Button>
                   </Link>
-                  <Link href={`/yard/${yard.id}/edit`}>
+                  <Link href={`/yard/${yard.slug}/edit`}>
                     <Button variant="outline" size="sm">
                       <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
                     </Button>
                   </Link>
-                  <Link href={`/yard/${yard.id}/sections/new`}>
+                  <Link href={`/yard/${yard.slug}/sections/new`}>
                     <Button variant="outline" size="sm">
                       <Plus className="w-3.5 h-3.5 mr-1" /> Add Section
                     </Button>
@@ -135,7 +137,7 @@ export default async function YardPage() {
                     const score = section.analyses[0]?.healthScore ?? null;
                     const scoreColor = score == null ? "text-gray-400" : score >= 70 ? "text-green-600" : score >= 40 ? "text-yellow-600" : "text-red-600";
                     return (
-                      <Link key={section.id} href={`/yard/${yard.id}/sections/${section.id}`}>
+                      <Link key={section.id} href={`/yard/${yard.slug}/sections/${section.slug}`}>
                         <Button variant="outline" size="sm" className="text-xs h-7 px-2.5 gap-1.5">
                           <ArrowRight className="w-3 h-3" />
                           {section.name}

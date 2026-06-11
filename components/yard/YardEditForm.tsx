@@ -47,6 +47,7 @@ function serializeSchedule(days: string[], time: string, inches: string): string
 
 interface Props {
   yardId: string;
+  yardSlug: string;
   initialData: {
     name: string;
     zipCode: string;
@@ -59,7 +60,7 @@ interface Props {
   };
 }
 
-export function YardEditForm({ yardId, initialData }: Props) {
+export function YardEditForm({ yardId, yardSlug, initialData }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
@@ -105,7 +106,8 @@ export function YardEditForm({ yardId, initialData }: Props) {
         body: JSON.stringify(data),
       });
       if (!res.ok) { setError("Failed to save. Please try again."); return; }
-      router.push(`/yard/${yardId}`);
+      const saved = await res.json();
+      router.push(`/yard/${saved.slug ?? yardSlug}`);
       router.refresh();
     } catch {
       setError("Network error. Please check your connection.");

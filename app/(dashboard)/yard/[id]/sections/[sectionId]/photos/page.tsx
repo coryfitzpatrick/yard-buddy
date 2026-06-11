@@ -13,10 +13,16 @@ export default async function SectionPhotosPage({
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const { id: yardId, sectionId } = await params;
+  const { id: yardSlug, sectionId: sectionSlug } = await params;
+
+  const yard = await db.yard.findFirst({
+    where: { slug: yardSlug, userId: session.user.id },
+    select: { id: true },
+  });
+  if (!yard) notFound();
 
   const section = await db.yardSection.findFirst({
-    where: { id: sectionId, yard: { id: yardId, userId: session.user.id } },
+    where: { slug: sectionSlug, yardId: yard.id },
     include: {
       analyses: {
         orderBy: { createdAt: "asc" },
@@ -40,7 +46,7 @@ export default async function SectionPhotosPage({
   return (
     <div className="px-4 py-8 pb-20 sm:pb-8 max-w-2xl">
       <Link
-        href={`/yard/${yardId}/sections/${sectionId}`}
+        href={`/yard/${yardSlug}/sections/${sectionSlug}`}
         className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6"
       >
         <ChevronLeft className="w-4 h-4" /> {section.name}

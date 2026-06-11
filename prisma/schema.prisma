@@ -79,6 +79,7 @@ model Yard {
   id                 String        @id @default(cuid())
   userId             String
   name               String        @default("My Property")
+  slug               String
   zipCode            String
   streetAddress      String?
   city               String?
@@ -100,6 +101,7 @@ model Yard {
   sections           YardSection[]
   gddRecords         GddRecord[]
 
+  @@unique([userId, slug])
   @@index([userId])
 }
 
@@ -107,6 +109,7 @@ model YardSection {
   id            String         @id @default(cuid())
   yardId        String
   name          String         @default("Front Yard")
+  slug          String
   areaType      String?
   yardSizeSqft  Int?
   grassType     String         @default("unknown")
@@ -128,6 +131,7 @@ model YardSection {
   analyses      LawnAnalysis[]
   tasks         LawnTask[]
 
+  @@unique([yardId, slug])
   @@index([yardId])
 }
 

@@ -20,7 +20,14 @@ export default async function SectionDetailPage({
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const { id: yardId, sectionId } = await params;
+  const { id: yardSlug, sectionId: sectionSlug } = await params;
+
+  const yardRecord = await db.yard.findFirst({
+    where: { slug: yardSlug, userId: session.user.id },
+    select: { id: true },
+  });
+  if (!yardRecord) notFound();
+  const yardId = yardRecord.id;
 
   const subscriptionUser = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
@@ -28,6 +35,13 @@ export default async function SectionDetailPage({
   });
   const limits = getPlanLimits(subscriptionUser);
   const daysUntilDeletion = getDaysUntilDeletion(subscriptionUser);
+
+  const sectionRecord = await db.yardSection.findFirst({
+    where: { yardId, slug: sectionSlug },
+    select: { id: true },
+  });
+  if (!sectionRecord) notFound();
+  const sectionId = sectionRecord.id;
 
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
@@ -43,7 +57,7 @@ export default async function SectionDetailPage({
       : `${monthlyAnalysisCount} of ${limits.maxAnalysesPerSectionPerMonth} analyses used this month`;
 
   const section = await db.yardSection.findFirst({
-    where: { id: sectionId, yard: { id: yardId, userId: session.user.id } },
+    where: { id: sectionId, yardId },
     include: {
       yard: {
         select: {
@@ -144,7 +158,7 @@ export default async function SectionDetailPage({
   return (
     <div className="px-4 py-8 pb-20 sm:pb-8">
       <Link
-        href={`/yard/${yardId}`}
+        href={`/yard/${yardSlug}`}
         className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6"
       >
         <ChevronLeft className="w-4 h-4" /> {section.yard.name}
@@ -176,7 +190,7 @@ export default async function SectionDetailPage({
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Link href={`/yard/${yardId}/sections/${sectionId}/edit`}>
+          <Link href={`/yard/${yardSlug}/sections/${sectionSlug}/edit`}>
             <Button variant="outline" size="sm">
               <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
             </Button>
@@ -249,7 +263,7 @@ export default async function SectionDetailPage({
           {totalPhotoCount > 0 && (
             <div className="pt-1">
               <Link
-                href={`/yard/${yardId}/sections/${sectionId}/photos`}
+                href={`/yard/${yardSlug}/sections/${sectionSlug}/photos`}
                 className="inline-flex items-center gap-1.5 text-sm text-green-700 hover:text-green-800 font-medium"
               >
                 <Images className="w-4 h-4" />
@@ -319,8 +333,8 @@ export default async function SectionDetailPage({
       )}
 
       <PersonalizedRemindersCard
-        yardId={yardId}
-        sectionId={sectionId}
+        yardId={yardSlug}
+        sectionId={sectionSlug}
         mowingSchedule={section.mowingSchedule ?? null}
         wateringSchedule={section.wateringSchedule ?? null}
       />

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { yardSchema } from "@/lib/validations/yard";
 import { canCreateYard, getPlanLimits } from "@/lib/subscription";
+import { uniqueSlug } from "@/lib/slug";
 
 export async function GET() {
   const session = await auth();
@@ -53,8 +54,14 @@ export async function POST(req: Request) {
     );
   }
 
+  const existingSlugs = await db.yard.findMany({
+    where: { userId: session.user.id },
+    select: { slug: true },
+  }).then((rows) => rows.map((r) => r.slug));
+  const slug = uniqueSlug(parsed.data.name ?? "my-property", existingSlugs);
+
   const yard = await db.yard.create({
-    data: { ...parsed.data, userId: session.user.id },
+    data: { ...parsed.data, userId: session.user.id, slug },
   });
   return NextResponse.json(yard, { status: 201 });
 }
