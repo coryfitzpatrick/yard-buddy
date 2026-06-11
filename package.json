@@ -14,6 +14,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",
     "@auth/prisma-adapter": "^2.11.2",
+    "@axiomhq/nextjs": "^0.2.2",
     "@base-ui/react": "^1.5.0",
     "@hookform/resolvers": "^5.4.0",
     "@prisma/client": "^6.19.3",
