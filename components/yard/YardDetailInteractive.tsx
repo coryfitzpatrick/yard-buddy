@@ -5,9 +5,10 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
-import { Camera, ArrowRight, CheckCircle2, Plus } from "lucide-react";
+import { Camera, ArrowRight, CheckCircle2, Plus, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardTaskSection } from "@/components/dashboard/DashboardTaskSection";
+import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 
 interface SectionSummary {
   id: string;
@@ -46,6 +47,8 @@ interface Task {
 
 interface Props {
   yardId: string;
+  zip: string;
+  initialWeatherCollapsed: boolean;
   sections: SectionSummary[];
   tasks: Task[];
   hiddenTaskCount?: number;
@@ -94,7 +97,7 @@ function SectionCard({
           : "border-gray-200 hover:border-green-300"
       )}
     >
-      {/* Header */}
+      {/* Header: name + View/Edit links */}
       <div className="flex items-start justify-between gap-1 mb-1">
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
           {Icon && <Icon className="w-4 h-4 text-gray-400 shrink-0" />}
@@ -107,13 +110,20 @@ function SectionCard({
             {section.name}
           </span>
         </div>
-        <Link
-          href={`/yard/${yardId}/sections/${section.id}`}
-          onClick={(e) => e.stopPropagation()}
-          className="shrink-0 flex items-center gap-0.5 text-xs font-medium text-green-600 hover:text-green-700 px-1.5 py-0.5 rounded-md hover:bg-green-100 transition-colors"
-        >
-          View <ArrowRight className="w-3 h-3" />
-        </Link>
+        <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+          <Link
+            href={`/yard/${yardId}/sections/${section.id}/edit`}
+            className="flex items-center gap-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 px-1.5 py-0.5 rounded-md hover:bg-gray-100 transition-colors"
+          >
+            <Pencil className="w-3 h-3" />
+          </Link>
+          <Link
+            href={`/yard/${yardId}/sections/${section.id}`}
+            className="flex items-center gap-0.5 text-xs font-medium text-green-600 hover:text-green-700 px-1.5 py-0.5 rounded-md hover:bg-green-100 transition-colors"
+          >
+            View <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
       </div>
 
       {/* Grass type + size */}
@@ -122,7 +132,7 @@ function SectionCard({
         {section.yardSizeSqft ? ` · ${section.yardSizeSqft.toLocaleString()} sq ft` : ""}
       </p>
 
-      {/* Health + tasks row */}
+      {/* Health + tasks + analyze row */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5">
           <span className={cn("w-2.5 h-2.5 rounded-full shrink-0", dotColor)} />
@@ -132,22 +142,14 @@ function SectionCard({
             <span className="text-xs text-gray-400">No analysis</span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
           {section.pendingTaskCount > 0 && (
             <span className="text-xs bg-orange-100 text-orange-700 rounded-full px-2 py-0.5 font-medium">
               {section.pendingTaskCount} task{section.pendingTaskCount !== 1 ? "s" : ""}
             </span>
           )}
-          <Link
-            href={`/analyze?sectionId=${section.id}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-6 px-2 text-xs"
-              tabIndex={-1}
-            >
+          <Link href={`/analyze?sectionId=${section.id}`}>
+            <Button size="sm" variant="outline" className="h-6 px-2 text-xs" tabIndex={-1}>
               <Camera className="w-3 h-3" />
             </Button>
           </Link>
@@ -171,7 +173,7 @@ function SectionCard({
   );
 }
 
-export function YardDetailInteractive({ yardId, sections, tasks, hiddenTaskCount }: Props) {
+export function YardDetailInteractive({ yardId, zip, initialWeatherCollapsed, sections, tasks, hiddenTaskCount }: Props) {
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
 
   const filteredTasks = selectedSectionId
@@ -220,6 +222,9 @@ export function YardDetailInteractive({ yardId, sections, tasks, hiddenTaskCount
           </div>
         )}
       </div>
+
+      {/* Weather — between sections and tasks, matching dashboard layout */}
+      <WeatherWidget zip={zip} initialCollapsed={initialWeatherCollapsed} />
 
       {/* Task list */}
       {(tasks.length > 0 || (hiddenTaskCount ?? 0) > 0) && (

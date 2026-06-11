@@ -4,7 +4,6 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Pencil } from "lucide-react";
-import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { YardDetailInteractive } from "@/components/yard/YardDetailInteractive";
 import { getPlanLimits, getDaysUntilDeletion } from "@/lib/subscription";
 
@@ -135,15 +134,10 @@ export default async function YardDetailPage({
         </Link>
       </div>
 
-      <div className="mb-6">
-        <WeatherWidget
-          zip={yard.zipCode}
-          initialCollapsed={user?.weatherWidgetCollapsed ?? false}
-        />
-      </div>
-
       <YardDetailInteractive
         yardId={id}
+        zip={yard.zipCode}
+        initialWeatherCollapsed={user?.weatherWidgetCollapsed ?? false}
         sections={sectionSummaries}
         tasks={visibleTasks}
         hiddenTaskCount={hiddenTaskCount}

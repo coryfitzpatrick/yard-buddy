@@ -21,7 +21,7 @@ model User {
   reminderDaysBefore           Int       @default(0)
   gddNotificationsEnabled      Boolean   @default(true)
   gddBestDayReminderDays       Int       @default(0)
-  weatherWidgetCollapsed       Boolean   @default(false)
+  weatherWidgetCollapsed       Boolean   @default(true)
   createdAt                    DateTime  @default(now())
   plan                 String    @default("trial")
   planStatus           String    @default("trialing")
