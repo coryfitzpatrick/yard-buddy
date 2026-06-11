@@ -14,6 +14,10 @@ const SCORE_THRESHOLD = 60;
 const REGRESSION_DELTA = 5;
 
 function loadScenarios(): Scenario[] {
+  if (!fs.existsSync(SCENARIOS_DIR)) {
+    console.error(`Scenarios directory not found: ${SCENARIOS_DIR}`);
+    process.exit(1);
+  }
   const scenarios: Scenario[] = [];
   const walk = (dir: string) => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
