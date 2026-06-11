@@ -114,7 +114,7 @@ const preEmergentSoilTemp: Rule = {
     if (!lower.includes("pre-emergent") && !lower.includes("preemergent")) {
       return { ruleId: this.id, pass: true, reason: "No pre-emergent recommendation — rule does not apply" };
     }
-    if (contains(response, "soil temp", "soil temperature", "55", "50 degree", "55 degree")) {
+    if (contains(response, "soil temp", "soil temperature", "50 degree", "55 degree")) {
       return { ruleId: this.id, pass: true, reason: "Pre-emergent recommendation includes soil temperature reference" };
     }
     return { ruleId: this.id, pass: false, reason: "Pre-emergent recommended but no soil temperature threshold mentioned" };
@@ -146,9 +146,9 @@ const mowingHeightInRange: Rule = {
   check(scenario, response): RuleResult {
     const range = MOWING_RANGES[scenario.profile.grassType];
     if (!range) return { ruleId: this.id, pass: true, reason: "No mowing range defined for this grass type" };
-    const matches = response.match(/(\d+(?:\.\d+)?)\s*(?:inch|"|'|in\b)/gi) ?? [];
+    const matches = [...response.matchAll(/(\d+(?:\.\d+)?)\s*(?:inch|"|'|in\b)/gi)];
     for (const match of matches) {
-      const num = parseFloat(match);
+      const num = parseFloat(match[1]);
       if (!isNaN(num) && num > 0 && num < 12) {
         if (num < range[0] || num > range[1]) {
           return {
