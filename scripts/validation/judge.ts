@@ -3,7 +3,13 @@ import OpenAI from "openai";
 import { generateRecommendations } from "../../lib/claude";
 import type { Scenario, JudgeResult } from "./types";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let _openai: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openai;
+}
 
 const JUDGE_SYSTEM = `You are a turfgrass expert with 20+ years of experience and deep knowledge of university extension recommendations. You evaluate AI-generated lawn care advice for agronomic accuracy.`;
 
@@ -39,7 +45,7 @@ Return ONLY valid JSON, no other text:
   "reasoning": "<2-3 sentence explanation>"
 }`;
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o",
       messages: [
         { role: "system", content: JUDGE_SYSTEM },
