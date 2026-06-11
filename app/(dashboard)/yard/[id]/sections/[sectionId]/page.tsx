@@ -56,7 +56,9 @@ export default async function SectionDetailPage({
         select: { id: true, healthScore: true, issues: true, summary: true, createdAt: true, imageUrls: true },
       },
       tasks: {
-        where: { status: { not: "skipped" } },
+        where: {
+          status: { not: "skipped" },
+        },
         orderBy: { createdAt: "desc" },
         select: {
           id: true,
@@ -80,6 +82,32 @@ export default async function SectionDetailPage({
   });
   if (!section) notFound();
 
+  // Also fetch tasks from other sections that were merged to show on this section's page
+  const sharedTasks = await db.lawnTask.findMany({
+    where: {
+      additionalSectionIds: { has: sectionId },
+      status: { not: "skipped" },
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      priority: true,
+      status: true,
+      scheduledStart: true,
+      scheduledEnd: true,
+      overdueNote: true,
+      stillWorthDoing: true,
+      product: true,
+      applicationRate: true,
+      spreaderSetting: true,
+      taskMode: true,
+      productSearchQuery: true,
+      yardSectionId: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   const areaCfg = section.areaType ? AREA_CONFIG[section.areaType as AreaType] : null;
   const AreaIcon = areaCfg?.icon;
   const latestAnalysis = section.analyses[0] ?? null;
@@ -96,17 +124,19 @@ export default async function SectionDetailPage({
     latestAnalysis.healthScore >= 70 ? "text-green-600" :
     latestAnalysis.healthScore >= 40 ? "text-yellow-600" : "text-red-600";
 
-  const serializedTasks = section.tasks.map((t) => ({
+  const sectionRef = { id: section.id, name: section.name, areaType: section.areaType, yard: { name: section.yard.name } };
+  type RawTask = { id: string; title: string; description: string; priority: string; status: string; scheduledStart: Date | null; scheduledEnd: Date | null; overdueNote: string | null; stillWorthDoing: boolean | null; product: string | null; applicationRate: string | null; spreaderSetting: string | null; taskMode: string | null; productSearchQuery: string | null; yardSectionId: string };
+  const serializeTask = (t: RawTask) => ({
     ...t,
     scheduledStart: t.scheduledStart?.toISOString() ?? null,
     scheduledEnd: t.scheduledEnd?.toISOString() ?? null,
-    yardSection: {
-      id: section.id,
-      name: section.name,
-      areaType: section.areaType,
-      yard: { name: section.yard.name },
-    },
-  }));
+    yardSection: sectionRef,
+  });
+
+  const serializedTasks = [
+    ...section.tasks.map(serializeTask),
+    ...sharedTasks.map(serializeTask),
+  ];
 
   const visibleTasks = limits.maxVisibleTasks === -1 ? serializedTasks : serializedTasks.slice(0, limits.maxVisibleTasks);
   const hiddenTaskCount = limits.maxVisibleTasks === -1 ? 0 : Math.max(0, serializedTasks.length - limits.maxVisibleTasks);

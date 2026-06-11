@@ -82,6 +82,7 @@ export default async function YardDetailPage({
               spreaderSetting: true,
               taskMode: true,
               productSearchQuery: true,
+              additionalSectionIds: true,
             },
           },
         },
@@ -91,14 +92,21 @@ export default async function YardDetailPage({
   if (!yard) notFound();
 
   const sections = yard.sections.map((s) => ({ id: s.id, name: s.name }));
+  const sectionNameMap = new Map(yard.sections.map((s) => [s.id, s.name]));
 
   const allTasks = yard.sections.flatMap((s) =>
-    s.tasks.map((t) => ({
-      ...t,
-      scheduledStart: t.scheduledStart?.toISOString() ?? null,
-      scheduledEnd: t.scheduledEnd?.toISOString() ?? null,
-      yardSection: { id: s.id, name: s.name, areaType: s.areaType, yard: { name: yard.name } },
-    }))
+    s.tasks.map((t) => {
+      const additionalNames = t.additionalSectionIds
+        .map((id) => sectionNameMap.get(id))
+        .filter((n): n is string => !!n);
+      return {
+        ...t,
+        scheduledStart: t.scheduledStart?.toISOString() ?? null,
+        scheduledEnd: t.scheduledEnd?.toISOString() ?? null,
+        yardSection: { id: s.id, name: s.name, areaType: s.areaType, yard: { name: yard.name } },
+        mergedSections: additionalNames.length > 0 ? [s.name, ...additionalNames] : undefined,
+      };
+    })
   );
 
   const limits = getPlanLimits(user);

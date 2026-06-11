@@ -14,6 +14,15 @@ function addDays(date: Date, days: number): Date {
   return result;
 }
 
+function titleSimilarity(a: string, b: string): number {
+  const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+  const wordsA = new Set(normalize(a).split(/\s+/).filter(Boolean));
+  const wordsB = new Set(normalize(b).split(/\s+/).filter(Boolean));
+  const intersection = [...wordsA].filter((w) => wordsB.has(w)).length;
+  const union = new Set([...wordsA, ...wordsB]).size;
+  return union === 0 ? 0 : intersection / union;
+}
+
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -131,6 +140,48 @@ export async function POST(req: NextRequest) {
 
     result.recommendations = deduplicateRecommendations(result.recommendations);
 
+    // Deduplicate against existing pending tasks in this yard
+    const existingYardTasks = await db.lawnTask.findMany({
+      where: {
+        yardSection: { yardId: section.yardId },
+        status: { not: "skipped" },
+        yardSectionId: { not: sectionId }, // only cross-section matches
+      },
+      select: { id: true, title: true, product: true, additionalSectionIds: true },
+    });
+
+    const recsToCreate: typeof result.recommendations = [];
+    const taskIdsToLink: string[] = [];
+
+    for (const rec of result.recommendations) {
+      const match = existingYardTasks.find((existing) => {
+        if (existing.additionalSectionIds.includes(sectionId)) return false;
+        if (titleSimilarity(rec.title, existing.title) < 0.6) return false;
+        // Only merge if products are compatible (same or one is absent)
+        const rp = rec.productSuggestion?.toLowerCase().trim() || null;
+        const ep = existing.product?.toLowerCase().trim() || null;
+        return !rp || !ep || rp === ep;
+      });
+
+      if (match) {
+        taskIdsToLink.push(match.id);
+      } else {
+        recsToCreate.push(rec);
+      }
+    }
+
+    // Link matched existing tasks to this section
+    if (taskIdsToLink.length > 0) {
+      await Promise.all(
+        taskIdsToLink.map((id) =>
+          db.lawnTask.update({
+            where: { id },
+            data: { additionalSectionIds: { push: sectionId } },
+          })
+        )
+      );
+    }
+
     const analysis = await db.lawnAnalysis.create({
       data: {
         yardSectionId: sectionId,
@@ -140,7 +191,7 @@ export async function POST(req: NextRequest) {
         summary: result.summary,
         rawResponse: JSON.stringify(result),
         tasks: {
-          create: result.recommendations.map((r) => ({
+          create: recsToCreate.map((r) => ({
             yardSectionId: sectionId,
             title: r.title,
             description: r.description,
