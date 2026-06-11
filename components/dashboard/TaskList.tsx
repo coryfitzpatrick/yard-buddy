@@ -118,9 +118,9 @@ function TaskCard({
               </div>
             ) : task.yardSection ? (
               <div className="text-xs text-green-700 font-medium mb-1">
-                {task.yardSection.yard.name === task.yardSection.name
-                  ? task.yardSection.name
-                  : `${task.yardSection.yard.name} > ${task.yardSection.name}`}
+                {multiYard && task.yardSection.yard.name !== task.yardSection.name
+                  ? `${task.yardSection.yard.name} > ${task.yardSection.name}`
+                  : task.yardSection.name}
               </div>
             ) : null}
             <div className="flex items-center gap-2 mb-1 flex-wrap">
