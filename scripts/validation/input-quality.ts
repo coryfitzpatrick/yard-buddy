@@ -49,7 +49,7 @@ Return JSON only, no other text:
     const json = JSON.parse(text.replace(/^```json\n?/, "").replace(/\n?```$/, ""));
     return { valid: json.valid === true, feedback: json.feedback ?? null };
   } catch {
-    return { valid: true, feedback: null };
+    return { valid: false, feedback: "Failed to parse image validation response" };
   }
 }
 
@@ -67,9 +67,11 @@ async function runInputTest(
 
 function assertUncertain(response: string, context: string): void {
   const confidentPatterns = [
-    /apply \d+ lb/i,
-    /fertilize (now|this week|immediately)/i,
-    /use \d+-\d+-\d+/i,
+    /apply \d+(?:\.\d+)?\s*(?:lb|lbs|pound|pounds|bag|bags)/i,
+    /fertilize\s+(?:now|this week|this weekend|immediately|today|tonight)/i,
+    /use\s+\d+-\d+-\d+/i,
+    /apply\s+(?:at\s+)?\d+(?:\.\d+)?\s*(?:lb|lbs)\s+per\s+\d+\s*(?:sq\s*ft|square)/i,
+    /spread\s+\d+(?:\.\d+)?\s*(?:lb|lbs)/i,
   ];
   const uncertainPatterns = [
     "unknown", "unable to", "cannot", "don't know", "not sure",
@@ -91,10 +93,10 @@ export async function runInputGuardTests(): Promise<InputTestResult[]> {
 
   results.push(
     await runInputTest("boundary-ph-zero", async () => {
-      const ctx: LawnContext = { grassType: "tall_fescue", zipCode: "27601", soilPh: 0 };
+      const ctx: LawnContext = { grassType: "tall_fescue", zipCode: "27601", soilPh: -1 };
       const recs = await generateRecommendations(ctx);
-      assertUncertain(JSON.stringify(recs), "pH=0");
-      return "pH=0 handled with uncertainty";
+      assertUncertain(JSON.stringify(recs), "pH=-1");
+      return "pH=-1 handled with uncertainty";
     })
   );
 
@@ -125,11 +127,11 @@ export async function runInputGuardTests(): Promise<InputTestResult[]> {
       const ctx: LawnContext = {
         grassType: "kentucky_bluegrass",
         zipCode: "66101",
-        yardSizeSqft: 0,
+        yardSizeSqft: -500,
       };
       const recs = await generateRecommendations(ctx);
-      assertUncertain(JSON.stringify(recs), "sqft=0");
-      return "sqft=0 handled";
+      assertUncertain(JSON.stringify(recs), "sqft=-500");
+      return "sqft=-500 handled";
     })
   );
 
@@ -170,7 +172,16 @@ export async function runInputGuardTests(): Promise<InputTestResult[]> {
       if (!recs || recs.length === 0) {
         throw new Error("Returned empty recommendations for empty profile");
       }
-      return `Got ${recs.length} recommendations for minimal profile`;
+      const text = JSON.stringify(recs).toLowerCase();
+      const hasAcknowledgment =
+        text.includes("unknown") ||
+        text.includes("identify") ||
+        text.includes("grass type") ||
+        text.includes("general");
+      if (!hasAcknowledgment) {
+        throw new Error("Minimal profile did not produce any uncertainty acknowledgment or general guidance note");
+      }
+      return `Got ${recs.length} recommendations with uncertainty acknowledgment`;
     })
   );
 
