@@ -1,4 +1,6 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config(); // fallback to .env
 import Anthropic from "@anthropic-ai/sdk";
 import { generateRecommendations } from "../../lib/claude";
 import type { LawnContext } from "../../lib/claude";
@@ -159,9 +161,20 @@ export async function runInputGuardTests(): Promise<InputTestResult[]> {
       const ctx: LawnContext = { grassType: "bermuda", zipCode: "" };
       const recs = await generateRecommendations(ctx);
       if (!recs || recs.length === 0) {
-        throw new Error("Returned empty recommendations with no error message");
+        throw new Error("Returned empty recommendations for missing location");
       }
-      return `Got ${recs.length} recommendations with empty ZIP (graceful)`;
+      const text = JSON.stringify(recs).toLowerCase();
+      const hasLocationAcknowledgment =
+        text.includes("general") ||
+        text.includes("location") ||
+        text.includes("region") ||
+        text.includes("climate") ||
+        text.includes("zip") ||
+        text.includes("area");
+      if (!hasLocationAcknowledgment) {
+        throw new Error("Response made no reference to location/region context with empty ZIP");
+      }
+      return `Got ${recs.length} recommendations with location context acknowledged`;
     })
   );
 

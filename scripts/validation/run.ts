@@ -1,11 +1,13 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config(); // fallback to .env
 import * as fs from "fs";
 import * as path from "path";
 import { generateRecommendations } from "../../lib/claude";
 import { ALL_RULES } from "./rules/assertions";
 import { runInputGuardTests } from "./input-quality";
 import { runJudge } from "./judge";
-import type { Scenario, RunReport, PillarResult } from "./types";
+import type { Scenario, RunReport, PillarResult, RuleResult } from "./types";
 
 const SCENARIOS_DIR = path.join(__dirname, "scenarios");
 const RESULTS_DIR = path.join(__dirname, "results");
@@ -45,11 +47,12 @@ function printPillar1(results: { testId: string; pass: boolean; reason: string }
   });
 }
 
-function printPillar2(results: { ruleId: string; pass: boolean; reason: string }[]) {
+function printPillar2(results: RuleResult[]) {
   const passed = results.filter((r) => r.pass).length;
   console.log(`Pillar 2: Rule Assertions       ${passed}/${results.length} passed`);
   results.filter((r) => !r.pass).forEach((r) => {
-    console.log(`  FAIL [rule] ${r.ruleId}: ${r.reason}`);
+    const prefix = r.scenarioId ? `${r.scenarioId}/${r.ruleId}` : r.ruleId;
+    console.log(`  FAIL [rule] ${prefix}: ${r.reason}`);
   });
 }
 
@@ -79,7 +82,7 @@ async function main() {
 
   // --- Pillar 2: Rule Assertions ---
   console.log("\nRunning Pillar 2: Rule Assertions...");
-  const ruleResults: { ruleId: string; pass: boolean; reason: string }[] = [];
+  const ruleResults: RuleResult[] = [];
   for (const scenario of scenarios) {
     process.stdout.write(`  ${scenario.id}... `);
     try {
@@ -87,7 +90,7 @@ async function main() {
       const responseText = JSON.stringify(recs);
       for (const rule of ALL_RULES) {
         const result = rule.check(scenario, responseText);
-        ruleResults.push(result);
+        ruleResults.push({ ...result, scenarioId: scenario.id });
       }
       process.stdout.write("done\n");
     } catch (err) {

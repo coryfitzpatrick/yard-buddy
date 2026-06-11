@@ -65,7 +65,7 @@ const noFertInDormancy: Rule = {
 
 const limeForLowPh: Rule = {
   id: "lime-for-low-ph",
-  description: "Soil pH <6.0: lime or acidification treatment must be mentioned (Source: Penn State Extension)",
+  description: "Soil pH <6.0: lime or pH-raising amendment must be mentioned (Source: Penn State Extension)",
   check(scenario, response): RuleResult {
     const ph = scenario.profile.soilPh;
     if (ph == null || ph >= 6.0) return { ruleId: this.id, pass: true, reason: "Rule does not apply" };
@@ -146,7 +146,7 @@ const mowingHeightInRange: Rule = {
   check(scenario, response): RuleResult {
     const range = MOWING_RANGES[scenario.profile.grassType];
     if (!range) return { ruleId: this.id, pass: true, reason: "No mowing range defined for this grass type" };
-    const matches = [...response.matchAll(/(\d+(?:\.\d+)?)\s*(?:inch|"|'|in\b)/gi)];
+    const matches = [...response.matchAll(/(\d+(?:\.\d+)?)\s*(?:inch|"|in\b)/gi)];
     for (const match of matches) {
       const num = parseFloat(match[1]);
       if (!isNaN(num) && num > 0 && num < 12) {

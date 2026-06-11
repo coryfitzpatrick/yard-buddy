@@ -1,4 +1,6 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config(); // fallback to .env
 import OpenAI from "openai";
 import { generateRecommendations } from "../../lib/claude";
 import type { Scenario, JudgeResult } from "./types";

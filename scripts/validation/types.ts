@@ -13,6 +13,7 @@ export type Scenario = {
 
 export type RuleResult = {
   ruleId: string;
+  scenarioId?: string;
   pass: boolean;
   reason: string;
 };

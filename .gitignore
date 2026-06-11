@@ -48,3 +48,4 @@ coverage/
 
 # Validation results
 scripts/validation/results/*.json
+!scripts/validation/results/baseline.json
