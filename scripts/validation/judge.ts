@@ -1,16 +1,13 @@
-import dotenv from "dotenv";
-dotenv.config({ path: ".env.local" });
-dotenv.config(); // fallback to .env
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import { generateRecommendations } from "../../lib/claude";
 import type { Scenario, JudgeResult } from "./types";
 
-let _openai: OpenAI | null = null;
-function getOpenAI(): OpenAI {
-  if (!_openai) {
-    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let _anthropic: Anthropic | null = null;
+function getAnthropic(): Anthropic {
+  if (!_anthropic) {
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   }
-  return _openai;
+  return _anthropic;
 }
 
 const JUDGE_SYSTEM = `You are a turfgrass expert with 20+ years of experience and deep knowledge of university extension recommendations. You evaluate AI-generated lawn care advice for agronomic accuracy.`;
@@ -47,18 +44,16 @@ Return ONLY valid JSON, no other text:
   "reasoning": "<2-3 sentence explanation>"
 }`;
 
-    const completion = await getOpenAI().chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: JUDGE_SYSTEM },
-        { role: "user", content: prompt },
-      ],
-      temperature: 0,
-      response_format: { type: "json_object" },
+    const message = await getAnthropic().messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 512,
+      system: JUDGE_SYSTEM,
+      messages: [{ role: "user", content: prompt }],
     });
 
-    const raw = completion.choices[0]?.message.content ?? "{}";
-    const parsed = JSON.parse(raw) as { score?: number; flags?: string[]; reasoning?: string };
+    const raw = message.content[0]?.type === "text" ? message.content[0].text : "{}";
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(jsonMatch?.[0] ?? "{}") as { score?: number; flags?: string[]; reasoning?: string };
     return {
       scenarioId: scenario.id,
       score: parsed.score ?? 0,

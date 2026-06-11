@@ -38,9 +38,18 @@ const noHighNInHeat: Rule = {
       "28-0", "32-0", "34-0", "30-0", "high nitrogen", "high-nitrogen",
       "apply fertilizer this week", "fertilize now",
     ];
-    const found = highNPatterns.find((p) => response.toLowerCase().includes(p.toLowerCase()));
-    if (found) {
-      return { ruleId: this.id, pass: false, reason: `Found high-N indicator "${found}" for cool-season grass at ${temp}°F` };
+    const negativeContext = /\b(avoid|not|don't|never|defer|wait|instead|without|skip)\b/i;
+    for (const pattern of highNPatterns) {
+      const lowerResponse = response.toLowerCase();
+      let idx = lowerResponse.indexOf(pattern.toLowerCase());
+      while (idx !== -1) {
+        // Check the surrounding sentence (~150 chars) for negative context
+        const snippet = lowerResponse.slice(Math.max(0, idx - 100), idx + 100);
+        if (!negativeContext.test(snippet)) {
+          return { ruleId: this.id, pass: false, reason: `Found high-N indicator "${pattern}" for cool-season grass at ${temp}°F` };
+        }
+        idx = lowerResponse.indexOf(pattern.toLowerCase(), idx + 1);
+      }
     }
     return { ruleId: this.id, pass: true, reason: "No high-N recommendation found during heat stress" };
   },
@@ -146,16 +155,23 @@ const mowingHeightInRange: Rule = {
   check(scenario, response): RuleResult {
     const range = MOWING_RANGES[scenario.profile.grassType];
     if (!range) return { ruleId: this.id, pass: true, reason: "No mowing range defined for this grass type" };
-    const matches = [...response.matchAll(/(\d+(?:\.\d+)?)\s*(?:inch|"|in\b)/gi)];
-    for (const match of matches) {
-      const num = parseFloat(match[1]);
-      if (!isNaN(num) && num > 0 && num < 12) {
-        if (num < range[0] || num > range[1]) {
-          return {
-            ruleId: this.id,
-            pass: false,
-            reason: `Mowing height ${num}" is outside valid range ${range[0]}–${range[1]}" for ${scenario.profile.grassType}`,
-          };
+    // Only inspect sentences that contain mowing-specific language to avoid matching
+    // water/irrigation depths (e.g. "apply 1 inch of water", "penetrate 6 inches deep")
+    const mowingWords = /\b(?:mow(?:ing)?|cut(?:ting)?|blade|deck|grass\s+height|mowing\s+height|cutting\s+height)\b/i;
+    const sentences = response.split(/(?:[.!?]\s+|\n)/);
+    for (const sentence of sentences) {
+      if (!mowingWords.test(sentence)) continue;
+      const matches = [...sentence.matchAll(/(\d+(?:\.\d+)?)\s*(?:inch(?:es)?|"|in\b)/gi)];
+      for (const match of matches) {
+        const num = parseFloat(match[1]);
+        if (!isNaN(num) && num > 0 && num < 12) {
+          if (num < range[0] || num > range[1]) {
+            return {
+              ruleId: this.id,
+              pass: false,
+              reason: `Mowing height ${num}" is outside valid range ${range[0]}–${range[1]}" for ${scenario.profile.grassType}`,
+            };
+          }
         }
       }
     }
@@ -169,7 +185,9 @@ const fungicideNeedsHumidity: Rule = {
     "Fungicide recommendation: must not appear unless humidity is elevated (>65%) or recent rainfall present (Source: UF/IFAS Extension)",
   check(scenario, response): RuleResult {
     const lower = response.toLowerCase();
-    if (!lower.includes("fungicide") && !lower.includes("fungal") && !lower.includes("disease")) {
+    // Only trigger on explicit fungicide/fungal mentions — not generic "disease" mentions
+    // which may be awareness notes rather than treatment recommendations
+    if (!lower.includes("fungicide") && !lower.includes("fungal treatment") && !lower.includes("apply fungal")) {
       return { ruleId: this.id, pass: true, reason: "No fungicide recommendation — rule does not apply" };
     }
     const humidity = scenario.profile.weatherData?.humidity ?? 100;

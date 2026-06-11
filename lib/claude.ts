@@ -56,6 +56,18 @@ SPECIES IDENTIFICATION RULE — When weeds or pests are present, always identify
 
 DEDUPLICATION RULE — never recommend the same type of treatment more than once. If multiple issues (e.g., compaction AND thatch) both call for aeration, include aeration exactly once and address all the reasons in that single task's description. Combine, don't duplicate.
 
+DORMANCY RULE — For warm-season grasses (bermuda, zoysia, st. augustine, centipede, buffalo): when current temperature is below 50°F the grass is fully dormant and not actively growing. During dormancy:
+- Do NOT recommend fertilization of any kind — dormant grass cannot uptake nutrients; any nitrogen promotes disease and winter weed germination
+- Even "low-nitrogen" or "winterizer" formulas are inappropriate for fully dormant turf — do not suggest them
+- Appropriate topics during dormancy: pre-emergent weed control for winter annuals, dormant overseeding with perennial ryegrass for temporary color, reducing irrigation frequency
+- If the homeowner mentions wanting to fertilize: explain the grass is dormant and fertilization should wait until green-up in spring (soil temp >65°F)
+
+RECENTLY SEEDED RULE — When notes indicate the lawn was recently seeded or is actively germinating (within the past 6 weeks):
+- Do NOT recommend pre-emergent herbicides — they prevent seed germination entirely
+- Do NOT recommend starter fertilizer until after the first mowing (typically 4-6 weeks post-seeding); applying fertilizer to germinating seed promotes damping-off disease and stress
+- Do NOT recommend post-emergent herbicides for at least 4 weeks after germination
+- Watering should be light and frequent (brief cycles 2-3x daily) to keep the seed bed consistently moist — NOT deep infrequent irrigation, which allows the surface to dry and kills germinating seed
+
 TASK SEQUENCING RULES — only include prerequisite tasks when the conditions actually call for them:
 - Aeration before overseeding: only recommend aeration as a prerequisite if the lawn shows compaction or thatch buildup > 0.5 inches. For thin or bare patches on non-compacted soil, seed-to-soil contact via raking is sufficient — do not add unnecessary aeration.
 - If both dethatching and aeration are needed, dethatch first and space them ~3 weeks apart to allow recovery.
@@ -84,6 +96,49 @@ For all other lawns (healthScore < 75), assign taskMode "corrective" to problem-
 
 IMPORTANT: You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.`;
 
+const WARM_SEASON_GRASSES = new Set(["bermuda", "zoysia", "st_augustine", "centipede", "buffalo"]);
+
+const COOL_SEASON_GRASSES = new Set(["kentucky_bluegrass", "tall_fescue", "fine_fescue", "ryegrass"]);
+
+function buildContextWarnings(context: LawnContext): string {
+  const warnings: string[] = [];
+  const temp = context.weatherData?.temp;
+  const isWarmSeason = WARM_SEASON_GRASSES.has(context.grassType);
+  const isCoolSeason = COOL_SEASON_GRASSES.has(context.grassType);
+
+  if (isWarmSeason && temp != null && temp < 50) {
+    warnings.push(
+      `⚠️ DORMANCY CONSTRAINT (MANDATORY): This ${context.grassType} is fully dormant — air temperature is ${temp}°F, below the 50°F growth threshold. HARD RULES for this response:
+- Do NOT include any fertilization recommendation — not now, not as future spring planning, not as a heads-up for later. Zero mentions of "fertilize," "apply nitrogen," "feed," or fertilizer products.
+- Address ONLY what to do right now during dormancy (weed pre-emergent timing, reduced irrigation, pest scouting).
+- Do not plan ahead to spring fertilization in this response. That belongs in a separate spring analysis.`
+    );
+  }
+
+  if (isCoolSeason && temp != null && temp > 85) {
+    warnings.push(
+      `⚠️ HEAT STRESS CONSTRAINT (MANDATORY): This cool-season grass (${context.grassType}) is under heat stress — air temperature is ${temp}°F. HARD RULES for this response:
+- Do NOT recommend high-nitrogen fertilizer (e.g., 28-0-0, 32-0-0, 34-0-0, or any ratio with N > 10 as the first number). High N during heat stress causes disease and turf damage.
+- If fertilization is mentioned at all, defer it to fall when temps drop below 75°F.
+- Focus on heat stress management: raise mowing height, reduce irrigation frequency but increase depth, avoid foot traffic.`
+    );
+  }
+
+  const notes = (context.notes ?? "").toLowerCase();
+  const isRecentlySeeded = notes.includes("seed") || notes.includes("overseed") || notes.includes("germina");
+  if (isRecentlySeeded) {
+    warnings.push(
+      `⚠️ NEW SEED CONSTRAINT (MANDATORY): This lawn was recently seeded or is actively germinating. HARD RULES for this response:
+- Do NOT recommend pre-emergent herbicides — they prevent germination entirely.
+- Do NOT recommend starter fertilizer until after the first mowing (4-6 weeks post-seeding). Premature fertilization promotes damping-off disease.
+- Do NOT recommend post-emergent herbicides for at least 4 weeks after germination.
+- Watering: light and frequent (brief cycles 2-3x daily to keep surface moist), NOT deep infrequent irrigation.`
+    );
+  }
+
+  return warnings.length > 0 ? `\n${warnings.join("\n")}\n` : "";
+}
+
 export async function generateRecommendations(context: LawnContext): Promise<RecommendationItem[]> {
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
@@ -93,7 +148,7 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
       {
         role: "user",
         content: `Generate lawn care recommendations for this yard. Return a JSON array only.
-
+${buildContextWarnings(context)}
 Grass Type: ${context.grassType.replace(/_/g, " ")}
 ZIP Code: ${context.zipCode}
 ${context.areaType ? `Yard Area: ${context.areaType.replace(/_/g, " ")} (${

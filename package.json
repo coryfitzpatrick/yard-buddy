@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "validate": "tsx scripts/validation/run.ts"
+    "validate": "tsx --env-file .env.local scripts/validation/run.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",

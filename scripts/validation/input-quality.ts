@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config({ path: ".env.local" });
-dotenv.config(); // fallback to .env
 import Anthropic from "@anthropic-ai/sdk";
 import { generateRecommendations } from "../../lib/claude";
 import type { LawnContext } from "../../lib/claude";
