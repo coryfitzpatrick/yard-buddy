@@ -17,26 +17,28 @@ Score interpretation: **90+ = releasable** | 85–89 = mostly trustworthy | 78�
 | 9 | 9189ebd | 2026-06-12 | 8/9 | 163/165 | 82.2 | centipede 72 (improved from 52); SA mowing still 2" in P2; stochastic drops in kbg, ryegrass, bermuda-drought |
 | 10 | d65d281 | 2026-06-12 | 9/9 | 162/165 | 82.2 | 3 P2 fails (kbg fungicide, kbg overseed, bermuda-drought fungicide — fixed in 1c0b900) |
 | 11 | 359855d | 2026-06-12 | 9/9 | 163/165 | 84.7 | Big wins: centipede +19, bermuda-drought +10, kbg +9; ryegrass still 72 (mowing now too low) |
+| 12 | c77c9d3 | 2026-06-12 | 9/9 | 163/165 | 83.7 | ryegrass +16, bermuda-drought +9; recently-seeded 42 (starter fert regression); fall-preemergent 72 |
+| 13 | 76f9360 | 2026-06-12 | — | — | pending | Aeration gap 2-4wks, KBG 4", sulfur 1-2lbs, herbicide 55F, MSM Turf limited Poa annua, starter fert reverted |
 
 ## Scenario Scores by Run
 
 | Scenario | R3 | R4 | R8 | R9 | R10 | R11 |
 |----------|----|----|----|----|-----|-----|
-| fall-preemergent | 82 | 88 | 88 | 82 | 82 | 82 |
-| kbg-july-heat | 91 | 91 | 91 | 82 | 82 | 91 |
-| ryegrass-spring | 82 | 82 | 82 | 72 | 72 | 72 |
-| tall-fescue-low-ph | 72 | 82 | 82 | 82 | 82 | 88 |
-| drought-cool | 92 | 91 | 82 | 88 | 88 | 82 |
-| grub-damage | 88 | 88 | 91 | 88 | 88 | 91 |
-| high-ph | 62 | 62 | 82 | 82 | 82 | 82 |
-| overwatering | 91 | 82 | 91 | 91 | 91 | 91 |
-| recently-seeded | 62 | 62 | 82 | 88 | 88 | 82 |
-| sparse-profile | 72 | 91 | 91 | 88 | 88 | 82 |
-| bermuda-dormancy | 82 | 72 | 82 | 82 | 82 | 82 |
-| bermuda-drought | 88 | 91 | 82 | 72 | 72 | 82 |
-| centipede-summer | 82 | 91 | 52 | 72 | 72 | 91 |
-| st-augustine-summer | 78 | 88 | 78 | 82 | 82 | 84 |
-| zoysia-spring | 82 | 88 | 82 | 82 | 82 | 88 |
+| fall-preemergent | 82 | 88 | 88 | 82 | 82 | 82 | 72 |
+| kbg-july-heat | 91 | 91 | 91 | 82 | 82 | 91 | 91 |
+| ryegrass-spring | 82 | 82 | 82 | 72 | 72 | 72 | 88 |
+| tall-fescue-low-ph | 72 | 82 | 82 | 82 | 82 | 88 | 82 |
+| drought-cool | 92 | 91 | 82 | 88 | 88 | 82 | 88 |
+| grub-damage | 88 | 88 | 91 | 88 | 88 | 91 | 91 |
+| high-ph | 62 | 62 | 82 | 82 | 82 | 82 | 82 |
+| overwatering | 91 | 82 | 91 | 91 | 91 | 91 | 91 |
+| recently-seeded | 62 | 62 | 82 | 88 | 88 | 82 | 42 |
+| sparse-profile | 72 | 91 | 91 | 88 | 88 | 82 | 91 |
+| bermuda-dormancy | 82 | 72 | 82 | 82 | 82 | 82 | 82 |
+| bermuda-drought | 88 | 91 | 82 | 72 | 72 | 82 | 91 |
+| centipede-summer | 82 | 91 | 52 | 72 | 72 | 91 | 91 |
+| st-augustine-summer | 78 | 88 | 78 | 82 | 82 | 84 | 82 |
+| zoysia-spring | 82 | 88 | 82 | 82 | 82 | 88 | 91 |
 
 ## Key Fixes by Run
 
