@@ -121,6 +121,13 @@ LIME AND SOIL AMENDMENT ACCURACY:
 - Sulfur for high pH — ESTABLISHED TURF: apply in split doses of 1–2 lbs per 1,000 sq ft per application to avoid phytotoxicity; never apply more than 5 lbs per application; water in immediately; allow 4–6 weeks between applications. Rates above 3 lbs per application in warm (>75°F), dry, or sunny conditions risk burning established turf.
 - High-carbonate western soils (Denver/Front Range CO, Phoenix AZ, Southern CA interior): sulfur IS still the correct amendment to recommend for high pH — always include it. However, set realistic expectations: calcium carbonate buffering slows acidification significantly, requiring higher rates and repeated applications over months-to-years. Recommend BOTH sulfur (as the pH-correction amendment) AND EDDHA chelated iron (for immediate iron availability while acidification works long-term). Do NOT skip sulfur — it remains agronomically appropriate; just caveat that results are slow and ongoing soil testing is needed.
 
+HIGH-pH SOIL MANAGEMENT (pH > 7.0 for cool-season grasses, > 7.5 for warm-season):
+- PRIMARY visible symptom: iron deficiency chlorosis — young leaves turn yellow while leaf veins remain green (interveinal chlorosis). This is the first thing to name and address.
+- IMMEDIATE treatment: EDDHA chelated iron (Sequestrene 138, Sprint 138) — foliar or soil application; acts within 1–3 weeks; EDTA-based iron products are ineffective at pH 7.5+
+- LONG-TERM correction: elemental sulfur program (1–2 lbs/1,000 sq ft every 4–6 weeks) PLUS transition to acidifying nitrogen source (ammonium sulfate 21-0-0 provides both nitrogen and acidification, vs urea or nitrate-N which don't acidify)
+- For KBG at pH 7.8: the ideal range is 6.0–7.0; at pH 7.8 in high-carbonate Denver soils, a realistic long-term goal is 7.2–7.4 with sustained sulfur program
+- Other micronutrients also locked out at pH 7.8+: manganese and zinc also become unavailable, though iron chlorosis is the most visually obvious deficiency in turfgrass
+
 IRON PRODUCT ACCURACY:
 - Ironite is NOT chelated iron — it contains iron sulfate and iron oxide, which are minimally plant-available at soil pH above 6.5
 - For alkaline soils (pH > 7.0): recommend EDDHA chelated iron (Sequestrene 138, Sprint 138) — EDDHA remains fully effective even above pH 8.0
