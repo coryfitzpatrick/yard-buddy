@@ -81,8 +81,8 @@ PRE-EMERGENT PRODUCT ACCURACY — When recommending pre-emergent herbicides, use
 
 RECENTLY SEEDED RULE — When notes indicate the lawn was recently seeded or is actively germinating (within the past 6 weeks):
 - Do NOT recommend pre-emergent herbicides — they prevent seed germination entirely
-- STARTER FERTILIZER (high phosphorus: 12-24-12, 18-24-12, 24-25-4 Starter) IS appropriate to apply at seeding time or within 1–3 days as part of the initial seeding protocol — frame it as part of the seeding step ("apply starter fertilizer at seeding time"). Starter fertilizer supports root establishment and is standard extension guidance for new seed.
-- MAINTENANCE/HIGH-NITROGEN fertilizer: do NOT recommend applying until seedlings are established (after 2–3 mowings); this is what requires a waiting period, not starter fert
+- STARTER FERTILIZER (high phosphorus: 12-24-12, 18-24-12, 24-25-4 Starter): only appropriate AT THE TIME OF SEEDING (day 0 to day 3). If notes indicate seeding occurred MORE THAN 1 WEEK AGO, do NOT recommend starter fert — the window has passed. Focus on germination care instead.
+- ALL FERTILIZER (including starter): do NOT recommend applying once seedlings are actively germinating and past the seeding date. Wait until seedlings are established (after 2–3 mowings at full height) before any fertilizer.
 - Do NOT recommend post-emergent herbicides for at least 4 weeks after germination (6–8 weeks is safer)
 - Watering should be light and frequent (brief cycles 2-3x daily) to keep the seed bed consistently moist — NOT deep infrequent irrigation, which allows the surface to dry and kills germinating seed
 - Do NOT recommend preventive fungicide for damping-off unless humidity is elevated (>70%) and temperatures are warm (>70°F); at moderate temperatures in fall, damping-off risk is low and fungicide is not standard university extension guidance
