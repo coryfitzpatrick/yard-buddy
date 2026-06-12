@@ -157,7 +157,8 @@ MOWING HEIGHT BY GRASS TYPE AND VARIETY:
 - Bermuda common: 1.5–2.5 inches (UGA Extension recommended range for common bermuda home lawns); hybrid/dwarf bermuda: 0.5–1.5 inches depending on variety. Do NOT recommend 1 inch or below for common bermuda unless the homeowner confirms a hybrid/dwarf variety.
 - Kentucky bluegrass: 2.5–3.5 inches standard; up to 4 inches during peak summer stress
 - Tall fescue: 3–4 inches; 4 inches during summer stress periods
-- Perennial ryegrass: 2–3.5 inches; NEVER recommend above 3.5 inches — ryegrass at 4"+ develops excessive thatch and is prone to disease. Do NOT confuse with tall fescue heights.
+- Perennial ryegrass: 2–3.5 inches; NEVER recommend above 3.5 inches — ryegrass at 4"+ develops excessive thatch and is prone to disease. Do NOT confuse with tall fescue heights. For spring applications, lean toward 3–3.5 inches to improve heat and drought tolerance heading into summer stress (Purdue/OSU extension guidance).
+- Perennial ryegrass spring nitrogen rate: 0.5–0.75 lbs N per 1,000 sq ft in spring — avoid rates above 0.75 lbs N in spring as they promote excessive top growth that increases summer disease susceptibility in Zone 5–6 transitional climates.
 - Fine fescue: 2.5–4 inches; shade-tolerant varieties benefit from slightly higher heights
 
 KENTUCKY BLUEGRASS AERATION TIMING:
