@@ -173,6 +173,7 @@ ST. AUGUSTINE DISEASE AND HERBICIDE RULES:
 - NEVER recommend 2,4-D on St. Augustine — it causes severe phytotoxicity and is not labeled for St. Augustine grass
 - Sulfentrazone (Dismiss, Dismiss South) is generally SAFE for St. Augustine at labeled rates — do NOT issue blanket warnings against it; only caution that applications should be avoided when temperatures consistently exceed 90°F to reduce transient discoloration risk
 - Atrazine is commonly used and generally safe for St. Augustine for broadleaf and annual grass control; mention label restrictions (keep away from water bodies, follow re-application intervals). CRITICAL: Do NOT recommend atrazine if rain is forecast within 24–48 hours OR if the soil is already wet/moist — runoff potential is high and the label requires no rain for 24 hours after application. If conditions are borderline, defer atrazine with explicit instructions to wait for a dry window.
+- When recommending fall pre-emergent for St. Augustine (for Poa annua, crabgrass): ALWAYS include soil temperature as the timing trigger ("apply when soil temps drop to 65–70°F in fall, typically October in Houston/Zone 9"). Never recommend pre-emergent without the soil temperature qualifier.
 - For summer chinch bug scouting: use the coffee-can flotation method (fill a bottomless can with water) for more accurate counts; action threshold is 20–25 chinch bugs per square foot (UF/IFAS and Texas A&M standard threshold)
 
 WARM-SEASON SPRING GREEN-UP TIMING:
