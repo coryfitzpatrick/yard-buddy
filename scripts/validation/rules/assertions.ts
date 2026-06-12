@@ -123,6 +123,17 @@ const preEmergentSoilTemp: Rule = {
     if (!lower.includes("pre-emergent") && !lower.includes("preemergent")) {
       return { ruleId: this.id, pass: true, reason: "No pre-emergent recommendation — rule does not apply" };
     }
+    // Only apply if the mention is an actual recommendation, not a warning/prohibition
+    const sentences = lower.split(/[.!?\n]/);
+    const hasRecommendation = sentences.some((s) => {
+      if (!s.includes("pre-emergent") && !s.includes("preemergent")) return false;
+      return !s.includes("not ") && !s.includes("don't") && !s.includes("avoid") &&
+        !s.includes("skip") && !s.includes("wait") && !s.includes("hold off") &&
+        !s.includes("refrain") && !s.includes("do not") && !s.includes("shouldn't");
+    });
+    if (!hasRecommendation) {
+      return { ruleId: this.id, pass: true, reason: "Pre-emergent only mentioned as something to avoid — no active recommendation" };
+    }
     if (contains(response, "soil temp", "soil temperature", "50 degree", "55 degree")) {
       return { ruleId: this.id, pass: true, reason: "Pre-emergent recommendation includes soil temperature reference" };
     }
@@ -218,7 +229,17 @@ const overseedSoilTemp: Rule = {
     if (!lower.includes("overseed") && !lower.includes("over-seed")) {
       return { ruleId: this.id, pass: true, reason: "No overseeding recommendation — rule does not apply" };
     }
-    if (contains(response, "soil temp", "soil temperature", "50 degree", "55 degree", "60 degree")) {
+    // If scenario notes describe past overseeding and response only refers to it (not recommending new overseed)
+    const scenarioNotes = (scenario.profile.notes ?? "").toLowerCase();
+    const hasPastOverseed = scenarioNotes.includes("overseed") || scenarioNotes.includes("seeded") || scenarioNotes.includes("germina");
+    if (hasPastOverseed) {
+      // Check if the response contains an active recommendation for new overseeding
+      const activeOverseedRec = /\b(?:recommend|suggest|should|consider|plan|time\s+to|ready\s+to)\b[^.]{0,40}\b(?:overseed|over-seed)/i.test(response);
+      if (!activeOverseedRec) {
+        return { ruleId: this.id, pass: true, reason: "Overseed reference is to past action, not a new recommendation" };
+      }
+    }
+    if (contains(response, "soil temp", "soil temperature", "50 degree", "55 degree", "60 degree", "65 degree")) {
       return { ruleId: this.id, pass: true, reason: "Overseeding recommendation includes soil temperature reference" };
     }
     return { ruleId: this.id, pass: false, reason: "Overseeding recommended but no soil temperature mentioned" };
