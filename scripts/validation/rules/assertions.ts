@@ -206,6 +206,18 @@ const fungicideNeedsHumidity: Rule = {
     if (!lower.includes("fungicide") && !lower.includes("fungal treatment") && !lower.includes("apply fungal")) {
       return { ruleId: this.id, pass: true, reason: "No fungicide recommendation — rule does not apply" };
     }
+    // Skip if fungicide is only mentioned in a prohibitive/advisory context
+    const sentences = lower.split(/[.!?\n]/);
+    const hasPositiveRec = sentences.some((s) => {
+      if (!s.includes("fungicide") && !s.includes("fungal treatment")) return false;
+      return !s.includes("not ") && !s.includes("don't") && !s.includes("avoid") &&
+        !s.includes("defer") && !s.includes("hold off") && !s.includes("do not") &&
+        !s.includes("shouldn't") && !s.includes("unnecessary") && !s.includes("not recommended") &&
+        !s.includes("not needed") && !s.includes("not warranted");
+    });
+    if (!hasPositiveRec) {
+      return { ruleId: this.id, pass: true, reason: "Fungicide only mentioned as something to avoid — no active recommendation" };
+    }
     const humidity = scenario.profile.weatherData?.humidity ?? 100;
     const recentRain = scenario.profile.weatherData?.recentRainfall ?? 1;
     const moisture = scenario.profile.soilMoisture;
