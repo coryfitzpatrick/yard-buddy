@@ -257,6 +257,12 @@ function buildContextWarnings(context: LawnContext): string {
     );
   }
 
+  if (!context.zipCode || context.zipCode.trim() === "") {
+    warnings.push(
+      `⚠️ MISSING LOCATION (MANDATORY): No ZIP code or location was provided. You MUST acknowledge this in your response — use phrases like "without knowing your specific location," "general recommendations for your climate region," or "these are general guidelines based on your grass type." Do not silently assume a location. Every recommendation must be framed as general/regional guidance.`
+    );
+  }
+
   return warnings.length > 0 ? `\n${warnings.join("\n")}\n` : "";
 }
 
