@@ -157,7 +157,7 @@ KENTUCKY BLUEGRASS DISEASE ACCURACY:
 - Summer patch: causal pathogen is Magnaporthe poae — do NOT call it Magnaporthe nivalis (that is pink snow mold, a completely different cool-weather disease). Never identify summer patch as "caused by Magnaporthe nivalis."
 - Necrotic ring spot: caused by Ophiosphaerella korrae — similar symptoms to summer patch (rings, frogeye patterns) but a distinct pathogen
 - Both root/crown diseases are favored by soil temperatures 65–80°F (summer patch most active when soil at 4-inch depth exceeds 65°F) and are triggered by summer heat stress on KBG
-- Treatment: fungicide drench with DMI fungicide (propiconazole, myclobutanil) or QoI (azoxystrobin) applied preventively when soil temps approach 65°F; curative control is difficult once symptoms appear
+- Treatment: fungicide drench with DMI fungicide (propiconazole, myclobutanil) or QoI (azoxystrobin) applied preventively when soil temps approach 65°F — ONLY when moisture conditions are adequate (humidity >65% or recent rainfall or moist soil). Do NOT recommend preventive summer patch fungicide when conditions are hot and dry (humidity below 65%, no recent rainfall) — the pathogen requires moisture to be active.
 
 MOWING HEIGHT BY GRASS TYPE AND VARIETY:
 - Zoysia: varies by variety — fine-leaf types (Zeon, Emerald, Cavalier): 0.5–1.5 inches; coarser home-lawn types (Meyer, Z-52, Zenith, Empire): 1.5–2.5 inches. Without knowing the specific variety, recommend 1.5–2 inches as a safe general guideline. Never recommend below 1 inch unless homeowner confirms a fine-leaf variety.
@@ -299,10 +299,11 @@ function buildContextWarnings(context: LawnContext): string {
 
   const humidity = context.weatherData?.humidity;
   const recentRainfall = context.weatherData?.recentRainfall ?? 0;
-  const isDryConditions = recentRainfall === 0 && humidity != null && humidity < 50 && temp != null && temp >= 80;
+  // Fire for any temperature — low humidity + no rain = no fungal pressure regardless of heat
+  const isDryConditions = recentRainfall === 0 && humidity != null && humidity < 65;
   if (isDryConditions && !isDroughtStress) {
     warnings.push(
-      `⚠️ DRY CONDITIONS FUNGICIDE CONSTRAINT (MANDATORY): Humidity is ${humidity}% with no recent rainfall and temperature is ${temp}°F — these conditions do NOT support fungal disease development. HARD RULE: Do NOT recommend fungicide application. If disease is mentioned, frame it as a monitoring note only ("watch for X if conditions become humid"), NOT an active treatment recommendation.`
+      `⚠️ DRY CONDITIONS FUNGICIDE CONSTRAINT (MANDATORY): Humidity is ${humidity}% with no recent rainfall — these conditions do NOT support fungal disease development or spread. HARD RULE: Do NOT recommend fungicide application of any kind. This applies even to preventive summer patch or necrotic ring spot fungicide drench — preventive fungicides require moisture to be relevant. If disease is mentioned, frame it ONLY as a future monitoring note ("watch for X if conditions become more humid"), NOT as an active treatment.`
     );
   }
 
