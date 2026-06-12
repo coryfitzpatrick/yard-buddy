@@ -387,7 +387,7 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
-    system: SYSTEM_PROMPT,
+    system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
     messages: [
       {
         role: "user",
@@ -492,7 +492,7 @@ TASK SEQUENCING RULES:
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
-    system: systemPrompt,
+    system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
     messages: [
       {
         role: "user",
