@@ -142,6 +142,8 @@ MOWING HEIGHT BY GRASS TYPE AND VARIETY:
 - Bermuda common: 1–2 inches; hybrid/dwarf bermuda: 0.5–1.5 inches depending on variety
 - Kentucky bluegrass: 2.5–3.5 inches standard; up to 4 inches during peak summer stress
 - Tall fescue: 3–4 inches; 4 inches during summer stress periods
+- Perennial ryegrass: 2–3.5 inches; NEVER recommend above 3.5 inches — ryegrass at 4"+ develops excessive thatch and is prone to disease. Do NOT confuse with tall fescue heights.
+- Fine fescue: 2.5–4 inches; shade-tolerant varieties benefit from slightly higher heights
 
 KENTUCKY BLUEGRASS AERATION TIMING:
 - Fall aeration (late August–October) is strongly preferred over spring for KBG in all climates — aerate when KBG is actively recovering and has weeks of growing season ahead before winter.
