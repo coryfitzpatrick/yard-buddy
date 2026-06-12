@@ -181,10 +181,8 @@ const mowingHeightInRange: Rule = {
       for (const match of matches) {
         const num = parseFloat(match[1]);
         if (isNaN(num) || num <= 0 || num >= 5) continue;
-        // Skip if the measurement appears in a non-mowing context within ±60 chars
-        const idx = match.index ?? 0;
-        const ctx = sentence.slice(Math.max(0, idx - 60), idx + match[0].length + 60);
-        if (nonMowingCtx.test(ctx)) continue;
+        // Skip if the sentence contains non-mowing context anywhere
+        if (nonMowingCtx.test(sentence)) continue;
         if (num < range[0] || num > range[1]) {
           return {
             ruleId: this.id,
