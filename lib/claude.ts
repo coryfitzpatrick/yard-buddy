@@ -107,7 +107,7 @@ TASK SEQUENCING RULES — only include prerequisite tasks when the conditions ac
 SOIL TEMPERATURE GUIDANCE — Whenever recommending pre-emergent herbicides or overseeding, always specify soil temperature as the timing trigger, not calendar date alone:
 - Always instruct the homeowner to verify soil temperature using a soil thermometer (at 2–4 inch depth) or an online tool — do NOT infer soil temp from air temperature alone; they can differ by 10–20°F
 - In high-altitude or high-desert climates (Denver CO, Salt Lake City UT, Albuquerque NM): spring soil temps lag air temps by 3–6 weeks. Even when air temp reaches 65–70°F in April, soil at 2-inch depth may still be 45–50°F. Do not recommend "urgent" spring pre-emergent based on air temp alone in these climates.
-- Crabgrass pre-emergent: apply before soil temp reaches 55°F at 2-inch depth (for 3–5 consecutive days)
+- Crabgrass pre-emergent: apply when soil temp is in the 50–55°F range at 2-inch depth (maintained for 3–5 consecutive days). The optimal window is BEFORE soil temps consistently exceed 55°F — waiting until soil temp hits 55°F risks being too late in a fast-warming spring. Recommend applying when soil temp is 50–53°F to provide a comfortable buffer (Purdue Extension guidance).
 - Winter annual pre-emergent (Poa annua, chickweed): apply when soil temps drop to 55–70°F in fall
 - Cool-season overseeding: soil temp 50–65°F, ideally above 55°F for reliable germination before winter
 - Warm-season green-up fertilization: soil temp sustained at 65°F+
@@ -282,6 +282,12 @@ function buildContextWarnings(context: LawnContext): string {
   if (context.yardSizeSqft !== undefined && context.yardSizeSqft <= 0) {
     warnings.push(
       `⚠️ INVALID YARD SIZE: The provided yard size (${context.yardSizeSqft} sq ft) is invalid or missing. You MUST acknowledge this uncertainty in your response and note that product quantities cannot be calculated without a valid yard size. Use phrases like "unable to calculate exact quantities without a valid yard size" or "cannot determine specific amounts." Do not provide specific product amounts (lbs, bags, or oz per sq ft calculations) when yard size is invalid.`
+    );
+  }
+
+  if (context.soilPh != null && (context.soilPh < 0 || context.soilPh > 14)) {
+    warnings.push(
+      `⚠️ INVALID SOIL pH: The provided soil pH (${context.soilPh}) is outside the physically possible range of 0–14. pH values below 0 or above 14 cannot occur in soil. You MUST acknowledge this as an invalid reading and express uncertainty — use phrases like "the pH reading appears to be invalid," "this value is outside the measurable pH range," or "please retest with a calibrated meter." Do NOT provide specific pH-based recommendations (lime rates, sulfur rates, amendment programs) based on an invalid pH value.`
     );
   }
 
