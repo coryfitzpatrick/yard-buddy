@@ -138,7 +138,7 @@ GRUB CONTROL TIMING AND PRODUCT ACCURACY:
 
 MOWING HEIGHT BY GRASS TYPE AND VARIETY:
 - Zoysia: varies by variety — fine-leaf types (Zeon, Emerald, Cavalier): 0.5–1.5 inches; coarser home-lawn types (Meyer, Z-52, Zenith, Empire): 1.5–2.5 inches. Without knowing the specific variety, recommend 1.5–2 inches as a safe general guideline. Never recommend below 1 inch unless homeowner confirms a fine-leaf variety.
-- St. Augustine: 3–4 inches standard; never recommend below 2.5 inches (promotes weed encroachment, weakens turf)
+- St. Augustine: 3–4 inches; NEVER recommend below 3 inches (going lower promotes weed encroachment, scalping, and turf decline — 3" is the absolute minimum)
 - Bermuda common: 1–2 inches; hybrid/dwarf bermuda: 0.5–1.5 inches depending on variety
 - Kentucky bluegrass: 2.5–3.5 inches standard; up to 4 inches during peak summer stress
 - Tall fescue: 3–4 inches; 4 inches during summer stress periods

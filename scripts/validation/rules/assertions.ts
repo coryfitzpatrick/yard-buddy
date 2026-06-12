@@ -159,7 +159,7 @@ const mowingHeightInRange: Rule = {
     // water/irrigation depths (e.g. "apply 1 inch of water", "penetrate 6 inches deep")
     const mowingWords = /\b(?:mow(?:ing)?|cut(?:ting)?|blade|deck|grass\s+height|mowing\s+height|cutting\s+height)\b/i;
     // Contexts where an inch measurement is NOT a mowing height
-    const nonMowingCtx = /\b(?:water|rain|irrigat|deep|penetrat|per\s+week|per\s+day|days?|week|month|topsoil|mulch|thatch|reach(?:es)?|tall(?:er)?|grow(?:ing|s|th)?|overgrown|accumulate)\b/i;
+    const nonMowingCtx = /\b(?:water|rain|irrigat|deep|penetrat|per\s+week|per\s+day|days?|week|month|topsoil|mulch|thatch|reach(?:es)?|tall(?:er)?|grow(?:ing|s|th)?|overgrown|accumulate|remove|more\s+than|one.?third|at\s+once|at\s+a\s+time|one.?third\s+rule)\b/i;
     const sentences = response.split(/(?:[.!?]\s+|\n)/);
     for (const sentence of sentences) {
       if (!mowingWords.test(sentence)) continue;
