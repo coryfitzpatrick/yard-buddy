@@ -256,6 +256,7 @@ function buildContextWarnings(context: LawnContext): string {
       `⚠️ HEAT STRESS CONSTRAINT (MANDATORY): This cool-season grass (${context.grassType}) is under heat stress — air temperature is ${temp}°F. HARD RULES for this response:
 - Do NOT recommend high-nitrogen fertilizer now or include specific high-N product codes (28-0, 32-0, 34-0, 30-0) anywhere in your response — not even as future planning examples.
 - If fertilization is mentioned, say only "defer to fall when temperatures drop below 75°F" without naming specific high-N products.
+- Do NOT recommend overseeding or seeding now — cool-season seed cannot germinate or survive in ${temp}°F heat. Overseeding should be deferred to fall when soil temps are 50–65°F.
 - Focus on heat stress management: raise mowing height, deep infrequent irrigation, avoid foot traffic.`
     );
   }
@@ -275,9 +276,18 @@ function buildContextWarnings(context: LawnContext): string {
 - Priority #1 is rehydration: deep, infrequent irrigation (1–1.5 inches, early morning, 2–3 cycles/week).
 - MOWING HEIGHT: RAISE to the MAXIMUM for this grass type during drought — tall fescue: 4 inches, Kentucky bluegrass: 4 inches, bermuda: 2 inches. NEVER lower mowing height during drought stress; lower heights increase water loss and turf damage.
 - Do NOT recommend fertilization of any kind — applying fertilizer to drought-stressed turf causes salt burn and amplifies stress.
-- Do NOT recommend herbicide or fungicide applications — stressed turf cannot safely absorb them, and dry conditions prevent fungal disease development anyway.
-- Defer all non-irrigation inputs (fertilizer, weed control, pre-emergent, fungicide) until the lawn has fully recovered (2–3 weeks of normal growth).
+- ABSOLUTELY NO FUNGICIDE: Do NOT recommend any fungicide — dry conditions (soil moisture: dry, no recent rainfall) prevent fungal disease development. Fungal pathogens require moisture to spread. Any fungicide recommendation in these conditions is agronomically incorrect.
+- Defer ALL non-irrigation inputs (fertilizer, weed control, pre-emergent, fungicide) until the lawn has fully recovered (2–3 weeks of normal growth).
 - Include the footprint/wilt test as a watering trigger: water when footprints remain visible 30 minutes after walking on the lawn.`
+    );
+  }
+
+  const humidity = context.weatherData?.humidity;
+  const recentRainfall = context.weatherData?.recentRainfall ?? 0;
+  const isDryConditions = recentRainfall === 0 && humidity != null && humidity < 50 && temp != null && temp >= 80;
+  if (isDryConditions && !isDroughtStress) {
+    warnings.push(
+      `⚠️ DRY CONDITIONS FUNGICIDE CONSTRAINT (MANDATORY): Humidity is ${humidity}% with no recent rainfall and temperature is ${temp}°F — these conditions do NOT support fungal disease development. HARD RULE: Do NOT recommend fungicide application. If disease is mentioned, frame it as a monitoring note only ("watch for X if conditions become humid"), NOT an active treatment recommendation.`
     );
   }
 
