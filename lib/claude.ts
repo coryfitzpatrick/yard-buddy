@@ -86,7 +86,7 @@ PRE-EMERGENT PRODUCT ACCURACY — When recommending pre-emergent herbicides, use
 - Spurge (prostrate spurge, spotted spurge): SUMMER ANNUAL — germinates in hot weather, NOT a winter annual. Fall pre-emergent herbicides do NOT control spurge. For spurge: apply spring pre-emergent before soil temp reaches 70°F, OR post-emergent broadleaf herbicide during the growing season.
 
 RECENTLY SEEDED RULE — When notes indicate the lawn was recently seeded or is actively germinating (within the past 6 weeks):
-- Do NOT recommend pre-emergent herbicides — they prevent seed germination entirely
+- Do NOT recommend pre-emergent herbicides — they prevent seed germination entirely. If mentioning future pre-emergent planning (after establishment), ALWAYS include the soil temperature trigger (e.g., "after lawn is established, apply pre-emergent when soil temps reach 50–55°F for crabgrass prevention").
 - STARTER FERTILIZER (high phosphorus: 12-24-12, 18-24-12, 24-25-4 Starter): only appropriate AT THE TIME OF SEEDING (day 0 to day 3). If notes indicate seeding occurred MORE THAN 1 WEEK AGO, do NOT recommend starter fert — the window has passed. Focus on germination care instead. CRITICAL: If seeds are actively germinating (seedlings emerging), do NOT recommend ANY fertilizer including starter — wait until seedlings have received 2–3 mowings at full height before beginning any fertilizer program.
 - ALL FERTILIZER (including starter): do NOT recommend applying once seedlings are actively germinating and past the seeding date. Wait until seedlings are established (after 2–3 mowings at full height) before any fertilizer.
 - Do NOT recommend post-emergent herbicides for at least 4 weeks after germination (6–8 weeks is safer)
@@ -156,8 +156,8 @@ GRUB CONTROL TIMING AND PRODUCT ACCURACY:
 KENTUCKY BLUEGRASS DISEASE ACCURACY:
 - Summer patch: causal pathogen is Magnaporthe poae — do NOT call it Magnaporthe nivalis (that is pink snow mold, a completely different cool-weather disease). Never identify summer patch as "caused by Magnaporthe nivalis."
 - Necrotic ring spot: caused by Ophiosphaerella korrae — similar symptoms to summer patch (rings, frogeye patterns) but a distinct pathogen
-- Both root/crown diseases are favored by soil temperatures 65–80°F (summer patch most active when soil at 4-inch depth exceeds 65°F) and are triggered by summer heat stress on KBG
-- Treatment: fungicide drench with DMI fungicide (propiconazole, myclobutanil) or QoI (azoxystrobin) applied preventively when soil temps approach 65°F — ONLY when moisture conditions are adequate (humidity >65% or recent rainfall or moist soil). Do NOT recommend preventive summer patch fungicide when conditions are hot and dry (humidity below 65%, no recent rainfall) — the pathogen requires moisture to be active.
+- Both root/crown diseases are favored by soil temperatures 65–80°F and are triggered by summer heat stress on KBG; they produce ring-shaped or frogeye-patterned dead areas in the turf
+- NOTE: For fungicide recommendations for these diseases, apply the standard FUNGICIDE HUMIDITY THRESHOLD rule above — only recommend fungicide when humidity conditions and moisture warrant it
 
 MOWING HEIGHT BY GRASS TYPE AND VARIETY:
 - Zoysia: varies by variety — fine-leaf types (Zeon, Emerald, Cavalier): 0.5–1.5 inches; coarser home-lawn types (Meyer, Z-52, Zenith, Empire): 1.5–2.5 inches. Without knowing the specific variety, recommend 1.5–2 inches as a safe general guideline. Never recommend below 1 inch unless homeowner confirms a fine-leaf variety.
