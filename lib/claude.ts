@@ -257,6 +257,12 @@ function buildContextWarnings(context: LawnContext): string {
     );
   }
 
+  if (context.grassType === "st_augustine" && temp != null && temp >= 80) {
+    warnings.push(
+      `⚠️ ST. AUGUSTINE MOWING CONSTRAINT (MANDATORY): St. Augustine must ALWAYS be mowed at 3–4 inches — the absolute MINIMUM is 3 inches. NEVER recommend a mowing height below 3 inches for St. Augustine, even in summer heat. Do NOT apply bermuda grass mowing heights to St. Augustine.`
+    );
+  }
+
   const isDroughtStress = (context.soilMoisture === "dry") &&
     (context.weatherData?.recentRainfall ?? 1) === 0 &&
     (temp != null && temp >= 80);
