@@ -288,7 +288,7 @@ function buildContextWarnings(context: LawnContext): string {
     warnings.push(
       `⚠️ DROUGHT STRESS CONSTRAINT (MANDATORY): This lawn is in acute drought stress — soil is dry, no recent rainfall, and temperature is ${temp}°F. HARD RULES for this response:
 - Priority #1 is rehydration: deep, infrequent irrigation (1–1.5 inches, early morning, 2–3 cycles/week).
-- MOWING HEIGHT: RAISE to the MAXIMUM for this grass type during drought — tall fescue: 4 inches, Kentucky bluegrass: 3.5 inches, bermuda common: 1.5 inches (Arizona/desert bermuda: 1–1.5 inches). NEVER lower mowing height during drought stress; lower heights increase water loss and turf damage.
+- MOWING HEIGHT: RAISE to the MAXIMUM for this grass type during drought — tall fescue: 4 inches, Kentucky bluegrass: 3.5 inches, bermuda: 1.5 inches. NEVER lower mowing height during drought stress; lower heights increase water loss and turf damage.
 - Do NOT recommend fertilization of any kind — applying fertilizer to drought-stressed turf causes salt burn and amplifies stress.
 - ABSOLUTELY NO FUNGICIDE: Do NOT recommend any fungicide — dry conditions (soil moisture: dry, no recent rainfall) prevent fungal disease development. Fungal pathogens require moisture to spread. Any fungicide recommendation in these conditions is agronomically incorrect.
 - Defer ALL non-irrigation inputs (fertilizer, weed control, pre-emergent, fungicide) until the lawn has fully recovered (2–3 weeks of normal growth).
