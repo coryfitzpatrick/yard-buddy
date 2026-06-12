@@ -406,18 +406,18 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         </div>
         <div className="space-y-1">
           <Label>Nitrogen (N) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
-          <Input type="number" step="0.1" min="0" placeholder="e.g. 42" {...register("nitrogenPpm")} />
-          {errors.nitrogenPpm && <p className="text-sm text-red-500">{errors.nitrogenPpm.message || "Must be a positive number"}</p>}
+          <Input type="number" step="0.1" min="0" max="1000" placeholder="e.g. 42" {...register("nitrogenPpm")} />
+          {errors.nitrogenPpm && <p className="text-sm text-red-500">{errors.nitrogenPpm.message || "Must be between 0 and 1000 ppm"}</p>}
         </div>
         <div className="space-y-1">
           <Label>Phosphorus (P) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
-          <Input type="number" step="0.1" min="0" placeholder="e.g. 28" {...register("phosphorusPpm")} />
-          {errors.phosphorusPpm && <p className="text-sm text-red-500">{errors.phosphorusPpm.message || "Must be a positive number"}</p>}
+          <Input type="number" step="0.1" min="0" max="2000" placeholder="e.g. 28" {...register("phosphorusPpm")} />
+          {errors.phosphorusPpm && <p className="text-sm text-red-500">{errors.phosphorusPpm.message || "Must be between 0 and 2000 ppm"}</p>}
         </div>
         <div className="space-y-1">
           <Label>Potassium (K) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
-          <Input type="number" step="0.1" min="0" placeholder="e.g. 180" {...register("potassiumPpm")} />
-          {errors.potassiumPpm && <p className="text-sm text-red-500">{errors.potassiumPpm.message || "Must be a positive number"}</p>}
+          <Input type="number" step="0.1" min="0" max="2000" placeholder="e.g. 180" {...register("potassiumPpm")} />
+          {errors.potassiumPpm && <p className="text-sm text-red-500">{errors.potassiumPpm.message || "Must be between 0 and 2000 ppm"}</p>}
         </div>
         <div className="space-y-1">
           <Label>Soil Test Source <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>

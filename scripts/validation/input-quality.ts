@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generateRecommendations } from "../../lib/claude";
 import type { LawnContext } from "../../lib/claude";
+import { yardSectionSchema } from "../../lib/validations/yard";
 import type { InputTestResult } from "./types";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -90,47 +91,39 @@ export async function runInputGuardTests(): Promise<InputTestResult[]> {
 
   // --- Value boundary tests ---
 
+  // Boundary tests: verify that impossible values are rejected by input validation (Zod schema),
+  // not that the AI handles them gracefully. These values should never reach generateRecommendations()
+  // in production because the form UI (min/max) and Zod schema block them at the API layer.
+
   results.push(
     await runInputTest("boundary-ph-zero", async () => {
-      const ctx: LawnContext = { grassType: "tall_fescue", zipCode: "27601", soilPh: -1 };
-      const recs = await generateRecommendations(ctx);
-      assertUncertain(JSON.stringify(recs), "pH=-1");
-      return "pH=-1 handled with uncertainty";
+      const result = yardSectionSchema.safeParse({ grassType: "tall_fescue", soilPh: -1 });
+      if (result.success) throw new Error("Schema accepted invalid soilPh=-1 (below minimum 4)");
+      return "soilPh=-1 correctly rejected by schema validation";
     })
   );
 
   results.push(
     await runInputTest("boundary-ph-fourteen", async () => {
-      const ctx: LawnContext = { grassType: "tall_fescue", zipCode: "27601", soilPh: 14 };
-      const recs = await generateRecommendations(ctx);
-      assertUncertain(JSON.stringify(recs), "pH=14");
-      return "pH=14 handled with uncertainty";
+      const result = yardSectionSchema.safeParse({ grassType: "tall_fescue", soilPh: 14 });
+      if (result.success) throw new Error("Schema accepted invalid soilPh=14 (above maximum 9)");
+      return "soilPh=14 correctly rejected by schema validation";
     })
   );
 
   results.push(
     await runInputTest("boundary-nitrogen-extreme", async () => {
-      const ctx: LawnContext = {
-        grassType: "tall_fescue",
-        zipCode: "27601",
-        nitrogenPpm: 99999,
-      };
-      const recs = await generateRecommendations(ctx);
-      assertUncertain(JSON.stringify(recs), "nitrogen=99999");
-      return "nitrogen=99999 handled with uncertainty";
+      const result = yardSectionSchema.safeParse({ grassType: "tall_fescue", nitrogenPpm: 99999 });
+      if (result.success) throw new Error("Schema accepted invalid nitrogenPpm=99999 (above maximum 1000 ppm)");
+      return "nitrogenPpm=99999 correctly rejected by schema validation";
     })
   );
 
   results.push(
     await runInputTest("boundary-sqft-zero", async () => {
-      const ctx: LawnContext = {
-        grassType: "kentucky_bluegrass",
-        zipCode: "66101",
-        yardSizeSqft: -500,
-      };
-      const recs = await generateRecommendations(ctx);
-      assertUncertain(JSON.stringify(recs), "sqft=-500");
-      return "sqft=-500 handled";
+      const result = yardSectionSchema.safeParse({ grassType: "kentucky_bluegrass", yardSizeSqft: -500 });
+      if (result.success) throw new Error("Schema accepted invalid yardSizeSqft=-500 (below minimum 1)");
+      return "yardSizeSqft=-500 correctly rejected by schema validation";
     })
   );
 
