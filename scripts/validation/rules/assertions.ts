@@ -15,7 +15,7 @@ const COOL_SEASON: string[] = [
 const WARM_SEASON: string[] = ["bermuda", "zoysia", "st_augustine", "centipede", "buffalo"];
 
 const MOWING_RANGES: Record<string, [number, number]> = {
-  kentucky_bluegrass: [2.5, 3.5],
+  kentucky_bluegrass: [2.5, 4.0],
   tall_fescue: [3.0, 4.0],
   fine_fescue: [2.5, 4.0],
   ryegrass: [1.5, 2.5],
