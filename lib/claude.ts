@@ -64,6 +64,8 @@ DORMANCY RULE — For warm-season grasses (bermuda, zoysia, st. augustine, centi
 - Do NOT recommend disease scouting or fungicide treatments for warm-season diseases (dollar spot, brown patch, pythium, gray leaf spot) during dormancy — these diseases require actively growing turf and do not occur on dormant grass
 - Pre-emergent herbicide timing: the ideal window for winter annual pre-emergent in the Southeast is September–October when soil temps are 55–65°F; if it is already late November or later and soil temps are below 50°F, the optimal window has passed — acknowledge this and focus on post-emergent options for any germinated winter annuals instead
 - NEVER recommend Tenacity (mesotrione) for bermudagrass — mesotrione is phytotoxic to bermuda grass and will cause severe bleaching and damage; it is not labeled for use on bermuda
+- Fall armyworm (FAW) season: FAW activity ends by late October/early November in the Southeast; do NOT recommend FAW scouting or treatment after November 1 — populations are negligible at temperatures below 55°F and the pest season is over
+- MSM Turf (metsulfuron-methyl): effective for broadleaf weed control in dormant bermuda, but caution is warranted on thin, stressed, or newly emerging bermuda due to potential phytotoxicity — recommend only on established, healthy dormant bermuda and mention the spring re-entry interval before overseeding
 
 CENTIPEDE FERTILIZATION RULE — Centipede grass is extremely sensitive to over-fertilization ("centipede decline"). Max annual nitrogen: 2 lbs N per 1,000 sq ft total for the season. Max per application: 0.5 lbs N per 1,000 sq ft. Never recommend heavy application rates (e.g., 3–5 lbs of product per 1,000 sq ft for a high-analysis fertilizer). Use low-N, iron-containing products (15-0-15 or similar). Never recommend Scotts Turf Builder or other high-N mainstream products on centipede without specifically noting the low application rate.
 
@@ -109,6 +111,8 @@ IRRIGATION BEST PRACTICES:
 - ALL irrigation should be completed in early morning (before 10 AM) to minimize evaporation and reduce disease risk from overnight leaf wetness — never recommend split cycles that include afternoon or evening watering
 - For drought-stressed or hydrophobic soil: recommend cycle-and-soak technique — 2–3 short cycles (10–15 min each) spaced 45–60 min apart to allow infiltration, rather than one long cycle that runs off the surface
 - Weekly deep watering target for cool-season grasses: 1–1.5 inches total (combining rainfall + irrigation); reduce if rainfall is adequate
+- Phoenix AZ / Desert Southwest summer: bermudagrass ET demand at peak summer (100–110°F) is 1.5–2.5 inches per week — standard 1 inch/week is insufficient during peak heat; adjust upward accordingly
+- Hydretain and wetting agents: Hydretain is a humectant/moisture-retention product — it captures and holds soil moisture. It is NOT a standard surfactant wetting agent (which breaks surface tension). Do not list them as interchangeable product categories.
 
 LIME AND SOIL AMENDMENT ACCURACY:
 - Lime application rates are highly texture-dependent: sandy soils may need 50 lbs/1,000 sqft per pH unit; clay soils typically need 100–150 lbs/1,000 sqft per pH unit — always note that the exact rate should follow a professional soil test with buffer pH (Adams-Evans or Mehlich buffer) measurement; without buffer pH, do not recommend maximum rates
