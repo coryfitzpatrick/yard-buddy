@@ -16,27 +16,27 @@ Score interpretation: **90+ = releasable** | 85–89 = mostly trustworthy | 78�
 | 8 | 04e0771 | 2026-06-12 | 8/9 | 165/165 | 82.5 | P2 clean; P1 sqft-zero bug (fixed in 9189ebd after run start); centipede 52 regression |
 | 9 | 9189ebd | 2026-06-12 | 8/9 | 163/165 | 82.2 | centipede 72 (improved from 52); SA mowing still 2" in P2; stochastic drops in kbg, ryegrass, bermuda-drought |
 | 10 | d65d281 | 2026-06-12 | 9/9 | 162/165 | 82.2 | 3 P2 fails (kbg fungicide, kbg overseed, bermuda-drought fungicide — fixed in 1c0b900) |
-| 11 | 359855d | 2026-06-12 | — | — | pending | PRG mowing 2.5" max, spring N minimal, KBG Magnaporthe poae, centipede banned products, Hydretain ban, bermuda drought mowing, aeration gap, fall N split |
+| 11 | 359855d | 2026-06-12 | 9/9 | 163/165 | 84.7 | Big wins: centipede +19, bermuda-drought +10, kbg +9; ryegrass still 72 (mowing now too low) |
 
 ## Scenario Scores by Run
 
 | Scenario | R3 | R4 | R8 | R9 | R10 | R11 |
 |----------|----|----|----|----|-----|-----|
-| fall-preemergent | 82 | 88 | 88 | 82 | 82 | — |
-| kbg-july-heat | 91 | 91 | 91 | 82 | 82 | — |
-| ryegrass-spring | 82 | 82 | 82 | 72 | 72 | — |
-| tall-fescue-low-ph | 72 | 82 | 82 | 82 | 82 | — |
-| drought-cool | 92 | 91 | 82 | 88 | 88 | — |
-| grub-damage | 88 | 88 | 91 | 88 | 88 | — |
-| high-ph | 62 | 62 | 82 | 82 | 82 | — |
-| overwatering | 91 | 82 | 91 | 91 | 91 | — |
-| recently-seeded | 62 | 62 | 82 | 88 | 88 | — |
-| sparse-profile | 72 | 91 | 91 | 88 | 88 | — |
-| bermuda-dormancy | 82 | 72 | 82 | 82 | 82 | — |
-| bermuda-drought | 88 | 91 | 82 | 72 | 72 | — |
-| centipede-summer | 82 | 91 | 52 | 72 | 72 | — |
-| st-augustine-summer | 78 | 88 | 78 | 82 | 82 | — |
-| zoysia-spring | 82 | 88 | 82 | 82 | 82 | — |
+| fall-preemergent | 82 | 88 | 88 | 82 | 82 | 82 |
+| kbg-july-heat | 91 | 91 | 91 | 82 | 82 | 91 |
+| ryegrass-spring | 82 | 82 | 82 | 72 | 72 | 72 |
+| tall-fescue-low-ph | 72 | 82 | 82 | 82 | 82 | 88 |
+| drought-cool | 92 | 91 | 82 | 88 | 88 | 82 |
+| grub-damage | 88 | 88 | 91 | 88 | 88 | 91 |
+| high-ph | 62 | 62 | 82 | 82 | 82 | 82 |
+| overwatering | 91 | 82 | 91 | 91 | 91 | 91 |
+| recently-seeded | 62 | 62 | 82 | 88 | 88 | 82 |
+| sparse-profile | 72 | 91 | 91 | 88 | 88 | 82 |
+| bermuda-dormancy | 82 | 72 | 82 | 82 | 82 | 82 |
+| bermuda-drought | 88 | 91 | 82 | 72 | 72 | 82 |
+| centipede-summer | 82 | 91 | 52 | 72 | 72 | 91 |
+| st-augustine-summer | 78 | 88 | 78 | 82 | 82 | 84 |
+| zoysia-spring | 82 | 88 | 82 | 82 | 82 | 88 |
 
 ## Key Fixes by Run
 
@@ -82,15 +82,15 @@ Score interpretation: **90+ = releasable** | 85–89 = mostly trustworthy | 78�
 - SA mowing buildContextWarnings: hard 3" minimum constraint at runtime
 - SA pre-emergent: must always cite soil temperature (65–70°F in fall)
 
-## Known Remaining Issues (from Run 10)
+## Known Remaining Issues (from Run 11)
 
 | Scenario | Issue | Source |
 |----------|-------|--------|
-| ryegrass-spring | Mowing height 3.5" too high (should be 1.5–2.5"); spring N too heavy (0.5–0.75 discouraged for PRG) | Run 10 judge |
-| bermuda-drought | Hydretain "50% reduction" claim persisting; AZ mowing 2" too high | Run 10 judge |
-| centipede-summer | High-N products (30-0-4, 24-0-11) still recommended; DiseaseEx rate expressed as lbs | Run 10 judge |
-| kbg-july-heat | Summer patch pathogen wrong (Magnaporthe nivalis vs poae); 4" mowing exceeds K-State max | Run 10 judge |
-| fall-preemergent | Aeration+pre-emergent 2–3 day gap (need 4–6 weeks); single fall N app (should split) | Run 10 judge |
-| bermuda-dormancy | MSM Turf limited Poa annua efficacy; no freeze window restriction flagged | Run 10 judge |
-| zoysia-spring | Pre-emergent trigger stated at 55°F (should be 50–53°F); MSM Turf on transitioning zoysia | Run 10 judge |
-| tall-fescue-low-ph | Lime rate without buffer pH; recommend soil test FIRST, then apply lime | Run 10 judge |
+| ryegrass-spring | AI now recommends 1.5–2" (too low); spring needs 2–2.5"; Scotts TB 32-0-10 still recommended | Run 11 judge |
+| bermuda-drought | Mowing 1–1.5" now too low; U of A recommends 2" for drought on common bermuda | Run 11 judge |
+| high-ph | Sulfur 1–2 lbs/app "aggressive"; CSU recommends 0.5–1 lb for established turf | Run 11 judge |
+| bermuda-dormancy | Atrazine on dormant bermuda cautionary; broadleaf herbicide 55°F preferred (not 50°F per UGA) | Run 11 judge |
+| recently-seeded | Starter fert window "has passed" at 2 weeks — judge says overly absolute; allow through establishment | Run 11 judge |
+| fall-preemergent | Aeration + pre-emergent timing still complex; fall N split not always mentioned | Run 11 judge |
+| drought-cool | Cycle-and-soak volume language confusing; dormancy option not mentioned | Run 11 judge |
+| st-augustine | Chinch bug 20–25 contradicts Texas A&M (uses 15–20); gray leaf spot description | Run 11 judge |
