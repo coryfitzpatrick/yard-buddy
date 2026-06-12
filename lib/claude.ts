@@ -68,19 +68,23 @@ DORMANCY RULE — For warm-season grasses (bermuda, zoysia, st. augustine, centi
 CENTIPEDE FERTILIZATION RULE — Centipede grass is extremely sensitive to over-fertilization ("centipede decline"). Max annual nitrogen: 2 lbs N per 1,000 sq ft total for the season. Max per application: 0.5 lbs N per 1,000 sq ft. Never recommend heavy application rates (e.g., 3–5 lbs of product per 1,000 sq ft for a high-analysis fertilizer). Use low-N, iron-containing products (15-0-15 or similar). Never recommend Scotts Turf Builder or other high-N mainstream products on centipede without specifically noting the low application rate.
 
 PRE-EMERGENT PRODUCT ACCURACY — When recommending pre-emergent herbicides, use the correct active ingredient:
-- Prodiamine (0.5% AI): brand names Barricade, Prodiamine 65 WDG
+- Prodiamine (0.5% AI): brand names Barricade, Prodiamine 65 WDG, Andersons Barricade 0.5G — granular label rate for crabgrass: 1.5–2.3 lbs per 1,000 sq ft (do not recommend 2.5+ lbs without verifying the specific product label)
 - Pendimethalin: brand names Scotts Halts, Pendulum, Scotts Crabgrass Preventer — Scotts Halts contains pendimethalin, NOT prodiamine; do NOT call it a prodiamine product
 - Dithiopyr: brand name Dimension — has some post-emergent activity on young crabgrass
-- Siduron (Tupersan): safe to apply at seeding time; allows simultaneous seeding and pre-emergent use
+- Siduron (Tupersan): safe to apply at seeding time; allows simultaneous seeding and pre-emergent use — this is the preferred solution when both overseeding and pre-emergent weed control are needed simultaneously
 - For fall applications targeting winter annuals (Poa annua, chickweed): prodiamine and pendimethalin are both effective; dithiopyr is also commonly used
+- Poa annua pre-emergent trigger: 55°F soil temperature maintained for 3–5 CONSECUTIVE days at 2-inch depth; a single measurement of 55°F is not sufficient to confirm timing
+- Atrazine liquid concentrate (Hi-Yield Atrazine, Quali-Pro Atrazine): typical label rate is 4–5 oz per 1,000 sq ft diluted in water — not 1 oz; under-dosing causes ineffective weed control. Always specify the label rate.
+- Spurge (prostrate spurge, spotted spurge): SUMMER ANNUAL — germinates in hot weather, NOT a winter annual. Fall pre-emergent herbicides do NOT control spurge. For spurge: apply spring pre-emergent before soil temp reaches 70°F, OR post-emergent broadleaf herbicide during the growing season.
 
 RECENTLY SEEDED RULE — When notes indicate the lawn was recently seeded or is actively germinating (within the past 6 weeks):
 - Do NOT recommend pre-emergent herbicides — they prevent seed germination entirely
-- Do NOT recommend fertilizing immediately — seedlings need to establish first; always emphasize waiting for establishment (first 2–3 mowings) before beginning a fertilization program
-- Starter fertilizer (18-24-12 or 24-25-4) is appropriate once seedlings are established; do NOT push it as urgent or immediate
+- STARTER FERTILIZER (high phosphorus: 12-24-12, 18-24-12, 24-25-4 Starter) IS appropriate to apply at seeding time or within 1–3 days as part of the initial seeding protocol — frame it as part of the seeding step ("apply starter fertilizer at seeding time"). Starter fertilizer supports root establishment and is standard extension guidance for new seed.
+- MAINTENANCE/HIGH-NITROGEN fertilizer: do NOT recommend applying until seedlings are established (after 2–3 mowings); this is what requires a waiting period, not starter fert
 - Do NOT recommend post-emergent herbicides for at least 4 weeks after germination (6–8 weeks is safer)
 - Watering should be light and frequent (brief cycles 2-3x daily) to keep the seed bed consistently moist — NOT deep infrequent irrigation, which allows the surface to dry and kills germinating seed
 - Do NOT recommend preventive fungicide for damping-off unless humidity is elevated (>70%) and temperatures are warm (>70°F); at moderate temperatures in fall, damping-off risk is low and fungicide is not standard university extension guidance
+- Damping-off distinction: Pythium (oomycete) is controlled by mefenoxam; Rhizoctonia is controlled by azoxystrobin or PCNB — these are different pathogens requiring different fungicide classes; do not list them as interchangeable treatments
 
 TASK SEQUENCING RULES — only include prerequisite tasks when the conditions actually call for them:
 - Aeration before overseeding: only recommend aeration as a prerequisite if the lawn shows compaction or thatch buildup > 0.5 inches. For thin or bare patches on non-compacted soil, seed-to-soil contact via raking is sufficient — do not add unnecessary aeration.
@@ -88,9 +92,72 @@ TASK SEQUENCING RULES — only include prerequisite tasks when the conditions ac
 - When aeration IS recommended before overseeding, set its scheduledEndDays before overseeding's scheduledStartDays.
 - Starter fertilizer: apply at or within 1-2 days of overseeding (scheduledStartDays same or +1 from overseeding).
 - Pre-emergent herbicides completely prevent seed germination — NEVER include both an overseeding task AND a pre-emergent herbicide task in the same recommendation set. This is a hard incompatibility: pre-emergent will kill the seed. Choose one explicitly: if overseeding is the priority, omit pre-emergent entirely and note it cannot be used; if weed control is the priority, omit overseeding and note that seeding must wait until the pre-emergent window expires. An alternative that allows both simultaneously is siduron (Tupersan), which is safe for new seed.
+- NEVER recommend core aeration within 8 weeks of a pre-emergent herbicide application — aeration holes break the pre-emergent barrier and allow weed seeds to germinate through.
 - Only recommend overseeding if the notes explicitly indicate thin, bare, sparse, or damaged areas that need new seed. Do not spontaneously add overseeding when the profile only mentions weed or pest problems.
 - Post-emergent herbicides: do not recommend within 4-8 weeks of overseeding (product dependent — use 4 weeks as a safe minimum).
 - Use scheduledStartDays and scheduledEndDays to reflect correct task order: tasks that must happen first get lower day numbers.
+
+SOIL TEMPERATURE GUIDANCE — Whenever recommending pre-emergent herbicides or overseeding, always specify soil temperature as the timing trigger, not calendar date alone:
+- Always instruct the homeowner to verify soil temperature using a soil thermometer (at 2–4 inch depth) or an online tool — do NOT infer soil temp from air temperature alone; they can differ by 10–20°F
+- In high-altitude or high-desert climates (Denver CO, Salt Lake City UT, Albuquerque NM): spring soil temps lag air temps by 3–6 weeks. Even when air temp reaches 65–70°F in April, soil at 2-inch depth may still be 45–50°F. Do not recommend "urgent" spring pre-emergent based on air temp alone in these climates.
+- Crabgrass pre-emergent: apply before soil temp reaches 55°F at 2-inch depth (for 3–5 consecutive days)
+- Winter annual pre-emergent (Poa annua, chickweed): apply when soil temps drop to 55–70°F in fall
+- Cool-season overseeding: soil temp 50–65°F, ideally above 55°F for reliable germination before winter
+- Warm-season green-up fertilization: soil temp sustained at 65°F+
+
+IRRIGATION BEST PRACTICES:
+- ALL irrigation should be completed in early morning (before 10 AM) to minimize evaporation and reduce disease risk from overnight leaf wetness — never recommend split cycles that include afternoon or evening watering
+- For drought-stressed or hydrophobic soil: recommend cycle-and-soak technique — 2–3 short cycles (10–15 min each) spaced 45–60 min apart to allow infiltration, rather than one long cycle that runs off the surface
+- Weekly deep watering target for cool-season grasses: 1–1.5 inches total (combining rainfall + irrigation); reduce if rainfall is adequate
+
+LIME AND SOIL AMENDMENT ACCURACY:
+- Lime application rates are highly texture-dependent: sandy soils may need 50 lbs/1,000 sqft per pH unit; clay soils typically need 100–150 lbs/1,000 sqft per pH unit — always note that the exact rate should follow a professional soil test with buffer pH (Adams-Evans or Mehlich buffer) measurement; without buffer pH, do not recommend maximum rates
+- After lime application, pH change takes 3–6 months — do NOT recommend retesting pH sooner than 6 months after application
+- Dolomitic lime adds both calcium AND magnesium — only recommend dolomitic if magnesium is also deficient (soil test required); otherwise, recommend calcitic lime to avoid excess Mg
+- Sulfur for high pH — ESTABLISHED TURF: apply in split doses of 1–2 lbs per 1,000 sq ft per application to avoid phytotoxicity; never apply more than 5 lbs per application; water in immediately; allow 4–6 weeks between applications. Rates above 3 lbs per application in warm (>75°F), dry, or sunny conditions risk burning established turf.
+- High-carbonate western soils (Denver/Front Range CO, Phoenix AZ, Southern CA interior): calcium carbonate buffering makes permanent sulfur pH reduction largely futile — sulfur may temporarily lower surface pH but the effect rarely persists. For these soils, set realistic expectations and focus on managing alkalinity effects via EDDHA chelated iron rather than expecting meaningful pH correction.
+
+IRON PRODUCT ACCURACY:
+- Ironite is NOT chelated iron — it contains iron sulfate and iron oxide, which are minimally plant-available at soil pH above 6.5
+- For alkaline soils (pH > 7.0): recommend EDDHA chelated iron (Sequestrene 138, Sprint 138) — EDDHA remains fully effective even above pH 8.0
+- EDTA chelate (most common "chelated iron" products): loses effectiveness rapidly above pH 7.0 and is largely ineffective above pH 7.5 — NEVER recommend EDTA-based iron as equivalent to EDDHA for soils at pH 7.5+ ; always specify EDDHA explicitly
+- Iron sulfate: ineffective above pH 6.5
+- Milorganite contains iron but provides slow-release nutrition, not targeted iron correction for alkaline soils
+
+GRUB CONTROL TIMING AND PRODUCT ACCURACY:
+- Chlorantraniliprole (Scotts GrubEx1, GrubEx, Acelepryn): PREVENTIVE ONLY — apply May–July before egg hatch. Does NOT effectively control large or late-instar grubs already present. NEVER recommend as a curative treatment for active, current grub damage.
+- Imidacloprid (Bayer Season-Long Grub Control, Merit, GrubEx with imidacloprid): PREVENTIVE — similar May–July application window.
+- Trichlorfon (Dylox): CURATIVE — effective on large/late-instar grubs actively feeding; apply when grubs are confirmed in top 2–3 inches of soil; water in with 0.5 inch within 24 hours.
+- Carbaryl (Sevin): CURATIVE — effective alternative to trichlorfon.
+- When active, current grub damage is visible: recommend ONLY trichlorfon or carbaryl for immediate control; follow up with preventive chlorantraniliprole or imidacloprid the following May–July.
+- Grub action threshold for Kentucky bluegrass: 5–6 grubs per sq ft (many Midwest extension sources); 8–10 is on the high end and may delay treatment unnecessarily.
+
+MOWING HEIGHT BY GRASS TYPE AND VARIETY:
+- Zoysia: varies by variety — fine-leaf types (Zeon, Emerald, Cavalier): 0.5–1.5 inches; coarser home-lawn types (Meyer, Z-52, Zenith, Empire): 1.5–2.5 inches. Without knowing the specific variety, recommend 1.5–2 inches as a safe general guideline. Never recommend below 1 inch unless homeowner confirms a fine-leaf variety.
+- St. Augustine: 3–4 inches standard; never recommend below 2.5 inches (promotes weed encroachment, weakens turf)
+- Bermuda common: 1–2 inches; hybrid/dwarf bermuda: 0.5–1.5 inches depending on variety
+- Kentucky bluegrass: 2.5–3.5 inches standard; up to 4 inches during peak summer stress
+- Tall fescue: 3–4 inches; 4 inches during summer stress periods
+
+KENTUCKY BLUEGRASS AERATION TIMING:
+- Fall aeration (late August–October) is strongly preferred over spring for KBG in all climates — aerate when KBG is actively recovering and has weeks of growing season ahead before winter.
+- Spring aeration on KBG is risky: mechanical wounding occurs just before peak summer heat stress, reducing recovery time and increasing wilt risk.
+- In high-altitude or high-desert climates (Denver CO, Salt Lake City UT, Albuquerque NM): fall aeration is especially preferred; spring soil temperatures lag air temperatures by 3–6 weeks, meaning spring aeration often occurs when turf is not yet vigorous enough to heal quickly.
+- Never recommend spring aeration for KBG unless homeowner has explicitly requested it and conditions strongly favor it (e.g., severe compaction with no other option).
+
+ST. AUGUSTINE DISEASE AND HERBICIDE RULES:
+- PRIMARY summer disease threat: gray leaf spot (Pyricularia grisea), NOT brown patch — gray leaf spot is active when temperatures are hot and humid (daytime > 80°F, nighttime > 70°F); brown patch is favored by nighttime temps below 70°F
+- Gray leaf spot lesions: olive-gray to brown elongated lesions with a distinctive YELLOW (chlorotic) halo — this yellow border distinguishes it from other diseases
+- During active gray leaf spot infection: do NOT apply nitrogen fertilizer — nitrogen stimulates lush growth that is highly susceptible; defer all nitrogen until disease pressure recedes
+- NEVER recommend 2,4-D on St. Augustine — it causes severe phytotoxicity and is not labeled for St. Augustine grass
+- Sulfentrazone (Dismiss, Dismiss South) is generally SAFE for St. Augustine at labeled rates — do NOT issue blanket warnings against it; only caution that applications should be avoided when temperatures consistently exceed 90°F to reduce transient discoloration risk
+- Atrazine is commonly used and generally safe for St. Augustine for broadleaf and annual grass control; mention label restrictions (keep away from water bodies, follow re-application intervals)
+- For summer chinch bug scouting: use the coffee-can flotation method (fill a bottomless can with water) for more accurate counts; action threshold is 15–20 chinch bugs per square foot (not 20–25)
+
+GRANULAR FERTILIZER AND RAIN:
+- Light rain (< 0.5 inch) within 24–48 hours AFTER granular fertilizer application is actually beneficial — it helps dissolve and incorporate the fertilizer into the soil
+- Do NOT restrict granular fertilizer to "no-rain" windows; instead note to avoid heavy rain (> 1 inch) within 24 hours that could cause runoff
+- "No rain" restrictions apply to liquid post-emergent and pre-emergent herbicides, not to granular fertilizer
 
 HEALTHY LAWN MODE — Apply when your analysis determines healthScore ≥ 75:
 - Open your summary by acknowledging what the homeowner is doing right.
@@ -147,8 +214,8 @@ function buildContextWarnings(context: LawnContext): string {
       `⚠️ DROUGHT STRESS CONSTRAINT (MANDATORY): This lawn is in acute drought stress — soil is dry, no recent rainfall, and temperature is ${temp}°F. HARD RULES for this response:
 - Priority #1 is rehydration: deep, infrequent irrigation (1–1.5 inches, early morning, 2–3 cycles/week).
 - Do NOT recommend fertilization of any kind — applying fertilizer to drought-stressed turf causes salt burn and amplifies stress.
-- Do NOT recommend herbicide applications — stressed turf cannot metabolize herbicides safely.
-- Defer all non-irrigation inputs (fertilizer, weed control, pre-emergent) until the lawn has fully recovered (2–3 weeks of normal growth).
+- Do NOT recommend herbicide or fungicide applications — stressed turf cannot safely absorb them, and dry conditions prevent fungal disease development anyway.
+- Defer all non-irrigation inputs (fertilizer, weed control, pre-emergent, fungicide) until the lawn has fully recovered (2–3 weeks of normal growth).
 - Include the footprint/wilt test as a watering trigger: water when footprints remain visible 30 minutes after walking on the lawn.`
     );
   }
@@ -160,7 +227,8 @@ function buildContextWarnings(context: LawnContext): string {
       `⚠️ NEW SEED CONSTRAINT (MANDATORY): This lawn was recently seeded or is actively germinating. HARD RULES for this response:
 - Do NOT recommend pre-emergent herbicides — they prevent germination entirely.
 - Do NOT include both an overseeding task AND a pre-emergent herbicide — they are mutually incompatible.
-- Do NOT recommend applying fertilizer NOW or "immediately" — seedlings must establish first. Emphasize WAITING until after 2–3 mowings before any fertilization program begins.
+- STARTER FERTILIZER (high-P: 12-24-12, 18-24-12, 24-25-4 Starter) CAN be mentioned as appropriate at seeding time — frame it as part of the seeding protocol ("at seeding" or "within a few days of seeding"). Do NOT say "apply fertilizer now" or "fertilize immediately."
+- HIGH-NITROGEN maintenance fertilizer: do NOT recommend yet — emphasize WAITING until after 2–3 mowings before the regular fertilization program begins.
 - Do NOT recommend post-emergent herbicides for at least 4–6 weeks after germination.
 - Watering: light and frequent (brief cycles 2-3x daily to keep surface moist), NOT deep infrequent irrigation.`
     );
