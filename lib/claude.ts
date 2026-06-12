@@ -91,6 +91,7 @@ RECENTLY SEEDED RULE — When notes indicate the lawn was recently seeded or is 
 - Do NOT recommend pre-emergent herbicides — they prevent seed germination entirely. If mentioning future pre-emergent planning (after establishment), ALWAYS include the soil temperature trigger (e.g., "after lawn is established, apply pre-emergent when soil temps reach 50–55°F for crabgrass prevention").
 - STARTER FERTILIZER (high phosphorus: 12-24-12, 18-24-12, 24-25-4 Starter): appropriate AT THE TIME OF SEEDING (day 0 to day 3 maximum). If notes indicate seeding occurred MORE THAN 1 WEEK AGO or seeds are actively germinating, do NOT recommend starter fertilizer — the window has passed. Focus on germination care instead. After full establishment (2–3 mowings at full height, typically 6–8 weeks post-seeding), a light maintenance fertilizer (0.5 lbs slow-release N/1000 sqft) can begin the regular program.
 - ALL FERTILIZER: do NOT recommend any fertilizer (including starter) once seeds are actively germinating and past the seeding date. Wait until establishment (after 2–3 mowings at full height) before beginning any fertilizer program — there is no in-between fertilizer step during active germination.
+- COMBINATION FERTILIZER+PESTICIDE PRODUCTS: NEVER recommend Scotts with SummerGuard, Scotts with GrubEx, or any other combination fertilizer+insecticide product for recently seeded lawns — the insecticide component may harm establishing seedlings and these products are not intended for new seedings.
 - Do NOT recommend post-emergent herbicides for at least 4 weeks after germination (6–8 weeks is safer)
 - Watering should be light and frequent (brief cycles 2-3x daily) to keep the seed bed consistently moist — NOT deep infrequent irrigation, which allows the surface to dry and kills germinating seed
 - Do NOT recommend preventive fungicide for damping-off unless humidity is elevated (>70%) and temperatures are warm (>70°F); at moderate temperatures in fall, damping-off risk is low and fungicide is not standard university extension guidance
@@ -137,7 +138,7 @@ LIME AND SOIL AMENDMENT ACCURACY:
 HIGH-pH SOIL MANAGEMENT (pH > 7.0 for cool-season grasses, > 7.5 for warm-season):
 - PRIMARY visible symptom: iron deficiency chlorosis — young leaves turn yellow while leaf veins remain green (interveinal chlorosis). This is the first thing to name and address IF visual symptoms are described or likely at the given pH.
 - IMPORTANT: Do NOT recommend EDDHA chelated iron as "urgent" if the homeowner's profile does not describe visible yellowing or iron chlorosis symptoms. At pH 7.8, iron deficiency is common but not guaranteed — recommend monitoring for interveinal chlorosis first if no symptoms are described. If chlorosis is confirmed or highly probable (pH >8.0), then EDDHA iron is appropriate.
-- IMMEDIATE treatment when symptoms present: EDDHA chelated iron (Sequestrene 138, Sprint 138) — SOIL APPLICATION ONLY (not foliar); EDDHA works by keeping iron plant-available in the root zone, so it must be watered into the soil. Acts within 2–4 weeks. EDTA-based iron products are ineffective at pH 7.5+. Iron sulfate may be used as a FOLIAR spray for quick cosmetic greening (spray at 2 oz/gallon solution), but this is short-lived color improvement only, not a long-term fix.
+- IMMEDIATE treatment when symptoms present: EDDHA chelated iron (Sequestrene 138, Sprint 138) — SOIL APPLICATION ONLY (not foliar); EDDHA works by keeping iron plant-available in the root zone, so it must be watered into the soil. Acts within 3–6 weeks for full greening (not 2 weeks — allow adequate time). EDTA-based iron products are ineffective at pH 7.5+. Iron sulfate may be used as a FOLIAR spray for quick cosmetic greening (spray at 2 oz/gallon solution), but this is short-lived color improvement only, not a long-term fix.
 - Always recommend retesting soil pH in 3–6 months after starting a sulfur program to track progress — this is standard extension protocol and helps the homeowner know if the program is working.
 - LONG-TERM correction: elemental sulfur program (1–2 lbs/1,000 sq ft every 4–6 weeks) PLUS transition to acidifying nitrogen source (ammonium sulfate 21-0-0 provides both nitrogen and acidification, vs urea or nitrate-N which don't acidify)
 - For KBG at pH 7.8: the ideal range is 6.0–7.0; at pH 7.8 in high-carbonate Denver soils, a realistic long-term goal is 7.0–7.4 over a MULTI-YEAR sustained sulfur program (3–5 years of consistent applications). Do NOT suggest pH can be corrected in 1–2 seasons — free calcium carbonate buffering in Denver/Front Range soils means meaningful pH reduction is extremely slow. Set realistic expectations: sulfur will help manage symptoms and improve iron availability over time, but permanent pH correction to 6.5 is generally not achievable without continuous acidification inputs.
@@ -196,7 +197,8 @@ ST. AUGUSTINE DISEASE AND HERBICIDE RULES:
 - Sulfentrazone (Dismiss, Dismiss South) is generally SAFE for St. Augustine at labeled rates — do NOT issue blanket warnings against it; only caution that applications should be avoided when temperatures consistently exceed 90°F to reduce transient discoloration risk
 - Atrazine is commonly used and generally safe for St. Augustine for broadleaf and annual grass control; mention label restrictions (keep away from water bodies, follow re-application intervals). CRITICAL: Do NOT recommend atrazine if rain is forecast within 24–48 hours OR if the soil is already wet/moist — runoff potential is high and the label requires no rain for 24 hours after application. If conditions are borderline, defer atrazine with explicit instructions to wait for a dry window.
 - When recommending fall pre-emergent for St. Augustine (for Poa annua, crabgrass): ALWAYS include soil temperature as the timing trigger ("apply when soil temps drop to 65–70°F in fall, typically October in Houston/Zone 9"). Never recommend pre-emergent without the soil temperature qualifier.
-- For summer chinch bug scouting: use the coffee-can flotation method (fill a bottomless can with water) for more accurate counts; action threshold is 20–25 chinch bugs per square foot (UF/IFAS and Texas A&M AgriLife Extension both use this range as the standard action threshold for St. Augustine). Do NOT recommend treatment below 20 per square foot — minor infestations below threshold do not warrant insecticide applications and healthy St. Augustine can tolerate low chinch bug populations.
+- For summer chinch bug scouting: use the coffee-can flotation method (fill a bottomless can with water) for more accurate counts; action threshold is 15–20 chinch bugs per square foot (Texas A&M AgriLife Extension standard for Texas lawns) or 20–25 per square foot (UF/IFAS standard for Florida lawns). For Houston/Texas ZIP codes (77xxx, 78xxx, 79xxx), use 15–20; for Florida ZIP codes (32xxx–34xxx), use 20–25. Do NOT recommend treatment below 15 per square foot.
+- GRAY LEAF SPOT FUNGICIDE ACCURACY: Gray leaf spot (Pyricularia grisea) is NOT effectively controlled by DMI fungicides (myclobutanil/Spectracide Immunox, propiconazole/Banner Maxx). The correct treatment for gray leaf spot is QoI fungicides (FRAC Group 11): azoxystrobin (Heritage, Syngenta), trifloxystrobin (Armada 50 WDG), or pyraclostrobin. Do NOT recommend myclobutanil or propiconazole as primary gray leaf spot treatments — they have limited efficacy against Pyricularia grisea.
 
 WARM-SEASON SPRING GREEN-UP TIMING:
 - Do NOT recommend resuming irrigation during early green-up of warm-season grasses (bermuda, zoysia, st. augustine) unless soil moisture is actively dry — early spring with rainfall of 0.3–0.5 inches and cool temps (60–65°F) does NOT need supplemental irrigation. Reserve irrigation recommendations for when the lawn is established and soil temps are consistently above 65°F.
@@ -350,6 +352,27 @@ function buildContextWarnings(context: LawnContext): string {
     warnings.push(
       `⚠️ MISSING LOCATION (MANDATORY): No ZIP code or location was provided. You MUST acknowledge this in your response — use phrases like "without knowing your specific location," "general recommendations for your climate region," or "these are general guidelines based on your grass type." Do not silently assume a location. Every recommendation must be framed as general/regional guidance.`
     );
+  }
+
+  if (context.grassType === "unknown") {
+    warnings.push(
+      `⚠️ UNKNOWN GRASS TYPE CONSTRAINT (MANDATORY): The grass type is unknown and unidentified. HARD RULES for this response:
+- EVERY recommendation must explicitly acknowledge that it is tentative pending grass type identification — use language like "once your grass type is identified," "this assumes cool-season grass — verify first," or "general guidance until type confirmed"
+- Do NOT provide specific mowing height recommendations (ranges vary dramatically by species)
+- Do NOT provide specific fertilizer rates or NPK product codes
+- Do NOT provide species-specific disease or pest control without first noting uncertainty
+- LEAD with grass type identification guidance: recommend taking photos of the lawn and consulting a local extension office, or describe the key visual differences between common grass types (blade width, growth habit, color, season) so the homeowner can self-identify
+- Pre-emergent recommendations must be framed as general guidance without species-specific timing`
+    );
+  }
+
+  if (context.soilPh !== undefined && context.soilPh !== null) {
+    // Soil test was already done — explicitly note this so AI doesn't recommend waiting for test
+    if (context.soilPh > 7.0) {
+      warnings.push(
+        `⚠️ SOIL TEST COMPLETE (pH ${context.soilPh} confirmed): A soil test has already been performed — the soil pH is confirmed at ${context.soilPh}. Do NOT recommend waiting for a soil test before starting pH management. The test is done; begin the management program immediately. DO recommend: (1) Follow-up soil test in 3–6 months to track pH progress, (2) Start the sulfur/amendment program now using the known pH as the baseline.`
+      );
+    }
   }
 
   return warnings.length > 0 ? `\n${warnings.join("\n")}\n` : "";
