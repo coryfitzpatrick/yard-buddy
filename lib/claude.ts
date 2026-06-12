@@ -116,8 +116,8 @@ IRRIGATION BEST PRACTICES:
 - ALL irrigation should be completed in early morning (before 10 AM) to minimize evaporation and reduce disease risk from overnight leaf wetness — never recommend split cycles that include afternoon or evening watering
 - For drought-stressed or hydrophobic soil: recommend cycle-and-soak technique — 2–3 short cycles (10–15 min each) spaced 45–60 min apart to allow infiltration, rather than one long cycle that runs off the surface
 - Weekly deep watering target for cool-season grasses: 1–1.5 inches total (combining rainfall + irrigation); reduce if rainfall is adequate
-- Phoenix AZ / Desert Southwest summer: bermudagrass ET demand at peak summer (100–110°F) is 1.5–2.5 inches per week — standard 1 inch/week is insufficient during peak heat; adjust upward accordingly
-- Hydretain and wetting agents: Hydretain is a humectant/moisture-retention product — it captures and holds soil moisture. It is NOT a standard surfactant wetting agent (which breaks surface tension). Do not list them as interchangeable product categories.
+- Phoenix AZ / Desert Southwest summer: bermudagrass ET demand at peak summer (100–110°F) is 1.5–2.5 inches per WEEK total (replacing ET deficit, not applying a fixed volume per session). Use cycle-and-soak technique to deliver this weekly target across multiple sessions — e.g., 3 sessions of 0.5–0.8 inches each, NOT 1.5–2 inches per session. Applying 1.5–2 inches per session 3x/week would total 4.5–6 inches/week, causing waterlogging and runoff even in hot/dry conditions.
+- Hydretain and wetting agents: Hydretain is a humectant/moisture-retention product — it captures and holds soil moisture. It is NOT a standard surfactant wetting agent (which breaks surface tension). Do not list them as interchangeable product categories. IMPORTANT: Do NOT make specific quantified claims about Hydretain efficacy (e.g., "reduces irrigation by 30–50%") — these are manufacturer claims without consistent university extension support. If mentioning Hydretain, frame it as a supplemental option with cautious language ("some users report improved moisture retention") without citing specific reduction percentages.
 
 LIME AND SOIL AMENDMENT ACCURACY:
 - Lime application rates are highly texture-dependent: sandy soils need ~50 lbs/1,000 sqft per pH unit; clay soils typically need 100–150 lbs/1,000 sqft per pH unit. ALWAYS recommend a soil test with buffer pH (Adams-Evans or Mehlich buffer) for the most precise rate — without it, rates can be off by 2–3x. For North Carolina ZIP codes, recommend NCDA&CS Agronomic Division (free soil testing service). For other states, recommend the state's land-grant university extension service (Purdue, Penn State, UGA, Texas A&M, etc.). WITHOUT buffer pH data, frame any rate as a "conservative starting rate pending buffer pH test": 40–50 lbs/1,000 sqft for sandy/loam; 50–75 lbs for clay as a FIRST APPLICATION only.
@@ -173,6 +173,11 @@ ST. AUGUSTINE DISEASE AND HERBICIDE RULES:
 - Sulfentrazone (Dismiss, Dismiss South) is generally SAFE for St. Augustine at labeled rates — do NOT issue blanket warnings against it; only caution that applications should be avoided when temperatures consistently exceed 90°F to reduce transient discoloration risk
 - Atrazine is commonly used and generally safe for St. Augustine for broadleaf and annual grass control; mention label restrictions (keep away from water bodies, follow re-application intervals). CRITICAL: Do NOT recommend atrazine if rain is forecast within 24–48 hours OR if the soil is already wet/moist — runoff potential is high and the label requires no rain for 24 hours after application. If conditions are borderline, defer atrazine with explicit instructions to wait for a dry window.
 - For summer chinch bug scouting: use the coffee-can flotation method (fill a bottomless can with water) for more accurate counts; action threshold is 20–25 chinch bugs per square foot (UF/IFAS and Texas A&M standard threshold)
+
+WARM-SEASON SPRING GREEN-UP TIMING:
+- Do NOT recommend resuming irrigation during early green-up of warm-season grasses (bermuda, zoysia, st. augustine) unless soil moisture is actively dry — early spring with rainfall of 0.3–0.5 inches and cool temps (60–65°F) does NOT need supplemental irrigation. Reserve irrigation recommendations for when the lawn is established and soil temps are consistently above 65°F.
+- Do NOT recommend broadleaf herbicides (2,4-D, MCPP, dicamba) on warm-season grasses until turf is at least 50% green and actively growing — applying herbicides to partially dormant or emerging turf risks phytotoxicity and transient bleaching/damage. Always include this caveat for spring green-up scenarios.
+- Birmingham AL (ZIP 35201–35299): Zone 8a — zoysia green-up typically begins mid-March to early April when soil temps reach 60°F; full green-up at 65°F+
 
 USDA HARDINESS ZONE ACCURACY — When citing a homeowner's USDA zone, verify it carefully. Common errors to avoid:
 - Charleston, SC (ZIP 29401–29499): Zone 8b — NOT Zone 9a (frequently misidentified)
@@ -285,11 +290,6 @@ function buildContextWarnings(context: LawnContext): string {
     );
   }
 
-  if (context.soilPh != null && (context.soilPh < 0 || context.soilPh > 14)) {
-    warnings.push(
-      `⚠️ INVALID SOIL pH: The provided soil pH (${context.soilPh}) is outside the physically possible range of 0–14. pH values below 0 or above 14 cannot occur in soil. You MUST acknowledge this as an invalid reading and express uncertainty — use phrases like "the pH reading appears to be invalid," "this value is outside the measurable pH range," or "please retest with a calibrated meter." Do NOT provide specific pH-based recommendations (lime rates, sulfur rates, amendment programs) based on an invalid pH value.`
-    );
-  }
 
   const recentRain = context.weatherData?.recentRainfall ?? 0;
   const isWaterlogged = context.soilMoisture === "wet" && recentRain >= 2;
