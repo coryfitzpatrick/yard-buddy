@@ -269,6 +269,18 @@ function buildContextWarnings(context: LawnContext): string {
     );
   }
 
+  const recentRain = context.weatherData?.recentRainfall ?? 0;
+  const isWaterlogged = context.soilMoisture === "wet" && recentRain >= 2;
+  if (isWaterlogged) {
+    warnings.push(
+      `⚠️ WATERLOGGED SOIL CONSTRAINT: This lawn has wet/saturated soil with ${recentRain}" of recent rainfall. HARD RULES for this response:
+- Yellow patches and decline in low wet areas are PRIMARILY caused by anaerobic soil conditions (oxygen deprivation/root suffocation), NOT fungal disease — do NOT leap to fungicide as the diagnosis.
+- Priority recommendation: reduce irrigation immediately, improve drainage (aeration, topdressing with sand in low areas, french drain consideration).
+- Do NOT recommend fungicide unless there is clear evidence of disease (e.g., visible lesions, target-shaped patches with distinct margins) — overwatering symptoms and disease look similar but have different causes.
+- Fertilizer should be deferred until soil moisture normalizes — applying fertilizer to saturated soil causes runoff and does not benefit the lawn.`
+    );
+  }
+
   if (!context.zipCode || context.zipCode.trim() === "") {
     warnings.push(
       `⚠️ MISSING LOCATION (MANDATORY): No ZIP code or location was provided. You MUST acknowledge this in your response — use phrases like "without knowing your specific location," "general recommendations for your climate region," or "these are general guidelines based on your grass type." Do not silently assume a location. Every recommendation must be framed as general/regional guidance.`
