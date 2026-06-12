@@ -275,6 +275,12 @@ function buildContextWarnings(context: LawnContext): string {
     );
   }
 
+  if (context.yardSizeSqft !== undefined && context.yardSizeSqft <= 0) {
+    warnings.push(
+      `⚠️ INVALID YARD SIZE: The provided yard size (${context.yardSizeSqft} sq ft) is invalid or missing. You MUST acknowledge this uncertainty in your response and note that product quantities cannot be calculated without a valid yard size. Use phrases like "unable to calculate exact quantities without a valid yard size" or "cannot determine specific amounts." Do not provide specific product amounts (lbs, bags, or oz per sq ft calculations) when yard size is invalid.`
+    );
+  }
+
   const recentRain = context.weatherData?.recentRainfall ?? 0;
   const isWaterlogged = context.soilMoisture === "wet" && recentRain >= 2;
   if (isWaterlogged) {
