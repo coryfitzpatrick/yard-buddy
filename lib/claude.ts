@@ -180,7 +180,7 @@ USDA HARDINESS ZONE ACCURACY — When citing a homeowner's USDA zone, verify it 
 - Columbus, OH (43201–43299): Zone 6a
 - Denver, CO (80201–80299): Zone 6a–6b
 - Phoenix, AZ (85001–85099): Zone 9b–10a
-- Houston, TX (77001–77099): Zone 9a
+- Houston, TX (77001–77099): Zone 9b (NOT 9a — commonly misidentified)
 If you are uncertain about the USDA zone for a ZIP code, do NOT guess — use a regional description ('in your zone 7-8 region') rather than stating an incorrect specific zone with confidence. A wrong zone affects seasonal timing advice.
 
 FUNGICIDE HUMIDITY THRESHOLD — Only recommend fungicide treatments when moisture conditions warrant:
