@@ -129,12 +129,15 @@ const preEmergentSoilTemp: Rule = {
       if (!s.includes("pre-emergent") && !s.includes("preemergent")) return false;
       return !s.includes("not ") && !s.includes("don't") && !s.includes("avoid") &&
         !s.includes("skip") && !s.includes("wait") && !s.includes("hold off") &&
-        !s.includes("refrain") && !s.includes("do not") && !s.includes("shouldn't");
+        !s.includes("refrain") && !s.includes("do not") && !s.includes("shouldn't") &&
+        !s.includes("passed") && !s.includes("too late") && !s.includes("missed") &&
+        !s.includes("window has") && !s.includes("next year") && !s.includes("next spring") &&
+        !s.includes("already germinated") && !s.includes("already emerged");
     });
     if (!hasRecommendation) {
-      return { ruleId: this.id, pass: true, reason: "Pre-emergent only mentioned as something to avoid — no active recommendation" };
+      return { ruleId: this.id, pass: true, reason: "Pre-emergent only mentioned as something to avoid or as a timing note — no active recommendation" };
     }
-    if (contains(response, "soil temp", "soil temperature", "50 degree", "55 degree")) {
+    if (contains(response, "soil temp", "soil temperature", "50 degree", "55 degree", "50°f", "55°f", "50-55")) {
       return { ruleId: this.id, pass: true, reason: "Pre-emergent recommendation includes soil temperature reference" };
     }
     return { ruleId: this.id, pass: false, reason: "Pre-emergent recommended but no soil temperature threshold mentioned" };
@@ -251,7 +254,8 @@ const overseedSoilTemp: Rule = {
         return { ruleId: this.id, pass: true, reason: "Overseed reference is to past action, not a new recommendation" };
       }
     }
-    if (contains(response, "soil temp", "soil temperature", "50 degree", "55 degree", "60 degree", "65 degree")) {
+    if (contains(response, "soil temp", "soil temperature", "50 degree", "55 degree", "60 degree", "65 degree",
+      "50°f", "55°f", "60°f", "65°f", "50-55", "55-60", "60-65", "60–65", "50–65", "55–65")) {
       return { ruleId: this.id, pass: true, reason: "Overseeding recommendation includes soil temperature reference" };
     }
     return { ruleId: this.id, pass: false, reason: "Overseeding recommended but no soil temperature mentioned" };
