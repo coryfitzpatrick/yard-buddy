@@ -259,11 +259,10 @@ function buildContextWarnings(context: LawnContext): string {
     warnings.push(
       `⚠️ NEW SEED CONSTRAINT (MANDATORY): This lawn was recently seeded or is actively germinating. HARD RULES for this response:
 - Do NOT recommend pre-emergent herbicides — they prevent germination entirely.
-- Do NOT include both an overseeding task AND a pre-emergent herbicide — they are mutually incompatible.
-- STARTER FERTILIZER (high-P: 12-24-12, 18-24-12, 24-25-4 Starter) CAN be mentioned as appropriate at seeding time — frame it as part of the seeding protocol ("at seeding" or "within a few days of seeding"). Do NOT say "apply fertilizer now" or "fertilize immediately."
-- HIGH-NITROGEN maintenance fertilizer: do NOT recommend yet — emphasize WAITING until after 2–3 mowings before the regular fertilization program begins.
 - Do NOT recommend post-emergent herbicides for at least 4–6 weeks after germination.
-- Watering: light and frequent (brief cycles 2-3x daily to keep surface moist), NOT deep infrequent irrigation.`
+- Do NOT recommend high-nitrogen maintenance fertilizer yet — seedlings need to be established first. Emphasize WAITING until after 2–3 mowings at full height before the regular fertilization program begins.
+- Watering: light and frequent (brief cycles 2-3x daily to keep surface moist), NOT deep infrequent irrigation.
+- Focus on: protecting germinating seedlings, correct watering frequency, first mowing timing (when grass reaches 3-4 inches), disease monitoring (damping-off risk from Pythium in wet conditions).`
     );
   }
 
