@@ -19,26 +19,30 @@ Score interpretation: **90+ = releasable** | 85–89 = mostly trustworthy | 78�
 | 11 | 359855d | 2026-06-12 | 9/9 | 163/165 | 84.7 | Big wins: centipede +19, bermuda-drought +10, kbg +9; ryegrass still 72 (mowing now too low) |
 | 12 | c77c9d3 | 2026-06-12 | 9/9 | 163/165 | 83.7 | ryegrass +16, bermuda-drought +9; recently-seeded 42 (starter fert regression); fall-preemergent 72 |
 | 13 | 76f9360 | 2026-06-12 | — | — | pending | Aeration gap 2-4wks, KBG 4", sulfur 1-2lbs, herbicide 55F, MSM Turf limited Poa annua, starter fert reverted |
+| 18–22 | (prior session) | 2026-06-12 | — | — | 85.9–87.8 | Prompt caching added; centipede 94; nonMowingCtx whole-sentence fix |
+| 23 | a1b3f0f | 2026-06-12 | 9/9 | 165/165 | 88.2 | New P3 high; whole-sentence mowing fix + drought pre-emergent constraint |
+| 24 | 6fecb2c | 2026-06-13 | 9/9 | 165/165 | 86.6 | tall-fescue 72 (regression from lime overcorrection); stochastic drops |
+| 25 | 0912660 | 2026-06-13 | 9/9 | 165/165 | 87.5 | tall-fescue 91 (+19!); KBG botanicals; soil N ppm rule; zoysia spring fixes |
 
 ## Scenario Scores by Run
 
-| Scenario | R3 | R4 | R8 | R9 | R10 | R11 |
-|----------|----|----|----|----|-----|-----|
-| fall-preemergent | 82 | 88 | 88 | 82 | 82 | 82 | 72 |
-| kbg-july-heat | 91 | 91 | 91 | 82 | 82 | 91 | 91 |
-| ryegrass-spring | 82 | 82 | 82 | 72 | 72 | 72 | 88 |
-| tall-fescue-low-ph | 72 | 82 | 82 | 82 | 82 | 88 | 82 |
-| drought-cool | 92 | 91 | 82 | 88 | 88 | 82 | 88 |
-| grub-damage | 88 | 88 | 91 | 88 | 88 | 91 | 91 |
-| high-ph | 62 | 62 | 82 | 82 | 82 | 82 | 82 |
-| overwatering | 91 | 82 | 91 | 91 | 91 | 91 | 91 |
-| recently-seeded | 62 | 62 | 82 | 88 | 88 | 82 | 42 |
-| sparse-profile | 72 | 91 | 91 | 88 | 88 | 82 | 91 |
-| bermuda-dormancy | 82 | 72 | 82 | 82 | 82 | 82 | 82 |
-| bermuda-drought | 88 | 91 | 82 | 72 | 72 | 82 | 91 |
-| centipede-summer | 82 | 91 | 52 | 72 | 72 | 91 | 91 |
-| st-augustine-summer | 78 | 88 | 78 | 82 | 82 | 84 | 82 |
-| zoysia-spring | 82 | 88 | 82 | 82 | 82 | 88 | 91 |
+| Scenario | R3 | R4 | R8 | R9 | R10 | R11 | R23 | R24 | R25 |
+|----------|----|----|----|----|-----|-----|-----|-----|-----|
+| fall-preemergent | 82 | 88 | 88 | 82 | 82 | 82 | 82 | 82 | 82 |
+| kbg-july-heat | 91 | 91 | 91 | 82 | 82 | 91 | 91 | 88 | 91 |
+| ryegrass-spring | 82 | 82 | 82 | 72 | 72 | 72 | 88 | 88 | 82 |
+| tall-fescue-low-ph | 72 | 82 | 82 | 82 | 82 | 88 | 82 | 72 | **91** |
+| drought-cool | 92 | 91 | 82 | 88 | 88 | 82 | 91 | 91 | 91 |
+| grub-damage | 88 | 88 | 91 | 88 | 88 | 91 | 91 | 91 | 88 |
+| high-ph | 62 | 62 | 82 | 82 | 82 | 82 | 82 | 82 | 82 |
+| overwatering | 91 | 82 | 91 | 91 | 91 | 91 | 91 | 91 | 91 |
+| recently-seeded | 62 | 62 | 82 | 88 | 88 | 82 | 88 | 82 | 88 |
+| sparse-profile | 72 | 91 | 91 | 88 | 88 | 82 | 91 | 91 | 91 |
+| bermuda-dormancy | 82 | 72 | 82 | 82 | 82 | 82 | 88 | 88 | 82 |
+| bermuda-drought | 88 | 91 | 82 | 72 | 72 | 82 | 91 | 91 | 91 |
+| centipede-summer | 82 | 91 | 52 | 72 | 72 | 91 | 94 | 92 | 92 |
+| st-augustine-summer | 78 | 88 | 78 | 82 | 82 | 84 | 82 | 82 | 82 |
+| zoysia-spring | 82 | 88 | 82 | 82 | 82 | 88 | 91 | 88 | 88 |
 
 ## Key Fixes by Run
 
