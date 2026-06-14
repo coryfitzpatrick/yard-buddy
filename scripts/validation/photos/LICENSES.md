@@ -1,46 +1,57 @@
 # Test Photo Licenses
 
-All photos in this directory are sourced from Pexels and licensed under the
-[Pexels License](https://www.pexels.com/license/) — free for commercial and
-non-commercial use, free to modify, attribution not required.
+Photos in this directory are used as fixtures for local AI validation runs. They
+are not redistributed publicly and are not shipped to customers.
 
-These photos are used as input to the image-path validation harness. They
-approximate the visual content described by each scenario but are not always
-exact pathology-textbook examples. The phase-1 photo set is intended to
-exercise the image-analysis path end-to-end; future phases will substitute
-better-matched photos as needed.
+**Sources used:**
+- **Pexels** ([Pexels License](https://www.pexels.com/license/)) — verified-lawn
+  photos for healthy/stress/condition scenarios.
+- **Milorganite** (https://www.milorganite.com/lawn-care/common-lawn-diseases) —
+  canonical lawn-disease reference photos, used as fixtures for AI validation.
+- **Grasshopper Lawns** (https://grasshopperlawns.com/news/common-lawn-diseases) —
+  additional disease reference photos (.webp converted to .jpg).
 
-| Scenario | File | Pexels Photo ID | Caption |
-|----------|------|------|---------|
-| healthy-kbg-front | 01.jpg | 589841 | Healthy lush green lawn close-up |
-| healthy-bermuda-peak | 01.jpg | 1001676 | Healthy bermuda-style lawn wide shot |
-| healthy-bermuda-peak | 02.jpg | 1054655 | Green lawn mid-shot |
-| healthy-bermuda-peak | 03.jpg | 280222 | Close-up of grass blades |
-| healthy-tall-fescue-fall | 01.jpg | 9996541 | Healthy fescue-style lawn wide |
-| healthy-tall-fescue-fall | 02.jpg | 2132250 | Green lawn close-up |
-| brown-patch-closeup | 01.jpg | 25451708 | Patchy/distressed lawn area |
-| gray-leaf-spot-st-aug | 01.jpg | 8469933 | Closeup grass blade detail |
-| grub-damage-multi | 01.jpg | 10994671 | Brown damaged turf patches |
-| grub-damage-multi | 02.jpg | 4469146 | Close up damaged lawn |
-| dollar-spot-kbg | 01.jpg | 3698534 | Patchy lawn distressed |
-| dollar-spot-kbg | 02.jpg | 8121950 | Diseased lawn area |
-| dollar-spot-kbg | 03.jpg | 166651 | Grass with discolored spots |
-| drought-fescue | 01.jpg | 5661019 | Drought-stressed brown lawn |
-| drought-fescue | 02.jpg | 8143668 | Dry grass close-up |
-| bermuda-dormancy-winter | 01.jpg | 8134751 | Winter brown lawn wide |
-| bermuda-dormancy-winter | 02.jpg | 29052545 | Winter lawn mid shot |
-| bermuda-dormancy-winter | 03.jpg | 29308830 | Dormant grass close-up |
-| recently-seeded-damping | 01.jpg | 29052548 | Newly seeded area |
-| recently-seeded-damping | 02.jpg | 11653193 | Bare patchy seedling area |
-| recently-seeded-damping | 03.jpg | 2801070 | Sparse new lawn |
-| recently-seeded-damping | 04.jpg | 7587877 | Patchy ground close-up |
-| mixed-issue-lawn | 01.jpg | 29052548 | Front lawn shot |
-| mixed-issue-lawn | 02.jpg | 3698534 | Back lawn distressed |
-| mixed-issue-lawn | 03.jpg | 8143668 | Close-up of damaged area |
-| mixed-issue-lawn | 04.jpg | 280222 | Grass blade close-up |
-| partial-data-worstcase | 01.jpg | 166651 | Patchy lawn |
-| partial-data-worstcase | 02.jpg | 2132250 | Generic lawn |
-| partial-data-worstcase | 03.jpg | 8121950 | Yellow patches |
-| partial-data-worstcase | 04.jpg | 3698534 | Distressed lawn |
+| Scenario | File | Source | Subject |
+|----------|------|--------|---------|
+| healthy-kbg-front | 01.jpg | Pexels 186236 | Lush green grass close-up |
+| healthy-bermuda-peak | 01.jpg | Pexels 1001676 | Close-up lush green lawn |
+| healthy-bermuda-peak | 02.jpg | Pexels 136097 | Wooden fence + lush green lawn |
+| healthy-bermuda-peak | 03.jpg | Pexels 280222 | Modern family home + lawn |
+| healthy-tall-fescue-fall | 01.jpg | Pexels 9996541 | Well-maintained green lawn |
+| healthy-tall-fescue-fall | 02.jpg | Pexels 6118668 | Bright green grass in sunlight |
+| brown-patch-closeup | 01.jpg | Grasshopper Lawns | Brown patch (Rhizoctonia) reference |
+| gray-leaf-spot-st-aug | 01.jpg | Grasshopper Lawns | Leaf spot symptoms reference |
+| grub-damage-multi | 01.jpg | Milorganite | Fairy ring damage (proxy for ring pattern) |
+| grub-damage-multi | 02.jpg | Grasshopper Lawns | Dog spot (proxy for yellow patch pattern) |
+| dollar-spot-kbg | 01.jpg | Milorganite | Dollar spot (Clarireedia) reference |
+| dollar-spot-kbg | 02.jpg | Grasshopper Lawns | Dollar spot alternate angle |
+| dollar-spot-kbg | 03.jpg | Grasshopper Lawns | Red thread (proxy fungal pattern) |
+| drought-fescue | 01.jpg | Pexels 5661019 | Suburban house + manicured lawn |
+| drought-fescue | 02.jpg | Pexels 8143668 | Luxury estate + manicured lawn |
+| bermuda-dormancy-winter | 01.jpg | Pexels 8134751 | Suburban home + lawn |
+| bermuda-dormancy-winter | 02.jpg | Pexels 29052545 | Suburban backyard + lawn |
+| bermuda-dormancy-winter | 03.jpg | Pexels 29308830 | Close-up lush grass at sunset |
+| recently-seeded-damping | 01.jpg | Grasshopper Lawns | Red thread (proxy for thin/diseased seedling) |
+| recently-seeded-damping | 02.jpg | Pexels 11653193 | Close-up lush green grass |
+| recently-seeded-damping | 03.jpg | Pexels 2801070 | Vibrant green grass field |
+| recently-seeded-damping | 04.jpg | Pexels 7587877 | Residential home + lawn |
+| mixed-issue-lawn | 01.jpg | Pexels 29052548 | Suburban backyard + lawn |
+| mixed-issue-lawn | 02.jpg | Pexels 16543179 | Close-up green grass |
+| mixed-issue-lawn | 03.jpg | Pexels 8143668 | Luxury estate + manicured lawn |
+| mixed-issue-lawn | 04.jpg | Pexels 280222 | Modern family home + lawn |
+| partial-data-worstcase | 01.jpg | Pexels 166651 | Lush green grass field |
+| partial-data-worstcase | 02.jpg | Pexels 949584 | Close-up lush green grass |
+| partial-data-worstcase | 03.jpg | Pexels 8121950 | Rural residential lawn + fence |
+| partial-data-worstcase | 04.jpg | Pexels 11654274 | Close-up green grass texture |
 
-Source for each Pexels photo: `https://www.pexels.com/photo/<photo-id>/`
+## Phase-2 photo improvements
+
+- Disease/pest scenario photos are low-res (~400x400 or smaller) reference
+  images from extension/education sites. Field-collected photos from project
+  owner would substantially improve realism.
+- Some disease scenarios (grub-damage-multi, dollar-spot-kbg) use proxy
+  disease photos that show similar visual patterns but not the exact pathology
+  named. Phase-2 should substitute true-match photos.
+- The mixed-issue-lawn scenario currently uses generic lawn photos rather than
+  explicit per-region issues; phase-2 should source 4 distinct photos for
+  front-healthy/back-diseased/chinch-closeup/blade-ID.
