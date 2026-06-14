@@ -35,6 +35,8 @@ export type JudgeResult = {
   score: number;
   flags: string[];
   reasoning: string;
+  critiqueFlags?: string[];
+  revised?: boolean;
 };
 
 export type PillarResult =

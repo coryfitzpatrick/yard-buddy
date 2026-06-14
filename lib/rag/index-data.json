@@ -1,0 +1,3233 @@
+[
+  {
+    "id": "01-pre-emergent-product-catalog-0",
+    "source": "Purdue Extension TurfTips + Penn State Center for Turfgrass Science",
+    "url": "https://www.purdue.edu/agriculture/turfgrass/",
+    "title": "Pre-Emergent Herbicide Product Catalog & Active Ingredients",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "# Pre-Emergent Herbicide Product Catalog (Homeowner Retail)\n\nCorrect active ingredient and product mapping for pre-emergent herbicides commonly sold at retail. Always pair active ingredient with brand name when recommending — homeowners shop by brand."
+  },
+  {
+    "id": "01-pre-emergent-product-catalog-1",
+    "source": "Purdue Extension TurfTips + Penn State Center for Turfgrass Science",
+    "url": "https://www.purdue.edu/agriculture/turfgrass/",
+    "title": "Pre-Emergent Herbicide Product Catalog & Active Ingredients",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Prodiamine (Group 3 mitotic inhibitor)\n- **Andersons Barricade 0.5G** (granular, 0.5% AI) — typical label rate 3.2–4.6 lbs product per 1,000 sq ft for crabgrass control (corresponds to ~0.65 lb AI/acre)\n- **Quali-Pro Prodiamine 65 WDG** — wettable dispersible granule, professional sizes\n- **Syngenta Barricade 65 WDG** — same active, professional formulation\n- Best-in-class residual; effective on crabgrass, Poa annua, goosegrass"
+  },
+  {
+    "id": "01-pre-emergent-product-catalog-2",
+    "source": "Purdue Extension TurfTips + Penn State Center for Turfgrass Science",
+    "url": "https://www.purdue.edu/agriculture/turfgrass/",
+    "title": "Pre-Emergent Herbicide Product Catalog & Active Ingredients",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Pendimethalin (Group 3)\n- **Scotts Halts Crabgrass Preventer** (NOT prodiamine; commonly miscategorized)\n- **Pendulum 2G granular** (Lesco/professional)\n- **Scotts Turf Builder Halts Crabgrass Preventer** (pre-emergent only; do NOT confuse with Triple Action which adds broadleaf killer)"
+  },
+  {
+    "id": "01-pre-emergent-product-catalog-3",
+    "source": "Purdue Extension TurfTips + Penn State Center for Turfgrass Science",
+    "url": "https://www.purdue.edu/agriculture/turfgrass/",
+    "title": "Pre-Emergent Herbicide Product Catalog & Active Ingredients",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Dithiopyr (Group 3)\n- **Bonide Crabgrass & Weed Preventer** (dithiopyr)\n- **Dimension 2EW** (liquid pro)\n- **Greenview Crabgrass Preventer with Dimension**\n- Has some early post-emergent activity on young crabgrass (up to 1-tiller stage) — unique among Group 3s"
+  },
+  {
+    "id": "01-pre-emergent-product-catalog-4",
+    "source": "Purdue Extension TurfTips + Penn State Center for Turfgrass Science",
+    "url": "https://www.purdue.edu/agriculture/turfgrass/",
+    "title": "Pre-Emergent Herbicide Product Catalog & Active Ingredients",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Isoxaben (Group 21 — BROADLEAF pre-emergent)\n- **Gallery 75 DF** — water-dispersible granule (WG/DF formulation). The standard professional application is as a LIQUID SUSPENSION sprayed via boom or backpack sprayer. Some homeowner applications spread the granules with a calibrated rotary spreader, but liquid application provides more uniform coverage. When recommending Gallery 75 DF, prefer the liquid suspension application method.\n- **Quali-Pro Isoxaben 75 WG** — same active, professional sizing\n- Critical: isoxaben targets BROADLEAF winter annuals (chickweed, henbit, bittercress). Prodiamine/pendimethalin/dithiopyr have LIMITED chickweed efficacy. For combined Poa annua + chickweed pressure, use both classes or a combination product."
+  },
+  {
+    "id": "01-pre-emergent-product-catalog-5",
+    "source": "Purdue Extension TurfTips + Penn State Center for Turfgrass Science",
+    "url": "https://www.purdue.edu/agriculture/turfgrass/",
+    "title": "Pre-Emergent Herbicide Product Catalog & Active Ingredients",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Siduron (Group 3 — overseed-safe)\n- **Tupersan** — only pre-emergent that is safe to apply AT TIME OF SEEDING for cool-season grass establishment"
+  },
+  {
+    "id": "01-pre-emergent-product-catalog-6",
+    "source": "Purdue Extension TurfTips + Penn State Center for Turfgrass Science",
+    "url": "https://www.purdue.edu/agriculture/turfgrass/",
+    "title": "Pre-Emergent Herbicide Product Catalog & Active Ingredients",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## NOT Pre-Emergents (commonly miscategorized retail products)\n- **Spectracide Weed Stop / Spectracide Weed & Grass Killer**: POST-EMERGENT broadleaf herbicide (2,4-D + dicamba + mecoprop + carfentrazone). Kills emerged broadleaf weeds. NOT a pre-emergent.\n- **Spectracide Weed & Grass Killer Concentrate**: contains diquat — POST-EMERGENT non-selective.\n- **Roundup / Roundup For Lawns**: glyphosate (non-selective post-emergent). \"Roundup For Lawns\" is a different reformulated product but still POST-EMERGENT, contains MCPA + sulfentrazone + others.\n- **Ortho Weed-B-Gon**: POST-EMERGENT three-way broadleaf.\n- **Scotts Turf Builder Triple Action**: pre-emergent (pendimethalin) PLUS post-emergent broadleaf; not pure pre-emergent.\n- **Image Kills Nutsedge**: POST-EMERGENT for nutsedge (imazaquin)."
+  },
+  {
+    "id": "01-pre-emergent-product-catalog-7",
+    "source": "Purdue Extension TurfTips + Penn State Center for Turfgrass Science",
+    "url": "https://www.purdue.edu/agriculture/turfgrass/",
+    "title": "Pre-Emergent Herbicide Product Catalog & Active Ingredients",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Activation requirements\nAll granular pre-emergents require 0.5 inches of water (rain or irrigation) to activate the barrier. Activation timing window varies:\n- Prodiamine (Barricade): within 3–5 days of application\n- Pendimethalin (Halts): within 14 days per label\n- Dithiopyr (Dimension): within 7 days\n- Isoxaben (Gallery): within 21 days\n\nIf no rain forecast within the activation window, instruct the homeowner to irrigate 0.5 inches manually."
+  },
+  {
+    "id": "02-kbg-fall-program-0",
+    "source": "Ohio State University Extension + Purdue Turfgrass Science",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Kentucky Bluegrass Fall Maintenance Program",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "fertilization",
+      "pre-emergent",
+      "aeration",
+      "mowing",
+      "overseeding"
+    ],
+    "region": [
+      "midwest"
+    ],
+    "text": "# Kentucky Bluegrass Fall Maintenance Program — Ohio/Indiana (Zones 5b–6a)\n\nFall is the most important season for cool-season turf management. KBG recovers from summer stress, rebuilds root reserves, and establishes new growth before winter dormancy.\n\n**Cite OSU Extension (Ohio) or Purdue Turfgrass (Indiana) — these are the regionally appropriate authorities for Midwest KBG. Avoid citing extension authorities from outside the region (e.g., K-State for an Ohio yard would be agronomically valid but geographically inappropriate; cite OSU instead).**"
+  },
+  {
+    "id": "02-kbg-fall-program-1",
+    "source": "Ohio State University Extension + Purdue Turfgrass Science",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Kentucky Bluegrass Fall Maintenance Program",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "fertilization",
+      "pre-emergent",
+      "aeration",
+      "mowing",
+      "overseeding"
+    ],
+    "region": [
+      "midwest"
+    ],
+    "text": "## Mowing height transitioning out of summer\n- Peak summer (July–August, air temps >85°F sustained): maintain elevated mowing height up to 3.5–4 inches for heat stress mitigation.\n- **Fall (September–November):** drop back to STANDARD KBG range of 3–3.5 inches as temperatures moderate. Per Ohio State Extension, the recommended fall mowing height is 3–3.5 inches.\n- Maintaining 4-inch turf into fall is NOT beneficial — it increases disease pressure (snow mold, leaf spot) without providing the heat protection that justified the summer height.\n- Final mow of the season: about 2.5 inches just before ground freezes (typically Thanksgiving in zones 5b–6a) reduces matting under snow."
+  },
+  {
+    "id": "02-kbg-fall-program-2",
+    "source": "Ohio State University Extension + Purdue Turfgrass Science",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Kentucky Bluegrass Fall Maintenance Program",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "fertilization",
+      "pre-emergent",
+      "aeration",
+      "mowing",
+      "overseeding"
+    ],
+    "region": [
+      "midwest"
+    ],
+    "text": "## Fall nitrogen split applications\nPer Ohio State Extension, fall N for KBG should be SPLIT into two applications, not delivered in one mass application.\n\n**Application 1 — Labor Day window (early September):**\n- Rate: 0.5–1.0 lb N per 1,000 sq ft\n- Product: SLOW-RELEASE source — polymer-coated urea (PCU, e.g., Lebanon ProScape 24-0-11), IBDU-based fertilizers (note: IBDU is sold as a component in blends like Lesco IBDU 31-0-0 or various branded blends; \"IBDU 28-3-3\" is not a standard product name), or Milorganite 6-4-0 for low N rate applications.\n- DO NOT use Scotts WinterGuard for this application. WinterGuard products (e.g., 32-0-10) are formulated and marketed for late-season application; reserve them for the Thanksgiving window.\n- Milorganite 6-4-0 is acceptable but impractical for large lawns at this rate — to deliver 1 lb N requires ~16.7 lbs of product per 1,000 sq ft. Prefer IBDU or PCU for September.\n\n**Application 2 — Thanksgiving window (late October/November, before ground freezes):**\n- Rate: 0.5–1.0 lb N per 1,000 sq ft\n- Product: WinterGuard 32-0-10 or similar late-fall/dormancy-feed product. These products contain slow-release N optimized for late-season uptake before dormancy. NOTE: WinterGuard contains slow-release nitrogen — do NOT characterize it as \"quick-release.\"\n- Apply when grass has stopped vigorous top growth but is still green; root uptake continues even when shoot growth has slowed."
+  },
+  {
+    "id": "02-kbg-fall-program-3",
+    "source": "Ohio State University Extension + Purdue Turfgrass Science",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Kentucky Bluegrass Fall Maintenance Program",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "fertilization",
+      "pre-emergent",
+      "aeration",
+      "mowing",
+      "overseeding"
+    ],
+    "region": [
+      "midwest"
+    ],
+    "text": "## Aeration + pre-emergent sequencing (fall-overseed scenarios)\n**Order matters: aerate BEFORE applying pre-emergent. NEVER aerate AFTER pre-emergent is down — core plugs break the herbicide barrier and create open germination channels.**\n\nWhen both are recommended in fall, sequence them naturally:\n- **Late August/early September:** core aerate (peak recovery window)\n- **Mid–late September** (soil temps ~70°F falling): apply pre-emergent for winter annuals\n- A 1–2 week separation between aeration and pre-emergent application is sufficient. The natural seasonal sequence — aerate first, then pre-emergent as soil temps fall through 70°F — works without explicit hard waits.\n- Do NOT recommend extreme separation (4–6 weeks) — that overstates the disruption.\n- Do NOT recommend same-day application; modest spacing is helpful.\n- **Critical warning to include in recommendations:** \"Do not aerate within 8 weeks AFTER pre-emergent application — coring breaks the herbicide barrier.\""
+  },
+  {
+    "id": "02-kbg-fall-program-4",
+    "source": "Ohio State University Extension + Purdue Turfgrass Science",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Kentucky Bluegrass Fall Maintenance Program",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "fertilization",
+      "pre-emergent",
+      "aeration",
+      "mowing",
+      "overseeding"
+    ],
+    "region": [
+      "midwest"
+    ],
+    "text": "## Fall pre-emergent for KBG lawns\n- Target weeds: Poa annua (annual bluegrass) — grassy weed; chickweed, henbit, hairy bittercress — broadleaf winter annuals.\n- Soil temperature trigger: apply when soil at 2-inch depth has fallen to 70°F or just below — Poa annua germination upper bound is ~70°F.\n- Product choice:\n  - Poa annua only: prodiamine (Barricade) or pendimethalin (Halts)\n  - Chickweed pressure noted: add isoxaben (Gallery 75 DF) for broadleaf control OR use a combination product\n  - PRODIAMINE alone has limited chickweed control — pair with isoxaben if chickweed is the concern"
+  },
+  {
+    "id": "02-kbg-fall-program-5",
+    "source": "Ohio State University Extension + Purdue Turfgrass Science",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Kentucky Bluegrass Fall Maintenance Program",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "fertilization",
+      "pre-emergent",
+      "aeration",
+      "mowing",
+      "overseeding"
+    ],
+    "region": [
+      "midwest"
+    ],
+    "text": "## IBDU and slow-release N temperature performance\nIBDU (isobutyledene diurea) is a slow-release nitrogen source that releases via hydrolysis. Hydrolysis rate is temperature-dependent:\n- At soil temps >65°F: rapid release, full nitrogen available within 4–6 weeks\n- At soil temps 50–65°F: moderate release\n- At soil temps <50°F: hydrolysis slows substantially; release is delayed and may carry over into the following spring\n\nFor Ohio/Zone 6a in September applications: IBDU is appropriate (soil temps typically 60–70°F). For late November Thanksgiving-window applications, IBDU release will be carried over to spring — this is acceptable but is not the same as \"winter feeding.\""
+  },
+  {
+    "id": "02-kbg-fall-program-6",
+    "source": "Ohio State University Extension + Purdue Turfgrass Science",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Kentucky Bluegrass Fall Maintenance Program",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "fertilization",
+      "pre-emergent",
+      "aeration",
+      "mowing",
+      "overseeding"
+    ],
+    "region": [
+      "midwest"
+    ],
+    "text": "## Overseeding + pre-emergent incompatibility\nPre-emergent herbicides (prodiamine, pendimethalin, dithiopyr) prevent ALL seed germination including grass seed. **Never recommend both pre-emergent AND overseeding for the same fall window.**\n- If overseeding is the priority: skip pre-emergent for that season; tolerate one season of winter annuals.\n- If pre-emergent is the priority: defer overseeding for at least 3 months after application.\n- ALTERNATIVE: Siduron (Tupersan) is the only pre-emergent safe to apply at seeding time — allows simultaneous overseed + pre-emergent for crabgrass."
+  },
+  {
+    "id": "03-high-ph-denver-calcareous-0",
+    "source": "Colorado State University Extension",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/",
+    "title": "High-pH Calcareous Soil Management — Denver/Front Range",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "mountain-west"
+    ],
+    "text": "# Managing High-pH Calcareous Soils (Denver Front Range, Zone 5b–6a)\n\nFront Range Colorado soils are predominantly CALCAREOUS — they contain free calcium carbonate (CaCO3) that continuously buffers against acidification. This makes pH correction fundamentally different from non-calcareous soils elsewhere."
+  },
+  {
+    "id": "03-high-ph-denver-calcareous-1",
+    "source": "Colorado State University Extension",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/",
+    "title": "High-pH Calcareous Soil Management — Denver/Front Range",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "mountain-west"
+    ],
+    "text": "## Realistic pH correction expectations\n- Achieving \"ideal\" turfgrass pH (6.0–6.5) via elemental sulfur is GENERALLY NOT achievable long-term in native Front Range soils. Free calcium carbonate continuously neutralizes sulfuric acid produced by sulfur oxidation.\n- Realistic goal at pH 7.8 in Denver: reduce by 0.3–0.5 units over 1–2 seasons of consistent sulfur applications, improving iron availability. A multi-year sustained program (3–5 years) is required for any meaningful long-term reduction toward 7.0–7.4.\n- DO NOT frame Denver pH correction as easily achievable. Set expectations: sulfur improves micronutrient availability over time; permanent correction to 6.5 is not realistic without continuous acidification inputs."
+  },
+  {
+    "id": "03-high-ph-denver-calcareous-2",
+    "source": "Colorado State University Extension",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/",
+    "title": "High-pH Calcareous Soil Management — Denver/Front Range",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "mountain-west"
+    ],
+    "text": "## Elemental sulfur application\n- Product: GRANULAR ELEMENTAL SULFUR (agricultural/lawn grade — Espoma Garden Sulfur, generic \"lawn sulfur\" or \"soil sulfur\"). NOT powdered sulfur fungicide products (Bonide Sulfur Plant Fungicide, Hi-Yield Wettable Dusting Sulfur) — these are fine-particle fungicide-grade not designed for soil pH correction.\n- Rate per application: 1–2 lbs per 1,000 sq ft (CSU standard for established turf). Start at the LOWER end (1 lb) in warm/dry/sunny conditions to avoid phytotoxicity.\n- **ANNUAL CUMULATIVE MAXIMUM: 5 lbs per 1,000 sq ft per YEAR** (CSU Extension established turf cap). This means at 1–2 lbs per application, you can apply 3–5 split applications per growing season — but the seasonal total must not exceed 5 lbs.\n- Spacing: allow 4–6 weeks between applications.\n- Always water in immediately after application.\n- Never exceed 5 lbs in any single year on established turf."
+  },
+  {
+    "id": "03-high-ph-denver-calcareous-3",
+    "source": "Colorado State University Extension",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/",
+    "title": "High-pH Calcareous Soil Management — Denver/Front Range",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "mountain-west"
+    ],
+    "text": "## Soil temperature requirement (CRITICAL for Denver)\nElemental sulfur acidification depends on MICROBIAL OXIDATION — Thiobacillus bacteria convert elemental S to sulfuric acid. This process requires soil temperatures consistently ABOVE 55°F.\n\nIn Denver/Front Range (Zone 5b–6a):\n- November through March: soil temps typically below 55°F. Sulfur applied during this window sits INERT — does not acidify.\n- Best application windows: late April through October when soil temps are reliably 55–60°F+.\n- Always mention the soil temperature requirement when recommending sulfur in early spring to Denver homeowners."
+  },
+  {
+    "id": "03-high-ph-denver-calcareous-4",
+    "source": "Colorado State University Extension",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/",
+    "title": "High-pH Calcareous Soil Management — Denver/Front Range",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "mountain-west"
+    ],
+    "text": "## Combined sulfur + EDDHA iron approach\nPer CSU, when high pH is causing iron chlorosis symptoms (interveinal yellowing in new growth), apply BOTH:\n1. **Sulfur** — long-term pH correction (slow, multi-year). Apply per schedule above.\n2. **EDDHA chelated iron** — immediate iron availability for symptom relief.\n\nDo NOT skip sulfur because results are slow — it remains the only correct soil amendment for high pH."
+  },
+  {
+    "id": "03-high-ph-denver-calcareous-5",
+    "source": "Colorado State University Extension",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/",
+    "title": "High-pH Calcareous Soil Management — Denver/Front Range",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "mountain-west"
+    ],
+    "text": "## Ammonium sulfate (21-0-0) framing\nAmmonium sulfate is appropriate for high-pH soils because of its ACIDIFYING effect — the ammonium form of N acidifies soil as it converts to nitrate, and the sulfate ion contributes additional acidification.\n- **It is a QUICK-RELEASE, water-soluble fertilizer.** Do NOT describe it as slow-release.\n- Apply 0.5–0.75 lbs N per 1,000 sq ft per application (lower rate than slow-release products).\n- More frequent applications than slow-release products.\n- Its value in a high-pH program is its acidifying effect, not its release kinetics."
+  },
+  {
+    "id": "03-high-ph-denver-calcareous-6",
+    "source": "Colorado State University Extension",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/",
+    "title": "High-pH Calcareous Soil Management — Denver/Front Range",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "mountain-west"
+    ],
+    "text": "## Soil pH retesting timeline\n- Recommend retesting 3–6 months after starting a sulfur program to track progress.\n- Heavy clay/calcareous soils: meaningful nutrient availability change may take 6+ months.\n- Do NOT retest sooner than 3 months — pH change in calcareous soils is slow and short-interval retesting will not show meaningful change."
+  },
+  {
+    "id": "03-high-ph-denver-calcareous-7",
+    "source": "Colorado State University Extension",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/",
+    "title": "High-pH Calcareous Soil Management — Denver/Front Range",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "mountain-west"
+    ],
+    "text": "## KBG specifically at pH 7.8 in Denver\n- KBG ideal range: 6.0–7.0\n- Realistic long-term goal in Denver calcareous soil: 7.0–7.4 over 3–5 years of consistent sulfur applications\n- Combine pH program with EDDHA iron for immediate green-up while pH program works long-term\n- Other micronutrients (manganese, zinc) also become unavailable at pH 7.8+ but iron chlorosis is the dominant visible deficiency"
+  },
+  {
+    "id": "04-eddha-chelated-iron-0",
+    "source": "University Extension Iron Product Technical Guidance",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/iron-deficiency/",
+    "title": "EDDHA Chelated Iron — Product Properties and Application",
+    "grassType": "any",
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "# EDDHA Chelated Iron for Alkaline Soils\n\nEDDHA (ethylene-diamine-di(o-hydroxyphenyl)acetic acid) is the chelate of choice for delivering plant-available iron to turf growing on alkaline soils (pH > 7.0)."
+  },
+  {
+    "id": "04-eddha-chelated-iron-1",
+    "source": "University Extension Iron Product Technical Guidance",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/iron-deficiency/",
+    "title": "EDDHA Chelated Iron — Product Properties and Application",
+    "grassType": "any",
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Why EDDHA vs other chelates\n| Chelate | Effective pH range | Notes |\n|---|---|---|\n| **EDDHA** | up to ~pH 9.0 | Best choice for alkaline soils. Maintains iron in plant-available form even at pH 8+ |\n| EDTA | up to ~pH 6.5 | Loses effectiveness above 7.0; largely ineffective above 7.5. NEVER recommend as equivalent to EDDHA for alkaline soils. |\n| DTPA | up to ~pH 7.5 | Intermediate; suitable for mildly alkaline soils |\n| Iron sulfate | <pH 6.5 | Inorganic; precipitates and becomes unavailable above pH 6.5 |\n| Iron oxide (Ironite) | <pH 6.5 | Minimally plant-available at pH > 6.5 |"
+  },
+  {
+    "id": "04-eddha-chelated-iron-2",
+    "source": "University Extension Iron Product Technical Guidance",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/iron-deficiency/",
+    "title": "EDDHA Chelated Iron — Product Properties and Application",
+    "grassType": "any",
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## EDDHA retail products\n- **Sequestrene 138 Fe** — 6% iron, the standard EDDHA chelate product\n- **Sprint 138** — 6% iron EDDHA, equivalent\n- **Greenway Biotech EDDHA 6%**\n- Generic agricultural EDDHA chelates labeled \"Fe-EDDHA\""
+  },
+  {
+    "id": "04-eddha-chelated-iron-3",
+    "source": "University Extension Iron Product Technical Guidance",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/iron-deficiency/",
+    "title": "EDDHA Chelated Iron — Product Properties and Application",
+    "grassType": "any",
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Application method (CRITICAL)\nEDDHA chelated iron is **SOIL-APPLIED, NOT FOLIAR**. The chelate works by keeping iron in plant-available form in the root zone — it must be watered into the soil to reach roots.\n- Apply granular product to turf\n- Water in with at least 0.25 inches of irrigation\n- Foliar application is INEFFECTIVE for EDDHA — the chelate does not penetrate leaf cuticle efficiently\n\nFor quick cosmetic foliar greening (short-lived only), iron sulfate spray at 2 oz/gallon water can be used — but this is NOT a long-term fix and lasts only 7–14 days."
+  },
+  {
+    "id": "04-eddha-chelated-iron-4",
+    "source": "University Extension Iron Product Technical Guidance",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/iron-deficiency/",
+    "title": "EDDHA Chelated Iron — Product Properties and Application",
+    "grassType": "any",
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Response timeline\n- Mild deficiency at pH 7.5–7.8: new growth greens up in 10–14 days\n- Moderate deficiency: 2–3 weeks for visible improvement; 4–6 weeks for full recovery\n- Severe deficiency at pH >8.0: 4–8 weeks for visible response\n\nDO NOT cite \"3–6 months\" for visible response to EDDHA iron — that timeline applies to soil pH correction with sulfur, NOT to chelated iron greening."
+  },
+  {
+    "id": "04-eddha-chelated-iron-5",
+    "source": "University Extension Iron Product Technical Guidance",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/iron-deficiency/",
+    "title": "EDDHA Chelated Iron — Product Properties and Application",
+    "grassType": "any",
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## When to recommend EDDHA iron\n- Visible iron chlorosis symptoms: interveinal yellowing (yellow leaves with green veins) in new growth\n- Soil pH ≥ 7.5 with marginal turf color\n- For pH 7.0–7.5 with no visible symptoms: monitor first; recommend only if chlorosis appears\n\nDO NOT recommend EDDHA as \"urgent\" when the homeowner's profile does not describe visible chlorosis. At pH 7.8, iron deficiency is common but not guaranteed."
+  },
+  {
+    "id": "04-eddha-chelated-iron-6",
+    "source": "University Extension Iron Product Technical Guidance",
+    "url": "https://extension.colostate.edu/topic-areas/yard-garden/lawns/iron-deficiency/",
+    "title": "EDDHA Chelated Iron — Product Properties and Application",
+    "grassType": "any",
+    "topic": [
+      "soil-ph-alkaline",
+      "fertilization"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Pair with long-term soil pH correction\nEDDHA iron addresses SYMPTOMS, not the underlying high pH. For sustained color and overall turf health, pair with:\n1. Elemental sulfur program (1–2 lbs/1,000 sq ft every 4–6 weeks)\n2. Acidifying nitrogen source (ammonium sulfate 21-0-0) for ongoing fertilization\n3. Soil pH retest in 3–6 months"
+  },
+  {
+    "id": "05-st-augustine-summer-care-0",
+    "source": "Texas A&M AgriLife Extension + UF/IFAS Extension",
+    "url": "https://agrilifeextension.tamu.edu/library/landscaping/st-augustine-grass/",
+    "title": "St. Augustine Grass Summer Maintenance — Texas A&M Standards",
+    "grassType": [
+      "st_augustine"
+    ],
+    "topic": [
+      "mowing",
+      "disease",
+      "pest",
+      "fertilization"
+    ],
+    "region": [
+      "southeast",
+      "south-central"
+    ],
+    "text": "# St. Augustine Grass Summer Maintenance (Texas A&M AgriLife)"
+  },
+  {
+    "id": "05-st-augustine-summer-care-1",
+    "source": "Texas A&M AgriLife Extension + UF/IFAS Extension",
+    "url": "https://agrilifeextension.tamu.edu/library/landscaping/st-augustine-grass/",
+    "title": "St. Augustine Grass Summer Maintenance — Texas A&M Standards",
+    "grassType": [
+      "st_augustine"
+    ],
+    "topic": [
+      "mowing",
+      "disease",
+      "pest",
+      "fertilization"
+    ],
+    "region": [
+      "southeast",
+      "south-central"
+    ],
+    "text": "## Mowing height\n- **Standard full-sun mowing height: 2.5–3.5 inches** (Texas A&M AgriLife Extension residential St. Augustine — standard cultivars like Floratam, Raleigh, Palmetto)\n- **Shaded locations: 3.5–4 inches** — taller mowing compensates for reduced photosynthesis under tree canopy.\n- **Absolute minimum: 2.5 inches** for standard varieties; 2 inches for semi-dwarf cultivars (Floratam dwarf, Captiva). NEVER recommend below 2.5 inches without confirming cultivar.\n- Many Houston/southern lawns have partial shade — the shade-height distinction (3.5-4\") is a critical recommendation for those scenarios.\n- Mowing frequency: every 5–7 days during summer; never remove more than 1/3 of blade height per mow."
+  },
+  {
+    "id": "05-st-augustine-summer-care-2",
+    "source": "Texas A&M AgriLife Extension + UF/IFAS Extension",
+    "url": "https://agrilifeextension.tamu.edu/library/landscaping/st-augustine-grass/",
+    "title": "St. Augustine Grass Summer Maintenance — Texas A&M Standards",
+    "grassType": [
+      "st_augustine"
+    ],
+    "topic": [
+      "mowing",
+      "disease",
+      "pest",
+      "fertilization"
+    ],
+    "region": [
+      "southeast",
+      "south-central"
+    ],
+    "text": "## Chinch bug scouting and threshold\nThe southern chinch bug (Blissus insularis) is the primary summer insect pest of St. Augustine.\n\n**Scouting method — SOAP FLUSH (drench), the Texas A&M AgriLife standard:**\n1. Mix 1.5 oz liquid dish soap with 1 gallon of water\n2. Pour evenly over a 4 sq ft area at the margin of damaged turf\n3. Watch for 5 minutes — chinch bugs irritated by the soap will surface\n4. Count adults and nymphs that emerge\n\nAlternative: coffee-can flotation (cut both ends out of a coffee can, push 1 inch into turf, fill with water, count floating insects). The soap flush is generally preferred — easier and covers more area per test.\n\n**Action thresholds** (Texas A&M AgriLife Extension — METHOD MATTERS, do not conflate):\n- **Visual inspection / coffee-can flotation** (full population estimate per area): **20–25 chinch bugs per square foot** of damaged turf indicates treatment threshold.\n- **Soap flush method** (catches a fraction of the population — irritated bugs that surface): **2–3 chinch bugs per square foot** from soap flush observations is the treatment threshold per UF/IFAS and Texas A&M. Do NOT apply the 20-25 number to soap flush counts — that would be unreasonable.\n\n**When recommending treatment thresholds, always specify which method the count refers to.** Example: \"If your soap flush brings up 8 or more chinch bugs from a 4 sq ft area (≥2 per sq ft), treatment is warranted.\"\n\n**PYRETHROID RESISTANCE WARNING:** Southern chinch bug populations in the Gulf Coast (Houston, FL, coastal LA, AL) have well-documented resistance to pyrethroid insecticides (bifenthrin, lambda-cyhalothrin, permethrin). If pyrethroid treatment fails or chinch bugs return within 4 weeks, ROTATE to a different mode of action: clothianidin (Bayer Complete Insect Killer for Soil and Turf), trichlorfon (Dylox), or carbaryl (Sevin). Mention resistance management when recommending bifenthrin/Talstar in Houston or other coastal areas."
+  },
+  {
+    "id": "05-st-augustine-summer-care-3",
+    "source": "Texas A&M AgriLife Extension + UF/IFAS Extension",
+    "url": "https://agrilifeextension.tamu.edu/library/landscaping/st-augustine-grass/",
+    "title": "St. Augustine Grass Summer Maintenance — Texas A&M Standards",
+    "grassType": [
+      "st_augustine"
+    ],
+    "topic": [
+      "mowing",
+      "disease",
+      "pest",
+      "fertilization"
+    ],
+    "region": [
+      "southeast",
+      "south-central"
+    ],
+    "text": "**Scouting sample area:** Texas A&M AgriLife recommends a coffee-can flotation cylinder (cut both ends out, push 1 inch into turf, fill with water, count floating insects) OR the soap flush method (1.5 oz dish soap + 1 gallon water poured over 4 sq ft area, count bugs surfacing in 5 minutes). Use ONE method consistently; do not mix counts.\n\nTreatment when above threshold: bifenthrin (Talstar P, Ortho Bug-B-Gon) or imidacloprid (Bayer Complete Insect Killer for Soil and Turf). Apply per label; water in lightly to move active ingredient into the thatch where chinch bugs feed."
+  },
+  {
+    "id": "05-st-augustine-summer-care-4",
+    "source": "Texas A&M AgriLife Extension + UF/IFAS Extension",
+    "url": "https://agrilifeextension.tamu.edu/library/landscaping/st-augustine-grass/",
+    "title": "St. Augustine Grass Summer Maintenance — Texas A&M Standards",
+    "grassType": [
+      "st_augustine"
+    ],
+    "topic": [
+      "mowing",
+      "disease",
+      "pest",
+      "fertilization"
+    ],
+    "region": [
+      "southeast",
+      "south-central"
+    ],
+    "text": "## Gray leaf spot (Pyricularia grisea) — PRIMARY summer disease\nGray leaf spot is the dominant summer disease threat on St. Augustine — NOT brown patch. Brown patch is favored by nighttime temps below 70°F (a fall/spring disease on warm-season grasses).\n\n**Conditions favoring gray leaf spot:**\n- Daytime temps >80°F and nighttime temps >70°F\n- High humidity, leaf wetness >12 hours per day, recent rainfall\n- Excessive nitrogen (lush succulent growth is highly susceptible)\n\n**Lesions:** small (1-4 mm) olive-green to tan/brown spots with a distinctive WATER-SOAKED appearance and YELLOW (chlorotic) halo. Lesions can elongate into oval/elliptical shapes especially on perennial ryegrass overseeded turf, but the diagnostic features on St. Augustine are the small spot size, water-soaked center, and yellow halo. The yellow border distinguishes gray leaf spot from brown patch (which has dark border ring with green center).\n\n**During active infection: DO NOT apply nitrogen.** Nitrogen stimulates lush growth that the pathogen exploits. Defer all N applications until disease pressure recedes (lesions stop spreading, grass actively recovering).\n- The trigger to resume N is DISEASE RESOLUTION, not nighttime air temperature thresholds.\n- Do NOT hold N indefinitely based on temperature alone.\n\n**Fungicide treatment — QoI (FRAC Group 11) is first-line:**\nHomeowner-accessible QoI products:\n- **Scotts DiseaseEx Lawn Fungicide** (azoxystrobin) — most accessible at retail\n- **BioAdvanced Disease Control for Lawns** (azoxystrobin)\n\nDMI fungicides (myclobutanil/Spectracide Immunox, propiconazole/Banner Maxx) are NOT preferred — less reliable control of Pyricularia grisea than QoI fungicides. Do NOT lead with myclobutanil or propiconazole.\n\nProfessional formulations (Heritage, Armada 50 WDG) exist but are less accessible to homeowners — prefer Scotts DiseaseEx for homeowner recommendations."
+  },
+  {
+    "id": "05-st-augustine-summer-care-5",
+    "source": "Texas A&M AgriLife Extension + UF/IFAS Extension",
+    "url": "https://agrilifeextension.tamu.edu/library/landscaping/st-augustine-grass/",
+    "title": "St. Augustine Grass Summer Maintenance — Texas A&M Standards",
+    "grassType": [
+      "st_augustine"
+    ],
+    "topic": [
+      "mowing",
+      "disease",
+      "pest",
+      "fertilization"
+    ],
+    "region": [
+      "southeast",
+      "south-central"
+    ],
+    "text": "**MANDATORY RESISTANCE MANAGEMENT (must include in every gray leaf spot fungicide recommendation):**\nPyricularia grisea has DOCUMENTED resistance to QoI/strobilurin fungicides in many regions. Always include rotation guidance:\n- Apply no more than 2 consecutive Scotts DiseaseEx (azoxystrobin/QoI) applications\n- Then rotate to a different mode of action: **tebuconazole** (BioAdvanced Fungus Control for Lawns) is the most homeowner-accessible DMI alternative\n- Fluopyram (Indemnify) and boscalid are professional SDHI options — not retail-available"
+  },
+  {
+    "id": "05-st-augustine-summer-care-6",
+    "source": "Texas A&M AgriLife Extension + UF/IFAS Extension",
+    "url": "https://agrilifeextension.tamu.edu/library/landscaping/st-augustine-grass/",
+    "title": "St. Augustine Grass Summer Maintenance — Texas A&M Standards",
+    "grassType": [
+      "st_augustine"
+    ],
+    "topic": [
+      "mowing",
+      "disease",
+      "pest",
+      "fertilization"
+    ],
+    "region": [
+      "southeast",
+      "south-central"
+    ],
+    "text": "## Herbicide rules for St. Augustine\n- **NEVER recommend 2,4-D on St. Augustine** — causes severe phytotoxicity, not labeled for SA\n- **Sulfentrazone** (Dismiss, Dismiss South) is generally SAFE at labeled rates — avoid application when air temps consistently exceed 90°F to reduce transient discoloration risk\n- **Atrazine** is commonly used and safe on SA for broadleaf and post-emergent annual grass control. It has SOME pre-emergent activity but is primarily a POST-emergent product on residential St. Augustine — for pre-emergent Poa annua control, prefer pendimethalin (Scotts Halts) or isoxaben (Gallery 75 DF). Critical timing/safety rules:\n  - DO NOT apply if rain forecast within 24–48 hours\n  - DO NOT apply if soil is wet/moist (runoff risk)\n  - Follow label re-application intervals\n  - **TEXAS LABEL — WATER BODIES:** Atrazine label specifically restricts application near water bodies, drainage ditches, storm drains, and wells. This is critical for Houston's flat, flood-prone geography. Maintain at least a 50-foot buffer from any water body or drainage feature. Atrazine is a leading contaminant of urban runoff in coastal TX waterways."
+  },
+  {
+    "id": "05-st-augustine-summer-care-7",
+    "source": "Texas A&M AgriLife Extension + UF/IFAS Extension",
+    "url": "https://agrilifeextension.tamu.edu/library/landscaping/st-augustine-grass/",
+    "title": "St. Augustine Grass Summer Maintenance — Texas A&M Standards",
+    "grassType": [
+      "st_augustine"
+    ],
+    "topic": [
+      "mowing",
+      "disease",
+      "pest",
+      "fertilization"
+    ],
+    "region": [
+      "southeast",
+      "south-central"
+    ],
+    "text": "## Pre-emergent timing for SA in fall (Houston, Zone 9b)\n- Target weeds: Poa annua (annual bluegrass), winter broadleaf weeds\n- Soil temperature trigger: apply when soil temp at 2-inch depth approaches **70°F falling**\n- For Houston/Zone 9b: this typically corresponds to **late September through early October** — NOT mid or late October. By mid-October Poa annua may already be germinating in Zone 9b coastal areas.\n- Preferred products on St. Augustine: pendimethalin (Scotts Halts) or isoxaben (Gallery 75 DF for broadleaf winter annuals). Atrazine has SOME pre-emergent activity but is primarily used post-emergent on St. Augustine.\n- ALWAYS include soil temperature qualifier — never recommend pre-emergent on calendar alone in Zone 9; verify with soil thermometer before applying."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-0",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "# Tall Fescue Low-pH Management (NCSU TurfFiles + PSU Extension)\n\nTall fescue is a cool-season grass widely grown in NC Piedmont and Mountain regions (USDA Zones 6–8a) and across the cool-season transition zone. Optimal soil pH for tall fescue is **6.0–6.5 (NCSU)** / **6.0–7.0 acceptable, 6.5 optimum (Penn State)**. NC clay soils typically run acidic and benefit from periodic lime applications."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-1",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Soil testing — REQUIRED FIRST STEP for pH correction\n\nThe most important step in any pH-correction program is a current soil test that reports **buffer pH**, not just soil pH. **Without buffer pH data, a specific lime rate cannot be calculated accurately.**\n\n- **North Carolina:** NCDA&CS Agronomic Division provides FREE soil testing April 1 – November 30 (small fee Dec–March). Submit via local county Cooperative Extension office or directly to the Raleigh lab. Standard turnaround: **2–4 weeks** during peak season. NCDA&CS reports both pH AND buffer pH (Mehlich buffer), which is what's required for accurate lime rate calculation.\n- **Pennsylvania / general:** Penn State Agricultural Analytical Services Lab uses the Adams–Evans buffer test. ~$10/sample, 2-week turnaround.\n- **Other states:** request \"buffer pH\" or \"lime requirement\" explicitly on the submission form — basic pH-only tests do NOT include buffer pH and cannot be used for precise lime rates."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-2",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Lime rate methodology — BUFFER pH determines the rate\n\n**Per NCSU and Penn State extension methodology, lime rate is a FUNCTION of buffer pH AND target pH AND soil texture, not soil pH alone.** Two soils at the same measured pH can require dramatically different lime amounts depending on cation exchange capacity (CEC) and buffering capacity — high-clay, high-organic-matter soils need much more lime to shift one pH unit than sandy soils do."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-3",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "### Two paths for the homeowner\n\n**Path A — RECOMMENDED: wait for buffer pH before any lime application.**\n- Order soil test with buffer pH (NCDA&CS for NC, PSU AASL for PA, your state's Cooperative Extension lab elsewhere).\n- When results arrive, use the lab's lime requirement value directly (it will be reported as lbs/1,000 sq ft or tons/acre).\n- This is the agronomically correct path. The 2–4 week delay is short relative to the 3–6 month timeframe for pH change.\n\n**Path B — Conservative blind application when soil test must be deferred.**\n- Apply a **CONSERVATIVE** initial dose: **25–30 lbs calcitic lime per 1,000 sq ft**, NOT 40–50 lbs.\n- 25–30 lbs is the \"safe under-application\" range that will not over-shoot pH on lightly-buffered (sandy) soils. Heavy clay soils may need more, but the second application after retesting can deliver that.\n- DO NOT recommend 40–50 lbs per 1,000 sq ft without buffer pH data — even though this stays below the 50 lb safety cap, it risks over-liming sandy or low-CEC soils, which is **harder to reverse** than under-liming.\n- Retest with buffer pH at 6 months; apply additional lime per lab calculation if pH is still below 6.0.\n- NEVER exceed 50 lbs lime per 1,000 sq ft in any single application (NCSU + PSU upper safety limit, regardless of buffer pH).\n- If the lab eventually reports a calculated rate above 50 lbs/1,000 sq ft, SPLIT into two applications 4–6 months apart."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-4",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Calcitic vs dolomitic lime — calcitic is the DEFAULT\n\n- **Default recommendation: CALCITIC lime** (calcium carbonate, CaCO3)\n- Dolomitic lime (calcium magnesium carbonate, CaMg(CO3)2) is appropriate ONLY when a soil test confirms Mg deficiency\n- Applying dolomitic when Mg is adequate causes excess Mg, which inhibits Ca and K uptake\n- Do NOT recommend dolomitic based on regional assumptions alone (\"Southeast soils often have low Mg\"). Soil test required to confirm Mg status.\n\n**Product accuracy:**\n- **Pennington Fast Acting Lime is CALCITIC** (pelletized calcium carbonate with carrier). Do NOT recommend it as a dolomitic lime source. The \"fast acting\" marketing language refers to the carrier dispersion mechanism, not a faster pH shift — pH change still takes 3–6 months in typical clay soils.\n- **Greenview Mag-I-Cal contains MAGNESIUM** (calcium-magnesium product). Do NOT classify Mag-I-Cal as calcitic — its magnesium content makes it functionally dolomitic-style. Only recommend Mag-I-Cal when a soil test confirms Mg deficiency; otherwise prefer a true calcitic source.\n- Dolomitic lime brand examples: Old Castle Pelletized Dolomitic Lime, Hi-Yield Dolomitic Lime (use ONLY if Mg deficiency confirmed)"
+  },
+  {
+    "id": "06-tall-fescue-low-ph-5",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Lime application mechanics\n\n- After application, pH change takes **3–6 months** in typical clay soils to become measurable. Piedmont heavy clay may take longer.\n- Do NOT recommend retesting pH sooner than 6 months after application.\n- \"Watering in\" lime is NOT a strict requirement — lime is incorporated by rainfall and natural soil processes over months. Light irrigation after application is fine but is not the activation mechanism.\n- Lime does NOT need to \"activate\" before fertilization can resume. Fertilization can proceed on a normal schedule after lime application. Do NOT recommend waiting 3–4 weeks after lime before fertilizing."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-6",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Forbidden combinations — pH-correction context\n\n**At low pH with lime program: do NOT also recommend ammonium sulfate fertilizer.** Ammonium sulfate is acidifying — it will COUNTERACT the lime and further lower pH. Use urea, calcium nitrate, or a neutral N source instead.\n\nThis also applies to MESA (Methylene Extended Sulfur Ammonium) — the slow-release coating is ammonium sulfate, which is still acidifying. Do NOT recommend MESA alongside a lime correction program for acidic soils."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-7",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Spring pre-emergent timing — soil-temp-trigger decision tree (CRITICAL for NC Piedmont / spring)\n\nPre-emergent timing for crabgrass in NC Piedmont is sensitive in spring. At 68°F daytime air temperature, **soil temperature at 2-inch depth is typically 55–60°F under sunny conditions, 50–55°F under cloudy conditions**. This means the spring pre-emergent window may already be opening, closing, or closed depending on the recent weather pattern.\n\n**DECISION TREE based on current soil temp (use ECONet for NC, your state's soil-temp tool elsewhere):**\n\n- **Soil temp < 50°F:** Window not yet open — pre-emergent application is premature. Plan to apply when soil temps reach 50–53°F as an early-start option, or 55°F at 2\" depth maintained for 3 consecutive days (the standard PSU/Purdue trigger).\n- **Soil temp 50–55°F:** OPTIMAL APPLICATION WINDOW — apply prodiamine (Andersons Barricade 0.5G, generic prodiamine 65 WDG) or pendimethalin (Scotts Halts) at label rate now. Water in 0.25–0.5\" within 3–5 days for prodiamine, 14 days for pendimethalin.\n- **Soil temp 55–60°F:** Window is CLOSING. Apply within 5–7 days if not yet applied. Use a faster-activating product (prodiamine over pendimethalin) and water in immediately.\n- **Soil temp > 60°F:** Window has PASSED for spring crabgrass. Crabgrass germination may already be underway. Do NOT frame this as the \"ideal window.\" Pivot to:\n  - Watch for crabgrass emergence (look for first true leaves at ground level)\n  - Post-emergent options: quinclorac (Drive XLG, Ortho Crabgrass Killer for Lawns), or Tenacity (mesotrione) on cool-season turf\n  - Plan fall pre-emergent for winter annuals (Poa annua, chickweed) at ~70°F soil temp falling, typically September–early October\n\n**Alternate trigger if soil thermometer not available:** Forsythia bloom (the bright yellow shrub) reliably correlates with 50–55°F soil temps in the same region. Apply pre-emergent when forsythia is in full bloom."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-8",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Pre-emergent and fall overseeding incompatibility\n\nTall fescue lawns in NC are commonly overseeded in fall to thicken bunch-type stands. **Pre-emergent herbicides COMPLETELY INHIBIT seed germination** — never recommend both in the same season.\n\n- If the homeowner wants to overseed in September, skip fall pre-emergent that year (Poa annua control can be managed with post-emergent in spring if needed).\n- If pre-emergent is essential (heavy Poa annua history), use **siduron (Tupersan)** — the only pre-emergent compatible with seeding. Tupersan is hard to find at homeowner level; suggest a local Lesco/JDL dealer.\n- Do NOT recommend prodiamine, pendimethalin, dithiopyr, or any standard pre-emergent within 12 weeks of intended seeding."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-9",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Phosphorus and potassium — NC-SPECIFIC rules\n\n**North Carolina restricts broadcast phosphorus application without soil test justification.** Many NC soils have adequate or excess P from years of fertilization; over-application contributes to runoff and water quality issues.\n\n- DO NOT recommend P-containing fertilizers (16-4-8, 10-10-10, etc.) on tall fescue without a current soil test confirming P deficiency.\n- Default fertilizer recommendation without soil test P data: a **P-FREE product** — e.g., 18-0-3, 16-0-8, 25-0-5, or Milorganite 6-4-0 (Milorganite's P is organic/slow-release and generally acceptable under NC ordinances at homeowner rates).\n- If soil test shows P deficiency (Mehlich P < 25 ppm, low/very-low rating): a low-P starter product like 18-24-12 at seeding is acceptable.\n- K should be applied per soil test; many NC clay soils have adequate K already."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-10",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## NC Piedmont fall N program for tall fescue\n\nFall is the primary fertilization season for tall fescue in NC (drives root growth, prepares for winter).\n\n- **Total annual N for tall fescue in NC: 2.5–3.5 lbs N per 1,000 sq ft** (NCSU TurfFiles)\n- **Spring N: minimal — ≤0.5 lbs N/1,000 sq ft, applied only if clear deficiency is evident.** Avoid heavy spring N — it increases summer brown patch disease pressure (Rhizoctonia solani).\n- Fall split applications:\n  - **Mid-September: 1 lb N** (slow-release source — IBDU, polymer-coated urea, Milorganite 6-4-0 if P is acceptable; otherwise a P-free slow-release urea)\n  - **Mid-October to mid-November: 1 lb N** (similar slow-release; can use late-season \"winterizer\" formulations here)\n  - **Thanksgiving (mid-November) optional 3rd application: 0.5–1 lb N** quick-release urea — drives late root growth without top growth, builds carbohydrate reserves for spring green-up\n- Skip summer N entirely — tall fescue is heat-stressed in NC summer and N application increases brown patch disease pressure."
+  },
+  {
+    "id": "06-tall-fescue-low-ph-11",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Tall fescue mowing height\n\n- Standard: **3–4 inches**\n- Summer stress period: **4 inches** is the upper end during high heat\n- Spring/fall: **3.5 inches** is a good default (not below 3 inches)\n- NEVER below 3 inches — too low reduces drought and disease tolerance"
+  },
+  {
+    "id": "06-tall-fescue-low-ph-12",
+    "source": "North Carolina State University TurfFiles + NCDA&CS Agronomic Division + Penn State Extension",
+    "url": "https://turffiles.ncsu.edu/lawns/tall-fescue/",
+    "title": "Tall Fescue Low-pH Management — NCSU TurfFiles + Penn State Extension",
+    "grassType": [
+      "tall_fescue"
+    ],
+    "topic": [
+      "soil-ph-acidic",
+      "fertilization",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Common framing mistakes to AVOID\n\n- Do NOT state a specific lime rate without acknowledging the buffer-pH dependency in the same recommendation.\n- Do NOT recommend 40–50 lbs/1,000 sq ft as a \"conservative\" rate without buffer pH — 25–30 lbs is the actual conservative blind-application rate.\n- Do NOT recommend 16-4-8 (or any P-containing) fertilizer on NC tall fescue without confirming P need from soil test.\n- Do NOT cite a single soil temperature trigger (e.g., \"apply when soil reaches 55°F\") without distinguishing whether the current temp is already at, above, or below that threshold.\n- Do NOT recommend overseeding AND pre-emergent in the same fall season (except siduron)."
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-0",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "# Bermuda Drought Management — Phoenix AZ (Zone 9b–10a)\n\nCommon and hybrid bermuda are dominant warm-season turfgrasses in Phoenix and the desert Southwest. Drought management here is fundamentally different from humid Southeast bermuda."
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-1",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## Weekly irrigation target (CRITICAL)\n- **Phoenix AZ summer bermuda irrigation: 1–2 INCHES PER WEEK total** (University of Arizona Cooperative Extension range for established bermuda in Phoenix summer).\n  - **Mild summer (90–100°F daytime):** 1–1.5 inches/week\n  - **Peak summer (100–110°F daytime):** 1.5–2 inches/week\n  - **Extreme heat (>110°F sustained):** up to 2 inches/week with cycle-and-soak\n- This is the TOTAL across all sessions per week, NOT per-session.\n- DO NOT recommend 1.5–2 inches per SESSION — totaling 4.5–6 inches per week causes runoff even in hot/dry conditions.\n- DO NOT recommend 2.5+ inches per WEEK in any conditions — that exceeds even peak summer extension guidance."
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-2",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## Application technique — cycle-and-soak\n- Use cycle-and-soak across MULTIPLE sessions per week (3 sessions typical)\n- Each session: 0.3–0.5 inches delivered via multiple short cycles to allow infiltration\n- Example: 3 sessions of ~0.4 inches each = 1.2 inches/week total\n- Time of day: BEFORE 10 AM to minimize evaporation\n- For desert clay/caliche soils with poor infiltration: shorter cycles (5–8 min) with longer soak intervals (45–60 min between)"
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-3",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## Drought stress signs\n- Footprinting: footprints remain visible after walking on turf — water now\n- Blade folding/wilting: bermuda blades fold to reduce surface area — water now\n- Bluish-gray cast across the lawn — water now\n- Color loss to straw/tan — beyond simple drought, may indicate dormancy onset"
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-4",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## Mowing height for Phoenix bermuda\n- **Common bermuda Phoenix, variety unknown: 1.5–2 inches** (safe guideline for drought stress management; covers most common bermuda).\n- **Hybrid/dwarf varieties (confirmed):** 0.5–1.5 inches. Common AZ hybrids include Tifway 419, MidIron, Princess 77 (most prefer reel mowing).\n- **When recommending mowing height, ALWAYS note cultivar uncertainty:** \"If your bermuda is hybrid (e.g., Tifway, MidIron), aim for 0.75–1.5 inches; for common bermuda or unknown cultivar, 1.5–2 inches is safer.\"\n- Do NOT apply UGA common bermuda range (1.5–2.5\") as default for all AZ bermuda without acknowledging variety uncertainty.\n- During drought stress: RAISE to upper end of cultivar's range. Never LOWER height during drought — taller grass shades soil and reduces water loss."
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-5",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## Fertilization during drought\n- DO NOT recommend fertilization of any kind during active drought stress — applying fertilizer to drought-stressed turf causes salt burn and amplifies stress.\n- Defer fertilization until turf has recovered (2–3 weeks of normal growth)."
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-6",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## Wetting agents and humectants\n- Hydretain is a humectant/moisture-retention product — captures and holds soil moisture. NOT a surfactant wetting agent.\n- For HYDROPHOBIC SOIL (water beading on surface, refusing to absorb): a penetrant surfactant wetting agent helps. Products: Revolution, Aqua-Aid Penetrant, generic penetrant wetting agents labeled for turf.\n- DO NOT cite Hydretain irrigation reduction percentages — manufacturer efficiency claims have no extension validation. Use ONLY phrasing like \"may help with moisture retention.\" Never \"reduces irrigation by X%.\""
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-7",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## NO fungicide during drought\n- Dry conditions (low humidity, no rainfall) prevent fungal disease development\n- Any fungicide recommendation during active drought is agronomically incorrect\n- Defer fungicide topics until moisture conditions return"
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-8",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## Avoid these products on stressed bermuda\n- **NEVER recommend Tenacity (mesotrione) for bermuda** — phytotoxic, causes severe bleaching and damage; not labeled for bermuda\n- Do NOT recommend pre-emergent herbicides during peak drought (no germination occurring); plan ahead for fall application instead"
+  },
+  {
+    "id": "07-bermuda-drought-phoenix-9",
+    "source": "University of Arizona Cooperative Extension",
+    "url": "https://extension.arizona.edu/lawn-care",
+    "title": "Bermuda Drought Management — Phoenix and Desert Southwest",
+    "grassType": [
+      "bermuda"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southwest"
+    ],
+    "text": "## Bermuda spring-summer fertilization (when NOT in drought stress)\n- Begin N when soil temp consistently >65°F (full green-up)\n- Rate: 0.5–1.0 lbs N per 1,000 sq ft per application, every 4–6 weeks during growing season\n- Total annual N for AZ bermuda: 2–4 lbs N per 1,000 sq ft (UoA Extension range)\n- Product: balanced N source (urea, polymer-coated urea, or 16-8-8 type blends)"
+  },
+  {
+    "id": "08-soil-temperature-windows-0",
+    "source": "Multi-Extension Soil Temperature Reference (Penn State, Purdue, K-State, UGA, NCSU)",
+    "url": "https://extension.psu.edu/soil-temperature-and-pre-emergent-herbicide-timing",
+    "title": "Soil Temperature Timing Reference — Pre-Emergent, Overseeding, Fertilization",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "overseeding",
+      "fertilization",
+      "spring-green-up"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "# Soil Temperature Timing Reference\n\nSoil temperature at 2-inch depth is the primary timing trigger for most turf management decisions — significantly more reliable than calendar dates or air temperature."
+  },
+  {
+    "id": "08-soil-temperature-windows-1",
+    "source": "Multi-Extension Soil Temperature Reference (Penn State, Purdue, K-State, UGA, NCSU)",
+    "url": "https://extension.psu.edu/soil-temperature-and-pre-emergent-herbicide-timing",
+    "title": "Soil Temperature Timing Reference — Pre-Emergent, Overseeding, Fertilization",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "overseeding",
+      "fertilization",
+      "spring-green-up"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Crabgrass pre-emergent timing\n- **Standard trigger: 55°F at 2-inch depth, maintained 3 consecutive days** (Penn State, Purdue, K-State consensus)\n- Early-start option for heavy pressure: 50–53°F provides buffer in fast-warming springs\n- Frame in recommendations: \"The standard trigger is 55°F; applying at 50–53°F provides a buffer in fast-warming springs.\"\n- CRITICAL: If current soil temp is already 55–60°F, the window has PASSED or is CLOSING — do NOT frame 60°F as \"ideal window\"\n- Above 60°F, crabgrass germination may be underway — pivot to post-emergent options (quinclorac, Drive XLG) if crabgrass already visible"
+  },
+  {
+    "id": "08-soil-temperature-windows-2",
+    "source": "Multi-Extension Soil Temperature Reference (Penn State, Purdue, K-State, UGA, NCSU)",
+    "url": "https://extension.psu.edu/soil-temperature-and-pre-emergent-herbicide-timing",
+    "title": "Soil Temperature Timing Reference — Pre-Emergent, Overseeding, Fertilization",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "overseeding",
+      "fertilization",
+      "spring-green-up"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Winter annual pre-emergent timing (Poa annua, chickweed, henbit)\n- **Trigger: 70°F at 2-inch depth, FALLING** — soil cooling through 70°F in fall captures the early germination window\n- Apply when soil temps reach the upper end of the Poa annua germination range\n- Do NOT wait until soil reaches 55°F — by then early germination may have begun in heavy pressure lawns\n- Typical calendar: late September to mid-October in zones 5–7; October in zones 8–9"
+  },
+  {
+    "id": "08-soil-temperature-windows-3",
+    "source": "Multi-Extension Soil Temperature Reference (Penn State, Purdue, K-State, UGA, NCSU)",
+    "url": "https://extension.psu.edu/soil-temperature-and-pre-emergent-herbicide-timing",
+    "title": "Soil Temperature Timing Reference — Pre-Emergent, Overseeding, Fertilization",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "overseeding",
+      "fertilization",
+      "spring-green-up"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Cool-season overseeding (KBG, tall fescue, fine fescue, perennial ryegrass)\n- **Optimal soil temp: 60–65°F** for fast, reliable germination\n- This is the late summer / early fall target window (typically late August through mid-September in zones 5–7)\n- Acceptable range: 50–65°F. Below 55°F, germination slows significantly; seedlings may not establish before winter dormancy.\n- Above 70°F, cool-season seed germination rate drops sharply (heat stress)\n- DO NOT frame 50°F as \"ideal\" — 60–65°F is optimal"
+  },
+  {
+    "id": "08-soil-temperature-windows-4",
+    "source": "Multi-Extension Soil Temperature Reference (Penn State, Purdue, K-State, UGA, NCSU)",
+    "url": "https://extension.psu.edu/soil-temperature-and-pre-emergent-herbicide-timing",
+    "title": "Soil Temperature Timing Reference — Pre-Emergent, Overseeding, Fertilization",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "overseeding",
+      "fertilization",
+      "spring-green-up"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Warm-season green-up fertilization\n- Soil temp sustained 65°F at 2-inch depth before applying N to bermuda, zoysia, St. Augustine, centipede\n- Below 65°F: dormant or transitioning turf cannot uptake nutrients; N at this stage promotes weed germination and disease"
+  },
+  {
+    "id": "08-soil-temperature-windows-5",
+    "source": "Multi-Extension Soil Temperature Reference (Penn State, Purdue, K-State, UGA, NCSU)",
+    "url": "https://extension.psu.edu/soil-temperature-and-pre-emergent-herbicide-timing",
+    "title": "Soil Temperature Timing Reference — Pre-Emergent, Overseeding, Fertilization",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "overseeding",
+      "fertilization",
+      "spring-green-up"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Soil temperature resources by state\n- **Colorado:** CoAgMet (Colorado Agricultural Meteorological Network) — coagmet.colostate.edu. CSU Extension-verified, Colorado-only. Do NOT recommend for non-Colorado states.\n- **Other states:** state Cooperative Extension's soil temperature network, or a calibrated soil thermometer at 2-inch depth\n- DO NOT recommend SoilTemperature.org for Colorado users (not CSU-verified)\n- ALWAYS instruct the homeowner to verify soil temp — do NOT infer from air temperature alone (can differ 10–20°F)"
+  },
+  {
+    "id": "08-soil-temperature-windows-6",
+    "source": "Multi-Extension Soil Temperature Reference (Penn State, Purdue, K-State, UGA, NCSU)",
+    "url": "https://extension.psu.edu/soil-temperature-and-pre-emergent-herbicide-timing",
+    "title": "Soil Temperature Timing Reference — Pre-Emergent, Overseeding, Fertilization",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "overseeding",
+      "fertilization",
+      "spring-green-up"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## High-altitude / high-desert climates (Denver, Salt Lake City, Albuquerque)\n- Spring soil temps LAG air temps by 3–6 weeks\n- Even when air temp reaches 65–70°F in April, soil at 2-inch depth may still be 45–50°F\n- DO NOT recommend \"urgent\" spring pre-emergent based on air temp alone in these climates\n- Wait for actual soil thermometer reading before applying"
+  },
+  {
+    "id": "08-soil-temperature-windows-7",
+    "source": "Multi-Extension Soil Temperature Reference (Penn State, Purdue, K-State, UGA, NCSU)",
+    "url": "https://extension.psu.edu/soil-temperature-and-pre-emergent-herbicide-timing",
+    "title": "Soil Temperature Timing Reference — Pre-Emergent, Overseeding, Fertilization",
+    "grassType": "any",
+    "topic": [
+      "pre-emergent",
+      "overseeding",
+      "fertilization",
+      "spring-green-up"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Granular pre-emergent activation\nAll granular pre-emergents require 0.5 inches of water (rain or irrigation) to activate the barrier:\n- Prodiamine (Barricade): water in within 3–5 days\n- Pendimethalin (Scotts Halts): water in within 14 days per label\n- Dithiopyr (Dimension): water in within 7 days\n- Isoxaben (Gallery): water in within 21 days\n\nALWAYS include the water-in requirement when recommending a granular pre-emergent."
+  },
+  {
+    "id": "09-centipede-southeast-care-0",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "# Centipede Grass Maintenance Program (Clemson HGIC)\n\nCentipede is a low-input warm-season grass dominant in the coastal Southeast. Its management is fundamentally different from bermuda or zoysia — over-fertilization causes \"centipede decline.\""
+  },
+  {
+    "id": "09-centipede-southeast-care-1",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Annual nitrogen rate — STRICT CAP\n- **Maximum annual N: 1 lb N per 1,000 sq ft TOTAL for the entire year** (Clemson HGIC standard for established centipede on average soils; up to 2 lbs N/1,000 sq ft/yr is acceptable ONLY when a soil test confirms sandy, low-CEC soils with documented deficiency. Default to 1 lb N/1,000 sq ft/yr unless soil-test evidence is present.)\n- Maximum per application: 0.5 lbs N per 1,000 sq ft\n- 1–2 split applications per year (June + August in most of Southeast)\n- ANNUAL TOTAL MATH: 2 split applications of 0.5 lbs N each (each per 1,000 sq ft) = 1.0 lb N per 1,000 sq ft for the year — that IS the MAXIMUM\n- UNIT CONSISTENCY RULE — CRITICAL: Express EVERY nitrogen figure on a \"per 1,000 sq ft\" basis. NEVER mix a \"per 1,000 sq ft\" rate with a \"total for the entire lawn\" figure in the same sentence. Wrong: \"0.5 lbs N per 1,000 sq ft × 4,000 sq ft = 2.0 lbs N total, within the 1 lb cap.\" That reads as a contradiction even though it isn't. Correct: \"Apply 0.5 lbs N per 1,000 sq ft per application; over two splits that totals 1.0 lb N per 1,000 sq ft per year, the Clemson maximum. (For a 4,000 sq ft lawn, that's 2.0 lbs of N product weight in total per application — confirm the math but always cite the rate per 1,000 sq ft.)\"\n- NEVER recommend \"target 2 lbs of N per 1,000 sq ft\" or \"total of 2 lbs N per 1,000 sq ft\" for centipede — this would be double the safe annual limit and cause centipede decline"
+  },
+  {
+    "id": "09-centipede-southeast-care-2",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Rate expression rule — NITROGEN ONLY, never product weight\n- ALWAYS express centipede fertilizer rates in NITROGEN TERMS: \"apply 0.5 lbs nitrogen per 1,000 sq ft\"\n- NEVER state product weight: do NOT say \"apply 3.3 lbs of product\"\n- For fungicide and herbicide products on centipede: provide spreader setting (e.g., \"set Scotts rotary spreader to 3¼\") — never lbs per 1,000 sq ft"
+  },
+  {
+    "id": "09-centipede-southeast-care-3",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Banned products on centipede\n- **Pennington UltraGreen 30-0-4** — too high N concentration; impossible to apply 0.5 lb N rate accurately\n- **Pennington UltraGreen 30-0-10** — same issue\n- **Lesco Stressgard** (any formulation) — too high N for centipede\n- **Scotts Turf Builder** (any formulation) — too high N for centipede"
+  },
+  {
+    "id": "09-centipede-southeast-care-4",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Safe centipede fertilizer products\n- **Hi-Yield 15-0-15** — appropriate N concentration, phosphorus-free (preferred for established centipede)\n- **Lebanon Pro 16-4-8** — acceptable\n- **Milorganite 6-4-0** — slow-release, low N concentration; phosphorus may be a concern on established turf (see below)"
+  },
+  {
+    "id": "09-centipede-southeast-care-5",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Phosphorus on centipede\n- Excess phosphorus contributes to centipede decline AND may violate local fertilizer ordinances (FL, NC)\n- DO NOT recommend P-containing products on established centipede unless soil test confirms P deficiency\n- For established centipede: use phosphorus-free product like Hi-Yield 15-0-15\n- Milorganite is acceptable but P-containing — confirm soil test first"
+  },
+  {
+    "id": "09-centipede-southeast-care-6",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Primary diseases — gray leaf spot first, NOT dollar spot\n- **Gray leaf spot (Pyricularia grisea)** is the PRIMARY summer disease threat on centipede in Southeast\n  - Conditions: hot humid weather, daytime >80°F, nighttime >70°F\n  - Symptoms: small gray/tan lesions with brown borders on blades\n  - Treatment: same QoI-first approach as on St. Augustine (Scotts DiseaseEx / azoxystrobin)\n- **Large patch / brown patch (Rhizoctonia solani)** — affects the collar region; cool wet conditions (60–75°F)\n- **Dollar spot (Clarireedia jacksonii)** is NOT a primary disease concern for centipede. Do NOT lead with dollar spot recommendations on centipede."
+  },
+  {
+    "id": "09-centipede-southeast-care-7",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Centipede irrigation — significantly LESS than other warm-season grasses\nCentipede is notably drought-tolerant and requires much less water than bermuda or St. Augustine.\n\n- **Humid coastal Southeast** (Charleston SC, Savannah GA, Jacksonville FL, coastal NC — ZIP codes 29xxx, 30xxx, 31xxx, 32xxx): **0.5–0.75 inches total per week** (rainfall + irrigation)\n- **Drier inland Southeast:** 0.75–1 inch per week maximum\n- DO NOT apply cool-season irrigation targets (1–1.5 inch/week) to centipede — overwatering promotes disease and contributes to centipede decline\n- During summer rainfall patterns common to coastal SE (0.5+ inches/week), supplemental irrigation is often NOT needed"
+  },
+  {
+    "id": "09-centipede-southeast-care-8",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Centipede mowing height\n- Standard: **1.5–2 inches** (Clemson HGIC)\n- Maintain a single height through the growing season — do NOT scalp in spring\n- Do NOT raise above 2 inches in summer (taller centipede tends to thatch)"
+  },
+  {
+    "id": "09-centipede-southeast-care-9",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## USDA zone reference for South Carolina coast\n- **Charleston SC (ZIP 29401–29499): Zone 8b** — NOT 9a (commonly misidentified)\n- Columbia SC (29201–29299): Zone 8a"
+  },
+  {
+    "id": "09-centipede-southeast-care-10",
+    "source": "Clemson HGIC + UGA Extension",
+    "url": "https://hgic.clemson.edu/factsheet/centipedegrass-yearly-maintenance-program/",
+    "title": "Centipede Grass Maintenance — Clemson HGIC",
+    "grassType": [
+      "centipede"
+    ],
+    "topic": [
+      "fertilization",
+      "disease",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Texas / Florida note\n- \"Charleston, SC\" is in Zone 8b — centipede goes fully dormant in winter (below 50°F)\n- Coastal FL and TX have warmer winter ranges where centipede may stay partially green"
+  },
+  {
+    "id": "10-perennial-ryegrass-program-0",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "# Perennial Ryegrass Maintenance Program\n\nPerennial ryegrass (Lolium perenne) is a **PERENNIAL** cool-season grass widely used in zones 5–7 as a primary turf species. It is finer-textured than tall fescue and has different management requirements."
+  },
+  {
+    "id": "10-perennial-ryegrass-program-1",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "## Botanical accuracy\n- Perennial ryegrass is a PERENNIAL — persists year to year. Do NOT call it an annual.\n- It can thin under sustained summer heat stress but is not an annual species.\n- It is finer-textured than tall fescue — do NOT apply tall fescue heights (3–4\") to perennial ryegrass."
+  },
+  {
+    "id": "10-perennial-ryegrass-program-2",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "## Mowing height\n- **Normal home lawn range: 2.0–3.0 inches** (OSU/Purdue Extension residential PRG guidance)\n- **Spring and heat-stress periods: 2.5–3.0 inches** — upper end is the therapeutic target heading into summer\n- Reel-mown sport/golf turf: 0.5–1.5 inches (NOT applicable to home lawns)\n- Do NOT recommend 1.5 inches or below as a target for residential PRG — too low for home lawn conditions, reduces heat tolerance and recovery\n- Do NOT recommend below 2.0 inches for residential applications"
+  },
+  {
+    "id": "10-perennial-ryegrass-program-3",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "## Nitrogen timing — FALL is primary, spring is minimal\nPRG fertilization follows the cool-season pattern but with TIGHTER spring N restrictions than tall fescue or KBG.\n\n**FALL (primary season):**\n- Mid-September: 1 lb N per 1,000 sq ft (slow-release: IBDU, polymer-coated urea)\n- Mid-October to mid-November: 0.75–1 lb N per 1,000 sq ft\n- This builds root reserves and prepares for winter survival\n- Fall N is the foundation of PRG performance the following year\n\n**SPRING (minimal):**\n- Maximum 0.25–0.5 lbs N per 1,000 sq ft\n- Apply ONLY if lawn shows clear deficiency\n- Use SLOW-RELEASE source: IBDU, polymer-coated urea, or Milorganite 6-4-0\n- DO NOT recommend Scotts Turf Builder 32-0-10 or any other high-quick-release N product for spring PRG\n- Heavy spring N promotes excessive shoot growth, depletes carbohydrate reserves before summer heat stress, and increases disease pressure (red thread, rust)\n\n**SUMMER:**\n- No N applications during peak summer heat — let PRG ride out heat stress without lush growth promotion"
+  },
+  {
+    "id": "10-perennial-ryegrass-program-4",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "## Pre-emergent on PRG\n- Spring crabgrass pre-emergent: apply at 50–55°F soil temp standard window\n- Fall winter annual pre-emergent: 70°F soil falling\n- PRG-safe options: prodiamine, pendimethalin, dithiopyr (all label-safe on established PRG)\n- Spring overseeding of PRG is uncommon but if planned, defer pre-emergent or use siduron (Tupersan)"
+  },
+  {
+    "id": "10-perennial-ryegrass-program-5",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "## Crabgrass + fall pre-emergent — DISTINCTION\nA common error: confusing crabgrass with Poa annua in fall.\n- **Crabgrass (Digitaria spp.)** is a SUMMER ANNUAL — germinates in spring, dies by first frost. Fall pre-emergent does NOT target crabgrass.\n- **Poa annua, chickweed, henbit, hairy bittercress** are WINTER ANNUALS — germinate in fall, persist through winter, die in late spring/early summer.\n- Fall pre-emergent on PRG targets WINTER ANNUALS (Poa annua / chickweed). DO NOT frame fall pre-emergent on PRG as \"for crabgrass prevention\" — crabgrass season is already over."
+  },
+  {
+    "id": "10-perennial-ryegrass-program-6",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "## Quinclorac on PRG — label safety\n- Quinclorac (Drive XLR8, Bayer All-In-One Lawn Weed Killer) is the standard post-emergent for crabgrass breakthrough\n- PRG tolerance is generally acceptable at labeled rates, BUT label includes safety caveats — confirm specific product label says \"safe on perennial ryegrass\" before recommending\n- Application during cool weather (60–80°F daytime) minimizes injury risk; avoid during summer heat stress"
+  },
+  {
+    "id": "10-perennial-ryegrass-program-7",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "## Diseases on PRG\n- Red thread (Laetisaria fuciformis) — pink/red web-like mycelium on blades; favored by 60–75°F + nitrogen deficiency. First-line treatment: nitrogen application (light) often resolves; fungicide rarely needed.\n- Gray leaf spot (Pyricularia grisea) — affects PRG aggressively in transition zones; same QoI-first treatment with rotation as on St. Augustine\n- Pythium blight (P. aphanidermatum) — warm humid conditions >85°F; mefenoxam first line\n- Brown patch (Rhizoctonia solani) — humid 75–85°F; QoI or DMI fungicide"
+  },
+  {
+    "id": "10-perennial-ryegrass-program-8",
+    "source": "Ohio State + Purdue Extension Turfgrass Programs",
+    "url": "https://hyg.osu.edu/topic/lawn-care",
+    "title": "Perennial Ryegrass Maintenance — OSU/Purdue",
+    "grassType": [
+      "ryegrass"
+    ],
+    "topic": [
+      "mowing",
+      "fertilization",
+      "pre-emergent",
+      "weed-control"
+    ],
+    "region": [
+      "midwest",
+      "northeast"
+    ],
+    "text": "## Climate suitability note\nPRG performs best in zones 5–7. In Zone 8+ (lower AL/MS/GA/FL/SC coast/TX/AZ), perennial ryegrass typically functions as an annual due to summer heat — commonly used for WINTER OVERSEEDING on dormant warm-season lawns rather than as permanent turf."
+  },
+  {
+    "id": "11-zoysia-spring-care-0",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "# Zoysia Spring Green-Up and Maintenance (UGA Extension)\n\nZoysiagrass is a warm-season grass widely used in zones 7–9. Spring transition management is the most timing-sensitive period of the year."
+  },
+  {
+    "id": "11-zoysia-spring-care-1",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Spring fertilization trigger (CRITICAL)\n- **Do NOT apply nitrogen to zoysia until BOTH:**\n  - Soil temperatures consistently exceed 65°F (UGA Extension standard)\n  - The lawn is at least 75% green-up\n- Applying N before this threshold:\n  - Promotes disease (large patch flares)\n  - Wastes fertilizer on dormant tissue that cannot uptake\n  - Can stimulate weeds before zoysia is competitive\n\nALWAYS explicitly anchor the fertilization delay to the 65°F soil temperature benchmark. Do NOT give a calendar date alone without the soil temp qualifier."
+  },
+  {
+    "id": "11-zoysia-spring-care-2",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Spring disease priority — LARGE PATCH first\n- **Primary spring disease: Large patch (Rhizoctonia solani AG2-2 LP)**\n- Conditions: cool wet spring (55–75°F)\n- Symptoms: circular dying patches with orange/yellow halo at active edge\n- Treatment: azoxystrobin (Scotts DiseaseEx) or propiconazole — apply preventively in fall and curatively in spring when patches visible\n\n- **Dollar spot (Clarireedia jacksonii)** is primarily a MID-TO-LATE SUMMER disease on zoysia in warm/humid conditions\n- DO NOT list dollar spot as a spring priority alongside large patch\n- In spring, focus on large patch monitoring and curative fungicide if circular dying patches visible"
+  },
+  {
+    "id": "11-zoysia-spring-care-3",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Mowing height by variety\n- **Fine-leaf types (Zeon, Emerald, Cavalier):** 0.5–1.5 inches (reel-mow preferred for lowest heights)\n- **Coarser home-lawn types (Meyer, Z-52, Zenith, Empire):** 1.5–2.5 inches\n- **Variety unknown: 1.5–2 inches** as a safe general guideline\n- NEVER recommend below 1 inch unless homeowner confirms a fine-leaf variety"
+  },
+  {
+    "id": "11-zoysia-spring-care-4",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Spring scalping (controversial)\n- Some homeowners scalp zoysia to ~1 inch in early spring to remove dead material and promote earlier green-up\n- UGA cautions: only scalp if HEALTHY zoysia stand; risks weed encroachment in thin lawns\n- Standard recommendation: skip scalping unless variety confirmed and stand healthy\n- Better alternative: thorough core aeration AFTER full green-up (soil >65°F, >75% green)"
+  },
+  {
+    "id": "11-zoysia-spring-care-5",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Spring herbicide rules\n- **MSM Turf (metsulfuron-methyl) on zoysia during spring transition: DO NOT apply**\n  - Metsulfuron on partially-greened zoysia (<75% green) risks phytotoxicity and uneven discoloration\n  - Defer to when zoysia is fully established and actively growing (soil temps consistently >70°F, turf fully green)\n- **Three-way broadleaf products (2,4-D + MCPP + dicamba):**\n  - Per UGA, wait for daytime temperatures CONSISTENTLY above 60°F\n  - DO NOT apply to partially dormant/emerging turf — risks phytotoxicity and transient bleaching\n  - Apply only when zoysia is at least 50% green and actively growing"
+  },
+  {
+    "id": "11-zoysia-spring-care-6",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Pre-emergent for zoysia\n- Spring crabgrass pre-emergent: apply at 50–55°F soil temp standard window\n- This is BEFORE green-up — apply to dormant or transitioning turf\n- Fall winter annual pre-emergent: 70°F soil falling"
+  },
+  {
+    "id": "11-zoysia-spring-care-7",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Birmingham AL reference (Zone 8a)\n- Birmingham AL (ZIP 35201–35299): Zone 8a\n- Zoysia green-up typically begins mid-March to early April when soil temps reach 60°F\n- Full green-up at 65°F+\n- Spring fertilization window: typically late April / early May once 65°F + 75% green achieved"
+  },
+  {
+    "id": "11-zoysia-spring-care-8",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Irrigation during spring green-up\n- DO NOT recommend resuming irrigation during early green-up unless soil moisture is actively dry\n- Early spring rainfall (0.3–0.5 inches with cool temps 60–65°F) does NOT need supplemental irrigation\n- Reserve irrigation recommendations for when lawn is established and soil temps consistently above 65°F\n- Avoid morning irrigation creating prolonged leaf wetness — large patch thrives in moisture"
+  },
+  {
+    "id": "11-zoysia-spring-care-9",
+    "source": "UGA Extension + UK Cooperative Extension",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Zoysia Spring Green-Up and Maintenance — UGA Extension",
+    "grassType": [
+      "zoysia"
+    ],
+    "topic": [
+      "spring-green-up",
+      "fertilization",
+      "disease",
+      "mowing"
+    ],
+    "region": [
+      "southeast"
+    ],
+    "text": "## Summer maintenance — annual N program\n- Total annual N: 1–3 lbs N per 1,000 sq ft (UGA range; lower for low-maintenance, higher for high-input)\n- Split into 2–4 applications during active growing season (June–August)\n- Slow-release sources preferred"
+  },
+  {
+    "id": "12-warm-season-dormancy-0",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "# Warm-Season Grass Winter Dormancy Management\n\nWhen current air temperature is below 50°F, warm-season grasses (bermuda, zoysia, St. Augustine, centipede, buffalo) are fully dormant and not actively growing."
+  },
+  {
+    "id": "12-warm-season-dormancy-1",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Hard rules during dormancy\n- **NO fertilization of any kind.** Dormant grass cannot uptake nutrients. Any nitrogen application:\n  - Promotes disease\n  - Stimulates winter weed germination\n  - Is wasted (leaches through soil)\n- Even \"low-nitrogen\" or \"winterizer\" formulas are inappropriate for fully dormant warm-season turf — DO NOT suggest them\n- Wait until soil temps consistently exceed 65°F before resuming N (typically April–May depending on region)"
+  },
+  {
+    "id": "12-warm-season-dormancy-2",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## What to address during dormancy\nAppropriate topics:\n- Pre-emergent weed control for winter annuals (Poa annua, chickweed, henbit) — timing window detailed below\n- Dormant overseeding with perennial ryegrass for temporary winter color (warm-season grasses only)\n- Reducing irrigation frequency\n- Planning for spring (timing, products)"
+  },
+  {
+    "id": "12-warm-season-dormancy-3",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Pre-emergent timing in fall/winter\n- **Ideal window for winter annual pre-emergent in the Southeast: September–October** when soil temps are 55–65°F\n- If it is already late November or later AND soil temps are below 50°F: the optimal window has passed\n  - Acknowledge the missed window\n  - Focus on POST-EMERGENT options for any germinated winter annuals instead\n  - Plan for next year's pre-emergent application"
+  },
+  {
+    "id": "12-warm-season-dormancy-4",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Disease scouting during dormancy\n- DO NOT recommend disease scouting or fungicide treatments for warm-season diseases (dollar spot, brown patch, pythium, gray leaf spot) during dormancy\n- These diseases require actively growing turf to develop and do not occur on dormant grass\n- Save disease topics for spring green-up forward"
+  },
+  {
+    "id": "12-warm-season-dormancy-5",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Bermuda-specific dormancy rules\n- NEVER recommend Tenacity (mesotrione) on bermuda. Mesotrione is phytotoxic to bermuda — causes severe bleaching and damage; not labeled for bermuda.\n- MSM Turf (metsulfuron-methyl) on dormant bermuda:\n  - EFFECTIVE for broadleaf weed control in established dormant bermuda\n  - Caution on thin, stressed, or newly emerging bermuda — phytotoxicity risk\n  - CRITICAL: If lawn has been WINTER-OVERSEEDED with perennial ryegrass — DO NOT recommend MSM Turf. It will injure or kill the ryegrass.\n  - Poa annua control with MSM Turf is LIMITED — partial, inconsistent. Do NOT claim \"no efficacy\" (it has some) but do NOT recommend it as the primary Poa annua tool. Fall pre-emergent is the most effective approach for Poa annua.\n  - FREEZE WINDOW: DO NOT recommend post-emergent herbicide applications (including MSM Turf) if 5-day forecast highs stay below 55°F, or within 3–5 days of a forecast freeze. Herbicide uptake requires daytime temperatures above 50°F (ideally 55°F+)."
+  },
+  {
+    "id": "12-warm-season-dormancy-6",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Mechanical restrictions during dormancy\n- AVOID core aeration, vertical mowing (dethatching), or any mechanical disruption that exposes the soil\n- Dormant bermuda rhizomes and stolons are vulnerable to desiccation and cold injury when protective thatch layer is disturbed\n- Defer ALL mechanical lawn work to spring after green-up"
+  },
+  {
+    "id": "12-warm-season-dormancy-7",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Summer annual weeds in dormancy\n**Crabgrass, spurge (prostrate spurge), goosegrass, sandbur are SUMMER ANNUALS.** They complete their life cycle and die by first frost.\n- DO NOT recommend scouting for, treating, or pulling these during fall or winter dormancy — they are already dead\n- Focus instead on WINTER ANNUALS: Poa annua (annual bluegrass), henbit, chickweed, hairy bittercress"
+  },
+  {
+    "id": "12-warm-season-dormancy-8",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Post-emergent herbicide temperature minimums\n- **PRODUCT FORMULATION MATTERS — carfentrazone-containing four-ways are NOT the same as pure three-ways.** Speed Zone (PBI/Gordon) contains 2,4-D + MCPP + dicamba + **carfentrazone-ethyl**; the carfentrazone is a fast-acting contact PPO inhibitor that retains activity at low temperatures. Speed Zone is effective down to ~45–50°F daytime highs (PBI/Gordon label, university trial data) because carfentrazone burns leaf tissue contact-style independent of growth-regulator translocation. Do NOT lump Speed Zone with pure three-way products for cold-weather guidance.\n- **Pure three-way broadleaf products** (2,4-D + MCPP + dicamba — Trimec Classic, Ortho Weed-B-Gon, Bayer All-In-One Lawn Weed & Crabgrass Killer):\n  - UGA recommends >60°F daytime CONSISTENTLY before applying\n  - Below 60°F: poor activity, weak uptake and translocation (NOT volatility — dicamba volatility is a HOT-weather risk, manifest above ~85°F, especially in temperature inversions; cold-weather concerns are uptake and slow kill, not drift)\n  - In summer (>85°F): dicamba volatility risk increases significantly; consider lower-volatility 2,4-D amine + MCPP combinations instead\n  - DO NOT recommend pure three-way products if 5-day forecast highs consistently below 60°F\n- **Carfentrazone-containing four-ways** (Speed Zone, Speed Zone Southern, Surge):\n  - Effective at daytime highs of ~45–50°F and above; use these (not pure three-ways) for winter warm-spell spot-spraying in Zone 7b–8b dormancy\n  - Below ~45°F: still defer — even contact PPO activity slows, and any 2,4-D/dicamba component remains poor\n  - Do NOT recommend broadcast application during full dormancy; carfentrazone formulations are for SPOT-SPRAYING visible winter annuals on warm days\n- **WINTER WARM-SPELL STRATEGY:** In Atlanta and similar Zone 8a-8b winters where sustained 60°F+ days are uncommon between December and early March, recommend SPOT-SPRAYING individual visible winter annuals (Poa annua, henbit, chickweed) on warm days with a carfentrazone-containing four-way (Speed Zone) at 45–50°F+ rather than scheduling pure three-way applications calendar-style. Do NOT schedule generic broadcast broadleaf applications for a 60-day window in winter when realistic warm windows may be 2-3 days at a time."
+  },
+  {
+    "id": "12-warm-season-dormancy-9",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Late-fall / dormancy grub scouting\n- Grubs (Japanese beetle, masked chafer larvae) move DEEP in soil (6-12+ inches) once soil temps drop below 55°F, typically by late October.\n- Scouting in late November or beyond has LOW value — grubs are out of treatment depth and dormant.\n- **PEEL TEST TIMING:** The peel test (lifting a 1 sq ft section of sod to inspect for white C-shaped larvae in the root zone) is appropriate in SEPTEMBER through mid-OCTOBER while soil is still warm and turf is actively growing — the sod knits back together within 1–2 weeks of active growth. DO NOT recommend a peel test on DORMANT warm-season turf in November or later: dormant crowns and rhizomes have no recovery capacity until spring green-up, so lifting sod risks lasting damage. For damaged areas first observed during dormancy, defer scouting to early fall the following year and plan the May–July preventive window (chlorantraniliprole) directly. Curative treatments don't reach grubs at depth in late fall regardless.\n- Do NOT schedule grub scouting tasks for late November / December — wastes the homeowner's time and risks dormant-turf damage.\n- **Avoid scalping, heavy traffic, and unnecessary mechanical disturbance on dormant warm-season turf** (bermuda, zoysia, centipede, St. Augustine). The dormant crown is intact but cannot regenerate damaged tissue until spring green-up. UGA Extension specifically warns against scalping bermuda below 1 inch during dormancy and against parking equipment or staging materials on dormant warm-season turf.\n- **Single-active-ingredient products** (triclopyr, 2,4-D amine only): 50°F daytime minimum, 55°F+ preferred\n- **MSM Turf** (metsulfuron): 55°F daytime minimum\n- **NEVER recommend any broadleaf herbicide below 50°F daytime high**"
+  },
+  {
+    "id": "12-warm-season-dormancy-10",
+    "source": "UGA Extension + Clemson HGIC + Texas A&M",
+    "url": "https://extension.uga.edu/publications/detail.html?number=B1233",
+    "title": "Warm-Season Grass Winter Dormancy Management",
+    "grassType": [
+      "bermuda",
+      "zoysia",
+      "st_augustine",
+      "centipede",
+      "buffalo"
+    ],
+    "topic": [
+      "winter-care",
+      "weed-control",
+      "pre-emergent"
+    ],
+    "region": [
+      "southeast",
+      "south-central",
+      "southwest"
+    ],
+    "text": "## Fall armyworm (FAW) seasonality\n- FAW activity ENDS by late October / early November in the Southeast\n- Do NOT recommend FAW scouting or treatment after November 1\n- Populations are negligible at temperatures below 55°F — the pest season is over"
+  },
+  {
+    "id": "13-recently-seeded-establishment-0",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "# Recently Seeded / Establishing Cool-Season Lawn Care\n\nWhen a cool-season lawn was recently seeded or is actively germinating (within the past 6 weeks), the management approach differs sharply from established turf."
+  },
+  {
+    "id": "13-recently-seeded-establishment-1",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Hard prohibitions on new seedings\n- **NO pre-emergent herbicides.** Pre-emergent prevents ALL seed germination — kills your investment immediately.\n  - EXCEPTION: Siduron (Tupersan) is the only pre-emergent safe at seeding time\n- **NO post-emergent herbicides for at least 4 weeks after germination** (6–8 weeks is safer)\n  - Most post-emergent labels require turf to be mowed at least 2–3 times before application\n- **NO high-nitrogen maintenance fertilizer yet.** Seedlings need to establish first.\n  - Wait until 2–3 mowings at full height (typically 6–8 weeks post-seeding) before beginning regular fertilization\n- **NO combination fertilizer+insecticide products.** Scotts SummerGuard, Scotts GrubEx, or any combo product — the insecticide component may harm establishing seedlings."
+  },
+  {
+    "id": "13-recently-seeded-establishment-2",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Starter fertilizer — TIMING IS NARROW\nStarter fertilizer (high phosphorus: 12-24-12, 18-24-12, 24-25-4) is appropriate AT THE TIME OF SEEDING — day 0 to day 3 maximum.\n\n**If seeding occurred MORE THAN 1 WEEK AGO or seeds are actively germinating:**\n- The optimal starter window has PASSED\n- Do NOT recommend applying starter fertilizer now\n- Focus on germination care (moisture management) instead\n\nAfter full establishment (2–3 mowings at full height, typically 6–8 weeks post-seeding), a light maintenance fertilizer (0.5 lbs slow-release N/1000 sqft) can begin the regular program."
+  },
+  {
+    "id": "13-recently-seeded-establishment-3",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Watering during germination\n- LIGHT AND FREQUENT — brief cycles 2–3 times daily\n- Goal: keep the seed bed consistently moist; never let surface dry between cycles\n- Each cycle: 5–10 minutes per zone, just enough to wet top 1 inch\n- **DO NOT recommend deep infrequent irrigation** during germination — allows surface to dry, kills germinating seed\n- The \"before 10 AM only\" rule for established lawns DOES NOT apply to new seedings — multiple daily cycles including midday are essential"
+  },
+  {
+    "id": "13-recently-seeded-establishment-4",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## First mowing\n- Begin mowing when grass reaches 3–4 inches tall\n- Cut to ~2.5–3 inches initially (do not exceed 1/3 rule)\n- Make sure mower blades are SHARP — dull blades tear young seedlings\n- Soil should be firm (not soft/muddy) before first mow — wait for dry surface"
+  },
+  {
+    "id": "13-recently-seeded-establishment-5",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Disease monitoring on new seedings\nDamping-off is the primary disease concern, but management differs by temperature:\n\n**At soil temps below 75°F (typical fall overseeding 55–70°F):**\n- Damping-off risk is generally LOW\n- DO NOT cite Pythium blight or Pythium aphanidermatum — these are warm-season pathogens (require >85–90°F soil temp)\n- If mentioning disease at all: \"cool-season Pythium damping-off monitoring only if conditions stay persistently wet\"\n- Preventive fungicide is NOT standard university extension guidance for fall overseedings at moderate temps\n\n**At soil temps above 75°F (late summer / hot conditions):**\n- Pythium blight risk increases on new seedlings in wet conditions\n- Mefenoxam (Subdue MAXX, Hi-Yield Turf Fungicide) is the appropriate Pythium treatment if damping-off symptoms appear\n- Rhizoctonia damping-off treated with azoxystrobin or PCNB — different pathogens, different treatments\n\n**DO NOT recommend preventive fungicide for damping-off** unless:\n- Humidity is elevated (>70%)\n- Temperatures are warm (>70°F)\n- Conditions warrant it (recent rainfall, persistent moisture)"
+  },
+  {
+    "id": "13-recently-seeded-establishment-6",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Pythium species accuracy\n- **Pythium aphanidermatum** (primary Pythium blight pathogen) is WARM-SEASON — requires air/soil temps >85–90°F\n- DO NOT cite Pythium aphanidermatum as a fall overseeding risk at moderate temperatures (55–75°F)\n- At fall temperatures, cool-season Pythium species (P. ultimum, P. irregulare) can cause damping-off but are far less virulent\n- Use accurate species terminology: \"cool-season Pythium damping-off\" not \"Pythium blight\" for fall scenarios"
+  },
+  {
+    "id": "13-recently-seeded-establishment-7",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Pre-emergent planning for AFTER establishment\n- If planning future pre-emergent applications, ALWAYS include soil temperature trigger\n- Example phrasing: \"after lawn is established (6–8 weeks post-seed, 2–3 mowings at full height), apply pre-emergent for crabgrass prevention when soil temps reach 50–55°F next spring\"\n- Don't just say \"apply pre-emergent in spring\" — be specific about timing AND establishment prerequisites"
+  },
+  {
+    "id": "13-recently-seeded-establishment-8",
+    "source": "Penn State + Ohio State Extension Cool-Season Establishment",
+    "url": "https://extension.psu.edu/lawn-renovation",
+    "title": "Recently Seeded / Establishing Cool-Season Lawn Care",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "overseeding",
+      "fertilization",
+      "weed-control",
+      "disease"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Establishment timeline reference\n| Day | Activity |\n|-----|----------|\n| 0 | Seed + starter fertilizer (high P) |\n| 0–7 | Multiple light irrigations daily; protect from foot traffic |\n| 7–14 | Germination visible (varies by species; PRG fastest, KBG slowest) |\n| 21–35 | First mowing when grass reaches 3–4 inches |\n| 35–60 | Continue mowing; reduce irrigation toward deep-infrequent |\n| 60+ | Full establishment; begin regular fertilization program |"
+  },
+  {
+    "id": "14-cool-season-summer-drought-0",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "# Cool-Season Lawn Drought and Summer Stress Management\n\nCool-season grasses (KBG, tall fescue, fine fescue, perennial ryegrass) experience summer stress in zones 5–7 when temperatures sustain above 85°F or rainfall is deficient."
+  },
+  {
+    "id": "14-cool-season-summer-drought-1",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Two management paths during drought\nThe homeowner has a clear choice — communicate both options:"
+  },
+  {
+    "id": "14-cool-season-summer-drought-2",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "### Path A: Maintain green turf with irrigation\n- Target: **1–1.5 inches TOTAL per week** combining all irrigation and rainfall\n- Deliver as 2–3 SESSIONS per week (early morning, before 10 AM)\n- Each session 0.3–0.5 inches via cycle-and-soak technique\n- NEVER phrase as \"1–1.5 inches per session\" — that would be 3–4.5 inches/week causing severe overwatering and runoff"
+  },
+  {
+    "id": "14-cool-season-summer-drought-3",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "### Path B: Allow summer dormancy (acceptable extension-endorsed survival strategy)\nPer Penn State and OSU: cool-season grasses CAN be allowed to go summer dormant if the homeowner is unable or unwilling to irrigate.\n- Reduce irrigation to **0.5 inches every 2–3 weeks** for survival moisture (keeps crown alive without promoting growth)\n- Lawn turns straw color but crowns survive\n- Resume normal irrigation in fall when daytime highs consistently fall below 85°F\n- DO NOT set recovery threshold at 75°F — too conservative; most extension sources recommend 80–85°F resume\n- Dormancy is a SURVIVAL strategy, not a failure — frame positively as a valid option"
+  },
+  {
+    "id": "14-cool-season-summer-drought-4",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Mowing during drought stress\n- **RAISE to MAXIMUM for grass type during drought** — taller grass shades soil, reduces water loss, deeper roots\n- Tall fescue: 4 inches\n- Kentucky bluegrass: 3.5–4 inches\n- Perennial ryegrass: 2.5 inches (do not exceed)\n- NEVER lower mowing height during drought — increases water loss and turf damage\n- Mow less frequently if growth has slowed (every 2–3 weeks acceptable)"
+  },
+  {
+    "id": "14-cool-season-summer-drought-5",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Footprint test\n- If footprints remain visible in the lawn after walking on it: water now\n- Combined with visual wilting/bluish cast: confirms drought stress\n- This trigger applies to both Path A and Path B (irrigate to survival level at minimum)"
+  },
+  {
+    "id": "14-cool-season-summer-drought-6",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## What NOT to do during drought\n- **No fertilization of any kind.** Salt burn risk; stressed turf cannot use nitrogen.\n- **No fungicide.** Dry conditions prevent fungal disease development. Soil moisture \"dry\" + no recent rainfall = no fungal pressure. Foliar fungicide is contraindicated.\n  - EXCEPTION: Root/soil diseases (summer patch — Magnaporthe poae, necrotic ring spot — Ophiosphaerella korrae) actually develop UNDER dry heat stress and may warrant a preventive fungicide DRENCH (azoxystrobin or DMI) when heat stress symptoms are present. These are soil-borne, not foliar — distinguish clearly.\n- **No weed control / pre-emergent / herbicides** until lawn fully recovers (2–3 weeks of normal growth).\n  - Heat-stressed turf cannot tolerate herbicide phytotoxicity\n- **No aeration or mechanical disruption** — wounded turf cannot heal during stress."
+  },
+  {
+    "id": "14-cool-season-summer-drought-7",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Cycle-and-soak technique\nFor drought-stressed or hydrophobic soil:\n- 2–3 short cycles per session (10–15 min each)\n- Spaced 45–60 minutes apart to allow infiltration\n- Goal: 0.3–0.5 inches total per session\n- Alternative to one long cycle that runs off the surface\n\nFor clay/heavy soils: shorter cycles, longer intervals\nFor sandy soils: can deliver more per cycle, shorter intervals\nCalibrate with catch cups in each zone if precise output is needed."
+  },
+  {
+    "id": "14-cool-season-summer-drought-8",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Hydretain and wetting agents\n- Hydretain is a humectant/moisture-retention product. It is NOT a surfactant wetting agent.\n- For hydrophobic soil (water beading on surface): penetrant surfactant wetting agents help. Products: Revolution, Aqua-Aid Penetrant, generic penetrant wetting agents labeled for turf.\n- **NEVER cite Hydretain irrigation reduction percentages.** Prohibited phrases:\n  - \"reduces irrigation by [X]%\"\n  - \"up to [X]% reduction\"\n  - \"cuts watering by [X]%\"\n  - \"reduces irrigation frequency by [X]%\"\n  - Any quantified efficiency claim\n- If recommending Hydretain, use ONLY: \"may help with moisture retention.\" Nothing more specific."
+  },
+  {
+    "id": "14-cool-season-summer-drought-9",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## High-altitude / high-desert climates\nDenver CO, Salt Lake City UT, Albuquerque NM (zones 5b–6a): spring soil temps lag air temps by 3–6 weeks. Drought management considerations:\n- Cool nights enable Path B dormancy/recovery cycle\n- More efficient water use due to lower humidity but higher evaporation\n- Soil moisture monitoring is critical — caliche and clay layers complicate infiltration"
+  },
+  {
+    "id": "14-cool-season-summer-drought-10",
+    "source": "Penn State + Ohio State + K-State Extension Drought Programs",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Cool-Season Lawn Drought Management",
+    "grassType": [
+      "kentucky_bluegrass",
+      "tall_fescue",
+      "fine_fescue",
+      "ryegrass"
+    ],
+    "topic": [
+      "drought",
+      "irrigation",
+      "mowing"
+    ],
+    "region": [
+      "northeast",
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Stressgard product clarification\n- \"Lesco Stressgard\" / \"Stressgard\" is a Syngenta fertilizer/biostimulant line (e.g., 30-0-10 with biostimulants)\n- It is NOT a surfactant or wetting agent\n- DO NOT recommend Stressgard as a penetrant or wetting agent — that is a different product category\n- Stressgard fertilizer is BANNED for centipede (high N) but acceptable for bermuda and other warm-season grasses"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-0",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "# Kentucky Bluegrass Summer Heat and Disease Management\n\nKBG is vulnerable to heat stress and root/crown diseases in summer (July–August in zones 5–7 when daytime temps consistently exceed 85°F)."
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-1",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Summer mowing height\n- Raise to **3.5–4 inches** during peak summer heat stress (consistently >85–90°F)\n- Taller grass shades soil, reduces water loss, supports deeper roots\n- Return to STANDARD 3–3.5 inches as fall temperatures moderate (September onward)\n- DO NOT maintain 4 inches into fall — provides no benefit, increases disease pressure"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-2",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Hot weather irrigation\n- Target 1–1.5 inches TOTAL per week (rainfall + irrigation)\n- 2–3 sessions per week, early morning (before 10 AM)\n- Each session 0.3–0.5 inches via cycle-and-soak\n- Deep infrequent encourages root growth; shallow frequent promotes shallow roots and disease"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-3",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Summer patch (Magnaporthe poae) — primary KBG summer disease\n- **Causal pathogen: Magnaporthe poae** — DO NOT call it Magnaporthe nivalis (that is pink snow mold, a completely different cool-weather disease)\n- Symptoms: rings or \"frogeye\" patterns of dead/yellowing turf 1–5 ft diameter\n- Soil temperature trigger: 65–80°F at root zone — typical mid-summer\n- Favored by drought stress, compacted soil, heavy thatch\n- Preventive fungicide: DMI (propiconazole/Banner Maxx) or QoI (azoxystrobin/Scotts DiseaseEx) as SOIL DRENCH (not foliar) — must reach roots\n- Apply when soil temps reach 65°F (preventive); curative is far less effective"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-4",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Necrotic ring spot (Ophiosphaerella korrae)\n- Distinct pathogen from summer patch with similar symptoms\n- Same temperature triggers, same drench application method\n- Both root/crown diseases require DRENCH application, not foliar — fungicide must reach root zone\n- Same fungicide options as summer patch"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-5",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Fungicide note for KBG diseases — DEFAULT: NO FUNGICIDE IN DRY HEAT\n\n**Default behavior in dry heat conditions (humidity <65%, no recent rain): DO NOT recommend any fungicide application.** Discuss disease awareness as monitoring guidance only — \"watch for ring/frogeye patterns if conditions stay hot and stress accumulates.\"\n\nThe ONLY exception that permits a fungicide recommendation under dry conditions:\n1. The homeowner's profile explicitly describes visible ring or frogeye dead patches consistent with summer patch / necrotic ring spot, AND\n2. The recommendation explicitly names \"summer patch (Magnaporthe poae)\" or \"necrotic ring spot (Ophiosphaerella korrae)\" in the same sentence as the fungicide, AND\n3. The recommendation explicitly specifies \"soil drench\" application method (not foliar spray), AND\n4. The recommendation specifies that irrigation must be applied with the drench to carry the product to the root zone.\n\nIf ANY of these conditions are unmet, omit the fungicide recommendation entirely and frame as future monitoring instead.\n\n**Do NOT recommend \"preventive fungicide for summer disease pressure\" generically — that violates the humidity rule and is not appropriate when no symptoms are visible.**"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-6",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Product accuracy — Scotts DiseaseEx\n- Scotts DiseaseEx Lawn Fungicide contains **AZOXYSTROBIN** (FRAC Group 11 / QoI strobilurin)\n- DO NOT call it thiophanate-methyl (FRAC Group 1 / MBC benzimidazole) — that is the active in Scotts' older Disease Control product\n- Azoxystrobin and thiophanate-methyl are different classes with different modes of action"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-7",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Cool weather KBG diseases (for context)\n- **Pink snow mold (Microdochium nivale, formerly Fusarium nivale)** — winter/early spring under snow cover. Distinct from summer patch.\n- **Gray snow mold (Typhula spp.)** — similar conditions\n- **Red thread (Laetisaria fuciformis)** — spring and fall, nitrogen-deficient conditions; usually responds to light N application"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-8",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Botanical accuracy\n- KBG spreads primarily by RHIZOMES (underground horizontal stems that produce new tillers)\n- DO NOT say KBG spreads by stolons — stolons are above-ground horizontal runners; KBG does NOT produce stolons\n- Bermuda and zoysiagrass have BOTH rhizomes AND stolons\n- St. Augustine spreads by above-ground stolons only"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-9",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Heat-stress hard rules\nWhen current temperature exceeds 85°F sustained:\n- DO NOT recommend high-nitrogen fertilizer (heat-stress turf cannot handle quick-release N)\n- DO NOT recommend specific high-N product codes (28-0, 32-0, 34-0, 30-0)\n- If fertilization mentioned: \"defer to fall when temperatures drop below 75°F\"\n- DO NOT recommend overseeding or seeding — cool-season seed cannot germinate or survive\n  - Overseeding should be deferred to fall when SOIL TEMPERATURES drop to 60–65°F (verify with soil thermometer)\n- Focus on heat stress management: raise mowing height, deep infrequent irrigation, avoid foot traffic"
+  },
+  {
+    "id": "15-kbg-summer-heat-disease-10",
+    "source": "K-State Research and Extension + Purdue Extension",
+    "url": "https://www.k-state.edu/turf/lawn-care",
+    "title": "Kentucky Bluegrass Summer Heat and Disease Management",
+    "grassType": [
+      "kentucky_bluegrass"
+    ],
+    "topic": [
+      "disease",
+      "drought",
+      "mowing",
+      "irrigation"
+    ],
+    "region": [
+      "midwest",
+      "mountain-west"
+    ],
+    "text": "## Aeration timing for KBG\n- FALL aeration (late August through October) is strongly preferred — KBG is actively recovering with weeks of growing season ahead\n- Spring aeration is risky: wounding occurs just before peak summer heat stress\n- In high-altitude/high-desert (Denver, SLC, Albuquerque): fall aeration especially preferred (spring soil temps lag air temps)\n- NEVER recommend spring aeration for KBG unless homeowner explicitly requested it"
+  },
+  {
+    "id": "16-grub-control-0",
+    "source": "Purdue Extension E-75-W + Ohio State Extension",
+    "url": "https://extension.entm.purdue.edu/publications/E-75/E-75.pdf",
+    "title": "White Grub Control — Curative vs Preventive",
+    "grassType": "any",
+    "topic": [
+      "pest"
+    ],
+    "region": [
+      "midwest",
+      "northeast",
+      "southeast"
+    ],
+    "text": "# White Grub Control — Curative vs Preventive Distinction\n\nWhite grubs (larvae of Japanese beetles, masked chafers, June beetles, European chafers) are the most damaging soil-dwelling turf pests in zones 5–7. Treatment timing depends ENTIRELY on whether the situation is preventive or curative — wrong product for wrong stage = wasted application."
+  },
+  {
+    "id": "16-grub-control-1",
+    "source": "Purdue Extension E-75-W + Ohio State Extension",
+    "url": "https://extension.entm.purdue.edu/publications/E-75/E-75.pdf",
+    "title": "White Grub Control — Curative vs Preventive",
+    "grassType": "any",
+    "topic": [
+      "pest"
+    ],
+    "region": [
+      "midwest",
+      "northeast",
+      "southeast"
+    ],
+    "text": "## Identification — confirm BEFORE treatment\n- Cut a 1 sq ft × 2 inch deep flap of turf with a shovel\n- Count C-shaped white larvae in the root zone\n- Identify by size and raster pattern at base of abdomen\n- Common species in Midwest/Northeast: Japanese beetle, masked chafer, European chafer"
+  },
+  {
+    "id": "16-grub-control-2",
+    "source": "Purdue Extension E-75-W + Ohio State Extension",
+    "url": "https://extension.entm.purdue.edu/publications/E-75/E-75.pdf",
+    "title": "White Grub Control — Curative vs Preventive",
+    "grassType": "any",
+    "topic": [
+      "pest"
+    ],
+    "region": [
+      "midwest",
+      "northeast",
+      "southeast"
+    ],
+    "text": "## Action threshold for Kentucky bluegrass\n- **5–6 grubs per square foot** (many Midwest extension sources including Purdue E-75-W)\n- 8–10 grubs/sq ft is on the high end of what's published; using it as the threshold may delay treatment unnecessarily\n- For high-value or irrigated turf, the threshold can be lower (3–5/sq ft)\n- For drought-stressed turf showing damage: even lower threshold appropriate"
+  },
+  {
+    "id": "16-grub-control-3",
+    "source": "Purdue Extension E-75-W + Ohio State Extension",
+    "url": "https://extension.entm.purdue.edu/publications/E-75/E-75.pdf",
+    "title": "White Grub Control — Curative vs Preventive",
+    "grassType": "any",
+    "topic": [
+      "pest"
+    ],
+    "region": [
+      "midwest",
+      "northeast",
+      "southeast"
+    ],
+    "text": "## CURATIVE products (use for ACTIVE grub damage / late-instar grubs already present)\n- **Trichlorfon (Dylox)** — fast-acting, contact-and-ingestion. The standard curative product.\n  - Apply when grubs are confirmed in top 2–3 inches of soil\n  - Water in with 0.5 inch within 24 hours\n  - Effective on large/late-instar grubs (3rd instar)\n- **Carbaryl (Sevin)** — effective alternative to trichlorfon\n  - Same application + water-in requirements\n\n**Use ONLY these for active grub damage.** Do NOT recommend chlorantraniliprole or imidacloprid for active damage — they are preventive products with no curative effect on late-instar grubs."
+  },
+  {
+    "id": "16-grub-control-4",
+    "source": "Purdue Extension E-75-W + Ohio State Extension",
+    "url": "https://extension.entm.purdue.edu/publications/E-75/E-75.pdf",
+    "title": "White Grub Control — Curative vs Preventive",
+    "grassType": "any",
+    "topic": [
+      "pest"
+    ],
+    "region": [
+      "midwest",
+      "northeast",
+      "southeast"
+    ],
+    "text": "## PREVENTIVE products (apply BEFORE egg hatch)\nApply May–July before egg hatch:\n- **Chlorantraniliprole (Scotts GrubEx1, GrubEx, Acelepryn)** — PREVENTIVE ONLY\n  - Long residual; targets early-instar grubs as they hatch\n  - DOES NOT effectively control large or late-instar grubs already present\n  - NEVER recommend as a curative treatment for active grub damage\n- **Imidacloprid (Bayer Season-Long Grub Control, Merit, GrubEx with imidacloprid)** — PREVENTIVE\n  - Similar May–July application window\n  - Soil systemic; controls early-instar grubs"
+  },
+  {
+    "id": "16-grub-control-5",
+    "source": "Purdue Extension E-75-W + Ohio State Extension",
+    "url": "https://extension.entm.purdue.edu/publications/E-75/E-75.pdf",
+    "title": "White Grub Control — Curative vs Preventive",
+    "grassType": "any",
+    "topic": [
+      "pest"
+    ],
+    "region": [
+      "midwest",
+      "northeast",
+      "southeast"
+    ],
+    "text": "## Sequencing — curative + preventive follow-up\nWhen active grub damage is visible mid-season:\n1. **NOW**: Apply trichlorfon or carbaryl to control the active infestation\n2. **FOLLOW-UP next May–July**: Apply preventive chlorantraniliprole or imidacloprid before the next generation's egg hatch\n3. Continue preventive in subsequent years if grub pressure persists in the area\n\nThis sequence avoids the common mistake of recommending GrubEx for active damage — that's just feeding eggs that haven't hatched yet."
+  },
+  {
+    "id": "16-grub-control-6",
+    "source": "Purdue Extension E-75-W + Ohio State Extension",
+    "url": "https://extension.entm.purdue.edu/publications/E-75/E-75.pdf",
+    "title": "White Grub Control — Curative vs Preventive",
+    "grassType": "any",
+    "topic": [
+      "pest"
+    ],
+    "region": [
+      "midwest",
+      "northeast",
+      "southeast"
+    ],
+    "text": "## Recovery overseeding after grub damage\n- Wait until grubs are controlled (1–2 weeks after curative treatment) before overseeding bare patches\n- Soil temp must support germination (60–65°F for cool-season)\n- Damaged areas often need extensive raking to provide seed-to-soil contact\n- Apply starter fertilizer at seeding (high-P 12-24-12 or 18-24-12)\n- Do NOT apply pre-emergent in damaged/seeded areas — will prevent overseeding\n- Fall pre-emergent timing may CONFLICT with new seedling establishment — acknowledge timing tension and prioritize seeding success over pre-emergent for the immediate season"
+  },
+  {
+    "id": "16-grub-control-7",
+    "source": "Purdue Extension E-75-W + Ohio State Extension",
+    "url": "https://extension.entm.purdue.edu/publications/E-75/E-75.pdf",
+    "title": "White Grub Control — Curative vs Preventive",
+    "grassType": "any",
+    "topic": [
+      "pest"
+    ],
+    "region": [
+      "midwest",
+      "northeast",
+      "southeast"
+    ],
+    "text": "## Starter fertilizer accuracy\nWhen recommending starter fertilizer for grub-damaged repair areas:\n- Use a \"high phosphorus\" starter formulation: 12-24-12, 18-24-12, or 24-25-4 type products\n- DO NOT recommend Scotts 24-25-4 alongside framing as 12-24-12 — these are different N-to-P ratios; be internally consistent\n- Apply AT SEEDING (day 0 to day 3 maximum)\n- Light irrigation to incorporate, but seed bed must stay moist during germination"
+  },
+  {
+    "id": "17-overwatering-waterlogged-0",
+    "source": "Cornell + Penn State Extension Drainage and Soil Health",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Overwatering and Waterlogged Soil Management",
+    "grassType": "any",
+    "topic": [
+      "irrigation",
+      "disease",
+      "aeration"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "# Overwatering and Waterlogged Soil Management\n\nWhen soil is saturated (wet) and recent rainfall ≥ 2 inches, the lawn's problems are typically anaerobic conditions — NOT fungal disease."
+  },
+  {
+    "id": "17-overwatering-waterlogged-1",
+    "source": "Cornell + Penn State Extension Drainage and Soil Health",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Overwatering and Waterlogged Soil Management",
+    "grassType": "any",
+    "topic": [
+      "irrigation",
+      "disease",
+      "aeration"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Misdiagnosis warning\nYellow patches and decline in low wet areas are PRIMARILY caused by **anaerobic soil conditions (oxygen deprivation / root suffocation)** — not fungal disease.\n\n- DO NOT leap to fungicide as the diagnosis for yellow patches in wet soil\n- Overwatering symptoms and disease look similar but have different causes\n- Apply fungicide only if there is CLEAR evidence of disease: visible lesions, target-shaped patches with distinct margins, dollar-spot-style sunken spots"
+  },
+  {
+    "id": "17-overwatering-waterlogged-2",
+    "source": "Cornell + Penn State Extension Drainage and Soil Health",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Overwatering and Waterlogged Soil Management",
+    "grassType": "any",
+    "topic": [
+      "irrigation",
+      "disease",
+      "aeration"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Hard rules for waterlogged soil\n- **REDUCE irrigation immediately** — let soil dry between events\n- **DO NOT recommend fertilizer** until soil moisture normalizes; fertilizer on saturated soil runs off and does not benefit lawn\n- DO NOT recommend pre-emergent or post-emergent herbicides — they're carried off in runoff\n- DO NOT recommend fungicide unless distinct disease evidence is present"
+  },
+  {
+    "id": "17-overwatering-waterlogged-3",
+    "source": "Cornell + Penn State Extension Drainage and Soil Health",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Overwatering and Waterlogged Soil Management",
+    "grassType": "any",
+    "topic": [
+      "irrigation",
+      "disease",
+      "aeration"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Priority interventions\n1. **Reduce irrigation** — turn off automatic systems; rely on rainfall\n2. **Improve drainage**:\n   - Core aeration (relieves compaction; opens channels for oxygen)\n   - Topdressing low spots with coarse sand to raise grade\n   - French drain consideration for chronically wet areas\n   - Redirect downspouts away from problem areas\n3. **Allow recovery** — anaerobic damage heals once oxygen returns; turf often recovers without further intervention"
+  },
+  {
+    "id": "17-overwatering-waterlogged-4",
+    "source": "Cornell + Penn State Extension Drainage and Soil Health",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Overwatering and Waterlogged Soil Management",
+    "grassType": "any",
+    "topic": [
+      "irrigation",
+      "disease",
+      "aeration"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Aeration on saturated soil\n- DO NOT core aerate when soil is actively saturated (wet)\n- Wait for soil to dry to \"moist\" before aerating (typically 3–5 days after standing water clears)\n- Aerating saturated soil creates a muddy mess and doesn't deliver the soil opening benefits"
+  },
+  {
+    "id": "17-overwatering-waterlogged-5",
+    "source": "Cornell + Penn State Extension Drainage and Soil Health",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Overwatering and Waterlogged Soil Management",
+    "grassType": "any",
+    "topic": [
+      "irrigation",
+      "disease",
+      "aeration"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## When fungicide IS warranted in wet conditions\nIf distinct disease symptoms ARE present alongside wet soil:\n- **Pythium blight** (Pythium aphanidermatum) requires warm AND wet (>85°F + saturated soil/leaf wetness). Mefenoxam (Subdue MAXX, Hi-Yield Turf Fungicide) is the appropriate treatment.\n- **Brown patch** (Rhizoctonia solani) at 75–85°F + humidity: QoI (azoxystrobin) or DMI (propiconazole)\n- **Red thread** (Laetisaria fuciformis) at 60–75°F + nitrogen deficiency: light N application often resolves; fungicide rarely needed\n\nFor these distinct diseases, fungicide is appropriate. But the DEFAULT diagnosis for yellow patches in wet soil should be anaerobic damage, not disease."
+  },
+  {
+    "id": "17-overwatering-waterlogged-6",
+    "source": "Cornell + Penn State Extension Drainage and Soil Health",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Overwatering and Waterlogged Soil Management",
+    "grassType": "any",
+    "topic": [
+      "irrigation",
+      "disease",
+      "aeration"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Compaction and thatch as contributors\n- Compacted soil cannot drain — exacerbates overwatering symptoms\n- Thatch >0.5 inches holds water at the surface and creates anaerobic mat\n- These structural issues are root causes; addressing them is the long-term fix\n- Core aeration twice yearly (spring + fall for cool-season; spring + summer for warm-season) prevents compaction\n- Dethatching when thatch exceeds 0.5 inches"
+  },
+  {
+    "id": "17-overwatering-waterlogged-7",
+    "source": "Cornell + Penn State Extension Drainage and Soil Health",
+    "url": "https://extension.psu.edu/lawn-irrigation-and-water-conservation",
+    "title": "Overwatering and Waterlogged Soil Management",
+    "grassType": "any",
+    "topic": [
+      "irrigation",
+      "disease",
+      "aeration"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Smart irrigation principles\n- Match irrigation to ET (evapotranspiration) loss + rainfall\n- Most established lawns need 1–1.5 inches per week TOTAL (cool-season); centipede needs only 0.5–0.75 inches (humid SE); Phoenix bermuda 1–1.5 inches\n- Use a rain gauge or smart controller with rainfall sensor to avoid irrigating during/after rain\n- The \"deep and infrequent\" principle: encourage deep roots by watering less frequently but more thoroughly per session\n- Cycle-and-soak for clay soils to allow infiltration without runoff"
+  },
+  {
+    "id": "18-grass-identification-0",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "# Grass Type Identification Guide (Cool-Season vs Warm-Season)\n\nWhen grass type is unknown, identification is the FIRST priority — every species has different mowing heights, fertilization needs, disease pressures, and herbicide tolerances."
+  },
+  {
+    "id": "18-grass-identification-1",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Initial classification — cool-season vs warm-season\n**Where you live tells you what you likely have:**\n- Zone 5–7 (Midwest, Northeast): cool-season dominant (KBG, tall fescue, perennial ryegrass, fine fescue)\n- Zone 8 transition: mix of both; warm-season more common\n- Zone 9–10 (Southeast, Southwest): warm-season dominant (bermuda, zoysia, St. Augustine, centipede, buffalo)\n\n**Seasonal behavior:**\n- Cool-season: actively grows in spring and fall; struggles in summer heat (browns or thins); green through fall and into winter in mild zones\n- Warm-season: greens up in late spring; thrives in summer; goes DORMANT (brown/straw) when temperatures drop below 50°F sustained"
+  },
+  {
+    "id": "18-grass-identification-2",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Key visual identifiers"
+  },
+  {
+    "id": "18-grass-identification-3",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "### Spreading mechanism\n- **Stolons only** (above-ground runners): St. Augustine, centipede\n- **Rhizomes only** (underground stems): Kentucky bluegrass, tall fescue (limited rhizomes)\n- **Both stolons + rhizomes**: bermuda, zoysia\n- **Bunch-type** (no spreading runners): perennial ryegrass, fine fescue"
+  },
+  {
+    "id": "18-grass-identification-4",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "### Blade width\n- **Very fine** (< 2mm): fine fescue, Zoysia matrella (Zeon, Cavalier), bermuda hybrid\n- **Fine** (2–3mm): Zoysia japonica (Meyer, Z-52), perennial ryegrass, bermuda common\n- **Medium** (3–5mm): Kentucky bluegrass, centipede\n- **Wide** (>5mm): St. Augustine (very wide), tall fescue (medium-wide)"
+  },
+  {
+    "id": "18-grass-identification-5",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "### Blade tip & shape\n- **Boat-shaped** (pointed-cupped): Kentucky bluegrass — distinctive identifier\n- **Pointed**: tall fescue, perennial ryegrass\n- **Rounded/blunt**: St. Augustine, centipede"
+  },
+  {
+    "id": "18-grass-identification-6",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "### Other distinguishing features\n- **Tall fescue:** coarse texture, prominent VEINS (not midrib), rolled vernation, bunch-type growth. DO NOT identify tall fescue by \"prominent midrib\" — that's St. Augustine.\n- **Perennial ryegrass:** prominent midrib visible from below, glossy underside of blade, folded vernation\n- **St. Augustine:** prominent midrib, very wide blade (5+ mm), rounded tip, stoloniferous spreading runners\n- **Kentucky bluegrass:** boat-shaped pointed tip, medium-width blade, rhizomatous (underground spreading)\n- **Bermuda:** very fine blade with small ligule hairs (fringe), grayish-green color, dense low-growing"
+  },
+  {
+    "id": "18-grass-identification-7",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "### Vernation (how new leaves emerge from sheath)\n- **Folded**: perennial ryegrass, KBG, zoysia\n- **Rolled**: tall fescue, bermuda, St. Augustine\n- (Less useful for homeowner identification; mention if relevant)"
+  },
+  {
+    "id": "18-grass-identification-8",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Quick identification flow\n1. **Is the lawn green right now in winter?** (below 50°F sustained)\n   - YES: cool-season grass (KBG, fescue, PRG)\n   - NO (brown/dormant): warm-season grass (bermuda, zoysia, SA, centipede, buffalo)\n2. **Where is the lawn?**\n   - Northern US (Zone 5–7): cool-season\n   - Southern US (Zone 8–10): warm-season\n3. **What do the blades look like?** Apply blade width + tip + spreading mechanism above\n4. **What's the recent care history?** Type of sod laid (if known), prior seeding, common grass for the region"
+  },
+  {
+    "id": "18-grass-identification-9",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## What to do when grass type is unknown\n- LEAD with grass type identification guidance in your recommendations\n- Suggest: take close-up photos and submit to a local Cooperative Extension office for identification\n- Self-identification guide: provide the key visual differences above so homeowner can assess\n- Until identified, give GENERIC guidance with explicit uncertainty framing"
+  },
+  {
+    "id": "18-grass-identification-10",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Generic guidance when type is unknown\n- **Mowing height**: 2–3.5 inches as a generic safe range. Caveat that specific range depends on species.\n- **Fertilization**: do NOT recommend specific N rates or NPK formulas. Provide only general timing guidance (\"warm-season grasses fertilize during active summer growth; cool-season grasses fertilize fall + light spring\").\n- **Disease + pest**: defer species-specific advice until identified. General monitoring guidance acceptable.\n- **Pre-emergent**: frame as general guidance without species-specific timing — soil temperature triggers still apply but optimal product depends on species"
+  },
+  {
+    "id": "18-grass-identification-11",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Cornell Cooperative Extension resources (Northeast)\n- For ZIP codes in NY state (10xxx–14xxx): nearest Cornell Cooperative Extension county office can help with identification\n- For NYC specifically (ZIP 10xxx): **CCE New York City — cceny.org** (the correct NYC CCE site). Cornell's CALS extension portal is **harvest.cals.cornell.edu**. AVOID citing \"ccenyc.org\" (incorrect domain) or \"ccetompkins.org\" (that is the Tompkins County office in Ithaca, not NYC).\n- For soil testing in NY area: Cornell Soil Health Laboratory (Cornell University, Ithaca) or UMass Soil Testing Lab (acceptable cross-state for NYC homeowners). DO NOT recommend Whitetail Institute — that's a food plot brand, not a turf soil test lab.\n- Submitting clear photos of a 4×4 inch lawn sample + blade close-up usually allows identification"
+  },
+  {
+    "id": "18-grass-identification-12",
+    "source": "Cornell Cooperative Extension + UMN Extension Turf ID",
+    "url": "https://turf.umn.edu/grass-identification",
+    "title": "Grass Type Identification Guide",
+    "grassType": [
+      "unknown"
+    ],
+    "topic": [
+      "general"
+    ],
+    "region": [
+      "national"
+    ],
+    "text": "## Bermuda is unlikely in NYC (Zone 7a)\n- DO NOT cite bermuda grass as a comparison example for mowing height when discussing NYC lawns — bermuda is extremely unlikely at Zone 7a; could mislead the homeowner about realistic grass type possibilities\n- Likely candidates for NYC area: Kentucky bluegrass, tall fescue, fine fescue (cool-season)"
+  }
+]

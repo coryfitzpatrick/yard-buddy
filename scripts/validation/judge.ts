@@ -5,16 +5,81 @@ import type { Scenario, JudgeResult } from "./types";
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    _anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      timeout: 90_000,
+      maxRetries: 0,
+    });
   }
   return _anthropic;
 }
 
 const JUDGE_SYSTEM = `You are a turfgrass expert with 20+ years of experience and deep knowledge of university extension recommendations. You evaluate AI-generated lawn care advice for agronomic accuracy.`;
 
+// JUDGE_MODEL — defaults to Sonnet for cost-effective routine iteration.
+// Opus (claude-opus-4-7) gives more authoritative scores (R35 finding: +4.6 mean
+// points higher on identical AI output, fewer hallucinated citations) but costs
+// roughly 5x more per validation run. For milestone/release validation, override
+// with: JUDGE_MODEL=claude-opus-4-7 npm run validate
+// For iteration, Sonnet's biases are characterized (underestimates by ~4-5 points
+// on certain stuck scenarios) so relative changes between runs are still meaningful.
+const JUDGE_MODEL = process.env.JUDGE_MODEL ?? "claude-sonnet-4-6";
+
+const MAX_ATTEMPTS = 4;
+const BACKOFF_MS = [0, 2000, 5000, 10000];
+
+function isTransientError(err: unknown): boolean {
+  const message = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+  return (
+    message.includes("timed out") ||
+    message.includes("timeout") ||
+    message.includes("rate limit") ||
+    message.includes("overloaded") ||
+    message.includes("503") ||
+    message.includes("502") ||
+    message.includes("504") ||
+    message.includes("econnreset") ||
+    message.includes("etimedout")
+  );
+}
+
+async function callWithRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    if (BACKOFF_MS[attempt] > 0) {
+      await new Promise((r) => setTimeout(r, BACKOFF_MS[attempt]));
+    }
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (!isTransientError(err) || attempt === MAX_ATTEMPTS - 1) throw err;
+      const message = err instanceof Error ? err.message : String(err);
+      process.stdout.write(`\n    [retry ${attempt + 1}/${MAX_ATTEMPTS - 1}] ${label}: ${message.slice(0, 80)}\n  `);
+    }
+  }
+  throw lastErr;
+}
+
+// Strip non-printable control chars (keep tab, newline, carriage return) so
+// stray bytes inside JSON string values don't break JSON.parse. Built with
+// charCodeAt to avoid edit-tool mangling of regex escape sequences.
+function stripControlChars(s: string): string {
+  let out = "";
+  for (let k = 0; k < s.length; k++) {
+    const code = s.charCodeAt(k);
+    const isCtl = (code < 32 && code !== 9 && code !== 10 && code !== 13) || code === 127;
+    out += isCtl ? " " : s[k];
+  }
+  return out;
+}
+
 async function judgeScenario(scenario: Scenario): Promise<JudgeResult> {
   try {
-    const recs = await generateRecommendations(scenario.profile);
+    const recs = await callWithRetry(
+      `generate ${scenario.id}`,
+      () => generateRecommendations(scenario.profile),
+    );
     const responseText = JSON.stringify(recs, null, 2);
 
     const prompt = `A homeowner's AI lawn care advisor produced the following recommendations.
@@ -44,21 +109,57 @@ Return ONLY valid JSON, no other text:
   "reasoning": "<2-3 sentence explanation>"
 }`;
 
-    const message = await getAnthropic().messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1024,
-      system: JUDGE_SYSTEM,
-      messages: [{ role: "user", content: prompt }],
-    });
+    // ENSEMBLE JUDGING: call judge 3x and average the scores. Judge variance
+    // test showed sigma up to 2.5 on identical inputs; ensemble cuts variance
+    // to ~sigma/sqrt(3) so future improvements are measurable. Also averages
+    // out the judge's tendency to bin scores at 82/88/91.
+    const ENSEMBLE_N = 3;
+    type Vote = { score: number; flags: string[]; reasoning: string };
+    const votes: Vote[] = [];
+    for (let i = 0; i < ENSEMBLE_N; i++) {
+      // Retry the whole call+parse chain on JSON parse failures. The model
+      // occasionally emits raw control characters inside string values which
+      // breaks JSON.parse; we strip them and retry.
+      let parsed: { score?: number; flags?: string[]; reasoning?: string } | undefined;
+      let parseAttempt = 0;
+      while (parseAttempt < 3 && !parsed) {
+        const message = await callWithRetry(`judge ${scenario.id} (${i + 1}/${ENSEMBLE_N})`, () =>
+          getAnthropic().messages.create({
+            model: JUDGE_MODEL,
+            max_tokens: 1024,
+            system: JUDGE_SYSTEM,
+            messages: [{ role: "user", content: prompt }],
+          }),
+        );
+        const raw = message.content[0]?.type === "text" ? message.content[0].text : "{}";
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        const cleaned = stripControlChars(jsonMatch?.[0] ?? "{}");
+        try {
+          parsed = JSON.parse(cleaned) as { score?: number; flags?: string[]; reasoning?: string };
+        } catch (err) {
+          parseAttempt += 1;
+          process.stdout.write(`\n    [parse-retry ${parseAttempt}/3] ${scenario.id}: ${(err as Error).message.slice(0, 60)}\n  `);
+        }
+      }
+      if (!parsed) {
+        throw new Error(`Judge returned unparseable JSON after 3 attempts for ${scenario.id}`);
+      }
+      votes.push({
+        score: parsed.score ?? 0,
+        flags: parsed.flags ?? [],
+        reasoning: parsed.reasoning ?? "",
+      });
+    }
 
-    const raw = message.content[0]?.type === "text" ? message.content[0].text : "{}";
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    const parsed = JSON.parse(jsonMatch?.[0] ?? "{}") as { score?: number; flags?: string[]; reasoning?: string };
+    const sorted = [...votes].sort((a, b) => a.score - b.score);
+    const median = sorted[Math.floor(sorted.length / 2)];
+    const meanScore = votes.reduce((sum, v) => sum + v.score, 0) / votes.length;
+
     return {
       scenarioId: scenario.id,
-      score: parsed.score ?? 0,
-      flags: parsed.flags ?? [],
-      reasoning: parsed.reasoning ?? "",
+      score: Math.round(meanScore),
+      flags: median.flags,
+      reasoning: `[ensemble n=${ENSEMBLE_N} votes=${votes.map(v => v.score).join(",")} mean=${meanScore.toFixed(1)}] ${median.reasoning}`,
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

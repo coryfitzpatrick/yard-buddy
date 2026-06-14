@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { generateRecommendations } from "../../lib/claude";
+import { generateRecommendations, getLastCritiqueMetadata } from "../../lib/claude";
 import { ALL_RULES } from "./rules/assertions";
 import { runInputGuardTests } from "./input-quality";
 import { runJudge } from "./judge";
@@ -80,16 +80,20 @@ async function main() {
   // --- Pillar 2: Rule Assertions ---
   console.log("\nRunning Pillar 2: Rule Assertions...");
   const ruleResults: RuleResult[] = [];
+  const critiqueMeta: Record<string, { critiqueFlags: string[]; revised: boolean }> = {};
   for (const scenario of scenarios) {
     process.stdout.write(`  ${scenario.id}... `);
     try {
       const recs = await generateRecommendations(scenario.profile);
       const responseText = JSON.stringify(recs);
+      critiqueMeta[scenario.id] = getLastCritiqueMetadata();
       for (const rule of ALL_RULES) {
         const result = rule.check(scenario, responseText);
         ruleResults.push({ ...result, scenarioId: scenario.id });
       }
-      process.stdout.write("done\n");
+      const meta = critiqueMeta[scenario.id];
+      const marker = meta.revised ? " (revised)" : meta.critiqueFlags.length > 0 ? ` (${meta.critiqueFlags.length} flagged)` : "";
+      process.stdout.write(`done${marker}\n`);
     } catch (err) {
       process.stdout.write(`ERROR: ${err instanceof Error ? err.message : String(err)}\n`);
       failures.push(`[pillar2-error] ${scenario.id}`);
@@ -105,7 +109,12 @@ async function main() {
   } else {
     console.log("\nRunning Pillar 3: LLM-as-Judge...");
     const { results: judgeResults, mean } = await runJudge(scenarios);
-    pillars.push({ pillar: 3, results: judgeResults, mean });
+    const enrichedJudgeResults = judgeResults.map((r) => ({
+      ...r,
+      critiqueFlags: critiqueMeta[r.scenarioId]?.critiqueFlags ?? [],
+      revised: critiqueMeta[r.scenarioId]?.revised ?? false,
+    }));
+    pillars.push({ pillar: 3, results: enrichedJudgeResults, mean });
     printPillar3(judgeResults, mean);
     judgeResults.filter((r) => r.score < SCORE_THRESHOLD).forEach((r) =>
       failures.push(`[judge-low] ${r.scenarioId}`)

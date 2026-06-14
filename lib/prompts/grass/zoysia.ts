@@ -1,0 +1,6 @@
+export const ZOYSIA_PROMPT = `ZOYSIA MOWING HEIGHT:
+- Zoysia: varies by variety — fine-leaf types (Zeon, Emerald, Cavalier): 0.5–1.5 inches; coarser home-lawn types (Meyer, Z-52, Zenith, Empire): 1.5–2.5 inches. Without knowing the specific variety, recommend 1.5–2 inches as a safe general guideline. Never recommend below 1 inch unless homeowner confirms a fine-leaf variety.
+
+ZOYSIA SPRING FERTILIZATION TRIGGER: Do NOT apply nitrogen to zoysia until soil temperatures consistently exceed 65°F AND the lawn is at least 75% green. Applying N before this threshold promotes disease and wastes fertilizer on dormant tissue. ALWAYS explicitly anchor the fertilization delay to the 65°F soil temperature benchmark (UGA Extension standard) — do NOT give a calendar date alone without the soil temp qualifier.
+
+ZOYSIA SPRING DISEASE PRIORITY: The primary spring disease concern for zoysia is LARGE PATCH (Rhizoctonia solani), which affects zoysia during cool, wet spring conditions (55–75°F). Dollar spot is primarily a mid-to-late summer disease on zoysia in warm/humid conditions — do NOT list dollar spot as a spring priority alongside large patch. In spring, focus on large patch monitoring and curative fungicide if circular dying patches are visible.`;

@@ -63,12 +63,26 @@ const noFertInDormancy: Rule = {
     const isWarm = WARM_SEASON.includes(scenario.profile.grassType);
     const temp = scenario.profile.weatherData?.temp ?? 99;
     if (!isWarm || temp >= 50) return { ruleId: this.id, pass: true, reason: "Rule does not apply" };
-    const fertPatterns = ["fertilize", "apply nitrogen", "feed your lawn", "apply fertilizer"];
-    const found = fertPatterns.find((p) => response.toLowerCase().includes(p.toLowerCase()));
-    if (found) {
-      return { ruleId: this.id, pass: false, reason: `Found fertilization recommendation "${found}" while warm-season grass is dormant at ${temp}°F` };
+
+    // Only flag sentences that AFFIRMATIVELY recommend fertilizing now —
+    // deferrals, prohibitions, and future-spring guidance are legitimate.
+    const fertWord = /\b(?:fertiliz(?:e|er|ation|ing)?|apply\s+nitrogen|feed\s+your\s+lawn|apply\s+fertilizer)\b/i;
+    const deferralCtx = /\b(?:do\s+not|don'?t|never|avoid|skip|omit|withhold|defer|delay|hold\s+off|postpone|wait|after\s+green.?up|until\s+spring|until\s+soil\s+temp|once\s+temp(?:eratures?)?|once\s+soil|when\s+temp(?:eratures?)?|when\s+soil|spring(?:time)?|green.?up|not\s+recommend(?:ed)?|should\s+not|cannot|inappropriate|wrong\s+time|too\s+early|too\s+cold|too\s+dormant|premature|dormant|dormancy|no\s+(?:fertiliz|nitrogen|feeding|fert))\b/i;
+
+    const sentences = response.split(/(?:[.!?]\s+|\n|;\s+)/);
+    for (const sentence of sentences) {
+      if (!fertWord.test(sentence)) continue;
+      // Sentence mentions fertilization — is it a deferral/prohibition?
+      if (deferralCtx.test(sentence)) continue;
+      // Found an affirmative fertilization recommendation
+      const trimmed = sentence.trim().slice(0, 120);
+      return {
+        ruleId: this.id,
+        pass: false,
+        reason: `Found affirmative fertilization recommendation in dormancy at ${temp}°F: "${trimmed}..."`,
+      };
     }
-    return { ruleId: this.id, pass: true, reason: "No fertilization recommended during dormancy" };
+    return { ruleId: this.id, pass: true, reason: "No active fertilization recommended during dormancy" };
   },
 };
 
@@ -220,12 +234,13 @@ const fungicideNeedsHumidity: Rule = {
       return { ruleId: this.id, pass: true, reason: "Fungicide only mentioned as something to avoid — no active recommendation" };
     }
     // Root diseases (summer patch, necrotic ring spot) develop under dry heat stress — humidity is NOT required
-    // These are soil-borne root pathogens treated with fungicide drenches, not foliar fungicide
-    const isRootDisease = sentences.some(s =>
-      (s.includes("summer patch") || s.includes("necrotic ring spot")) &&
-      (s.includes("fungicide") || s.includes("drench") || s.includes("azoxystrobin") || s.includes("propiconazole"))
-    );
-    if (isRootDisease) {
+    // These are soil-borne root pathogens treated with fungicide drenches, not foliar fungicide.
+    // Accept if BOTH a root-disease pathogen AND drench/root-zone application are named anywhere
+    // in the response (relaxed from same-sentence to response-wide — the model often names the
+    // pathogen in the task title and the application method in the description).
+    const namesRootPathogen = /\b(?:summer patch|necrotic ring spot|magnaporthe poae|ophiosphaerella korrae)\b/i.test(lower);
+    const namesDrench = /\b(?:drench|root.zone|soil.applied|soil application|water.*0\.5.*inch|water into.*root)\b/i.test(lower);
+    if (namesRootPathogen && namesDrench) {
       return { ruleId: this.id, pass: true, reason: "Root disease fungicide drench (summer patch/NRS) — not humidity-dependent" };
     }
     const humidity = scenario.profile.weatherData?.humidity ?? 100;
