@@ -6,6 +6,7 @@ import { buildSystemPrompt } from "@/lib/prompts";
 import { retrieveRelevant, formatChunksForPrompt, inferTopicHints } from "@/lib/rag";
 import { getRelevantFacts } from "@/lib/facts";
 import { buildCritiquePrompt, buildRevisePrompt } from "@/lib/prompts/critique";
+import type { Base64Image } from "../scripts/validation/load-photos";
 
 const CRITIQUE_MODEL = process.env.CRITIQUE_MODEL || "claude-haiku-4-5-20251001";
 const CRITIQUE_ENABLED = process.env.CRITIQUE_DISABLED !== "1";
@@ -498,6 +499,72 @@ For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic wind
   } catch {
     throw new Error(`Claude returned non-JSON response: ${cleaned.slice(0, 300)}`);
   }
+}
+
+export async function analyzeImagesBase64(
+  base64Images: Base64Image[],
+  context: LawnContext
+): Promise<AnalysisResult> {
+  const systemPrompt = context.weatherData
+    ? buildSectionAnalysisPrompt({
+        section: {
+          name: context.sectionName ?? context.areaType ?? "Lawn Section",
+          grassType: context.grassType,
+          soilPh: context.soilPh,
+          nitrogenPpm: context.nitrogenPpm,
+          phosphorusPpm: context.phosphorusPpm,
+          potassiumPpm: context.potassiumPpm,
+          soilTestSource: context.soilTestSource,
+          sunExposure: context.sunExposure ?? null,
+          squareFootage: context.yardSizeSqft,
+          streetAddress: context.streetAddress,
+          currentRoutine: context.currentRoutine ?? null,
+        },
+        weather: context.weatherData,
+      }).systemPrompt + `
+
+ADDITIONAL CONTEXT FOR JSON RESPONSE:
+You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.`
+    : buildSystemPrompt(context.grassType);
+
+  const message = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 3000,
+    system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
+    messages: [
+      {
+        role: "user",
+        content: [
+          ...base64Images,
+          {
+            type: "text" as const,
+            text: `Analyze this lawn from the photos. Return the same JSON structure used by analyzeImages.
+
+Context:
+- Grass Type: ${context.grassType.replace(/_/g, " ")}
+- ZIP Code: ${context.zipCode}
+${context.yardSizeSqft ? `- Yard Size: ${context.yardSizeSqft} sq ft` : ""}
+${context.soilPh ? `- Soil pH: ${context.soilPh}` : ""}
+${context.soilMoisture ? `- Soil Moisture: ${context.soilMoisture}` : ""}
+${context.weatherSummary ? `- Weather: ${context.weatherSummary}` : ""}
+${context.notes ? `- Notes: ${context.notes.slice(0, 500)}` : ""}
+
+Return the exact AnalysisResult JSON shape with fields: issues (string[]), healthScore (0-100), summary, grassTypeDetected, confidence (0-100), recommendations (array of the standard recommendation shape).`,
+          },
+        ],
+      },
+    ],
+  });
+
+  const text = (message.content[0] as Anthropic.TextBlock).text.trim();
+  const cleaned = text
+    .replace(/```(?:json)?\n?/g, "")
+    .replace(/^[^[{]*/s, "")
+    .trim();
+  const result = JSON.parse(cleaned) as AnalysisResult;
+  const gaps = detectDataGaps(context);
+  result.dataGapWarning = buildDataGapWarning(gaps);
+  return result;
 }
 
 export async function validateLawnImages(
