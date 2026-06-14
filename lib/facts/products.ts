@@ -185,7 +185,7 @@ export const PRODUCTS: Product[] = [
     category: "pre-emergent",
     activeIngredients: ["isoxaben"],
     notes:
-      "Broadleaf pre-emergent (chickweed, henbit, spurge). DF = Dry Flowable — a WETTABLE GRANULE formulation: mix with water and apply as a SPRAY via backpack or pump sprayer at label rate (0.5–1.0 lb per acre = ~0.011–0.023 lb / 1,000 sq ft per application). Do NOT describe Gallery 75 DF as a broadcast-spreader granular product. Irrigation within 21 days for incorporation is standard; do NOT cite a strict 48-hour dry window.",
+      "Broadleaf pre-emergent (chickweed, henbit, spurge). DF = Dry Flowable — a WETTABLE GRANULE formulation: mix with water and apply as a SPRAY via backpack or pump sprayer. Label rate range: 0.66–1.33 oz of product per 1,000 sq ft (equivalent to 1.0–2.0 lbs product per acre, or 0.022–0.045 lb active ingredient per 1,000 sq ft). Consult the specific product label for your target weed and residual length. Do NOT describe Gallery 75 DF as a broadcast-spreader granular product. Irrigation within 21 days for incorporation is standard; do NOT cite a strict 48-hour dry window.",
   },
   {
     name: "Dimension 0.10%",
