@@ -16,6 +16,39 @@ export function getLastCritiqueMetadata(): { critiqueFlags: string[]; revised: b
   return { critiqueFlags: _lastCritiqueFlags, revised: _lastRevised };
 }
 
+export type DataGapField = 'soilPh' | 'grassType' | 'notes' | 'soilTest' | 'currentRoutine' | 'yardSizeSqft';
+
+export function detectDataGaps(context: LawnContext): DataGapField[] {
+  const gaps: DataGapField[] = [];
+  if (context.soilPh == null) gaps.push('soilPh');
+  if (!context.grassType || context.grassType === 'unknown') gaps.push('grassType');
+  if (!context.notes || context.notes.trim().length < 8) gaps.push('notes');
+  if (context.nitrogenPpm == null && context.phosphorusPpm == null && context.potassiumPpm == null) {
+    gaps.push('soilTest');
+  }
+  if (!context.currentRoutine || context.currentRoutine.trim().length < 8) gaps.push('currentRoutine');
+  if (!context.yardSizeSqft || context.yardSizeSqft <= 0) gaps.push('yardSizeSqft');
+  return gaps;
+}
+
+const GAP_SENTENCES: Record<DataGapField, string> = {
+  soilPh: "Soil pH wasn't shared, so any lime/sulfur and iron-chelate guidance is based on visible chlorosis only — confirm with a soil test before applying.",
+  grassType: "Grass type wasn't confirmed, so this analysis assumes the species inferred from the photos. Verify before applying species-specific products (pre-emergent rates, post-emergent selectivity).",
+  notes: "You didn't share notes about specific problems or history, so we worked from the photos alone — for chronic or recurring issues, the answer may be incomplete.",
+  soilTest: "No soil test N-P-K values were provided, so fertilizer recommendations default to general extension rates rather than your soil's actual needs.",
+  currentRoutine: "Your current lawn-care routine wasn't shared, so we couldn't tailor the recommendations to what you're already doing — some advice may duplicate or contradict your current schedule.",
+  yardSizeSqft: "Yard size wasn't shared, so product quantities are expressed per 1,000 sq ft rather than as total amounts for your lawn.",
+};
+
+export function buildDataGapWarning(gaps: DataGapField[]): string | null {
+  if (gaps.length === 0) return null;
+  if (gaps.length === 1) return GAP_SENTENCES[gaps[0]];
+  if (gaps.length <= 3) {
+    return gaps.map((g) => GAP_SENTENCES[g]).join(' ');
+  }
+  return `You only shared photos and your ZIP. These recommendations are general for your climate and what's visible — sharing a soil test, grass type, yard size, and notes about specific problems would tighten them considerably. Missing fields: ${gaps.join(', ')}.`;
+}
+
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export interface LawnContext {
