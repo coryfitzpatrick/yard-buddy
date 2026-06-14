@@ -1,0 +1,58 @@
+{
+  "id": "bermuda-dormancy-winter",
+  "description": "Three photos of bermuda grass in winter dormancy in Atlanta GA. Tests that the AI correctly identifies dormancy as a healthy/expected condition, not disease or drought, and avoids recommending fertilization.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Wide view of uniformly tan/straw-colored bermuda lawn in winter dormancy — consistent coloring across the entire lawn with no patchy or irregular browning."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of dormant bermuda blades showing uniform straw color and dry texture consistent with cold-induced dormancy."
+    },
+    {
+      "path": "03.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Edge of property showing dormant bermuda alongside a hardscape border — uniform straw color throughout with no green patches, indicating fully dormant turf."
+    }
+  ],
+  "profile": {
+    "grassType": "bermuda",
+    "zipCode": "30303",
+    "yardSizeSqft": 5500,
+    "soilPh": 6.4,
+    "soilMoisture": "moist",
+    "areaType": "front",
+    "weatherSummary": "42 F, overcast, winter",
+    "notes": "Front yard, bermuda is tan and dormant for the winter as expected. No problems noted — just the normal winter color.",
+    "currentRoutine": "No mowing during dormancy. Minimal irrigation in winter. Will resume normal schedule when green-up begins in spring.",
+    "weatherData": {
+      "temp": 42,
+      "humidity": 55,
+      "condition": "Overcast",
+      "recentRainfall": 0.6,
+      "forecast": [
+        { "day": "Today", "high": 45, "low": 35, "condition": "Overcast", "chanceOfRain": 30 },
+        { "day": "Tomorrow", "high": 48, "low": 36, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Day 3", "high": 50, "low": 38, "condition": "Mostly Cloudy", "chanceOfRain": 25 },
+        { "day": "Day 4", "high": 47, "low": 34, "condition": "Overcast", "chanceOfRain": 35 },
+        { "day": "Day 5", "high": 44, "low": 33, "condition": "Partly Cloudy", "chanceOfRain": 20 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "bermuda",
+    "issues": ["healthy"],
+    "healthScoreRange": [75, 95],
+    "mustInclude": ["maintain", "mowing", "irrigation"],
+    "mustNotInclude": ["fungicide", "herbicide", "corrective", "this lawn has", "treat the", "fertilize"],
+    "photoNotes": "Three photos of bermuda in full winter dormancy. Uniform straw/tan color across the entire lawn — no irregular patches, no disease symptoms, no pest damage. Consistent coloring throughout indicates normal cold-induced dormancy rather than disease or drought injury.",
+    "taskModeConstraint": ["maintenance"]
+  }
+}

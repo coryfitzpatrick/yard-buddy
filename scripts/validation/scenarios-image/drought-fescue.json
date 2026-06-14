@@ -1,0 +1,51 @@
+{
+  "id": "drought-fescue",
+  "description": "Two photos of tall fescue under acute drought stress in Kansas. Tests that the AI prioritizes rehydration over other recommendations and uses correct drought-stress guidance.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Wide view of tall fescue lawn with widespread grayish-blue wilting and folding leaf blades — classic drought stress color change before browning."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of tall fescue blades showing rolled or folded leaf blades and dull gray-green color indicating water deficit stress."
+    }
+  ],
+  "profile": {
+    "grassType": "tall_fescue",
+    "zipCode": "66101",
+    "yardSizeSqft": 5000,
+    "soilPh": 6.3,
+    "soilMoisture": "dry",
+    "areaType": "front",
+    "weatherSummary": "94 F, sunny, no rain in 3 weeks",
+    "notes": "Lawn has turned grayish and blades are folding. Footprints stay visible in the grass. No irrigation in the past 2 weeks due to travel.",
+    "currentRoutine": "Normally mow at 3.5 inches weekly and water twice a week, but missed watering for 2 weeks while traveling.",
+    "weatherData": {
+      "temp": 94,
+      "humidity": 38,
+      "condition": "Sunny",
+      "recentRainfall": 0,
+      "forecast": [
+        { "day": "Today", "high": 97, "low": 74, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Tomorrow", "high": 96, "low": 73, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 3", "high": 95, "low": 72, "condition": "Sunny", "chanceOfRain": 10 },
+        { "day": "Day 4", "high": 93, "low": 71, "condition": "Mostly Sunny", "chanceOfRain": 15 },
+        { "day": "Day 5", "high": 91, "low": 70, "condition": "Partly Cloudy", "chanceOfRain": 20 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "tall_fescue",
+    "issues": ["drought_stress"],
+    "healthScoreRange": [55, 75],
+    "mustInclude": ["irrigation", "drought"],
+    "mustNotInclude": [],
+    "photoNotes": "Two photos of tall fescue in acute drought stress. Wide shot shows widespread grayish-blue wilting canopy with folded blades. Close-up confirms rolled leaf blades and dull color — classic pre-dormancy wilt response to water deficit. No signs of disease or pest damage."
+  }
+}

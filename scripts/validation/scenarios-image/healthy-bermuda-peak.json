@@ -1,0 +1,58 @@
+{
+  "id": "healthy-bermuda-peak",
+  "description": "Three photos of a healthy bermuda lawn at peak summer growth in Atlanta. Tests that the AI provides maintenance-only recommendations and does not invent disease or pest issues.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Wide-angle view of dense, uniformly green bermuda turf at 1.5-inch mowing height, no bare spots."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of bermuda leaf blades showing healthy dark-green color and fine texture."
+    },
+    {
+      "path": "03.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Side-angle view showing uniform canopy density and consistent mowing height across the yard."
+    }
+  ],
+  "profile": {
+    "grassType": "bermuda",
+    "zipCode": "30303",
+    "yardSizeSqft": 5500,
+    "soilPh": 6.3,
+    "soilMoisture": "moist",
+    "areaType": "front",
+    "weatherSummary": "88 F, sunny, peak summer",
+    "notes": "Front yard, mowed at 1.5 inches every 5 days, no problems noted. Lawn looks great this season.",
+    "currentRoutine": "Mow every 5 days at 1.5 inches, irrigate 3x per week totaling 1 inch, applied 28-0-3 fertilizer in June.",
+    "weatherData": {
+      "temp": 88,
+      "humidity": 65,
+      "condition": "Sunny",
+      "recentRainfall": 0.3,
+      "forecast": [
+        { "day": "Today", "high": 91, "low": 70, "condition": "Sunny", "chanceOfRain": 10 },
+        { "day": "Tomorrow", "high": 89, "low": 69, "condition": "Mostly Sunny", "chanceOfRain": 15 },
+        { "day": "Day 3", "high": 87, "low": 68, "condition": "Partly Cloudy", "chanceOfRain": 25 },
+        { "day": "Day 4", "high": 90, "low": 70, "condition": "Sunny", "chanceOfRain": 10 },
+        { "day": "Day 5", "high": 92, "low": 71, "condition": "Sunny", "chanceOfRain": 5 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "bermuda",
+    "issues": ["healthy"],
+    "healthScoreRange": [88, 100],
+    "mustInclude": ["maintain", "mowing", "irrigation"],
+    "mustNotInclude": ["fungicide", "herbicide", "corrective", "this lawn has", "treat the"],
+    "photoNotes": "Three views of a dense, uniformly green bermuda lawn at peak summer growth. No signs of disease, pest damage, drought stress, weeds, or bare spots. Canopy is consistent and well-manicured.",
+    "taskModeConstraint": ["maintenance", "improvement"]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "gray-leaf-spot-st-aug",
+  "description": "Single photo of gray leaf spot (Pyricularia grisea) on St. Augustine grass in Houston TX. Tests correct disease identification and species-appropriate fungicide recommendations.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "St. Augustine leaf blades showing classic gray leaf spot lesions — small, gray-to-tan oblong spots with brown margins scattered across multiple blades, with some blades showing yellowing."
+    }
+  ],
+  "profile": {
+    "grassType": "st_augustine",
+    "zipCode": "77002",
+    "yardSizeSqft": 4800,
+    "soilPh": 6.8,
+    "soilMoisture": "moist",
+    "areaType": "back",
+    "weatherSummary": "90 F, very humid, wet weather pattern",
+    "notes": "Noticed small gray spots on the grass blades about a week ago. Spots have spread and some areas are thinning. Recently fertilized with high-nitrogen product.",
+    "currentRoutine": "Mow at 3.5 inches, irrigate 3x per week. Applied high-nitrogen fertilizer 2 weeks ago.",
+    "weatherData": {
+      "temp": 90,
+      "humidity": 88,
+      "condition": "Mostly Cloudy",
+      "recentRainfall": 2.1,
+      "forecast": [
+        { "day": "Today", "high": 92, "low": 75, "condition": "Mostly Cloudy", "chanceOfRain": 50 },
+        { "day": "Tomorrow", "high": 91, "low": 74, "condition": "Thunderstorms", "chanceOfRain": 75 },
+        { "day": "Day 3", "high": 89, "low": 73, "condition": "Partly Cloudy", "chanceOfRain": 45 },
+        { "day": "Day 4", "high": 90, "low": 75, "condition": "Thunderstorms", "chanceOfRain": 65 },
+        { "day": "Day 5", "high": 88, "low": 74, "condition": "Partly Cloudy", "chanceOfRain": 40 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "st_augustine",
+    "issues": ["fungus"],
+    "healthScoreRange": [50, 70],
+    "mustInclude": ["gray leaf spot"],
+    "mustNotInclude": [],
+    "photoNotes": "Close-up of St. Augustine leaf blades with multiple gray-to-tan oblong lesions with distinct brown borders — the hallmark of Pyricularia grisea gray leaf spot. Several blades show yellowing around lesion clusters. Disease pressure appears moderate to high given the widespread spotting."
+  }
+}

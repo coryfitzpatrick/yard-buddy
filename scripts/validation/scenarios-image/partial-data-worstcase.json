@@ -1,0 +1,56 @@
+{
+  "id": "partial-data-worstcase",
+  "description": "Four photos of a lawn in Columbus OH where the homeowner provided only a ZIP code — no grass type, no soil test, no notes, no routine. Tests that the AI acknowledges all data gaps, leads with grass type identification, frames all recommendations as general guidance, and recommends a soil test.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Wide view of a lawn with mixed coloring — some pale yellow-green patches and areas of wilted, dull foliage suggesting nutrient deficiency or drought stress."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of grass blades showing yellowing and interveinal chlorosis pattern consistent with nutrient deficiency, grass type uncertain from photo."
+    },
+    {
+      "path": "03.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Section of lawn showing dull gray-green wilted blades with footprint persistence indicating moisture stress."
+    },
+    {
+      "path": "04.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Broader lawn view showing uneven coloring and patchy distribution of pale areas without clear pest or disease lesion patterns."
+    }
+  ],
+  "profile": {
+    "grassType": "unknown",
+    "zipCode": "43215",
+    "weatherData": {
+      "temp": 82,
+      "humidity": 52,
+      "condition": "Sunny",
+      "recentRainfall": 0,
+      "forecast": [
+        { "day": "Today", "high": 85, "low": 65, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Tomorrow", "high": 87, "low": 66, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 3", "high": 84, "low": 64, "condition": "Mostly Sunny", "chanceOfRain": 15 },
+        { "day": "Day 4", "high": 83, "low": 63, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Day 5", "high": 81, "low": 62, "condition": "Partly Cloudy", "chanceOfRain": 25 }
+      ]
+    }
+  },
+  "dataGaps": ["grassType", "soilPh", "notes", "soilTest", "currentRoutine"],
+  "groundTruth": {
+    "grassType": "unknown",
+    "issues": ["nutrient_deficiency", "drought_stress"],
+    "healthScoreRange": [50, 80],
+    "mustInclude": ["soil test", "grass"],
+    "mustNotInclude": [],
+    "photoNotes": "Four photos of an unidentified lawn species in Columbus OH showing yellowing and chlorosis consistent with nutrient deficiency, plus wilting and footprint persistence indicating drought stress. Grass type cannot be confirmed from photos alone — blades appear medium-width but definitive species identification requires more context. No clear disease lesions or pest damage visible."
+  }
+}

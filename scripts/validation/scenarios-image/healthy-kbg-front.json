@@ -1,0 +1,46 @@
+{
+  "id": "healthy-kbg-front",
+  "description": "Single close-up photo of a healthy mid-season KBG front lawn. Tests that the AI gives maintenance recommendations (not corrective) and doesn't invent issues.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Uniformly green Kentucky bluegrass at ~3-inch height, no visible disease or pest damage."
+    }
+  ],
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "43215",
+    "yardSizeSqft": 4500,
+    "soilPh": 6.5,
+    "soilMoisture": "moist",
+    "areaType": "front",
+    "weatherSummary": "75 F, partly cloudy, mid-summer",
+    "notes": "Front yard, kept mowed at 3 inches, no problems noted.",
+    "currentRoutine": "Mow weekly at 3 inches, water twice a week with an inch total, applied slow-release fertilizer in May.",
+    "weatherData": {
+      "temp": 75,
+      "humidity": 60,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.5,
+      "forecast": [
+        { "day": "Today", "high": 78, "low": 60, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Tomorrow", "high": 82, "low": 62, "condition": "Sunny", "chanceOfRain": 10 },
+        { "day": "Day 3", "high": 80, "low": 61, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 4", "high": 79, "low": 60, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Day 5", "high": 80, "low": 60, "condition": "Sunny", "chanceOfRain": 10 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "kentucky_bluegrass",
+    "issues": ["healthy"],
+    "healthScoreRange": [85, 100],
+    "mustInclude": ["maintain", "mowing", "irrigation"],
+    "mustNotInclude": ["fungicide", "herbicide", "corrective", "this lawn has", "treat the"],
+    "photoNotes": "Uniformly green KBG at 3-inch height. No visible disease, weeds, drought stress, or pest damage. Healthy appearance.",
+    "taskModeConstraint": ["maintenance", "improvement"]
+  }
+}

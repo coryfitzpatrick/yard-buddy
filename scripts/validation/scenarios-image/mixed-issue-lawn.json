@@ -1,0 +1,63 @@
+{
+  "id": "mixed-issue-lawn",
+  "description": "Four photos of a KBG lawn in Columbus OH showing multiple simultaneous issues: fungal disease, pest damage, and bare spots. Tests the AI's ability to synthesize and prioritize across multiple problems.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Front yard wide-angle showing irregular brown patches interspersed with areas of thinning and bare soil, and a circular fungal ring in the upper-right quadrant."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of a bare patch area where turf has thinned and died, with chewed or ragged grass blade ends visible at the patch margins suggesting surface insect feeding."
+    },
+    {
+      "path": "03.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of circular fungal lesion on KBG blades — tan spots with distinct borders, consistent with dollar spot or early brown patch symptoms."
+    },
+    {
+      "path": "04.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Back yard view showing separate bare spots with no thatch layer and compacted-looking soil surface in multiple locations."
+    }
+  ],
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "43215",
+    "yardSizeSqft": 5800,
+    "soilPh": 6.6,
+    "soilMoisture": "moist",
+    "areaType": "front",
+    "weatherSummary": "78 F, humid, recent rain",
+    "notes": "Lawn has multiple issues this year: some circular brown/tan patches, bare spots in both front and back, and what looks like insect feeding damage at the edges of dying areas. Really struggling to figure out what is going on.",
+    "currentRoutine": "Mow at 3 inches, water 2-3x per week. No pesticide or fungicide applied this season.",
+    "weatherData": {
+      "temp": 78,
+      "humidity": 72,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.8,
+      "forecast": [
+        { "day": "Today", "high": 81, "low": 64, "condition": "Partly Cloudy", "chanceOfRain": 30 },
+        { "day": "Tomorrow", "high": 83, "low": 65, "condition": "Thunderstorms", "chanceOfRain": 60 },
+        { "day": "Day 3", "high": 80, "low": 63, "condition": "Partly Cloudy", "chanceOfRain": 35 },
+        { "day": "Day 4", "high": 79, "low": 62, "condition": "Mostly Cloudy", "chanceOfRain": 40 },
+        { "day": "Day 5", "high": 77, "low": 61, "condition": "Partly Cloudy", "chanceOfRain": 25 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "kentucky_bluegrass",
+    "issues": ["fungus", "pests", "bare_spots"],
+    "healthScoreRange": [50, 70],
+    "mustInclude": ["front", "back"],
+    "mustNotInclude": [],
+    "photoNotes": "Four photos showing a KBG lawn with multiple concurrent issues. Front yard wide shot shows circular fungal lesions alongside irregular bare patches. Second photo shows ragged blade edges suggesting insect feeding. Third photo confirms fungal lesions on individual blades. Back yard shot shows separate bare spots with compacted soil. Cross-photo synthesis required to triage all three issue types."
+  }
+}

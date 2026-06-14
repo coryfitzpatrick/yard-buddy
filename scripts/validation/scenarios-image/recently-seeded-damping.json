@@ -1,0 +1,63 @@
+{
+  "id": "recently-seeded-damping",
+  "description": "Four photos of a recently seeded KBG lawn in St. Paul MN showing damping-off symptoms from overwatering. Tests that the AI recognizes seedling damping-off, avoids pre-emergent/post-emergent herbicide recommendations, and addresses overwatering as the primary cause.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Wide view of a recently seeded lawn with patchy germination — some areas with emerging green seedlings alongside sections with collapsed or absent seedlings."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of newly germinated KBG seedlings showing healthy green shoots in some areas next to collapsed, water-soaked seedlings with discolored stems at soil level."
+    },
+    {
+      "path": "03.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Soil surface view showing standing water pooling in low areas of the seeded bed, indicating overwatering or poor drainage contributing to damping-off conditions."
+    },
+    {
+      "path": "04.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Pale yellowish patches amid emerging seedlings — yellowing and thinning consistent with nutrient deficiency in seedling stage or seedling decline from root rot."
+    }
+  ],
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "55101",
+    "yardSizeSqft": 4000,
+    "soilPh": 6.5,
+    "soilMoisture": "moist",
+    "areaType": "front",
+    "weatherSummary": "65 F, cloudy, cool and wet",
+    "notes": "Seeded 3 weeks ago with KBG. Germination started but some patches are collapsing. Have been watering 4-5 times daily to keep soil moist. Some yellow areas developing.",
+    "currentRoutine": "Watering very frequently — 4 to 5 times daily trying to keep the seed moist. No fertilizer applied yet to seedlings.",
+    "weatherData": {
+      "temp": 65,
+      "humidity": 78,
+      "condition": "Mostly Cloudy",
+      "recentRainfall": 1.5,
+      "forecast": [
+        { "day": "Today", "high": 67, "low": 52, "condition": "Mostly Cloudy", "chanceOfRain": 45 },
+        { "day": "Tomorrow", "high": 64, "low": 50, "condition": "Cloudy", "chanceOfRain": 55 },
+        { "day": "Day 3", "high": 66, "low": 51, "condition": "Partly Cloudy", "chanceOfRain": 30 },
+        { "day": "Day 4", "high": 68, "low": 52, "condition": "Partly Cloudy", "chanceOfRain": 25 },
+        { "day": "Day 5", "high": 70, "low": 53, "condition": "Mostly Sunny", "chanceOfRain": 15 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "kentucky_bluegrass",
+    "issues": ["overwatering", "nutrient_deficiency"],
+    "healthScoreRange": [40, 65],
+    "mustInclude": ["damping", "seedling"],
+    "mustNotInclude": [],
+    "photoNotes": "Four photos of a recently seeded KBG lawn with damping-off. Wide shot shows patchy germination with missing areas. Close-up reveals collapsed seedlings with water-soaked stems at the crown. Pooling water visible in low areas. Yellow patches suggest early nutrient deficiency or secondary root rot. Classic overwatering-induced damping-off presentation."
+  }
+}

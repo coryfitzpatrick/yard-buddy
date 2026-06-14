@@ -1,0 +1,57 @@
+{
+  "id": "dollar-spot-kbg",
+  "description": "Three photos documenting dollar spot (Clarireedia jacksonii) on Kentucky bluegrass in Kansas City KS. Tests correct disease identification and appropriate fungicide recommendations.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Wide-angle view of KBG lawn showing numerous small straw-colored circular spots roughly silver-dollar sized scattered across the turf."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of individual dollar spot lesions on KBG blades showing the characteristic bleached hourglass-shaped lesions with reddish-brown borders."
+    },
+    {
+      "path": "03.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Morning dew view showing white cottony mycelium webbing visible on affected patches — diagnostic for dollar spot under humid conditions."
+    }
+  ],
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "66101",
+    "yardSizeSqft": 4800,
+    "soilPh": 6.7,
+    "soilMoisture": "moist",
+    "areaType": "front",
+    "weatherSummary": "80 F, warm nights, morning dew daily",
+    "notes": "Small bleached spots about silver-dollar size appeared a week ago and are spreading. Noticed cottony webbing in the morning. Lawn has been low on nitrogen this season.",
+    "currentRoutine": "Mow at 3 inches weekly, water 3x per week in the morning. Light on fertilizer this year.",
+    "weatherData": {
+      "temp": 80,
+      "humidity": 75,
+      "condition": "Mostly Sunny",
+      "recentRainfall": 0.4,
+      "forecast": [
+        { "day": "Today", "high": 83, "low": 62, "condition": "Mostly Sunny", "chanceOfRain": 20 },
+        { "day": "Tomorrow", "high": 85, "low": 63, "condition": "Partly Cloudy", "chanceOfRain": 25 },
+        { "day": "Day 3", "high": 82, "low": 61, "condition": "Mostly Sunny", "chanceOfRain": 15 },
+        { "day": "Day 4", "high": 80, "low": 60, "condition": "Partly Cloudy", "chanceOfRain": 30 },
+        { "day": "Day 5", "high": 78, "low": 59, "condition": "Cloudy", "chanceOfRain": 40 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "kentucky_bluegrass",
+    "issues": ["fungus"],
+    "healthScoreRange": [60, 80],
+    "mustInclude": ["dollar spot"],
+    "mustNotInclude": [],
+    "photoNotes": "Three photos documenting dollar spot on KBG. Wide view shows numerous silver-dollar-sized straw-colored circular patches. Close-up confirms hourglass-shaped bleached lesions with reddish-brown borders on individual blades. Morning dew shot shows diagnostic white cottony mycelium webbing on affected patches."
+  }
+}

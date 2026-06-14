@@ -1,0 +1,51 @@
+{
+  "id": "grub-damage-multi",
+  "description": "Two photos documenting grub damage on Kentucky bluegrass in Indianapolis. Tests correct pest identification and appropriate curative grub treatment recommendations.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Wide view of KBG lawn showing irregular, spongy brown patches that pull up easily from the soil surface, with visible dead turf sections and surrounding healthy grass."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Pulled-back section of dead turf revealing white C-shaped Japanese beetle grub larvae at the soil-thatch interface, approximately 1 inch long."
+    }
+  ],
+  "profile": {
+    "grassType": "kentucky_bluegrass",
+    "zipCode": "46201",
+    "yardSizeSqft": 5200,
+    "soilPh": 6.6,
+    "soilMoisture": "moist",
+    "areaType": "back",
+    "weatherSummary": "78 F, partly cloudy, late summer",
+    "notes": "Large brown patches appeared in August. The dead sections pull up like carpet — no roots attached underneath. Found white grubs when I peeled back the turf.",
+    "currentRoutine": "Mow at 3 inches weekly, water twice a week. No grub preventive applied this year.",
+    "weatherData": {
+      "temp": 78,
+      "humidity": 58,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.2,
+      "forecast": [
+        { "day": "Today", "high": 80, "low": 62, "condition": "Partly Cloudy", "chanceOfRain": 20 },
+        { "day": "Tomorrow", "high": 82, "low": 63, "condition": "Sunny", "chanceOfRain": 10 },
+        { "day": "Day 3", "high": 79, "low": 61, "condition": "Mostly Sunny", "chanceOfRain": 15 },
+        { "day": "Day 4", "high": 77, "low": 60, "condition": "Partly Cloudy", "chanceOfRain": 25 },
+        { "day": "Day 5", "high": 75, "low": 58, "condition": "Cloudy", "chanceOfRain": 35 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "kentucky_bluegrass",
+    "issues": ["grubs", "bare_spots"],
+    "healthScoreRange": [40, 65],
+    "mustInclude": ["grub", "treat"],
+    "mustNotInclude": [],
+    "photoNotes": "Two photos showing classic grub damage on KBG. First photo shows irregular spongy brown patches with turf lifting freely from soil. Second photo confirms white C-shaped grub larvae at the soil surface — consistent with Japanese beetle or masked chafer grubs at late instar stage."
+  }
+}

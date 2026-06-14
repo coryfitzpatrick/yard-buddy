@@ -1,0 +1,52 @@
+{
+  "id": "healthy-tall-fescue-fall",
+  "description": "Two photos of a healthy tall fescue lawn in early fall in Raleigh NC. Tests that the AI gives appropriate fall maintenance guidance without inventing corrective issues.",
+  "photos": [
+    {
+      "path": "01.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Overhead view of uniformly green tall fescue lawn at 3.5-inch height with dense, clump-free coverage."
+    },
+    {
+      "path": "02.jpg",
+      "license": "extension-educational-use",
+      "source": "TBD-pending-photo-fetch",
+      "caption": "Close-up of tall fescue leaf blades showing healthy medium-green color and broad-bladed texture characteristic of tall fescue."
+    }
+  ],
+  "profile": {
+    "grassType": "tall_fescue",
+    "zipCode": "27601",
+    "yardSizeSqft": 4200,
+    "soilPh": 6.2,
+    "soilMoisture": "moist",
+    "areaType": "front",
+    "weatherSummary": "68 F, partly cloudy, early fall",
+    "notes": "Front yard, kept mowed at 3.5 inches, no problems noted. Lawn is coming out of summer well.",
+    "currentRoutine": "Mow weekly at 3.5 inches, water twice a week, planning fall overseeding touch-up in thin areas.",
+    "weatherData": {
+      "temp": 68,
+      "humidity": 55,
+      "condition": "Partly Cloudy",
+      "recentRainfall": 0.4,
+      "forecast": [
+        { "day": "Today", "high": 70, "low": 52, "condition": "Partly Cloudy", "chanceOfRain": 15 },
+        { "day": "Tomorrow", "high": 72, "low": 54, "condition": "Sunny", "chanceOfRain": 10 },
+        { "day": "Day 3", "high": 69, "low": 50, "condition": "Sunny", "chanceOfRain": 5 },
+        { "day": "Day 4", "high": 67, "low": 49, "condition": "Cloudy", "chanceOfRain": 30 },
+        { "day": "Day 5", "high": 65, "low": 48, "condition": "Partly Cloudy", "chanceOfRain": 20 }
+      ]
+    }
+  },
+  "dataGaps": [],
+  "groundTruth": {
+    "grassType": "tall_fescue",
+    "issues": ["healthy"],
+    "healthScoreRange": [80, 95],
+    "mustInclude": ["maintain", "mowing", "irrigation"],
+    "mustNotInclude": ["fungicide", "herbicide", "corrective", "this lawn has", "treat the"],
+    "photoNotes": "Two views of a healthy tall fescue lawn in early fall. Dense, uniform green coverage at appropriate mowing height. No visible disease, weeds, pest damage, or drought stress.",
+    "taskModeConstraint": ["maintenance", "improvement"]
+  }
+}
