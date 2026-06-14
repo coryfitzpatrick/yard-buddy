@@ -491,7 +491,10 @@ For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic wind
     .replace(/^[^[{]*/s, "")
     .trim();
   try {
-    return JSON.parse(cleaned) as AnalysisResult;
+    const result = JSON.parse(cleaned) as AnalysisResult;
+    const gaps = detectDataGaps(context);
+    result.dataGapWarning = buildDataGapWarning(gaps);
+    return result;
   } catch {
     throw new Error(`Claude returned non-JSON response: ${cleaned.slice(0, 300)}`);
   }
