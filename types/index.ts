@@ -64,6 +64,7 @@ export interface AnalysisResult {
   recommendations: RecommendationItem[];
   grassTypeDetected?: GrassType;
   confidence?: number;
+  dataGapWarning?: string | null;
 }
 
 export interface RecommendationItem {
