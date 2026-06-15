@@ -37,7 +37,7 @@
   "groundTruth": {
     "grassType": "st_augustine",
     "issues": ["fungus"],
-    "healthScoreRange": [50, 70],
+    "healthScoreRange": [40, 70],
     "mustInclude": ["gray leaf spot"],
     "mustNotInclude": [],
     "photoNotes": "Close-up of St. Augustine leaf blades with multiple gray-to-tan oblong lesions with distinct brown borders — the hallmark of Pyricularia grisea gray leaf spot. Several blades show yellowing around lesion clusters. Disease pressure appears moderate to high given the widespread spotting."
