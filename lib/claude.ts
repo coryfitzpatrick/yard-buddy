@@ -20,15 +20,27 @@ export function getLastCritiqueMetadata(): { critiqueFlags: string[]; revised: b
 export type DataGapField = 'soilPh' | 'grassType' | 'notes' | 'soilTest' | 'currentRoutine' | 'yardSizeSqft';
 
 export function detectDataGaps(context: LawnContext): DataGapField[] {
+  // Only flag CRITICAL fields that materially weaken the recommendation. Optional
+  // data like NPK values and current routine should not trigger phantom warnings
+  // when the rest of the profile is well-populated. Phase-1 image-judge finding:
+  // judge flagged unnecessary warnings on fully-populated scenarios.
   const gaps: DataGapField[] = [];
   if (context.soilPh == null) gaps.push('soilPh');
   if (!context.grassType || context.grassType === 'unknown') gaps.push('grassType');
   if (!context.notes || context.notes.trim().length < 8) gaps.push('notes');
-  if (context.nitrogenPpm == null && context.phosphorusPpm == null && context.potassiumPpm == null) {
+  if (!context.yardSizeSqft || context.yardSizeSqft <= 0) gaps.push('yardSizeSqft');
+  // soilTest only when soilPh is ALSO missing — a homeowner who shared pH did
+  // the basic test that matters for most recommendations.
+  if (context.soilPh == null &&
+      context.nitrogenPpm == null &&
+      context.phosphorusPpm == null &&
+      context.potassiumPpm == null) {
     gaps.push('soilTest');
   }
-  if (!context.currentRoutine || context.currentRoutine.trim().length < 8) gaps.push('currentRoutine');
-  if (!context.yardSizeSqft || context.yardSizeSqft <= 0) gaps.push('yardSizeSqft');
+  // currentRoutine only when 2+ other critical gaps already exist.
+  if ((!context.currentRoutine || context.currentRoutine.trim().length < 8) && gaps.length >= 2) {
+    gaps.push('currentRoutine');
+  }
   return gaps;
 }
 

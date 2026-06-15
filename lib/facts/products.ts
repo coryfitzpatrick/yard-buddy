@@ -245,4 +245,38 @@ export const PRODUCTS: Product[] = [
     notes:
       "FeEDTA — degrades above approximately pH 6.5 in soil. Do NOT recommend for high-pH soils; use FeEDDHA (e.g., Sequestar) above pH ~7.",
   },
+
+  // ── Insecticide / Fungicide product-name corrections (image-path R01 finding) ──
+  {
+    name: "Scotts GrubEx",
+    brand: "Scotts",
+    category: "insecticide",
+    activeIngredients: ["chlorantraniliprole"],
+    notes:
+      "Current Scotts GrubEx formulation uses CHLORANTRANILIPROLE (not trichlorfon). It is a PREVENTIVE grub product — apply May–July before egg hatch for season-long control. Do NOT recommend GrubEx as a curative for active late-stage grubs (curative = Dylox/trichlorfon, separate product). Do NOT cite GrubEx as a trichlorfon product — this is a common AI confusion.",
+  },
+  {
+    name: "Scotts DiseaseEx",
+    brand: "Scotts",
+    category: "fungicide",
+    activeIngredients: ["azoxystrobin"],
+    notes:
+      "DiseaseEx is a FUNGICIDE containing azoxystrobin (a QoI fungicide). Do NOT cite as bifenthrin (which is an insecticide in completely different products). Effective against brown patch, dollar spot, gray leaf spot at label rates.",
+  },
+  {
+    name: "Bonide Infuse Systemic Disease Control",
+    brand: "Bonide",
+    category: "fungicide",
+    activeIngredients: ["propiconazole"],
+    notes:
+      "Propiconazole is a DMI fungicide effective against brown patch, dollar spot, leaf spot, rust. PYTHIUM IS NOT A TRUE FUNGUS — it's an oomycete and propiconazole is INEFFECTIVE against Pythium blight. Do NOT recommend Bonide Infuse or propiconazole for Pythium control. For Pythium specifically, use mefenoxam (Subdue) or fosetyl-Al — those are oomycete-targeting actives.",
+  },
+  {
+    name: "BioAdvanced Fungus Control for Lawns",
+    brand: "BioAdvanced",
+    category: "fungicide",
+    activeIngredients: ["propiconazole"],
+    notes:
+      "Same active as Bonide Infuse (propiconazole). Same Pythium ineffectiveness — do NOT recommend for Pythium / damping-off. Effective against brown patch, dollar spot, rust.",
+  },
 ];

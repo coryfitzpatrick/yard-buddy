@@ -6,7 +6,9 @@ export type ProductCategory =
   | "pre-emergent"
   | "fertilizer"
   | "soil-acidifier"
-  | "iron";
+  | "iron"
+  | "insecticide"
+  | "fungicide";
 
 export type Product = {
   name: string;

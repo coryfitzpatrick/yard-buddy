@@ -10,7 +10,9 @@ type TopicHint =
   | "pre-emergent"
   | "fertilizer"
   | "soil-acidifier"
-  | "iron";
+  | "iron"
+  | "insecticide"
+  | "fungicide";
 
 function inferTopicHintsForFacts(profileText: string, notes: string | null | undefined): TopicHint[] {
   const text = `${profileText} ${notes ?? ""}`.toLowerCase();
@@ -25,6 +27,8 @@ function inferTopicHintsForFacts(profileText: string, notes: string | null | und
   if (/(fertiliz|nitrogen|n-p-k|npk|\bfeed\b)/.test(text)) hints.push("fertilizer");
   if (/(\bsulfur\b|acidify|high\s*ph|alkaline|calcareous|sodic)/.test(text)) hints.push("soil-acidifier");
   if (/(\biron\b|chlorosis|yellow|eddha|edta|fe.{0,3}chelate)/.test(text)) hints.push("iron");
+  if (/(grub|chinch|billbug|sod\s*webworm|armyworm|grubex|insect|larva)/.test(text)) hints.push("insecticide");
+  if (/(brown\s*patch|dollar\s*spot|gray\s*leaf|leaf\s*spot|pythium|fungus|fungic|rust|red\s*thread|snow\s*mold|disease|patch)/.test(text)) hints.push("fungicide");
   return hints;
 }
 
@@ -58,6 +62,8 @@ function formatProduct(p: Product): string {
   } else if (p.category === "fertilizer" && p.bannedFor?.length) {
     bits.push(`(BANNED for ${p.bannedFor.join(", ")})`);
   } else if ((p.category === "soil-acidifier" || p.category === "iron") && p.activeIngredients) {
+    bits.push(`(${p.activeIngredients.join(", ")})`);
+  } else if ((p.category === "insecticide" || p.category === "fungicide") && p.activeIngredients) {
     bits.push(`(${p.activeIngredients.join(", ")})`);
   }
   let line = bits.join(" ");
