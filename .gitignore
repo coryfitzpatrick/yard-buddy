@@ -49,3 +49,13 @@ coverage/
 # Validation results
 scripts/validation/results/*.json
 !scripts/validation/results/baseline.json
+
+# Claude Code local-only files (contains permission allowlist that may cache credentials)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# Superpowers brainstorm runtime state (PID files, server logs)
+.superpowers/brainstorm/*/state/
+
+# Backup files
+*.bak

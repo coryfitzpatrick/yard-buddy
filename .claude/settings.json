@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p *)",
+      "Bash(curl -sL *)",
+      "Bash(curl -s -L *)",
+      "Bash(curl -L *)",
+      "Bash(sips -Z *)",
+      "Bash(vercel env ls *)",
+      "Bash(vercel whoami)",
+      "Bash(vercel integration list *)",
+      "Bash(vercel integration guide *)",
+      "Bash(vercel integration discover *)",
+      "Bash(npm run validate *)"
+    ]
+  }
+}

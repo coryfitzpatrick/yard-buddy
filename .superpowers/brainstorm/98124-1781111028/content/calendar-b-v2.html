@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9fafb; margin: 0; padding: 24px; color: #111; }
+  .wrap { max-width: 860px; margin: 0 auto; background: white; border-radius: 16px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+
+  /* toolbar */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #e5e7eb; gap: 12px; flex-wrap: wrap; background: white; }
+  .filters { display: flex; gap: 8px; }
+  select { font-size: 13px; border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 28px 6px 10px; background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 8px center; -webkit-appearance: none; color: #374151; cursor: pointer; }
+  .nav { display: flex; align-items: center; gap: 10px; }
+  .nav button { border: 1px solid #d1d5db; background: white; border-radius: 8px; width: 32px; height: 32px; font-size: 14px; cursor: pointer; color: #374151; display: flex; align-items: center; justify-content: center; }
+  .nav button:hover { background: #f3f4f6; }
+  .month-label { font-size: 15px; font-weight: 600; color: #111827; min-width: 120px; text-align: center; }
+
+  /* calendar grid */
+  .cal { width: 100%; border-collapse: collapse; }
+  .day-headers { display: grid; grid-template-columns: repeat(7, 1fr); background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+  .day-header { text-align: center; padding: 8px 4px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .3px; }
+
+  /* week rows */
+  .week { border-bottom: 1px solid #f3f4f6; }
+  .week:last-child { border-bottom: none; }
+  .day-nums { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .day-num { padding: 8px 10px 4px; font-size: 13px; color: #374151; min-height: 32px; }
+  .day-num.other-month { color: #d1d5db; }
+  .day-num.today { font-weight: 700; color: #16a34a; }
+  .day-num.today span { background: #dcfce7; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; }
+
+  /* task bars layer */
+  .tasks-layer { padding: 2px 4px 8px; display: flex; flex-direction: column; gap: 3px; position: relative; }
+  .task-row { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .task-bar { border-radius: 5px; padding: 3px 10px; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity .15s; }
+  .task-bar:hover { opacity: .85; }
+  .task-bar .range { font-weight: 400; font-size: 11px; opacity: .65; margin-left: 4px; }
+  .empty-week { padding: 6px 10px 10px; font-size: 12px; color: #d1d5db; font-style: italic; }
+
+  /* colors */
+  .green  { background: #dcfce7; color: #15803d; }
+  .blue   { background: #dbeafe; color: #1d4ed8; }
+  .yellow { background: #fef9c3; color: #854d0e; }
+  .purple { background: #f3e8ff; color: #7c3aed; }
+  .red    { background: #fee2e2; color: #991b1b; }
+  .gray   { background: #f3f4f6; color: #6b7280; }
+
+  h2 { margin: 0 0 4px; font-size: 18px; }
+  .sub { color: #6b7280; font-size: 13px; margin: 0 0 16px; }
+</style>
+</head>
+<body>
+
+<h2>Calendar — Month View</h2>
+<p class="sub">Tasks span their full date window. Yard + section filters at top left.</p>
+
+<div class="wrap">
+
+  <div class="toolbar">
+    <div class="filters">
+      <select>
+        <option>All Yards</option>
+        <option>Front Yard</option>
+        <option>Back Yard</option>
+      </select>
+      <select>
+        <option>All Sections</option>
+        <option>Main Lawn</option>
+        <option>Side Garden</option>
+      </select>
+    </div>
+    <div class="nav">
+      <button>‹</button>
+      <span class="month-label">April 2026</span>
+      <button>›</button>
+    </div>
+  </div>
+
+  <div class="day-headers">
+    <div class="day-header">Sun</div>
+    <div class="day-header">Mon</div>
+    <div class="day-header">Tue</div>
+    <div class="day-header">Wed</div>
+    <div class="day-header">Thu</div>
+    <div class="day-header">Fri</div>
+    <div class="day-header">Sat</div>
+  </div>
+
+  <!-- Week 1: Mar 29 – Apr 4 -->
+  <div class="week">
+    <div class="day-nums">
+      <div class="day-num other-month">29</div>
+      <div class="day-num other-month">30</div>
+      <div class="day-num other-month">31</div>
+      <div class="day-num">1</div>
+      <div class="day-num">2</div>
+      <div class="day-num">3</div>
+      <div class="day-num">4</div>
+    </div>
+    <div class="tasks-layer">
+      <!-- Pre-emergent Apr 1–4 = starts col 4 (Wed), spans 4 cols -->
+      <div class="task-row">
+        <div></div><div></div><div></div>
+        <div class="task-bar green" style="grid-column:span 4;">🌱 Pre-emergent <span class="range">Apr 1–6 →</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week 2: Apr 5–11 -->
+  <div class="week">
+    <div class="day-nums">
+      <div class="day-num">5</div>
+      <div class="day-num">6</div>
+      <div class="day-num">7</div>
+      <div class="day-num">8</div>
+      <div class="day-num">9</div>
+      <div class="day-num">10</div>
+      <div class="day-num">11</div>
+    </div>
+    <div class="tasks-layer">
+      <!-- Pre-emergent continues full row Apr 5–6 -->
+      <div class="task-row">
+        <div class="task-bar green" style="grid-column:span 2; border-radius: 0 5px 5px 0;">← Apr 1–6</div>
+        <div></div><div></div><div></div><div></div><div></div>
+      </div>
+      <!-- Fertilize Apr 5–11 full week -->
+      <div class="task-row">
+        <div class="task-bar blue" style="grid-column:span 7;">💧 Fertilize <span class="range">Apr 5–11</span></div>
+      </div>
+      <!-- Weed control Apr 8–11 -->
+      <div class="task-row">
+        <div></div><div></div><div></div>
+        <div class="task-bar yellow" style="grid-column:span 4;">🌿 Weed control <span class="range">Apr 8–11</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week 3: Apr 12–18 -->
+  <div class="week">
+    <div class="day-nums">
+      <div class="day-num">12</div>
+      <div class="day-num">13</div>
+      <div class="day-num">14</div>
+      <div class="day-num today"><span>15</span></div>
+      <div class="day-num">16</div>
+      <div class="day-num">17</div>
+      <div class="day-num">18</div>
+    </div>
+    <div class="tasks-layer">
+      <!-- Aerate Apr 13–17 -->
+      <div class="task-row">
+        <div></div>
+        <div class="task-bar purple" style="grid-column:span 5;">✂️ Aerate &amp; dethatch <span class="range">Apr 13–17</span></div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week 4: Apr 19–25 -->
+  <div class="week">
+    <div class="day-nums">
+      <div class="day-num">19</div>
+      <div class="day-num">20</div>
+      <div class="day-num">21</div>
+      <div class="day-num">22</div>
+      <div class="day-num">23</div>
+      <div class="day-num">24</div>
+      <div class="day-num">25</div>
+    </div>
+    <div class="empty-week">No tasks scheduled</div>
+  </div>
+
+  <!-- Week 5: Apr 26–May 2 -->
+  <div class="week">
+    <div class="day-nums">
+      <div class="day-num">26</div>
+      <div class="day-num">27</div>
+      <div class="day-num">28</div>
+      <div class="day-num">29</div>
+      <div class="day-num">30</div>
+      <div class="day-num other-month">1</div>
+      <div class="day-num other-month">2</div>
+    </div>
+    <div class="tasks-layer">
+      <div class="task-row">
+        <div class="task-bar red" style="grid-column:span 5;">🌾 Overseed bare patches <span class="range">Apr 26–30</span></div>
+        <div></div><div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="text-align:center;font-size:12px;color:#9ca3af;margin-top:12px;">Today highlighted in green · Bars continue across week rows with arrows · Click a task to view details</p>
+
+</body>
+</html>

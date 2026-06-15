@@ -1,0 +1,145 @@
+<h2>Calendar — Month View</h2>
+<p class="subtitle">Tasks span their full date range as bars. Yard filter at top. Does this feel right?</p>
+
+<div class="mockup">
+  <div class="mockup-header">Calendar — April 2026</div>
+  <div class="mockup-body" style="padding:0;">
+
+    <!-- Filter + Nav bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #e5e7eb;gap:12px;flex-wrap:wrap;">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select style="font-size:13px;border:1px solid #d1d5db;border-radius:8px;padding:6px 10px;background:white;color:#374151;cursor:pointer;">
+          <option>All Yards</option>
+          <option>Front Yard</option>
+          <option>Back Yard</option>
+        </select>
+        <select style="font-size:13px;border:1px solid #d1d5db;border-radius:8px;padding:6px 10px;background:white;color:#374151;cursor:pointer;">
+          <option>All Sections</option>
+          <option>Main Lawn</option>
+          <option>Garden Bed</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button style="border:1px solid #d1d5db;background:white;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;color:#374151;">◀</button>
+        <span style="font-size:14px;font-weight:600;color:#111827;min-width:110px;text-align:center;">April 2026</span>
+        <button style="border:1px solid #d1d5db;background:white;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;color:#374151;">▶</button>
+      </div>
+    </div>
+
+    <!-- Day headers -->
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);background:#f9fafb;border-bottom:1px solid #e5e7eb;">
+      <div style="text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:#6b7280;">Sun</div>
+      <div style="text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:#6b7280;">Mon</div>
+      <div style="text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:#6b7280;">Tue</div>
+      <div style="text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:#6b7280;">Wed</div>
+      <div style="text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:#6b7280;">Thu</div>
+      <div style="text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:#6b7280;">Fri</div>
+      <div style="text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:#6b7280;">Sat</div>
+    </div>
+
+    <!-- Week rows with spanning task bars -->
+    <!-- Week 1: Mar 29 – Apr 4 -->
+    <div style="border-bottom:1px solid #f3f4f6;">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);">
+        <div style="padding:6px 6px 2px;font-size:12px;color:#9ca3af;min-height:28px;">29</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#9ca3af;">30</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#9ca3af;">31</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;font-weight:600;">1</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">2</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">3</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">4</div>
+      </div>
+      <!-- Task bar spanning Apr 1–6 (starts day 4 of 7 grid) -->
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:0 2px 6px;">
+        <div></div><div></div><div></div>
+        <div style="grid-column:span 4;background:#dcfce7;border-radius:4px;padding:3px 8px;font-size:11px;color:#15803d;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          🌱 Pre-emergent &nbsp;<span style="font-weight:400;opacity:.7;">Apr 1–6</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Week 2: Apr 5–11 -->
+    <div style="border-bottom:1px solid #f3f4f6;">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);">
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">5</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">6</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">7</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">8</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">9</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">10</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">11</div>
+      </div>
+      <!-- Fertilize bar Apr 5–11 (full week) -->
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:0 2px 4px;">
+        <div style="grid-column:span 7;background:#dbeafe;border-radius:4px;padding:3px 8px;font-size:11px;color:#1d4ed8;font-weight:500;">
+          💧 Fertilize &nbsp;<span style="font-weight:400;opacity:.7;">Apr 5–11</span>
+        </div>
+      </div>
+      <!-- Weed control Apr 8–11 -->
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:0 2px 6px;">
+        <div></div><div></div><div></div>
+        <div style="grid-column:span 4;background:#fef9c3;border-radius:4px;padding:3px 8px;font-size:11px;color:#854d0e;font-weight:500;">
+          🌿 Weed control &nbsp;<span style="font-weight:400;opacity:.7;">Apr 8–11</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Week 3: Apr 12–18 -->
+    <div style="border-bottom:1px solid #f3f4f6;">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);">
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">12</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">13</div>
+        <div style="padding:6px 6px 2px;font-size:12px;font-weight:700;color:#16a34a;background:#f0fdf4;border-radius:50%;width:20px;text-align:center;">14</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">15</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">16</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">17</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">18</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:0 2px 6px;">
+        <div></div>
+        <div style="grid-column:span 5;background:#f3e8ff;border-radius:4px;padding:3px 8px;font-size:11px;color:#7c3aed;font-weight:500;">
+          ✂️ Aerate &amp; dethatch &nbsp;<span style="font-weight:400;opacity:.7;">Apr 13–17</span>
+        </div>
+        <div></div>
+      </div>
+    </div>
+
+    <!-- Week 4: Apr 19–25 -->
+    <div style="border-bottom:1px solid #f3f4f6;">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);">
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">19</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">20</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">21</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">22</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">23</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">24</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">25</div>
+      </div>
+      <div style="padding:0 4px 6px;font-size:11px;color:#9ca3af;font-style:italic;">No tasks this week</div>
+    </div>
+
+    <!-- Week 5: Apr 26–30 -->
+    <div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);">
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">26</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">27</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">28</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">29</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#111827;">30</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#9ca3af;">1</div>
+        <div style="padding:6px 6px 2px;font-size:12px;color:#9ca3af;">2</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:0 2px 6px;">
+        <div style="grid-column:span 5;background:#fee2e2;border-radius:4px;padding:3px 8px;font-size:11px;color:#991b1b;font-weight:500;">
+          🌿 Overseed bare patches &nbsp;<span style="font-weight:400;opacity:.7;">Apr 26–30</span>
+        </div>
+        <div></div><div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="margin-top:12px;font-size:12px;color:#6b7280;text-align:center;">
+  Today is highlighted · Task bars show full date window · Click a task to view details
+</div>
