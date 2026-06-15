@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-const LOGO_SRC = "/yard-analyzer-logo.png";
+const LOGO_SRC = "/yard-analyzer-logo-v2.png";
 const LOGO_INTRINSIC_WIDTH = 200;
 const LOGO_INTRINSIC_HEIGHT = 310;
 
