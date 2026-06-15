@@ -1,15 +1,15 @@
-# Yard Analyzer — Session Handoff (last updated 2026-06-15)
+# Yard Analyzer — Session Handoff (last updated 2026-06-15, session 2 end)
 
 ## Quick state summary
-
-Two validation suites now live, exercising the two homeowner-facing entry points:
 
 | Suite | Path | Sonnet mean | Opus mean | Status |
 |---|---|---|---|---|
 | **Text** (`generateRecommendations`) | `npm run validate` | 87.5 (R44) | **91.3** (R36) | 90+ releasable, not yet 95+ |
-| **Image** (`analyzeImages` / `analyzeImagesBase64`) | `npm run validate:image` | **84.8** (R04) | **84.5** (R05) | mostly-trustworthy, not yet releasable |
+| **Image** (`analyzeImages` / `analyzeImagesBase64`) | `npm run validate:image` | **93.9** | **93.3** | **releasable**, climbing toward 95+ |
 
-The text path was tuned over R26–R45 to its current state. The image path was newly built in this session (R01–R05) and is now on the same measured-iteration loop. See sections below for per-path detail.
+This session lifted the image path from R05 84.5 → 93.3 Opus (+8.8) via RAG wire-up, prompt rules, ground-truth realignments, photo swaps, and a photo-first diagnostic priority rule.
+
+**Detailed image-path handoff:** see `docs/image-validation-handoff.md` for the full work log, per-scenario state, prompt anatomy, known P2 failures, cost reference, and next-session execution plan.
 
 ---
 
