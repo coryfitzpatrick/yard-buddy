@@ -1,30 +1,30 @@
 {
   "id": "partial-data-worstcase",
-  "description": "Four photos of a lawn in Columbus OH where the homeowner provided only a ZIP code — no grass type, no soil test, no notes, no routine. Tests that the AI acknowledges all data gaps, leads with grass type identification, frames all recommendations as general guidance, and recommends a soil test.",
+  "description": "Four photos of a mostly-healthy lawn in Columbus OH where the homeowner provided only a ZIP code — no grass type, no soil test, no notes, no routine. Photos show mature green canopy with a visibly unmowed weedy edge in one shot. Tests that the AI acknowledges all data gaps, leads with grass type identification, frames recommendations as general guidance, recommends a soil test, and identifies the dominant visible issue (the unmowed weedy edge) without inventing speculative pathogens.",
   "photos": [
     {
       "path": "01.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Wide view of a lawn with mixed coloring — some pale yellow-green patches and areas of wilted, dull foliage suggesting nutrient deficiency or drought stress."
+      "caption": "Wide view of mature, mostly-green lawn canopy with scattered light tip browning and faint yellow flecks but no clear pathology pattern."
     },
     {
       "path": "02.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Close-up of grass blades showing yellowing and interveinal chlorosis pattern consistent with nutrient deficiency, grass type uncertain from photo."
+      "caption": "Close-up of a healthy uniform green canopy with subtle yellowing toward the bottom edge; grass species not clearly identifiable."
     },
     {
       "path": "03.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Section of lawn showing dull gray-green wilted blades with footprint persistence indicating moisture stress."
+      "caption": "Unmowed lawn edge at a curb/wall transition with visibly tall weed stems and seed heads emerging above the regular canopy."
     },
     {
       "path": "04.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Broader lawn view showing uneven coloring and patchy distribution of pale areas without clear pest or disease lesion patterns."
+      "caption": "Overhead view of mature green canopy with subtle uneven coloring and a slightly thinner center but no clear disease, pest, or drought lesion patterns."
     }
   ],
   "profile": {
@@ -47,10 +47,10 @@
   "dataGaps": ["grassType", "soilPh", "notes", "soilTest", "currentRoutine"],
   "groundTruth": {
     "grassType": "unknown",
-    "issues": ["nutrient_deficiency", "drought_stress"],
-    "healthScoreRange": [50, 80],
+    "issues": ["weed_pressure"],
+    "healthScoreRange": [65, 85],
     "mustInclude": ["soil test", "grass"],
     "mustNotInclude": [],
-    "photoNotes": "Four photos of an unidentified lawn species in Columbus OH showing yellowing and chlorosis consistent with nutrient deficiency, plus wilting and footprint persistence indicating drought stress. Grass type cannot be confirmed from photos alone — blades appear medium-width but definitive species identification requires more context. No clear disease lesions or pest damage visible."
+    "photoNotes": "Four photos of an unidentified lawn species in Columbus OH. The canopy in photos 1, 2, and 4 is mature and largely green with only minor color variation and faint yellow flecks — no clear disease lesions, pest damage, or alarming chlorosis pattern. Photo 3 shows an unmowed weedy edge at a curb/wall boundary with tall weed stems going to seed — this is the dominant visible issue. Grass type cannot be confirmed from photos alone. The lawn is mostly healthy with weed pressure at the edge as the actionable concern."
   }
 }

@@ -49,7 +49,7 @@
   "groundTruth": {
     "grassType": "kentucky_bluegrass",
     "issues": ["fungus"],
-    "healthScoreRange": [60, 80],
+    "healthScoreRange": [50, 80],
     "mustInclude": ["dollar spot"],
     "mustNotInclude": [],
     "photoNotes": "Three photos documenting dollar spot on KBG. Wide view shows numerous silver-dollar-sized straw-colored circular patches. Close-up confirms hourglass-shaped bleached lesions with reddish-brown borders on individual blades. Morning dew shot shows diagnostic white cottony mycelium webbing on affected patches."

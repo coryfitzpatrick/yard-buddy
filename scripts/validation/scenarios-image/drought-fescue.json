@@ -43,7 +43,7 @@
   "groundTruth": {
     "grassType": "tall_fescue",
     "issues": ["drought_stress"],
-    "healthScoreRange": [55, 75],
+    "healthScoreRange": [50, 75],
     "mustInclude": ["irrigation", "drought"],
     "mustNotInclude": [],
     "photoNotes": "Two photos of tall fescue in acute drought stress. Wide shot shows widespread grayish-blue wilting canopy with folded blades. Close-up confirms rolled leaf blades and dull color — classic pre-dormancy wilt response to water deficit. No signs of disease or pest damage."

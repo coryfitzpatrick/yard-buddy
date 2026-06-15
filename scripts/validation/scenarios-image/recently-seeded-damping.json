@@ -1,30 +1,30 @@
 {
   "id": "recently-seeded-damping",
-  "description": "Four photos of a recently seeded KBG lawn in St. Paul MN showing damping-off symptoms from overwatering. Tests that the AI recognizes seedling damping-off, avoids pre-emergent/post-emergent herbicide recommendations, and addresses overwatering as the primary cause.",
+  "description": "Four photos for a homeowner overseeding a KBG front yard in St. Paul MN. One close-up shows clear damping-off / fungal mycelium on collapsed grass blades. The remaining photos show the established backyard turf elsewhere on the property, which is largely healthy. Tests that the AI recognizes the visible damping-off, addresses the homeowner-noted overwatering routine (4-5x daily), avoids herbicide recommendations on a seeded area, and does not over-extrapolate the disease to areas where it is not visible.",
   "photos": [
     {
       "path": "01.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Wide view of a recently seeded lawn with patchy germination — some areas with emerging green seedlings alongside sections with collapsed or absent seedlings."
+      "caption": "Close-up of established lawn showing visible white cottony fungal mycelium on collapsed brown grass blades at soil level — classic damping-off / fungal disease presentation."
     },
     {
       "path": "02.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Close-up of newly germinated KBG seedlings showing healthy green shoots in some areas next to collapsed, water-soaked seedlings with discolored stems at soil level."
+      "caption": "Wide view of healthy uniform green established turf elsewhere on the property — no visible seedlings, lesions, or disease pressure."
     },
     {
       "path": "03.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Soil surface view showing standing water pooling in low areas of the seeded bed, indicating overwatering or poor drainage contributing to damping-off conditions."
+      "caption": "Established lawn with shadow patterns across the canopy — turf appears healthy and uniformly green, no visible standing water or seedling-stage damage."
     },
     {
       "path": "04.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Pale yellowish patches amid emerging seedlings — yellowing and thinning consistent with nutrient deficiency in seedling stage or seedling decline from root rot."
+      "caption": "Backyard landscape view showing established lawn, mature trees, and house — overall property context shot; turf is mature and not freshly seeded in this frame."
     }
   ],
   "profile": {
@@ -54,10 +54,10 @@
   "dataGaps": [],
   "groundTruth": {
     "grassType": "kentucky_bluegrass",
-    "issues": ["overwatering", "nutrient_deficiency"],
-    "healthScoreRange": [40, 65],
+    "issues": ["damping_off", "overwatering"],
+    "healthScoreRange": [40, 75],
     "mustInclude": ["damping", "seedling"],
     "mustNotInclude": [],
-    "photoNotes": "Four photos of a recently seeded KBG lawn with damping-off. Wide shot shows patchy germination with missing areas. Close-up reveals collapsed seedlings with water-soaked stems at the crown. Pooling water visible in low areas. Yellow patches suggest early nutrient deficiency or secondary root rot. Classic overwatering-induced damping-off presentation."
+    "photoNotes": "Four photos for a homeowner who is overseeding a KBG front yard. Photo 1 shows the dominant visible problem — clear white cottony fungal mycelium / damping-off on collapsed grass blades. Photos 2, 3, 4 show the established turf elsewhere on the property and look largely healthy and uniformly green. The homeowner's notes (watering 4-5x daily on the seeded area) describe the overwatering cause that should also be addressed. A wide health score range is acceptable: a focus on the diseased seedling area can put healthScore in the 40-50 range, while integrating the largely-healthy established turf can put it in the 60-75 range — both are defensible reads of this 4-photo set."
   }
 }

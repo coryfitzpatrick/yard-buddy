@@ -1,30 +1,30 @@
 {
   "id": "mixed-issue-lawn",
-  "description": "Four photos of a KBG lawn in Columbus OH showing multiple simultaneous issues: fungal disease, pest damage, and bare spots. Tests the AI's ability to synthesize and prioritize across multiple problems.",
+  "description": "Four photos for a homeowner in Columbus OH reporting multiple lawn concerns. The submitted photos show: (1) a back-yard wide view with healthy green canopy and visible mowing stripes, (2) a healthy canopy close-up with minor tip browning, (3) a macro/extension ID photo of insects (chinch-bug nymphs or aphids) on a leaf, (4) a separate manicured back-yard view of a healthy striped lawn. Tests that the AI honestly reads what's visible (mostly healthy + visible insect pressure from the ID photo) rather than confabulating fungal or bare-spot issues that aren't in the photos. The homeowner's notes describe more problems than the photos support — the AI should address the notes-described issues conditionally while sticking to photo-evident diagnosis.",
   "photos": [
     {
       "path": "01.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Front yard wide-angle showing irregular brown patches interspersed with areas of thinning and bare soil, and a circular fungal ring in the upper-right quadrant."
+      "caption": "Wide back-yard view showing a largely healthy green canopy with visible mowing stripes — fall leaves scattered across the surface but no clear bare patches, fungal rings, or insect damage in this frame."
     },
     {
       "path": "02.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Close-up of a bare patch area where turf has thinned and died, with chewed or ragged grass blade ends visible at the patch margins suggesting surface insect feeding."
+      "caption": "Close-up of healthy KBG canopy with minor tip browning — no clear fungal lesions, ragged feeding damage, or bare soil in this frame."
     },
     {
       "path": "03.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Close-up of circular fungal lesion on KBG blades — tan spots with distinct borders, consistent with dollar spot or early brown patch symptoms."
+      "caption": "Macro / extension identification photo of multiple insect pests (chinch-bug nymphs or aphids) on a grass blade — confirms in-canopy insect pressure as a real concern."
     },
     {
       "path": "04.jpg",
       "license": "extension-educational-use",
       "source": "TBD-pending-photo-fetch",
-      "caption": "Back yard view showing separate bare spots with no thatch layer and compacted-looking soil surface in multiple locations."
+      "caption": "Separate back-yard view of a manicured striped lawn — healthy green canopy with no visible bare spots or disease lesions in this frame."
     }
   ],
   "profile": {
@@ -54,10 +54,10 @@
   "dataGaps": [],
   "groundTruth": {
     "grassType": "kentucky_bluegrass",
-    "issues": ["fungus", "pests", "bare_spots"],
-    "healthScoreRange": [50, 70],
-    "mustInclude": ["front", "back"],
+    "issues": ["pests"],
+    "healthScoreRange": [50, 80],
+    "mustInclude": ["pest"],
     "mustNotInclude": [],
-    "photoNotes": "Four photos showing a KBG lawn with multiple concurrent issues. Front yard wide shot shows circular fungal lesions alongside irregular bare patches. Second photo shows ragged blade edges suggesting insect feeding. Third photo confirms fungal lesions on individual blades. Back yard shot shows separate bare spots with compacted soil. Cross-photo synthesis required to triage all three issue types."
+    "photoNotes": "Four photos with mixed content. Photos 1, 2, and 4 show largely healthy KBG canopy with no clear fungal lesions, bare patches, or insect feeding damage visible. Photo 3 is a macro/extension ID image confirming insect (chinch-bug nymph or aphid) pressure on a leaf — the one clearly diagnosable photo-evident issue. The homeowner's notes describe more problems than the photos support; the AI should diagnose only what's visible (insect pressure + mostly healthy lawn) and frame note-described concerns conditionally. A correct read here lists 'pests' as the primary issue and keeps healthScore in the upper-middle range reflecting the healthy canopy."
   }
 }
