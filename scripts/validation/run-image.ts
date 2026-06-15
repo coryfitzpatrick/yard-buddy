@@ -32,8 +32,19 @@ function meanByKey(results: ImageJudgeResult[], key: keyof Omit<ImageJudgeResult
   return Math.round((values.reduce((s, v) => s + v, 0) / values.length) * 10) / 10;
 }
 
+function parseScenariosFilter(argv: string[]): Set<string> | null {
+  const idx = argv.indexOf("--scenarios");
+  if (idx === -1 || idx === argv.length - 1) return null;
+  const ids = argv[idx + 1]
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return ids.length === 0 ? null : new Set(ids);
+}
+
 async function main() {
   const smokeOnly = process.argv.includes("--smoke");
+  const scenariosFilter = parseScenariosFilter(process.argv);
   const date = new Date().toISOString().slice(0, 10);
   console.log(`\nYard Analyzer IMAGE-PATH Validation Report - ${date}`);
   console.log("-".repeat(60));
@@ -42,6 +53,16 @@ async function main() {
   if (smokeOnly) {
     scenarios = scenarios.filter((s) => s.id === "healthy-kbg-front").slice(0, 1);
     console.log(`SMOKE MODE: running 1 scenario only`);
+  } else if (scenariosFilter) {
+    const all = new Set(scenarios.map((s) => s.id));
+    const missing = [...scenariosFilter].filter((id) => !all.has(id));
+    if (missing.length > 0) {
+      console.error(`Unknown scenario id(s): ${missing.join(", ")}`);
+      console.error(`Available: ${[...all].sort().join(", ")}`);
+      process.exit(1);
+    }
+    scenarios = scenarios.filter((s) => scenariosFilter.has(s.id));
+    console.log(`SCENARIOS FILTER: ${[...scenariosFilter].join(", ")}`);
   }
   console.log(`Loaded ${scenarios.length} image scenarios\n`);
 
