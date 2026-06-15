@@ -539,6 +539,23 @@ ADDITIONAL CONTEXT FOR JSON RESPONSE:
 You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.`
     : buildSystemPrompt(context.grassType);
 
+  const scenarioText = [
+    `Grass type: ${context.grassType}`,
+    `ZIP: ${context.zipCode}`,
+    context.soilPh != null ? `Soil pH: ${context.soilPh}` : "",
+    context.soilMoisture ? `Soil moisture: ${context.soilMoisture}` : "",
+    context.weatherSummary ?? "",
+    context.notes ?? "",
+    context.currentRoutine ?? "",
+  ].filter(Boolean).join("\n");
+  const ragChunks = retrieveRelevant({
+    grassType: context.grassType,
+    scenarioText,
+    topicHints: inferTopicHints(scenarioText, context.notes ?? null),
+    k: 3,
+  });
+  const ragBlock = formatChunksForPrompt(ragChunks);
+
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
@@ -551,7 +568,7 @@ You must return valid JSON only — no markdown, no code fences, no explanation 
           {
             type: "text" as const,
             text: `Analyze this lawn from the photos. Return the same JSON structure used by analyzeImages.
-
+${ragBlock ? `\n${ragBlock}` : ""}
 Context:
 - Grass Type: ${context.grassType.replace(/_/g, " ")}
 - ZIP Code: ${context.zipCode}
