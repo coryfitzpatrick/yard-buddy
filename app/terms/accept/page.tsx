@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import { Logo } from "@/components/Logo";
 
 export default function AcceptTermsPage() {
   const router = useRouter();
@@ -30,7 +30,7 @@ export default function AcceptTermsPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
         <Link href="/" className="flex items-center gap-1">
-          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={28} height={28} className="rounded-full scale-x-[-1]" />
+          <Logo className="h-7 w-auto" />
           <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
       </nav>

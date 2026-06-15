@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
 
 export const metadata = { title: "Terms of Use – Yard Analyzer" };
@@ -9,7 +9,7 @@ export default function TermsPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
         <Link href="/" className="flex items-center gap-1">
-          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={28} height={28} className="rounded-full scale-x-[-1]" />
+          <Logo className="h-7 w-auto" />
           <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
       </nav>

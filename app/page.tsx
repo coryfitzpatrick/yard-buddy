@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { WhyYardAnalyzer } from "@/components/home/WhyYardAnalyzer";
@@ -19,7 +19,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-1">
-          <Image src="/gnome-buddy.png" alt="Yard Analyzer" width={32} height={32} className="rounded-full scale-x-[-1]" />
+          <Logo className="h-8 w-auto" />
           <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
         </div>
         <div className="flex gap-2">
