@@ -6,12 +6,14 @@ import { Footer } from "@/components/Footer";
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-emerald-100">
-      <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full">
-        <Link href="/" className="flex items-center gap-1">
-          <Logo className="h-8 w-auto" />
-          <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
-        </Link>
-        <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+          <Link href="/" className="flex items-center gap-1">
+            <Logo className="h-8 w-auto" />
+            <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
+          </Link>
+          <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
+        </div>
       </nav>
       <div className="flex-1 flex items-center justify-center p-4">
         {children}

@@ -17,15 +17,17 @@ const FEATURES = [
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
-      <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
-        <div className="flex items-center gap-1">
-          <Logo className="h-8 w-auto" />
-          <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
-        </div>
-        <div className="flex gap-2">
-          <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
-          <Link href="/login"><Button variant="ghost">Sign in</Button></Link>
-          <Link href="/register"><Button className="bg-green-600 hover:bg-green-700">Get started free</Button></Link>
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+          <div className="flex items-center gap-1">
+            <Logo className="h-8 w-auto" />
+            <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
+            <Link href="/login"><Button variant="ghost">Sign in</Button></Link>
+            <Link href="/register"><Button className="bg-green-600 hover:bg-green-700">Get started free</Button></Link>
+          </div>
         </div>
       </nav>
       <div className="max-w-4xl mx-auto px-6 pt-20 pb-10 text-center">
