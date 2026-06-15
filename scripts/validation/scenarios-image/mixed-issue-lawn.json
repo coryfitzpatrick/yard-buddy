@@ -1,30 +1,30 @@
 {
   "id": "mixed-issue-lawn",
-  "description": "Four photos for a homeowner in Columbus OH reporting multiple lawn concerns. The submitted photos show: (1) a back-yard wide view with healthy green canopy and visible mowing stripes, (2) a healthy canopy close-up with minor tip browning, (3) a macro/extension ID photo of insects (chinch-bug nymphs or aphids) on a leaf, (4) a separate manicured back-yard view of a healthy striped lawn. Tests that the AI honestly reads what's visible (mostly healthy + visible insect pressure from the ID photo) rather than confabulating fungal or bare-spot issues that aren't in the photos. The homeowner's notes describe more problems than the photos support — the AI should address the notes-described issues conditionally while sticking to photo-evident diagnosis.",
+  "description": "Four photos of a KBG lawn in Columbus OH with multiple concurrent problems: (1) a circular brown-patch fungal ring of dead straw-colored turf surrounded by healthy green, (2) a wide view of dollar-spot infection with numerous bleached/tan patches scattered across the canopy, (3) chinch-bug damage producing patchy yellowing and dying areas with healthy turf interspersed, (4) a dead/bare strip of turf along a hardscape edge representing bare_spots. Tests the AI's ability to synthesize across multiple distinct issue types — fungal disease (two presentations), insect damage, and bare areas — and prioritize them correctly.",
   "photos": [
     {
       "path": "01.jpg",
       "license": "extension-educational-use",
-      "source": "TBD-pending-photo-fetch",
-      "caption": "Wide back-yard view showing a largely healthy green canopy with visible mowing stripes — fall leaves scattered across the surface but no clear bare patches, fungal rings, or insect damage in this frame."
+      "source": "reference-library:brown-patch.jpg",
+      "caption": "Circular brown-patch fungal ring of dead straw-colored turf surrounded by healthy green KBG — textbook Rhizoctonia brown patch presentation."
     },
     {
       "path": "02.jpg",
       "license": "extension-educational-use",
-      "source": "TBD-pending-photo-fetch",
-      "caption": "Close-up of healthy KBG canopy with minor tip browning — no clear fungal lesions, ragged feeding damage, or bare soil in this frame."
+      "source": "reference-library:dollar-spot-2.jpg",
+      "caption": "Wide view of dollar-spot infection on KBG showing numerous small bleached/tan circular patches scattered across the canopy — classic Clarireedia damage pattern."
     },
     {
       "path": "03.jpg",
       "license": "extension-educational-use",
-      "source": "TBD-pending-photo-fetch",
-      "caption": "Macro / extension identification photo of multiple insect pests (chinch-bug nymphs or aphids) on a grass blade — confirms in-canopy insect pressure as a real concern."
+      "source": "reference-library:chinch-bugs-closeup.jpg",
+      "caption": "Macro / extension identification photo showing multiple insect pests (chinch-bug nymphs) on a grass blade — direct visual confirmation of pest pressure in the lawn."
     },
     {
       "path": "04.jpg",
       "license": "extension-educational-use",
-      "source": "TBD-pending-photo-fetch",
-      "caption": "Separate back-yard view of a manicured striped lawn — healthy green canopy with no visible bare spots or disease lesions in this frame."
+      "source": "reference-library:salt-damage.jpg",
+      "caption": "Dead/bare strip of turf along a hardscape edge — the unrecovered area where the canopy has died and bare soil/dead matter is visible adjacent to healthy turf."
     }
   ],
   "profile": {
@@ -54,10 +54,10 @@
   "dataGaps": [],
   "groundTruth": {
     "grassType": "kentucky_bluegrass",
-    "issues": ["pests"],
-    "healthScoreRange": [50, 80],
-    "mustInclude": ["pest"],
+    "issues": ["fungus", "pests", "bare_spots"],
+    "healthScoreRange": [40, 65],
+    "mustInclude": ["fungus", "pest"],
     "mustNotInclude": [],
-    "photoNotes": "Four photos with mixed content. Photos 1, 2, and 4 show largely healthy KBG canopy with no clear fungal lesions, bare patches, or insect feeding damage visible. Photo 3 is a macro/extension ID image confirming insect (chinch-bug nymph or aphid) pressure on a leaf — the one clearly diagnosable photo-evident issue. The homeowner's notes describe more problems than the photos support; the AI should diagnose only what's visible (insect pressure + mostly healthy lawn) and frame note-described concerns conditionally. A correct read here lists 'pests' as the primary issue and keeps healthScore in the upper-middle range reflecting the healthy canopy."
+    "photoNotes": "Four photos showing a KBG lawn with three distinct concurrent issues. Photo 1 shows a textbook circular brown-patch fungal ring (Rhizoctonia). Photo 2 shows widespread dollar-spot infection (Clarireedia) — multiple small bleached patches. Photo 3 shows chinch-bug-driven patchy yellowing/dying. Photo 4 shows a dead/bare strip of turf along a hardscape edge (bare_spots). Cross-photo synthesis required to triage all three issue types. The lawn is materially compromised by visible damage across all four photos, so healthScore should land in 40-65 reflecting multiple active stressors."
   }
 }
