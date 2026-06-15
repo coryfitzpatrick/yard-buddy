@@ -12,8 +12,8 @@ interface Screenshot {
 const HERO: Screenshot = {
   src: "/screenshots/dashboard.png",
   alt: "Yard Analyzer dashboard showing weather, yards, and scheduled tasks",
-  width: 1948,
-  height: 2400,
+  width: 1600,
+  height: 1971,
   title: "Your whole lawn, one screen",
   caption:
     "Local weather, every yard, and the next thing to do — all on the page the moment you sign in.",
@@ -23,8 +23,8 @@ const GRID: Screenshot[] = [
   {
     src: "/screenshots/section.png",
     alt: "Front yard section showing a health score of 88 and a chart over time",
-    width: 1948,
-    height: 1900,
+    width: 1600,
+    height: 1031,
     title: "Watch your lawn actually improve",
     caption:
       "Score your lawn from a single photo. Watch the chart climb as treatments take hold — 32 to 88 in three months.",
@@ -32,8 +32,8 @@ const GRID: Screenshot[] = [
   {
     src: "/screenshots/calendar.png",
     alt: "Calendar view of scheduled lawn-care tasks across June",
-    width: 1948,
-    height: 1788,
+    width: 1600,
+    height: 1031,
     title: "A schedule that fits your weather",
     caption:
       "Fertilizer, fungicide, mowing, overseeding — all stacked in a calendar that respects your climate and grass type.",
@@ -41,8 +41,8 @@ const GRID: Screenshot[] = [
   {
     src: "/screenshots/yard-detail.png",
     alt: "Yard detail page with four sections, each with its own health score and grass type",
-    width: 1948,
-    height: 2100,
+    width: 1600,
+    height: 1031,
     title: "Section by section, not one-size-fits-all",
     caption:
       "Front, back, side, border — different grass, different soil, different plan. We track each one separately.",
@@ -50,8 +50,8 @@ const GRID: Screenshot[] = [
   {
     src: "/screenshots/my-yards.png",
     alt: "My Yards page showing two properties with their sections and watering schedules",
-    width: 1948,
-    height: 1524,
+    width: 1600,
+    height: 1031,
     title: "Multiple properties? Handled.",
     caption:
       "Manage your home, your rental, your parents' place — each with its own spreader, schedule, and section list.",
@@ -75,7 +75,11 @@ export function ScreenshotSection() {
         </p>
       </div>
 
-      <figure className="space-y-3">
+      <figure className="space-y-4">
+        <figcaption className="text-center">
+          <h3 className="text-xl font-semibold text-gray-900">{HERO.title}</h3>
+          <p className="text-sm text-gray-500 max-w-xl mx-auto mt-1">{HERO.caption}</p>
+        </figcaption>
         <div className="relative rounded-xl overflow-hidden border border-gray-200 shadow-md bg-white">
           <Image
             src={HERO.src}
@@ -87,15 +91,15 @@ export function ScreenshotSection() {
           />
           {BADGE}
         </div>
-        <figcaption className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900">{HERO.title}</h3>
-          <p className="text-sm text-gray-500 max-w-xl mx-auto mt-1">{HERO.caption}</p>
-        </figcaption>
       </figure>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-12 mt-16">
         {GRID.map((shot) => (
           <figure key={shot.src} className="space-y-3">
+            <figcaption>
+              <h3 className="text-lg font-semibold text-gray-900">{shot.title}</h3>
+              <p className="text-sm text-gray-500 mt-1">{shot.caption}</p>
+            </figcaption>
             <div className="relative rounded-xl overflow-hidden border border-gray-200 shadow-sm bg-white">
               <Image
                 src={shot.src}
@@ -106,10 +110,6 @@ export function ScreenshotSection() {
               />
               {BADGE}
             </div>
-            <figcaption>
-              <h3 className="text-lg font-semibold text-gray-900">{shot.title}</h3>
-              <p className="text-sm text-gray-500 mt-1">{shot.caption}</p>
-            </figcaption>
           </figure>
         ))}
       </div>
