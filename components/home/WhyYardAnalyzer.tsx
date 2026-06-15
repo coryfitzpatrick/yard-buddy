@@ -19,8 +19,8 @@ const DIFFERENTIATORS = [
 
 export function WhyYardAnalyzer() {
   return (
-    <section className="max-w-5xl mx-auto px-6 py-16">
-      <div className="text-center mb-10">
+    <section className="max-w-5xl mx-auto px-6 py-10">
+      <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">Why Yard Analyzer?</h2>
         <p className="text-lg text-gray-500 max-w-xl mx-auto">
           Personalized advice that actually matches your yard — not a generic plan pushed by a brand.

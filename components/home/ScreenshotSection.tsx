@@ -66,8 +66,8 @@ const BADGE = (
 
 export function ScreenshotSection() {
   return (
-    <section className="max-w-6xl mx-auto px-6 py-16">
-      <div className="text-center mb-12">
+    <section className="max-w-6xl mx-auto px-6 py-10">
+      <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">See it in action</h2>
         <p className="text-base text-gray-500 max-w-xl mx-auto">
           A real demo account with two properties, four months of history, and the kind of
@@ -93,7 +93,7 @@ export function ScreenshotSection() {
         </div>
       </figure>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-12 mt-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-10 mt-12">
         {GRID.map((shot) => (
           <figure key={shot.src} className="space-y-3">
             <figcaption>

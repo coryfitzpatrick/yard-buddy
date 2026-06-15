@@ -28,7 +28,7 @@ export default function HomePage() {
           <Link href="/register"><Button className="bg-green-600 hover:bg-green-700">Get started free</Button></Link>
         </div>
       </nav>
-      <div className="max-w-4xl mx-auto px-6 py-20 text-center">
+      <div className="max-w-4xl mx-auto px-6 pt-20 pb-10 text-center">
         <h1 className="text-5xl font-bold text-gray-900 mb-4 leading-tight">
           Your AI lawn expert,<br />
           <span className="text-green-600">always on call.</span>
