@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const LOGO_SRC = "/yard-analyzer-logo-v2.png";
 const LOGO_INTRINSIC_WIDTH = 200;
-const LOGO_INTRINSIC_HEIGHT = 310;
+const LOGO_INTRINSIC_HEIGHT = 302;
 
 interface LogoProps {
   className?: string;
@@ -17,6 +17,7 @@ export function Logo({ className = "h-8 w-auto" }: LogoProps) {
       height={LOGO_INTRINSIC_HEIGHT}
       className={className}
       priority
+      unoptimized
     />
   );
 }
