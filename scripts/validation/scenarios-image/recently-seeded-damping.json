@@ -54,7 +54,7 @@
   "dataGaps": [],
   "groundTruth": {
     "grassType": "kentucky_bluegrass",
-    "issues": ["damping_off", "overwatering"],
+    "issues": ["damping_off"],
     "healthScoreRange": [40, 75],
     "mustInclude": ["damping", "seedling"],
     "mustNotInclude": [],
