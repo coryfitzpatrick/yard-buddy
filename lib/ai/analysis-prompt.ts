@@ -72,6 +72,22 @@ HEALTHY LAWN MODE — Apply when your analysis determines healthScore ≥ 75:
 - Aim for 2–4 total tasks — fewer focused tasks beats a long list for a healthy lawn.
 - Phrase maintenance tasks positively: "Continue your..." / "Keep up your..." / "Maintain your..." framing.
 
+VISUAL ASSESSMENT CALIBRATION — CRITICAL anti-fabrication and anti-pessimism rules:
+- If photos show uniform, mature, mostly-green turf with no clear pathology lesions, mushrooms, ring patterns, or visible damaged patches: the lawn is HEALTHY. Default healthScore to 85-95 and issues: ["healthy"]. Do NOT fabricate minor blemishes (tip browning, thatch layer, turf unevenness, density variation, root competition, thin zones) as ISSUES — these are normal variations in any close-up lawn photo and over-listing them produces alarmist advice.
+- WARM-SEASON DORMANCY IS HEALTHY. When the air temperature is below 50°F and the grass is warm-season (bermuda, zoysia, St. Augustine, centipede), tan/brown coloration is EXPECTED winter dormancy. Default healthScore to 80-95, issues: ["healthy"], taskMode: "maintenance" only. Do NOT recommend fertilization, fungicide, or "corrective" treatment of dormant warm-season turf. Frame around "the lawn is appropriately dormant — wait for spring green-up."
+- COOL-SEASON SUMMER DORMANCY can also be healthy when air >85°F and homeowner notes drought or unable to irrigate. Dormancy is an extension-endorsed survival strategy. Do NOT frame as urgent stress.
+- DO NOT EXPAND A SINGLE VISIBLE ISSUE INTO MULTIPLE SPECULATIVE SUB-ISSUES. If you see drought stress, list ONLY drought_stress, NOT also "possible dormancy onset", "risk of stand loss", "potential disease pressure". Inflated issue sets get penalized.
+- DO NOT INVENT ISSUES FROM PROFILE DATA NOT VISIBLE IN PHOTOS. If soilPh is 5.4 but the photo shows healthy turf with no chlorosis: pH may be a future-planning concern but should NOT be listed as a CURRENT visible issue. Only photo-visible problems go in the issues array.
+- HEALTH SCORE CALIBRATION (anti-pessimism):
+  - Photo shows healthy uniform green turf, no visible problems: 85-95
+  - Photo shows healthy turf with mowing artifacts or slight color variation: 80-90
+  - Photo shows mostly-healthy turf with one localized issue: 65-80
+  - Photo shows moderate disease pressure visible over 10-30% of frame: 50-70
+  - Photo shows severe pathology (>50% damaged): 30-50
+  - Photo shows dormant warm-season turf in winter: 80-95 (dormancy is healthy)
+  - NEVER score below 30 unless the entire visible turf is dead/destroyed.
+  - A homeowner expects honest assessment, not alarmism. Over-pessimistic scoring loses trust faster than over-optimism.
+
 SPECIES IDENTIFICATION RULE — When weeds or pests are present, always identify to the species level in task titles and descriptions. Do not use generic category names like "grassy weed," "broadleaf weed," or "pest." Instead use the specific common name: "crabgrass," "nutsedge," "dandelion," "clover," "Japanese beetle grubs," "chinch bugs," "armyworms," etc. If multiple weed or pest species are present, name the most prevalent one in the title and list others in the description. If the exact species cannot be confirmed from the image, name the most likely candidate given the grass type, region, and season — and note the uncertainty briefly (e.g., "likely crabgrass based on growth pattern"). Apply the same specificity to disease names: "brown patch," "dollar spot," "red thread" rather than "fungal disease."`
 
   const userMessage = userQuestion
