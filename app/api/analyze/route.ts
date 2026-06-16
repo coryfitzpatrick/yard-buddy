@@ -41,9 +41,23 @@ export async function POST(req: NextRequest) {
   if (!sectionId || photos.length === 0) {
     return NextResponse.json({ error: "sectionId and photos[] required" }, { status: 400 });
   }
-  const { MAX_PHOTOS } = await import("@/lib/photo-kinds");
+  const { MAX_PHOTOS, PHOTO_KIND_META } = await import("@/lib/photo-kinds");
   if (photos.length > MAX_PHOTOS) {
     return NextResponse.json({ error: `Maximum ${MAX_PHOTOS} photos per analysis` }, { status: 400 });
+  }
+  // Enforce per-kind caps server-side too, mirroring the UI.
+  const countsByKind: Record<string, number> = {};
+  for (const p of photos) {
+    countsByKind[p.kind] = (countsByKind[p.kind] ?? 0) + 1;
+  }
+  for (const [kind, count] of Object.entries(countsByKind)) {
+    const meta = PHOTO_KIND_META[kind as keyof typeof PHOTO_KIND_META];
+    if (meta?.maxPerKind != null && count > meta.maxPerKind) {
+      return NextResponse.json(
+        { error: `Maximum ${meta.maxPerKind} ${meta.label.toLowerCase()} photo${meta.maxPerKind === 1 ? "" : "s"}` },
+        { status: 400 }
+      );
+    }
   }
   const imageUrls = photos.map((p) => p.url);
 

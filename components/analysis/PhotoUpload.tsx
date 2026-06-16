@@ -167,30 +167,42 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {slots.map((slot) => {
-          const meta = PHOTO_KIND_META[slot.kind];
-          const Icon = KIND_ICONS[slot.kind] ?? ImagePlus;
-          const showAddAnother = meta.allowMultiple && !!slot.state && canAddMore;
-          const limitLabel = meta.allowMultiple ? "Multiple OK" : "1 photo max";
-          return (
-            <SlotCard
-              key={slot.id}
-              slot={slot}
-              icon={Icon}
-              labelOverride={meta.label}
-              limitLabel={limitLabel}
-              description={meta.description}
-              cameraRef={(el) => { cameraInputs.current[slot.id] = el; }}
-              fileRef={(el) => { fileInputs.current[slot.id] = el; }}
-              onPickCamera={() => cameraInputs.current[slot.id]?.click()}
-              onPickFile={() => fileInputs.current[slot.id]?.click()}
-              onFile={(f) => attachFile(slot.id, f)}
-              onClearPhoto={() => clearSlot(slot.id)}
-              onRemoveSlot={!slot.fixed ? () => removeSlot(slot.id) : undefined}
-              onAddAnother={showAddAnother ? () => addAnother(slot.kind, slot.id) : undefined}
-            />
-          );
-        })}
+        {(() => {
+          // Count slots per kind so we can enforce maxPerKind on "+ Add another".
+          const countByKind = new Map<PhotoKind, number>();
+          slots.forEach((s) => countByKind.set(s.kind, (countByKind.get(s.kind) ?? 0) + 1));
+          return slots.map((slot) => {
+            const meta = PHOTO_KIND_META[slot.kind];
+            const Icon = KIND_ICONS[slot.kind] ?? ImagePlus;
+            const currentOfKind = countByKind.get(slot.kind) ?? 1;
+            const kindAtCap = meta.maxPerKind != null && currentOfKind >= meta.maxPerKind;
+            const showAddAnother = meta.maxPerKind !== 1 && !!slot.state && canAddMore && !kindAtCap;
+            const limitLabel =
+              meta.maxPerKind === 1
+                ? "1 photo max"
+                : meta.maxPerKind != null
+                  ? `Up to ${meta.maxPerKind}`
+                  : null;
+            return (
+              <SlotCard
+                key={slot.id}
+                slot={slot}
+                icon={Icon}
+                labelOverride={meta.label}
+                limitLabel={limitLabel}
+                description={meta.description}
+                cameraRef={(el) => { cameraInputs.current[slot.id] = el; }}
+                fileRef={(el) => { fileInputs.current[slot.id] = el; }}
+                onPickCamera={() => cameraInputs.current[slot.id]?.click()}
+                onPickFile={() => fileInputs.current[slot.id]?.click()}
+                onFile={(f) => attachFile(slot.id, f)}
+                onClearPhoto={() => clearSlot(slot.id)}
+                onRemoveSlot={!slot.fixed ? () => removeSlot(slot.id) : undefined}
+                onAddAnother={showAddAnother ? () => addAnother(slot.kind, slot.id) : undefined}
+              />
+            );
+          });
+        })()}
       </div>
 
       <p className="text-xs text-gray-400 text-center">
@@ -218,7 +230,7 @@ interface SlotCardProps {
   slot: Slot;
   icon: typeof Expand;
   labelOverride: string;
-  limitLabel: string;
+  limitLabel: string | null;
   description: string;
   cameraRef: (el: HTMLInputElement | null) => void;
   fileRef: (el: HTMLInputElement | null) => void;
@@ -255,7 +267,9 @@ function SlotCard({ slot, icon: Icon, labelOverride, limitLabel, description, ca
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-sm font-semibold text-gray-900 leading-tight">{labelOverride}</span>
-              <span className="text-[10px] uppercase tracking-wide text-gray-400 font-medium">{limitLabel}</span>
+              {limitLabel && (
+                <span className="text-[10px] uppercase tracking-wide text-gray-400 font-medium">{limitLabel}</span>
+              )}
             </div>
             <p className="text-xs text-gray-500 leading-snug mt-0.5">{description}</p>
           </div>
