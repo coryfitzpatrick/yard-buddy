@@ -16,7 +16,7 @@ const TOPICS = [
   },
   {
     label: "General Questions",
-    description: "Anything else — feature requests, feedback, or just saying hi.",
+    description: "Anything else: feature requests, feedback, or just saying hi.",
   },
 ];
 

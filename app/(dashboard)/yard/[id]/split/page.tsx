@@ -32,8 +32,8 @@ export default async function SplitYardPage({ params }: { params: Promise<{ id: 
       </Link>
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Split {yard.name} into sections</h1>
       <p className="text-sm text-gray-500 mb-6">
-        Pick the parts of your yard you want to track separately. Each new section starts fresh — you&apos;ll
-        analyze them individually for grass-type-aware care.
+        Pick the parts of your yard you want to track separately. Each new section starts fresh, and
+        you&apos;ll analyze them individually for grass-type-aware care.
       </p>
       {analysisCount > 0 && (
         <div className="mb-6 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-900">

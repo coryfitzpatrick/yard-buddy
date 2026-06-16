@@ -199,7 +199,7 @@ function YardSummaryHero({ section, yardId }: { section: SectionSummary; yardId:
           ) : (
             <>
               <div className="text-xs uppercase tracking-wide text-gray-400 font-medium">Status</div>
-              <div className="text-base font-medium text-gray-500">No analysis yet — upload photos to get a plan.</div>
+              <div className="text-base font-medium text-gray-500">No analysis yet. Upload photos to get a plan.</div>
             </>
           )}
           <div className="text-xs text-gray-400 capitalize pt-1">
@@ -272,7 +272,7 @@ export function YardDetailInteractive({ yardId, zip, initialWeatherCollapsed, se
           </div>
           {sections.length === 0 ? (
             <div className="text-center py-8 text-gray-400 text-sm border border-dashed border-gray-200 rounded-xl">
-              No sections yet — add one to get started.
+              No sections yet. Add one to get started.
             </div>
           ) : (
             <div className="grid gap-3 grid-cols-2">

@@ -36,9 +36,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
             <p className="text-sm text-amber-800">
               {trialDaysLeft !== null && trialDaysLeft <= 1
-                ? "Your free trial ends tomorrow — upgrade to keep full access."
+                ? "Your free trial ends tomorrow. Upgrade to keep full access."
                 : trialDaysLeft !== null
-                ? `You're on a free trial — ${trialDaysLeft} day${trialDaysLeft !== 1 ? "s" : ""} remaining.`
+                ? `You're on a free trial. ${trialDaysLeft} day${trialDaysLeft !== 1 ? "s" : ""} remaining.`
                 : "You're on a free trial."}
             </p>
             <Link

@@ -1,7 +1,7 @@
 const DIFFERENTIATORS = [
   {
     heading: "Your whole yard, section by section",
-    body: "Front yard gets morning sun and struggles with weeds. Back yard is shaded with different grass. Most apps treat your yard as one blob. Yard Analyzer tracks each section separately — different grass types, different schedules, different soil.",
+    body: "Front yard gets morning sun and struggles with weeds. Back yard is shaded with different grass. Most apps treat your yard as one blob. Yard Analyzer tracks each section separately, with different grass types, different schedules, different soil.",
   },
   {
     heading: "No kit to buy. Any soil test works.",
@@ -9,7 +9,7 @@ const DIFFERENTIATORS = [
   },
   {
     heading: "Unbiased advice across all brands",
-    body: "Other apps push their own product line. Our AI recommends what's right for your lawn — Scotts, Jonathan Green, Milorganite, generic store brand, or organic options — with price ranges so you can choose what fits your budget.",
+    body: "Other apps push their own product line. Our AI recommends what's right for your lawn, whether that's Scotts, Jonathan Green, Milorganite, generic store brand, or organic options, with price ranges so you can choose what fits your budget.",
   },
   {
     heading: "Watch your lawn actually improve",
@@ -23,7 +23,7 @@ export function WhyYardAnalyzer() {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">Why Yard Analyzer?</h2>
         <p className="text-lg text-gray-500 max-w-xl mx-auto">
-          Personalized advice that actually matches your yard — not a generic plan pushed by a brand.
+          Personalized advice that actually matches your yard, not a generic plan pushed by a brand.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

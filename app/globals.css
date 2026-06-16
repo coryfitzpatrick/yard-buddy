@@ -46,6 +46,14 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Accessibility floor: clamp text-xs and text-sm to 16px so all body / UI
+     copy meets the 1rem minimum. Use the .text-legal utility for genuine
+     fine-print (copyright, terms references) where smaller is appropriate. */
+  --text-xs: 1rem;
+  --text-xs--line-height: 1.5rem;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5rem;
 }
 
 :root {
@@ -126,5 +134,14 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  /* Fine-print escape hatch for legal copy — copyright lines, terms references,
+     and other text where 16px would feel overweighted. */
+  .text-legal {
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
 }

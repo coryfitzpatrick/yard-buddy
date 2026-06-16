@@ -146,10 +146,10 @@ export function YardSetupForm() {
         }
       } else {
         setLotData(null);
-        setLookupNote(data.message ?? "Size not found — enter manually");
+        setLookupNote(data.message ?? "Size not found. Enter manually.");
       }
     } catch {
-      setLookupNote("Lookup failed — enter manually");
+      setLookupNote("Lookup failed. Enter manually.");
     } finally {
       setLookingUp(false);
     }
@@ -183,12 +183,12 @@ export function YardSetupForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageUrl: publicUrl }),
       });
-      if (!identifyRes.ok) { setIdentifyError("Analysis failed — try again."); return; }
+      if (!identifyRes.ok) { setIdentifyError("Analysis failed. Try again."); return; }
       const result = await identifyRes.json();
       setValue("grassType", result.grassType);
       setIdentified({ confidence: result.confidence, explanation: result.explanation });
     } catch {
-      setIdentifyError("Something went wrong — try again.");
+      setIdentifyError("Something went wrong. Try again.");
     } finally {
       setIdentifying(false);
     }
@@ -507,7 +507,7 @@ export function YardSetupForm() {
                   ) : identified ? (
                     <div className="text-left space-y-1">
                       <div className="flex items-center gap-2 text-sm font-medium text-green-700">
-                        <CheckCircle className="w-4 h-4" /> Identified — {identified.confidence} confidence
+                        <CheckCircle className="w-4 h-4" /> Identified at {identified.confidence} confidence
                       </div>
                       <p className="text-sm text-gray-500">{identified.explanation}</p>
                       <button type="button" onClick={() => photoRef.current?.click()} className="text-sm text-green-600 underline">Try a different photo</button>
@@ -557,7 +557,7 @@ export function YardSetupForm() {
             {step === 3 && (
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <Label>Street Address (optional — used to look up yard size)</Label>
+                  <Label>Street Address (optional, used to look up yard size)</Label>
                   <div className="flex gap-2">
                     <Input placeholder="123 Main St" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); lookupYardSize(); } }} />
@@ -584,7 +584,7 @@ export function YardSetupForm() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <p className="text-sm text-gray-400">Optional — helps calculate product amounts</p>
+                  <p className="text-sm text-gray-400">Optional. Helps calculate product amounts.</p>
                 </div>
                 <div className="space-y-1">
                   <Label>Soil pH</Label>
@@ -596,9 +596,9 @@ export function YardSetupForm() {
                   <Select onValueChange={(v) => setValue("soilMoisture", v as "dry" | "moderate" | "moist")}>
                     <SelectTrigger><SelectValue placeholder="Select moisture level" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="dry">Dry — cracks easily, water beads</SelectItem>
-                      <SelectItem value="moderate">Moderate — moist 1 inch down</SelectItem>
-                      <SelectItem value="moist">Moist — stays damp, possible overwatering</SelectItem>
+                      <SelectItem value="dry">Dry: cracks easily, water beads</SelectItem>
+                      <SelectItem value="moderate">Moderate: moist 1 inch down</SelectItem>
+                      <SelectItem value="moist">Moist: stays damp, possible overwatering</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-sm text-gray-400">Push a screwdriver 6" into soil: slides in = moist, resistance = moderate, very hard = dry.</p>
@@ -696,8 +696,8 @@ export function YardSetupForm() {
                   <div>
                     <span className="font-medium">Photos:</span>{" "}
                     {setupPhotoCount > 0
-                      ? `${setupPhotoCount} ready — we'll analyze them right after saving`
-                      : "None — you can add them later"}
+                      ? `${setupPhotoCount} ready. We'll analyze them right after saving.`
+                      : "None. You can add them later."}
                   </div>
                 </div>
               </div>

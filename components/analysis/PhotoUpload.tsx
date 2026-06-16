@@ -160,7 +160,7 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
         </p>
         <p className="text-xs text-gray-600">
           Use the slots below to upload photos by type. Skip anything that doesn&apos;t apply. Damage,
-          weed, and other slots accept multiples — tap{" "}
+          weed, and other slots accept multiples. Tap{" "}
           <span className="font-medium text-gray-700">+ Add another</span> to capture different
           zones or species. Only the wide overview is truly critical.
         </p>

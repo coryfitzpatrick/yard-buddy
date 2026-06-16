@@ -17,7 +17,7 @@ function BuyLinks({ query, estimatedPrice }: { query: string; estimatedPrice?: s
       <div className="flex items-center gap-1.5 flex-wrap">
         <ShoppingCart className="w-3 h-3 text-gray-400 shrink-0" />
         {estimatedPrice && (
-          <span className="text-xs text-gray-500 mr-1">{estimatedPrice} —</span>
+          <span className="text-xs text-gray-500 mr-1">{estimatedPrice}:</span>
         )}
         {RETAILERS.map((r) => (
           <a

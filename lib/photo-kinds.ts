@@ -21,7 +21,7 @@ export const PHOTO_KIND_META: Record<PhotoKind, PhotoKindMeta> = {
   closeup: {
     kind: "closeup",
     label: "Close-up of grass",
-    description: "Crouch down — show blade detail, thatch, and soil up close.",
+    description: "Crouch down so you can show blade detail, thatch, and soil up close.",
     promptLabel: "ground-level close-up of grass blades, thatch, and soil",
     maxPerKind: 1,
   },
@@ -42,7 +42,7 @@ export const PHOTO_KIND_META: Record<PhotoKind, PhotoKindMeta> = {
   other: {
     kind: "other",
     label: "Other",
-    description: "Edge transitions, fence-line shade, irrigation coverage — anything else worth flagging.",
+    description: "Edge transitions, fence-line shade, irrigation coverage, or anything else worth flagging.",
     promptLabel: "additional context photo (homeowner's choice)",
     maxPerKind: 2,
   },

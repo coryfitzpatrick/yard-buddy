@@ -175,12 +175,12 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageUrl: publicUrl }),
       });
-      if (!identifyRes.ok) { setIdentifyError("Analysis failed — try again."); return; }
+      if (!identifyRes.ok) { setIdentifyError("Analysis failed. Try again."); return; }
       const result = await identifyRes.json();
       setValue("grassType", result.grassType);
       setIdentified({ confidence: result.confidence, explanation: result.explanation });
     } catch {
-      setIdentifyError("Something went wrong — try again.");
+      setIdentifyError("Something went wrong. Try again.");
     } finally {
       setIdentifying(false);
     }
@@ -203,16 +203,16 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         setValue("yardSizeSqft", sqft as never);
         if (data.usableSqft && data.buildingSqft) {
           setLookupNote(
-            `Lot: ~${data.lotSqft.toLocaleString()} sq ft · Home: ~${data.buildingSqft.toLocaleString()} sq ft · Lawn: ~${data.usableSqft.toLocaleString()} sq ft — adjust below for just this section`
+            `Lot: ~${data.lotSqft.toLocaleString()} sq ft · Home: ~${data.buildingSqft.toLocaleString()} sq ft · Lawn: ~${data.usableSqft.toLocaleString()} sq ft. Adjust below for just this section.`
           );
         } else {
-          setLookupNote(`Lot: ~${data.lotSqft.toLocaleString()} sq ft — adjust below for just this section`);
+          setLookupNote(`Lot: ~${data.lotSqft.toLocaleString()} sq ft. Adjust below for just this section.`);
         }
       } else {
-        setLookupNote(data.message ?? "Size not found — enter manually");
+        setLookupNote(data.message ?? "Size not found. Enter manually.");
       }
     } catch {
-      setLookupNote("Lookup failed — enter manually");
+      setLookupNote("Lookup failed. Enter manually.");
     } finally {
       setLookingUp(false);
     }
@@ -299,7 +299,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           ) : identified ? (
             <div className="text-left space-y-1">
               <div className="flex items-center gap-2 text-sm font-medium text-green-700">
-                <CheckCircle className="w-4 h-4" /> Identified — {identified.confidence} confidence
+                <CheckCircle className="w-4 h-4" /> Identified at {identified.confidence} confidence
               </div>
               <p className="text-sm text-gray-500">{identified.explanation}</p>
               <button type="button" onClick={() => photoRef.current?.click()} className="text-sm text-green-600 underline">Try a different photo</button>
@@ -341,11 +341,11 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
               ? <>Lot: ~{lotSqft!.toLocaleString()} sq ft · Home: ~{buildingSqft.toLocaleString()} sq ft · Lawn: ~{usableSqft!.toLocaleString()} sq ft</>
               : <>Lot: ~{lotSqft!.toLocaleString()} sq ft</>
             }
-            <span className="text-green-600"> — adjust the size below for just this section</span>
+            <span className="text-green-600">. Adjust the size below for just this section.</span>
           </div>
         ) : (
           <div className="space-y-1">
-            <Label>Street Address (optional — look up lot size)</Label>
+            <Label>Street Address (optional, look up lot size)</Label>
             <div className="flex gap-2">
               <Input
                 placeholder="123 Main St"
@@ -394,7 +394,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           <p className="text-sm text-gray-400">
             {lookupNote?.startsWith("Lot:")
               ? "Adjust to just this section's share of the lawn"
-              : "Optional — helps calculate product amounts"}
+              : "Optional. Helps calculate product amounts."}
           </p>
           {errors.yardSizeSqft && <p className="text-sm text-red-500">{errors.yardSizeSqft.message || "Enter a size between 1 and 500,000 sq ft"}</p>}
         </div>
@@ -405,17 +405,17 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           {errors.soilPh && <p className="text-sm text-red-500">{errors.soilPh.message || "Soil pH must be between 4 and 9"}</p>}
         </div>
         <div className="space-y-1">
-          <Label>Nitrogen (N) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Label>Nitrogen (N), ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
           <Input type="number" step="0.1" min="0" max="1000" placeholder="e.g. 42" {...register("nitrogenPpm")} />
           {errors.nitrogenPpm && <p className="text-sm text-red-500">{errors.nitrogenPpm.message || "Must be between 0 and 1000 ppm"}</p>}
         </div>
         <div className="space-y-1">
-          <Label>Phosphorus (P) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Label>Phosphorus (P), ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
           <Input type="number" step="0.1" min="0" max="2000" placeholder="e.g. 28" {...register("phosphorusPpm")} />
           {errors.phosphorusPpm && <p className="text-sm text-red-500">{errors.phosphorusPpm.message || "Must be between 0 and 2000 ppm"}</p>}
         </div>
         <div className="space-y-1">
-          <Label>Potassium (K) — ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Label>Potassium (K), ppm <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
           <Input type="number" step="0.1" min="0" max="2000" placeholder="e.g. 180" {...register("potassiumPpm")} />
           {errors.potassiumPpm && <p className="text-sm text-red-500">{errors.potassiumPpm.message || "Must be between 0 and 2000 ppm"}</p>}
         </div>
@@ -559,7 +559,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           </div>
 
           <p className="text-xs text-gray-400">
-            These are your own notes — they won&apos;t affect AI analysis.
+            These are your own notes. They won&apos;t affect AI analysis.
           </p>
         </div>
       </div>

@@ -53,7 +53,7 @@ export default async function SectionPhotosPage({
       </Link>
 
       <h1 className="text-2xl font-bold text-gray-900 mb-6">
-        Photo history — {section.name}
+        Photo history: {section.name}
       </h1>
 
       <PhotoTimeline photos={photos} sectionName={section.name} />

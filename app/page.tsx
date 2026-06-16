@@ -40,7 +40,7 @@ export default function HomePage() {
         </p>
         <Link href="/register">
           <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 h-14">
-            Start for free — no credit card
+            Start for free. No credit card needed.
           </Button>
         </Link>
         <div className="mt-12 grid gap-3 text-left max-w-md mx-auto">

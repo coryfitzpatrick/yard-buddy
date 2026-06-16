@@ -39,7 +39,7 @@ export function SplitYardForm({ yardId, yardSlug, currentGrassType }: Props) {
 
   async function handleSubmit() {
     if (selected.size < 2) {
-      setError("Pick at least two sections — splitting into one isn't really splitting.");
+      setError("Pick at least two sections. Splitting into one isn't really splitting.");
       return;
     }
     setError(null);

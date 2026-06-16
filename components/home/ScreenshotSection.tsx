@@ -16,7 +16,7 @@ const HERO: Screenshot = {
   height: 1932,
   title: "Your whole lawn, one screen",
   caption:
-    "Local weather, every yard, and the next thing to do — all on the page the moment you sign in.",
+    "Local weather, every yard, and the next thing to do, all on the page the moment you sign in.",
 };
 
 const GRID: Screenshot[] = [
@@ -27,7 +27,7 @@ const GRID: Screenshot[] = [
     height: 1035,
     title: "Watch your lawn actually improve",
     caption:
-      "Score your lawn from a single photo. Watch the chart climb as treatments take hold — 32 to 88 in three months.",
+      "Score your lawn from a single photo. Watch the chart climb as treatments take hold: 32 to 88 in three months.",
   },
   {
     src: "/screenshots/calendar.webp",
@@ -36,7 +36,7 @@ const GRID: Screenshot[] = [
     height: 1035,
     title: "A schedule that fits your weather",
     caption:
-      "Fertilizer, fungicide, mowing, overseeding — all stacked in a calendar that respects your climate and grass type.",
+      "Fertilizer, fungicide, mowing, overseeding, all stacked in a calendar that respects your climate and grass type.",
   },
   {
     src: "/screenshots/yard-detail.webp",
@@ -45,7 +45,7 @@ const GRID: Screenshot[] = [
     height: 1035,
     title: "Section by section, not one-size-fits-all",
     caption:
-      "Front, back, side, border — different grass, different soil, different plan. We track each one separately.",
+      "Front, back, side, border: different grass, different soil, different plan. We track each one separately.",
   },
   {
     src: "/screenshots/my-yards.webp",
@@ -54,7 +54,7 @@ const GRID: Screenshot[] = [
     height: 1035,
     title: "Multiple properties? Handled.",
     caption:
-      "Manage your home, your rental, your parents' place — each with its own spreader, schedule, and section list.",
+      "Manage your home, your rental, your parents' place, each with its own spreader, schedule, and section list.",
   },
 ];
 

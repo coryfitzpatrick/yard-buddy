@@ -186,7 +186,7 @@ export function buildTrialReminderEmail(opts: {
       : `Your free trial ends in <strong>${daysLeft} days</strong>. Subscribe now to keep your lawn care on track.`
     }
   </p>
-  <p style="color:#374151;">Plans start at <strong>$7.99/month</strong> — less than a bag of fertilizer.</p>
+  <p style="color:#374151;">Plans start at <strong>$7.99/month</strong>, less than a bag of fertilizer.</p>
   <div style="text-align:center;margin:32px 0;">
     <a href="${pricingUrl}" style="background:#16a34a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">See plans &amp; pricing</a>
   </div>
@@ -257,7 +257,7 @@ export function buildPaymentFailedEmail(opts: {
 
   const bodyText = isFinal
     ? `We were unable to process your payment after multiple attempts. To avoid losing access to your lawn care history and tasks, please update your payment method now. Your subscription will be canceled if payment cannot be collected.`
-    : `We were unable to process your latest payment. We'll retry automatically — please update your payment method to make sure your subscription stays active.`;
+    : `We were unable to process your latest payment. We'll retry automatically. Please update your payment method to make sure your subscription stays active.`;
 
   const html = `<!DOCTYPE html>
 <html>

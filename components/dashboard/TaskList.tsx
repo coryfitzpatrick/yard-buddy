@@ -421,7 +421,7 @@ export function TaskList({
         <div className="mt-4 space-y-2">
           <p className="text-sm font-medium text-gray-400 flex items-center gap-1.5">
             <Lock className="w-3.5 h-3.5" />
-            {hiddenTaskCount} more recommendation{hiddenTaskCount !== 1 ? "s" : ""} — upgrade to see them
+            {hiddenTaskCount} more recommendation{hiddenTaskCount !== 1 ? "s" : ""}. Upgrade to see them.
           </p>
           {Array.from({ length: Math.min(hiddenTaskCount!, 3) }).map((_, i) => (
             <LockedTaskCard key={i} />

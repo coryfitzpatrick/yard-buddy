@@ -154,8 +154,8 @@ export function BillingSection({
           {isExpired && (
             <p className="text-sm text-red-600 font-medium mt-0.5">
               {daysUntilDeletion! > 0
-                ? `Your data will be deleted in ${daysUntilDeletion} day${daysUntilDeletion !== 1 ? "s" : ""} — upgrade to keep it`
-                : "Your data is scheduled for deletion — upgrade now"}
+                ? `Your data will be deleted in ${daysUntilDeletion} day${daysUntilDeletion !== 1 ? "s" : ""}. Upgrade to keep it.`
+                : "Your data is scheduled for deletion. Upgrade now."}
             </p>
           )}
         </div>
@@ -326,7 +326,7 @@ export function BillingSection({
           ) : canPauseSubscription && dialog !== "cancel" ? (
             dialog === "pause" ? (
               <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 space-y-3">
-                <p className="text-sm font-medium text-gray-800">Pause billing for winter — how long?</p>
+                <p className="text-sm font-medium text-gray-800">Pause billing for winter. How long?</p>
                 <div className="flex gap-2 flex-wrap">
                   {[1, 2, 3, 4, 5, 6].map((m) => (
                     <button

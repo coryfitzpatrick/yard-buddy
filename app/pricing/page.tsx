@@ -192,7 +192,7 @@ export default async function PricingPage() {
                   <span className="text-gray-400 text-sm"> per month</span>
                 </div>
                 <p className="text-xs text-green-600 font-medium mt-0.5">
-                  ${plan.annual} per year — save 2 months
+                  ${plan.annual} per year. Save 2 months.
                 </p>
               </div>
 
