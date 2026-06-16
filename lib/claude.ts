@@ -392,13 +392,26 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
 }
 
 export async function analyzeImages(
-  imageUrls: string[],
+  photos: Array<{ url: string; kind: string }>,
   context: LawnContext
 ): Promise<AnalysisResult> {
-  const imageContent = imageUrls.map((url) => ({
-    type: "image" as const,
-    source: { type: "url" as const, url },
-  }));
+  const { promptLabelFor } = await import("@/lib/photo-kinds");
+  // Interleave a short text label before each image so Claude knows the
+  // intent of each shot (wide overview vs. damage close-up vs. weed ID).
+  const imageContent: Array<
+    | { type: "text"; text: string }
+    | { type: "image"; source: { type: "url"; url: string } }
+  > = [];
+  photos.forEach((photo, i) => {
+    imageContent.push({
+      type: "text",
+      text: `Photo ${i + 1} — ${promptLabelFor(photo.kind)}:`,
+    });
+    imageContent.push({
+      type: "image",
+      source: { type: "url", url: photo.url },
+    });
+  });
 
   // Build section-aware system prompt when enriched context is available
   const systemPrompt = context.weatherData

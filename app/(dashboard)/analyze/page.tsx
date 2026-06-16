@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PhotoUpload } from "@/components/analysis/PhotoUpload";
+import { PhotoUpload, type UploadedPhoto } from "@/components/analysis/PhotoUpload";
 import { AnalysisResults } from "@/components/analysis/AnalysisResults";
 import type { AnalysisResult, AreaType } from "@/types";
 import { Loader2, ArrowRight, Plus, Camera } from "lucide-react";
@@ -62,7 +62,7 @@ export default function AnalyzePage() {
     setInvalidPhotos(false);
   }
 
-  async function handleUploaded(urls: string[]) {
+  async function handleUploaded(photos: UploadedPhoto[]) {
     if (!selectedSectionId) return;
     setInvalidPhotos(false);
     const controller = new AbortController();
@@ -75,7 +75,7 @@ export default function AnalyzePage() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sectionId: selectedSectionId, imageUrls: urls }),
+        body: JSON.stringify({ sectionId: selectedSectionId, photos }),
         signal: controller.signal,
       });
       if (!res.ok) {

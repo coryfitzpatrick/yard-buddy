@@ -27,13 +27,25 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { sectionId, imageUrls } = await req.json();
-  if (!sectionId || !Array.isArray(imageUrls) || imageUrls.length === 0) {
-    return NextResponse.json({ error: "sectionId and imageUrls[] required" }, { status: 400 });
+  const body = await req.json();
+  const { sectionId } = body;
+  // Accept either { photos: [{url, kind}] } (new) or { imageUrls: [...] } (legacy).
+  const photos: Array<{ url: string; kind: string }> = Array.isArray(body.photos)
+    ? body.photos.filter((p: unknown): p is { url: string; kind: string } =>
+        typeof p === "object" && p !== null && typeof (p as { url?: unknown }).url === "string"
+      )
+    : Array.isArray(body.imageUrls)
+      ? body.imageUrls.filter((u: unknown): u is string => typeof u === "string").map((url: string) => ({ url, kind: "other" }))
+      : [];
+
+  if (!sectionId || photos.length === 0) {
+    return NextResponse.json({ error: "sectionId and photos[] required" }, { status: 400 });
   }
-  if (imageUrls.length > 4) {
-    return NextResponse.json({ error: "Maximum 4 images per analysis" }, { status: 400 });
+  const { MAX_PHOTOS } = await import("@/lib/photo-kinds");
+  if (photos.length > MAX_PHOTOS) {
+    return NextResponse.json({ error: `Maximum ${MAX_PHOTOS} photos per analysis` }, { status: 400 });
   }
+  const imageUrls = photos.map((p) => p.url);
 
   let validation: { valid: boolean; feedback: string | null };
   try {
@@ -115,7 +127,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const today = new Date();
-    const result = await analyzeImages(imageUrls, {
+    const result = await analyzeImages(photos, {
       grassType: section.grassType as import("@/types").GrassType,
       zipCode: section.yard.zipCode,
       areaType: section.areaType,
