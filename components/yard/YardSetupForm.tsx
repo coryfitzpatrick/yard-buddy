@@ -84,7 +84,7 @@ export function YardSetupForm() {
   const activeStepIdx = activeSteps.indexOf(step);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [step]);
 
   function handleSetupModeChange(mode: "whole" | "sections") {
