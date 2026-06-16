@@ -40,6 +40,9 @@ export default function AnalyzePage() {
           if (yard) { setSelectedYardId(yard.id); setSelectedSectionId(preselect); }
         } else if (data.length === 1) {
           setSelectedYardId(data[0].id);
+          if (data[0].sections.length === 1) {
+            setSelectedSectionId(data[0].sections[0].id);
+          }
         }
       })
       .catch(() => {})
@@ -51,7 +54,8 @@ export default function AnalyzePage() {
   function handleYardSelect(yardId: string) {
     if (yardId === selectedYardId) return;
     setSelectedYardId(yardId);
-    setSelectedSectionId("");
+    const yard = yards.find((y) => y.id === yardId);
+    setSelectedSectionId(yard?.sections.length === 1 ? yard.sections[0].id : "");
     setResult(null);
     setAnalysisError(null);
     setAnalysisLimitReached(false);
@@ -168,7 +172,7 @@ export default function AnalyzePage() {
               </CardContent>
             </Card>
           )}
-          {selectedYard && selectedYard.sections.length > 0 && (
+          {selectedYard && selectedYard.sections.length > 1 && (
             <div className="mb-6">
               <p className="text-sm font-medium text-gray-700 mb-3">Which section are you photographing?</p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">

@@ -18,7 +18,18 @@ import { supabaseClient } from "@/lib/supabase-client";
 
 import { toSqft, toDisplaySize } from "@/lib/size-utils";
 
-const STEPS = ["Property", "Area Type", "Grass Type", "Soil & Equipment", "Review"];
+const STEP_LABELS: Record<number, string> = {
+  0: "Property",
+  1: "Area Type",
+  2: "Grass Type",
+  3: "Soil & Equipment",
+  4: "Review",
+};
+// Internal step indices for each entry path. New-yard flow skips Area Type —
+// the auto-created section is "Whole Yard" / areaType="other". Add-another-section
+// flow keeps it because that's the whole point of splitting a yard.
+const NEW_YARD_FLOW = [0, 2, 3, 4] as const;
+const ADD_SECTION_FLOW = [0, 1, 2, 3, 4] as const;
 
 const SPREADER_BRANDS: Record<string, string[]> = {
   broadcast: ["Scotts EdgeGuard DLX", "Scotts Turf Builder EdgeGuard", "Andersons Rotary Spreader", "Lesco 80 lb Rotary", "Earthway 2600"],
@@ -42,6 +53,7 @@ export function YardSetupForm() {
   const [createdYardId, setCreatedYardId] = useState<string | null>(null);
   const [createdPropertyName, setCreatedPropertyName] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [addingAnotherSection, setAddingAnotherSection] = useState(false);
 
   const [propertyName, setPropertyName] = useState("My Property");
   const [zipCode, setZipCode] = useState("");
@@ -50,13 +62,16 @@ export function YardSetupForm() {
   const { handleSubmit, watch, setValue, register, reset, trigger, formState: { errors, isSubmitting } } =
     useForm<YardSectionFormInput, unknown, YardSectionInput>({
       resolver: zodResolver(yardSectionSchema),
-      defaultValues: { name: "Front Yard", grassType: "unknown" },
+      defaultValues: { name: "Whole Yard", areaType: "other", grassType: "unknown" },
     });
 
   const [spreaderType, setSpreaderType] = useState<string>("");
   const [spreaderModel, setSpreaderModel] = useState<string>("");
   const [wateringDaysPerWeek, setWateringDaysPerWeek] = useState("");
   const [wateringMinutesPerSession, setWateringMinutesPerSession] = useState("");
+
+  const activeSteps: readonly number[] = createdYardId ? ADD_SECTION_FLOW : NEW_YARD_FLOW;
+  const activeStepIdx = activeSteps.indexOf(step);
 
   const areaType = watch("areaType") as AreaType | undefined;
   const grassType = watch("grassType") as YardSectionInput["grassType"] | undefined;
@@ -250,6 +265,7 @@ export function YardSetupForm() {
     setIdentifyError(null);
     setHighlightUpload(false);
     setShowSuccess(false);
+    setAddingAnotherSection(true);
     setStep(1);
   }
 
@@ -259,9 +275,15 @@ export function YardSetupForm() {
         <div className="text-center space-y-6 py-8">
           <CheckCircle2 className="mx-auto w-16 h-16 text-green-500" />
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">Section added!</h3>
+            <h3 className="text-xl font-semibold text-gray-900">
+              {addingAnotherSection ? "Section added!" : "Yard set up!"}
+            </h3>
             <p className="text-gray-500 mt-1">
-              <span className="font-medium">{createdPropertyName}</span> is set up with your new section.
+              {addingAnotherSection ? (
+                <><span className="font-medium">{createdPropertyName}</span> has a new section ready to analyze.</>
+              ) : (
+                <><span className="font-medium">{createdPropertyName}</span> is ready. Upload photos any time to get a custom plan, or split it into sections later.</>
+              )}
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -280,11 +302,11 @@ export function YardSetupForm() {
       ) : (
         <>
           <div className="flex gap-1 mb-8">
-            {STEPS.map((s, i) => (
-              <div key={s} className={`flex-1 h-2 rounded-full transition-colors ${i <= step ? "bg-green-500" : "bg-gray-200"}`} />
+            {activeSteps.map((stepNum, idx) => (
+              <div key={stepNum} className={`flex-1 h-2 rounded-full transition-colors ${idx <= activeStepIdx ? "bg-green-500" : "bg-gray-200"}`} />
             ))}
           </div>
-          <h2 className="text-xl font-semibold mb-1">{STEPS[step]}</h2>
+          <h2 className="text-xl font-semibold mb-1">{STEP_LABELS[step]}</h2>
           <p className="text-sm text-gray-400 mb-4">All details can be updated later.</p>
 
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -531,8 +553,12 @@ export function YardSetupForm() {
                 <div className="rounded-lg bg-gray-50 p-4 space-y-2">
                   {!createdYardId && <div><span className="font-medium">Property:</span> {propertyName} ({zipCode})</div>}
                   {createdYardId && <div><span className="font-medium">Property:</span> {createdPropertyName}</div>}
-                  <div><span className="font-medium">Section:</span> {watch("name")}</div>
-                  <div><span className="font-medium">Area:</span> {watch("areaType")?.replace(/_/g, " ") ?? "Not specified"}</div>
+                  {createdYardId && (
+                    <>
+                      <div><span className="font-medium">Section:</span> {watch("name")}</div>
+                      <div><span className="font-medium">Area:</span> {watch("areaType")?.replace(/_/g, " ") ?? "Not specified"}</div>
+                    </>
+                  )}
                   <div><span className="font-medium">Grass:</span> {watch("grassType")?.replace(/_/g, " ")}</div>
                   {!!watch("yardSizeSqft") && (
                     <div><span className="font-medium">Size:</span> {String(watch("yardSizeSqft"))} sq ft</div>
@@ -545,11 +571,11 @@ export function YardSetupForm() {
             )}
 
             <div className="flex justify-between mt-8">
-              {step > 0 ? (
-                <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>Back</Button>
+              {activeStepIdx > 0 ? (
+                <Button type="button" variant="outline" onClick={() => setStep(activeSteps[activeStepIdx - 1])}>Back</Button>
               ) : <div />}
-              {step < STEPS.length - 1 ? (
-                <Button type="button" onClick={async () => { if (await canAdvance()) setStep((s) => s + 1); }}
+              {activeStepIdx < activeSteps.length - 1 ? (
+                <Button type="button" onClick={async () => { if (await canAdvance()) setStep(activeSteps[activeStepIdx + 1]); }}
                   className="bg-green-600 hover:bg-green-700">Next</Button>
               ) : (
                 <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
