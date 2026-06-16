@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Camera, CheckCircle, CheckCircle2, Images, Loader2, Plus, Search } from "lucide-react";
 import { supabaseClient } from "@/lib/supabase-client";
+import { cn } from "@/lib/utils";
 
 import { toSqft, toDisplaySize } from "@/lib/size-utils";
 
@@ -25,11 +26,11 @@ const STEP_LABELS: Record<number, string> = {
   3: "Soil & Equipment",
   4: "Review",
 };
-// Internal step indices for each entry path. New-yard flow skips Area Type —
-// the auto-created section is "Whole Yard" / areaType="other". Add-another-section
-// flow keeps it because that's the whole point of splitting a yard.
-const NEW_YARD_FLOW = [0, 2, 3, 4] as const;
-const ADD_SECTION_FLOW = [0, 1, 2, 3, 4] as const;
+// Internal step indices for each entry path. Whole-yard flow skips Area Type —
+// the auto-created section is "Whole Yard" / areaType="other". Per-section flows
+// keep Area Type because picking what part of the yard this is is the whole point.
+const WHOLE_YARD_FLOW = [0, 2, 3, 4] as const;
+const BY_SECTION_FLOW = [0, 1, 2, 3, 4] as const;
 
 const SPREADER_BRANDS: Record<string, string[]> = {
   broadcast: ["Scotts EdgeGuard DLX", "Scotts Turf Builder EdgeGuard", "Andersons Rotary Spreader", "Lesco 80 lb Rotary", "Earthway 2600"],
@@ -58,6 +59,7 @@ export function YardSetupForm() {
   const [propertyName, setPropertyName] = useState("My Property");
   const [zipCode, setZipCode] = useState("");
   const [zipError, setZipError] = useState<string | null>(null);
+  const [setupMode, setSetupMode] = useState<"whole" | "sections">("whole");
 
   const { handleSubmit, watch, setValue, register, reset, trigger, formState: { errors, isSubmitting } } =
     useForm<YardSectionFormInput, unknown, YardSectionInput>({
@@ -70,8 +72,20 @@ export function YardSetupForm() {
   const [wateringDaysPerWeek, setWateringDaysPerWeek] = useState("");
   const [wateringMinutesPerSession, setWateringMinutesPerSession] = useState("");
 
-  const activeSteps: readonly number[] = createdYardId ? ADD_SECTION_FLOW : NEW_YARD_FLOW;
+  const activeSteps: readonly number[] =
+    createdYardId || setupMode === "sections" ? BY_SECTION_FLOW : WHOLE_YARD_FLOW;
   const activeStepIdx = activeSteps.indexOf(step);
+
+  function handleSetupModeChange(mode: "whole" | "sections") {
+    setSetupMode(mode);
+    if (mode === "whole") {
+      setValue("name", "Whole Yard");
+      setValue("areaType", "other");
+    } else {
+      setValue("name", "Front Yard");
+      setValue("areaType", "front");
+    }
+  }
 
   const areaType = watch("areaType") as AreaType | undefined;
   const grassType = watch("grassType") as YardSectionInput["grassType"] | undefined;
@@ -331,6 +345,46 @@ export function YardSetupForm() {
                   <Label>ZIP Code *</Label>
                   <Input placeholder="90210" maxLength={5} value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
                   {zipError && <p className="text-sm text-red-500">{zipError}</p>}
+                </div>
+                <div className="space-y-2 pt-2">
+                  <Label>How would you like to set this up?</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSetupModeChange("whole")}
+                      className={cn(
+                        "rounded-lg border-2 p-3 text-left transition-all",
+                        setupMode === "whole"
+                          ? "border-green-600 bg-green-50"
+                          : "border-gray-200 bg-white hover:border-green-400"
+                      )}
+                    >
+                      <div className={cn("font-medium text-sm", setupMode === "whole" ? "text-green-900" : "text-gray-800")}>
+                        Whole yard
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        Quickest. One plan for the entire lawn.
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSetupModeChange("sections")}
+                      className={cn(
+                        "rounded-lg border-2 p-3 text-left transition-all",
+                        setupMode === "sections"
+                          ? "border-green-600 bg-green-50"
+                          : "border-gray-200 bg-white hover:border-green-400"
+                      )}
+                    >
+                      <div className={cn("font-medium text-sm", setupMode === "sections" ? "text-green-900" : "text-gray-800")}>
+                        By section
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        Different grass or care for front, back, side, etc.
+                      </div>
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400">You can split your yard into sections later either way.</p>
                 </div>
               </div>
             )}
