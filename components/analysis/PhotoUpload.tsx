@@ -152,13 +152,6 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
     hasSelection: () => populated.length > 0,
   }), [populated.length]);  // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Count current slots per kind — used to label cards like "Damage · 2 of 3".
-  const kindIndexes = new Map<string, number>();
-  const kindCounts = new Map<PhotoKind, number>();
-  slots.forEach((slot) => {
-    kindCounts.set(slot.kind, (kindCounts.get(slot.kind) ?? 0) + 1);
-  });
-
   return (
     <div className="space-y-4">
       <div className="rounded-lg bg-green-50 border border-green-100 px-4 py-3">
@@ -177,15 +170,8 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
         {slots.map((slot) => {
           const meta = PHOTO_KIND_META[slot.kind];
           const Icon = KIND_ICONS[slot.kind] ?? ImagePlus;
-          const totalForKind = kindCounts.get(slot.kind) ?? 1;
-          const positionInKind = (kindIndexes.get(slot.kind) ?? 0) + 1;
-          kindIndexes.set(slot.kind, positionInKind);
           const showAddAnother = meta.allowMultiple && !!slot.state && canAddMore;
-          const limitLabel = !meta.allowMultiple
-            ? "1 photo max"
-            : totalForKind === 1
-              ? "Add more if needed"
-              : `Photo ${positionInKind} of ${totalForKind}`;
+          const limitLabel = meta.allowMultiple ? "Multiple OK" : "1 photo max";
           return (
             <SlotCard
               key={slot.id}
