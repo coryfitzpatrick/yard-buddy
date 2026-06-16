@@ -181,9 +181,11 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
           const positionInKind = (kindIndexes.get(slot.kind) ?? 0) + 1;
           kindIndexes.set(slot.kind, positionInKind);
           const showAddAnother = meta.allowMultiple && !!slot.state && canAddMore;
-          const limitLabel = meta.allowMultiple
-            ? `Photo ${positionInKind} of ${totalForKind}`
-            : "1 photo max";
+          const limitLabel = !meta.allowMultiple
+            ? "1 photo max"
+            : totalForKind === 1
+              ? "Add more if needed"
+              : `Photo ${positionInKind} of ${totalForKind}`;
           return (
             <SlotCard
               key={slot.id}
