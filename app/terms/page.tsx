@@ -55,7 +55,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">6. Payments and Billing</h2>
-            <p>Some features require a paid subscription. Billing terms, pricing, and refund policies are presented at the time of purchase. You may cancel at any time; access continues until the end of the current billing period. For billing questions, contact us at <a href="mailto:contact@yardanalyzer.app" className="text-green-600 hover:underline">contact@yardanalyzer.app</a>.</p>
+            <p>Some features require a paid subscription. Billing terms, pricing, and refund policies are presented at the time of purchase. You may cancel at any time; access continues until the end of the current billing period. For billing questions, contact us at <a href="mailto:contact@yardanalyzer.com" className="text-green-600 hover:underline">contact@yardanalyzer.com</a>.</p>
           </section>
 
           <section>
@@ -87,7 +87,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">12. Contact</h2>
-            <p>Questions about these terms? Email us at <a href="mailto:contact@yardanalyzer.app" className="text-green-600 hover:underline">contact@yardanalyzer.app</a>.</p>
+            <p>Questions about these terms? Email us at <a href="mailto:contact@yardanalyzer.com" className="text-green-600 hover:underline">contact@yardanalyzer.com</a>.</p>
           </section>
 
         </div>
