@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, forwardRef, useImperativeHandle, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Camera, Images, X, Loader2, Expand, ZoomIn, ScanEye, Sprout, ImagePlus, Plus, Trash2 } from "lucide-react";
@@ -17,10 +17,19 @@ export interface UploadedPhoto {
   kind: string;
 }
 
+export interface PhotoUploadHandle {
+  upload: () => Promise<UploadedPhoto[]>;
+  hasSelection: () => boolean;
+}
+
 interface Props {
-  onUploaded: (photos: UploadedPhoto[]) => void;
+  onUploaded?: (photos: UploadedPhoto[]) => void;
+  onSelectionChange?: (count: number) => void;
   onReset?: () => void;
   analyzing?: boolean;
+  // Hide the built-in "Analyze N Photos" submit button — useful when the parent
+  // owns the submit action and just wants this component for photo collection.
+  hideSubmitButton?: boolean;
 }
 
 interface Slot {
@@ -53,7 +62,10 @@ function nextId(kind: PhotoKind) {
   return `added-${slotCounter}-${kind}`;
 }
 
-export function PhotoUpload({ onUploaded, onReset, analyzing = false }: Props) {
+export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUpload(
+  { onUploaded, onSelectionChange, onReset, analyzing = false, hideSubmitButton = false },
+  ref
+) {
   const [slots, setSlots] = useState<Slot[]>(() => makeInitialSlots());
   const [uploading, setUploading] = useState(false);
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -90,7 +102,13 @@ export function PhotoUpload({ onUploaded, onReset, analyzing = false }: Props) {
   const totalSlots = slots.length;
   const canAddMore = totalSlots < MAX_PHOTOS;
 
-  async function uploadAll() {
+  // Notify parent of selection-count changes so it can enable/disable its own
+  // submit affordance (used by YardSetupForm).
+  useEffect(() => {
+    onSelectionChange?.(populated.length);
+  }, [populated.length, onSelectionChange]);
+
+  async function uploadAll(): Promise<UploadedPhoto[]> {
     setUploading(true);
     try {
       const results: UploadedPhoto[] = [];
@@ -122,11 +140,24 @@ export function PhotoUpload({ onUploaded, onReset, analyzing = false }: Props) {
           // skip individual upload failure; other photos still go through
         }
       }
-      if (results.length > 0) onUploaded(results);
+      if (results.length > 0) onUploaded?.(results);
+      return results;
     } finally {
       setUploading(false);
     }
   }
+
+  useImperativeHandle(ref, () => ({
+    upload: uploadAll,
+    hasSelection: () => populated.length > 0,
+  }), [populated.length]);  // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Count current slots per kind — used to label cards like "Damage · 2 of 3".
+  const kindIndexes = new Map<string, number>();
+  const kindCounts = new Map<PhotoKind, number>();
+  slots.forEach((slot) => {
+    kindCounts.set(slot.kind, (kindCounts.get(slot.kind) ?? 0) + 1);
+  });
 
   return (
     <div className="space-y-4">
@@ -135,9 +166,10 @@ export function PhotoUpload({ onUploaded, onReset, analyzing = false }: Props) {
           Photo guide
         </p>
         <p className="text-xs text-gray-600">
-          Add one photo per slot — skip any that don&apos;t apply. For damage zones and weed species,
-          tap <span className="font-medium text-gray-700">+ Add another</span> to include multiples.
-          Only the wide overview is truly critical.
+          Use the slots below to upload photos by type. Skip anything that doesn&apos;t apply. Damage,
+          weed, and other slots accept multiples — tap{" "}
+          <span className="font-medium text-gray-700">+ Add another</span> to capture different
+          zones or species. Only the wide overview is truly critical.
         </p>
       </div>
 
@@ -145,13 +177,20 @@ export function PhotoUpload({ onUploaded, onReset, analyzing = false }: Props) {
         {slots.map((slot) => {
           const meta = PHOTO_KIND_META[slot.kind];
           const Icon = KIND_ICONS[slot.kind] ?? ImagePlus;
+          const totalForKind = kindCounts.get(slot.kind) ?? 1;
+          const positionInKind = (kindIndexes.get(slot.kind) ?? 0) + 1;
+          kindIndexes.set(slot.kind, positionInKind);
           const showAddAnother = meta.allowMultiple && !!slot.state && canAddMore;
+          const limitLabel = meta.allowMultiple
+            ? `Photo ${positionInKind} of ${totalForKind}`
+            : "1 photo max";
           return (
             <SlotCard
               key={slot.id}
               slot={slot}
               icon={Icon}
               labelOverride={meta.label}
+              limitLabel={limitLabel}
               description={meta.description}
               cameraRef={(el) => { cameraInputs.current[slot.id] = el; }}
               fileRef={(el) => { fileInputs.current[slot.id] = el; }}
@@ -170,7 +209,7 @@ export function PhotoUpload({ onUploaded, onReset, analyzing = false }: Props) {
         {populated.length}/{MAX_PHOTOS} photos added
       </p>
 
-      {populated.length > 0 && !analyzing && (
+      {!hideSubmitButton && populated.length > 0 && !analyzing && (
         <Button
           onClick={uploadAll}
           disabled={uploading}
@@ -185,12 +224,13 @@ export function PhotoUpload({ onUploaded, onReset, analyzing = false }: Props) {
       )}
     </div>
   );
-}
+});
 
 interface SlotCardProps {
   slot: Slot;
   icon: typeof Expand;
   labelOverride: string;
+  limitLabel: string;
   description: string;
   cameraRef: (el: HTMLInputElement | null) => void;
   fileRef: (el: HTMLInputElement | null) => void;
@@ -202,7 +242,7 @@ interface SlotCardProps {
   onAddAnother?: () => void;
 }
 
-function SlotCard({ slot, icon: Icon, labelOverride, description, cameraRef, fileRef, onPickCamera, onPickFile, onFile, onClearPhoto, onRemoveSlot, onAddAnother }: SlotCardProps) {
+function SlotCard({ slot, icon: Icon, labelOverride, limitLabel, description, cameraRef, fileRef, onPickCamera, onPickFile, onFile, onClearPhoto, onRemoveSlot, onAddAnother }: SlotCardProps) {
   const filled = !!slot.state;
   return (
     <div className={`rounded-xl border-2 transition-colors ${filled ? "border-green-300 bg-green-50/40" : "border-dashed border-gray-200 bg-white"}`}>
@@ -225,7 +265,10 @@ function SlotCard({ slot, icon: Icon, labelOverride, description, cameraRef, fil
         <div className="flex items-start gap-2">
           <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${filled ? "text-green-600" : "text-gray-400"}`} />
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-semibold text-gray-900 leading-tight">{labelOverride}</div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-sm font-semibold text-gray-900 leading-tight">{labelOverride}</span>
+              <span className="text-[10px] uppercase tracking-wide text-gray-400 font-medium">{limitLabel}</span>
+            </div>
             <p className="text-xs text-gray-500 leading-snug mt-0.5">{description}</p>
           </div>
           {onRemoveSlot && !filled && (
@@ -241,16 +284,21 @@ function SlotCard({ slot, icon: Icon, labelOverride, description, cameraRef, fil
         </div>
 
         {filled ? (
-          <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
-            <Image src={slot.state!.preview} alt={`${labelOverride} preview`} fill className="object-cover" unoptimized />
-            <button
-              type="button"
-              onClick={onClearPhoto}
-              className="absolute top-1.5 right-1.5 bg-black/60 rounded-full p-1 text-white hover:bg-black/80"
-              aria-label={`Remove ${labelOverride} photo`}
-            >
-              <X className="w-3 h-3" />
-            </button>
+          <div className="flex items-center gap-3 pt-1">
+            <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+              <Image src={slot.state!.preview} alt={`${labelOverride} preview`} fill className="object-cover" unoptimized />
+            </div>
+            <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
+              <span className="text-xs text-green-700 font-medium truncate">Photo ready</span>
+              <button
+                type="button"
+                onClick={onClearPhoto}
+                className="shrink-0 inline-flex items-center gap-1 text-xs text-gray-500 hover:text-red-600 font-medium px-2 py-1 rounded-md hover:bg-red-50 transition-colors"
+                aria-label={`Remove ${labelOverride} photo`}
+              >
+                <X className="w-3 h-3" /> Remove
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">

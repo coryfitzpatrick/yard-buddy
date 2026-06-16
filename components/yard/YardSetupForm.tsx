@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Camera, CheckCircle, CheckCircle2, Images, Loader2, Plus, Search } from "lucide-react";
 import { supabaseClient } from "@/lib/supabase-client";
 import { cn } from "@/lib/utils";
+import { PhotoUpload, type PhotoUploadHandle } from "@/components/analysis/PhotoUpload";
 
 import { toSqft, toDisplaySize } from "@/lib/size-utils";
 
@@ -24,13 +25,14 @@ const STEP_LABELS: Record<number, string> = {
   1: "Area Type",
   2: "Grass Type",
   3: "Soil & Equipment",
-  4: "Review",
+  4: "Photos",
+  5: "Review",
 };
 // Internal step indices for each entry path. Whole-yard flow skips Area Type —
 // the auto-created section is "Whole Yard" / areaType="other". Per-section flows
 // keep Area Type because picking what part of the yard this is is the whole point.
-const WHOLE_YARD_FLOW = [0, 2, 3, 4] as const;
-const BY_SECTION_FLOW = [0, 1, 2, 3, 4] as const;
+const WHOLE_YARD_FLOW = [0, 2, 3, 4, 5] as const;
+const BY_SECTION_FLOW = [0, 1, 2, 3, 4, 5] as const;
 
 const SPREADER_BRANDS: Record<string, string[]> = {
   broadcast: ["Scotts EdgeGuard DLX", "Scotts Turf Builder EdgeGuard", "Andersons Rotary Spreader", "Lesco 80 lb Rotary", "Earthway 2600"],
@@ -52,9 +54,14 @@ export function YardSetupForm() {
   const [error, setError] = useState<string | null>(null);
   const [yardLimitReached, setYardLimitReached] = useState(false);
   const [createdYardId, setCreatedYardId] = useState<string | null>(null);
+  const [createdYardSlug, setCreatedYardSlug] = useState<string | null>(null);
   const [createdPropertyName, setCreatedPropertyName] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [addingAnotherSection, setAddingAnotherSection] = useState(false);
+  const [setupPhotoCount, setSetupPhotoCount] = useState(0);
+  const [postSaveStatus, setPostSaveStatus] = useState<"idle" | "saving" | "uploading" | "analyzing">("idle");
+  const [analyzedSectionSlug, setAnalyzedSectionSlug] = useState<string | null>(null);
+  const photoUploadRef = useRef<PhotoUploadHandle | null>(null);
 
   const [propertyName, setPropertyName] = useState("My Property");
   const [zipCode, setZipCode] = useState("");
@@ -224,6 +231,7 @@ export function YardSetupForm() {
         const yard = await yardRes.json();
         yardId = yard.id;
         setCreatedYardId(yard.id);
+        setCreatedYardSlug(yard.slug);
         setCreatedPropertyName(propertyName);
       } catch {
         setError("Network error. Please check your connection.");
@@ -246,17 +254,51 @@ export function YardSetupForm() {
       } catch { /* best-effort yard update */ }
     }
 
+    let createdSection: { id: string; slug: string } | null = null;
     try {
+      setPostSaveStatus("saving");
       const sectionRes = await fetch(`/api/yard/${yardId}/sections`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sectionData),
       });
-      if (!sectionRes.ok) { setError("Failed to save section. Please try again."); return; }
-      setShowSuccess(true);
+      if (!sectionRes.ok) {
+        setError("Failed to save section. Please try again.");
+        setPostSaveStatus("idle");
+        return;
+      }
+      createdSection = await sectionRes.json();
     } catch {
       setError("Network error. Please check your connection.");
+      setPostSaveStatus("idle");
+      return;
     }
+
+    // If the user added photos in the Photos step, upload + analyze before
+    // showing success. This way they land on a populated section, not an empty one.
+    if (createdSection && photoUploadRef.current?.hasSelection()) {
+      try {
+        setPostSaveStatus("uploading");
+        const photos = await photoUploadRef.current.upload();
+        if (photos.length > 0) {
+          setPostSaveStatus("analyzing");
+          const analyzeRes = await fetch("/api/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sectionId: createdSection.id, photos }),
+          });
+          if (analyzeRes.ok) {
+            setAnalyzedSectionSlug(createdSection.slug);
+          }
+          // Analysis failure isn't blocking — yard + section still exist.
+        }
+      } catch {
+        // Same — surface success anyway; user can re-analyze from /analyze.
+      }
+    }
+
+    setPostSaveStatus("idle");
+    setShowSuccess(true);
   }
 
   const canAdvance = async () => {
@@ -280,6 +322,8 @@ export function YardSetupForm() {
     setHighlightUpload(false);
     setShowSuccess(false);
     setAddingAnotherSection(true);
+    setAnalyzedSectionSlug(null);
+    setSetupPhotoCount(0);
     setStep(1);
   }
 
@@ -293,7 +337,9 @@ export function YardSetupForm() {
               {addingAnotherSection ? "Section added!" : "Yard set up!"}
             </h3>
             <p className="text-gray-500 mt-1">
-              {addingAnotherSection ? (
+              {analyzedSectionSlug ? (
+                <><span className="font-medium">{createdPropertyName}</span> is set up and your photos have been analyzed.</>
+              ) : addingAnotherSection ? (
                 <><span className="font-medium">{createdPropertyName}</span> has a new section ready to analyze.</>
               ) : (
                 <><span className="font-medium">{createdPropertyName}</span> is ready. Upload photos any time to get a custom plan, or split it into sections later.</>
@@ -304,13 +350,26 @@ export function YardSetupForm() {
             <Button type="button" variant="outline" onClick={handleAddAnotherSection}>
               <Plus className="w-4 h-4 mr-2" /> Add Another Section
             </Button>
-            <Button
-              type="button"
-              className="bg-green-600 hover:bg-green-700"
-              onClick={() => { router.push("/dashboard"); router.refresh(); }}
-            >
-              Go to Dashboard
-            </Button>
+            {analyzedSectionSlug && createdYardSlug ? (
+              <Button
+                type="button"
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => {
+                  router.push(`/yard/${createdYardSlug}/sections/${analyzedSectionSlug}`);
+                  router.refresh();
+                }}
+              >
+                View analysis
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => { router.push("/dashboard"); router.refresh(); }}
+              >
+                Go to Dashboard
+              </Button>
+            )}
           </div>
         </div>
       ) : (
@@ -602,6 +661,20 @@ export function YardSetupForm() {
             )}
 
             {step === 4 && (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-500">
+                  Photos are optional, but adding them now means you&apos;ll land on a populated lawn
+                  analysis right after Save. You can always add them later from Analyze.
+                </p>
+                <PhotoUpload
+                  ref={photoUploadRef}
+                  hideSubmitButton
+                  onSelectionChange={setSetupPhotoCount}
+                />
+              </div>
+            )}
+
+            {step === 5 && (
               <div className="space-y-3 text-sm">
                 <p className="text-gray-500">Review before saving.</p>
                 <div className="rounded-lg bg-gray-50 p-4 space-y-2">
@@ -620,6 +693,12 @@ export function YardSetupForm() {
                   {!!spreaderType && (
                     <div><span className="font-medium">Spreader:</span> {spreaderType}</div>
                   )}
+                  <div>
+                    <span className="font-medium">Photos:</span>{" "}
+                    {setupPhotoCount > 0
+                      ? `${setupPhotoCount} ready — we'll analyze them right after saving`
+                      : "None — you can add them later"}
+                  </div>
                 </div>
               </div>
             )}
@@ -632,8 +711,11 @@ export function YardSetupForm() {
                 <Button type="button" onClick={async () => { if (await canAdvance()) setStep(activeSteps[activeStepIdx + 1]); }}
                   className="bg-green-600 hover:bg-green-700">Next</Button>
               ) : (
-                <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
-                  {isSubmitting ? "Saving…" : "Save"}
+                <Button type="submit" disabled={isSubmitting || postSaveStatus !== "idle"} className="bg-green-600 hover:bg-green-700">
+                  {postSaveStatus === "saving" && "Saving…"}
+                  {postSaveStatus === "uploading" && "Uploading photos…"}
+                  {postSaveStatus === "analyzing" && "Analyzing your lawn…"}
+                  {postSaveStatus === "idle" && (setupPhotoCount > 0 ? "Save & analyze" : "Save")}
                 </Button>
               )}
             </div>
