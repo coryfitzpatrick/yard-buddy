@@ -14,10 +14,9 @@ interface Props {
 }
 
 export function EmailSection({ initialEmail, linkedToGoogle }: Props) {
-  const [email, setEmail] = useState(initialEmail);
   const [editing, setEditing] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<ChangeEmailInput>({
     resolver: zodResolver(changeEmailSchema),
@@ -25,7 +24,6 @@ export function EmailSection({ initialEmail, linkedToGoogle }: Props) {
 
   async function onSubmit(data: ChangeEmailInput) {
     setServerError(null);
-    setSuccess(false);
     const res = await fetch("/api/user/email", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -36,8 +34,7 @@ export function EmailSection({ initialEmail, linkedToGoogle }: Props) {
       setServerError(json.error ?? "Something went wrong. Please try again.");
       return;
     }
-    setEmail(json.email ?? data.newEmail);
-    setSuccess(true);
+    setPendingEmail(json.pendingEmail ?? data.newEmail);
     setEditing(false);
     reset();
   }
@@ -47,7 +44,7 @@ export function EmailSection({ initialEmail, linkedToGoogle }: Props) {
       <div className="space-y-2">
         <Label className="text-xs uppercase tracking-wide text-gray-400">Email</Label>
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm text-gray-900 font-medium break-all">{email}</span>
+          <span className="text-sm text-gray-900 font-medium break-all">{initialEmail}</span>
           <span className="text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5 font-medium border border-blue-200">
             Linked to Google
           </span>
@@ -62,15 +59,20 @@ export function EmailSection({ initialEmail, linkedToGoogle }: Props) {
   if (!editing) {
     return (
       <div className="space-y-3">
-        {success && (
-          <div className="rounded-md bg-green-50 p-3 text-sm text-green-700">Email updated.</div>
+        {pendingEmail && (
+          <div className="rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-900">
+            <p className="font-medium">Confirmation sent to {pendingEmail}</p>
+            <p className="text-amber-800 mt-0.5">
+              Click the link in that inbox within 1 hour to finish the change. Your current email stays active until you do.
+            </p>
+          </div>
         )}
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="space-y-0.5">
             <Label className="text-xs uppercase tracking-wide text-gray-400">Email</Label>
-            <div className="text-sm text-gray-900 font-medium break-all">{email}</div>
+            <div className="text-sm text-gray-900 font-medium break-all">{initialEmail}</div>
           </div>
-          <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)}>
+          <Button type="button" variant="outline" size="sm" onClick={() => { setEditing(true); setPendingEmail(null); }}>
             Change
           </Button>
         </div>
@@ -85,7 +87,7 @@ export function EmailSection({ initialEmail, linkedToGoogle }: Props) {
       )}
       <div className="space-y-1">
         <Label className="text-xs uppercase tracking-wide text-gray-400">Current email</Label>
-        <div className="text-sm text-gray-500 break-all">{email}</div>
+        <div className="text-sm text-gray-500 break-all">{initialEmail}</div>
       </div>
       <div className="space-y-1">
         <Label htmlFor="newEmail">New email</Label>
@@ -97,12 +99,15 @@ export function EmailSection({ initialEmail, linkedToGoogle }: Props) {
         <Input id="currentPassword" type="password" autoComplete="current-password" {...register("currentPassword")} />
         {errors.currentPassword && <p className="text-xs text-red-500">{errors.currentPassword.message}</p>}
       </div>
+      <p className="text-xs text-gray-400">
+        We&apos;ll send a confirmation link to the new address. The change only takes effect once you click it.
+      </p>
       <div className="flex gap-2">
         <Button type="button" variant="outline" onClick={() => { setEditing(false); reset(); setServerError(null); }} disabled={isSubmitting}>
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Updating…" : "Update email"}
+          {isSubmitting ? "Sending…" : "Send confirmation"}
         </Button>
       </div>
     </form>

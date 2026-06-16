@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { changeEmailSchema } from "@/lib/validations/auth";
+import { resend, buildEmailChangeConfirmEmail } from "@/lib/email";
 
 export async function PUT(req: NextRequest) {
   const session = await auth();
@@ -19,7 +21,7 @@ export async function PUT(req: NextRequest) {
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { email: true, passwordHash: true },
+    select: { id: true, email: true, name: true, passwordHash: true },
   });
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -45,10 +47,39 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "That email is already in use." }, { status: 409 });
   }
 
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { email: newEmail, emailVerified: null },
+  // Replace any prior pending request — only one outstanding change at a time.
+  await db.emailChangeRequest.deleteMany({ where: { userId: user.id } });
+
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  await db.emailChangeRequest.create({
+    data: { userId: user.id, newEmail, token, expiresAt },
   });
 
-  return NextResponse.json({ ok: true, email: newEmail });
+  const baseUrl =
+    process.env.NEXTAUTH_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+  const confirmUrl = `${baseUrl}/api/user/email/confirm?token=${token}`;
+
+  const { subject, html } = buildEmailChangeConfirmEmail({
+    userName: user.name ?? "there",
+    newEmail,
+    confirmUrl,
+  });
+
+  try {
+    await resend.emails.send({
+      from: "Yard Analyzer <noreply@yardanalyzer.com>",
+      to: newEmail,
+      subject,
+      html,
+    });
+  } catch {
+    return NextResponse.json(
+      { error: "Couldn't send confirmation email. Try again in a few minutes." },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ ok: true, pendingEmail: newEmail });
 }

@@ -221,6 +221,29 @@ export function buildPasswordResetEmail(opts: {
   };
 }
 
+export function buildEmailChangeConfirmEmail(opts: {
+  userName: string;
+  newEmail: string;
+  confirmUrl: string;
+}): { subject: string; html: string } {
+  const { userName, newEmail, confirmUrl } = opts;
+  return {
+    subject: "Confirm your new Yard Analyzer email",
+    html: `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">We received a request to change your Yard Analyzer email address to <strong>${escapeHtml(newEmail)}</strong>. Confirm the change by clicking the button below. This link expires in 1 hour.</p>
+  <div style="text-align:center;margin:32px 0;">
+    <a href="${confirmUrl}" style="background:#16a34a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Confirm new email</a>
+  </div>
+  <p style="color:#9ca3af;font-size:12px;">If you didn't request this change, ignore this email. Your account email won't change unless you click the link above.</p>
+</body>
+</html>`,
+  };
+}
+
 export function buildPaymentFailedEmail(opts: {
   userName: string;
   billingPortalUrl: string;

@@ -38,6 +38,7 @@ model User {
   sessions             Session[]
   yards                Yard[]
   passwordResets       PasswordResetToken[]
+  emailChangeRequests  EmailChangeRequest[]
 }
 
 model Account {
@@ -185,6 +186,18 @@ model LawnTask {
 model PasswordResetToken {
   id        String   @id @default(cuid())
   userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailChangeRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  newEmail  String
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())

@@ -8,9 +8,23 @@ import { EmailSection } from "@/components/settings/EmailSection";
 import { Bell, Lock, CreditCard, Mail } from "lucide-react";
 import { getDaysUntilDeletion, PLAN_LABELS, canPause } from "@/lib/subscription";
 
-export default async function SettingsPage() {
+const EMAIL_CHANGE_MESSAGES: Record<string, { tone: "success" | "error"; text: string }> = {
+  success: { tone: "success", text: "Email updated. You may need to sign in again." },
+  expired: { tone: "error", text: "That confirmation link expired. Start the email change again." },
+  invalid: { tone: "error", text: "That confirmation link is invalid. Start the email change again." },
+  taken: { tone: "error", text: "That email was claimed by another account before you confirmed." },
+  error: { tone: "error", text: "Something went wrong applying the change. Try again." },
+};
+
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ emailChange?: string }>;
+}) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  const { emailChange } = await searchParams;
+  const emailChangeNotice = emailChange ? EMAIL_CHANGE_MESSAGES[emailChange] : null;
 
   const user = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
@@ -62,6 +76,18 @@ export default async function SettingsPage() {
   return (
     <div className="px-4 py-8 pb-20 sm:pb-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+
+      {emailChangeNotice && (
+        <div
+          className={`max-w-lg mb-6 rounded-md p-3 text-sm ${
+            emailChangeNotice.tone === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          {emailChangeNotice.text}
+        </div>
+      )}
 
       <div className="max-w-lg space-y-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6">
