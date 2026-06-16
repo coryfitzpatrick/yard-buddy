@@ -284,7 +284,7 @@ export function YardSetupForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl">
       {showSuccess ? (
         <div className="text-center space-y-6 py-8">
           <CheckCircle2 className="mx-auto w-16 h-16 text-green-500" />
