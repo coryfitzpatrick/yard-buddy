@@ -386,7 +386,20 @@ export function YardSetupForm() {
           <h2 className="text-xl font-semibold mb-1">{STEP_LABELS[step]}</h2>
           <p className="text-sm text-gray-400 mb-4">All details can be updated later.</p>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            onKeyDown={(e) => {
+              // Prevent stray Enter on inputs from submitting the form mid-flow.
+              // The address field on step 3 has its own Enter handler that runs first.
+              if (
+                e.key === "Enter" &&
+                (e.target as HTMLElement).tagName === "INPUT" &&
+                activeStepIdx < activeSteps.length - 1
+              ) {
+                e.preventDefault();
+              }
+            }}
+          >
             {error && (
               <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600 flex items-start justify-between gap-3">
                 <span>{error}</span>
@@ -678,34 +691,88 @@ export function YardSetupForm() {
               </div>
             )}
 
-            {step === 5 && (
-              <div className="space-y-3 text-sm">
-                <p className="text-gray-500">Review before saving.</p>
-                <div className="rounded-lg bg-gray-50 p-4 space-y-2">
-                  {!createdYardId && <div><span className="font-medium">Property:</span> {propertyName} ({zipCode})</div>}
-                  {createdYardId && <div><span className="font-medium">Property:</span> {createdPropertyName}</div>}
-                  {createdYardId && (
-                    <>
-                      <div><span className="font-medium">Section:</span> {watch("name")}</div>
-                      <div><span className="font-medium">Area:</span> {watch("areaType")?.replace(/_/g, " ") ?? "Not specified"}</div>
-                    </>
-                  )}
-                  <div><span className="font-medium">Grass:</span> {watch("grassType")?.replace(/_/g, " ")}</div>
-                  {!!watch("yardSizeSqft") && (
-                    <div><span className="font-medium">Size:</span> {String(watch("yardSizeSqft"))} sq ft</div>
-                  )}
-                  {!!spreaderType && (
-                    <div><span className="font-medium">Spreader:</span> {spreaderType}</div>
-                  )}
-                  <div>
-                    <span className="font-medium">Photos:</span>{" "}
-                    {setupPhotoCount > 0
-                      ? `${setupPhotoCount} ready. We'll analyze them right after saving.`
-                      : "None. You can add them later."}
+            {step === 5 && (() => {
+              const missing: { label: string; stepTo: number }[] = [];
+              if (!watch("yardSizeSqft")) missing.push({ label: "Yard size: used to size product applications", stepTo: 3 });
+              if (!watch("soilPh")) missing.push({ label: "Soil pH: sharpens fertilizer recommendations", stepTo: 3 });
+              if (!watch("soilMoisture")) missing.push({ label: "Soil moisture: informs watering advice", stepTo: 3 });
+              if (!spreaderType) missing.push({ label: "Spreader type: needed for precise application rates", stepTo: 3 });
+              if (!wateringDaysPerWeek || !wateringMinutesPerSession) missing.push({ label: "Current watering schedule: helps refine our suggestions", stepTo: 3 });
+              return (
+                <div className="space-y-4 text-sm">
+                  <p className="text-gray-500">Review before saving.</p>
+                  <div className="rounded-lg bg-gray-50 p-4 space-y-2">
+                    {!createdYardId && <div><span className="font-medium">Property:</span> {propertyName} ({zipCode})</div>}
+                    {createdYardId && <div><span className="font-medium">Property:</span> {createdPropertyName}</div>}
+                    {createdYardId && (
+                      <>
+                        <div><span className="font-medium">Section:</span> {watch("name")}</div>
+                        <div><span className="font-medium">Area:</span> {watch("areaType")?.replace(/_/g, " ") ?? "Not specified"}</div>
+                      </>
+                    )}
+                    <div><span className="font-medium">Grass:</span> {watch("grassType")?.replace(/_/g, " ")}</div>
+                    {!!watch("yardSizeSqft") && (
+                      <div><span className="font-medium">Size:</span> {String(watch("yardSizeSqft"))} sq ft</div>
+                    )}
+                    {!!spreaderType && (
+                      <div><span className="font-medium">Spreader:</span> {spreaderType}</div>
+                    )}
+                    <div>
+                      <span className="font-medium">Photos:</span>{" "}
+                      {setupPhotoCount > 0
+                        ? `${setupPhotoCount} ready. We'll analyze them right after saving.`
+                        : "None"}
+                    </div>
                   </div>
+
+                  {setupPhotoCount === 0 && (
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2">
+                      <p className="font-semibold text-amber-900">No photos added</p>
+                      <p className="text-amber-800 text-xs leading-relaxed">
+                        Without photos we can only give generic advice. For an accurate
+                        analysis, add at least:
+                      </p>
+                      <ul className="text-xs text-amber-800 list-disc pl-5 space-y-0.5">
+                        <li>A wide overview of the section</li>
+                        <li>A close-up of grass blades and soil</li>
+                        <li>Any damage spots or weeds</li>
+                      </ul>
+                      <button
+                        type="button"
+                        onClick={() => setStep(4)}
+                        className="text-xs font-semibold text-amber-900 underline hover:text-amber-700"
+                      >
+                        Add photos now
+                      </button>
+                    </div>
+                  )}
+
+                  {missing.length > 0 && (
+                    <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 space-y-2">
+                      <p className="font-semibold text-blue-900">Add later for better recommendations</p>
+                      <p className="text-blue-800 text-xs">
+                        These optional details sharpen the analysis. You can add them now or
+                        from the section page anytime.
+                      </p>
+                      <ul className="text-xs text-blue-800 space-y-1">
+                        {missing.map((m) => (
+                          <li key={m.label} className="flex items-start gap-2">
+                            <span className="flex-1">{m.label}</span>
+                            <button
+                              type="button"
+                              onClick={() => setStep(m.stepTo)}
+                              className="shrink-0 text-blue-900 underline hover:text-blue-700 font-medium"
+                            >
+                              Add
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             <div className="flex justify-between mt-8">
               {activeStepIdx > 0 ? (
