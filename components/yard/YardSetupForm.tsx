@@ -387,17 +387,11 @@ export function YardSetupForm() {
           <p className="text-sm text-gray-400 mb-4">All details can be updated later.</p>
 
           <form
-            onSubmit={handleSubmit(onSubmit)}
-            onKeyDown={(e) => {
-              // Prevent stray Enter on inputs from submitting the form mid-flow.
-              // The address field on step 3 has its own Enter handler that runs first.
-              if (
-                e.key === "Enter" &&
-                (e.target as HTMLElement).tagName === "INPUT" &&
-                activeStepIdx < activeSteps.length - 1
-              ) {
-                e.preventDefault();
-              }
+            onSubmit={(e) => {
+              // Submission only happens via the Save button's onClick — see below.
+              // This blocks every native submit path (stray Enter, autofill, etc.)
+              // from skipping the Review step.
+              e.preventDefault();
             }}
           >
             {error && (
@@ -782,7 +776,12 @@ export function YardSetupForm() {
                 <Button type="button" onClick={async () => { if (await canAdvance()) setStep(activeSteps[activeStepIdx + 1]); }}
                   className="bg-green-600 hover:bg-green-700">Next</Button>
               ) : (
-                <Button type="submit" disabled={isSubmitting || postSaveStatus !== "idle"} className="bg-green-600 hover:bg-green-700">
+                <Button
+                  type="button"
+                  disabled={isSubmitting || postSaveStatus !== "idle"}
+                  onClick={handleSubmit(onSubmit)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
                   {postSaveStatus === "saving" && "Saving…"}
                   {postSaveStatus === "uploading" && "Uploading photos…"}
                   {postSaveStatus === "analyzing" && "Analyzing your lawn…"}
