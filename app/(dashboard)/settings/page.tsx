@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { NotificationPreferences } from "@/components/settings/NotificationPreferences";
 import { ChangePassword } from "@/components/settings/ChangePassword";
 import { BillingSection } from "@/components/settings/BillingSection";
-import { Bell, Lock, CreditCard } from "lucide-react";
+import { EmailSection } from "@/components/settings/EmailSection";
+import { Bell, Lock, CreditCard, Mail } from "lucide-react";
 import { getDaysUntilDeletion, PLAN_LABELS, canPause } from "@/lib/subscription";
 
 export default async function SettingsPage() {
@@ -14,6 +15,7 @@ export default async function SettingsPage() {
   const user = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
     select: {
+      email: true,
       notificationsEnabled: true,
       notifyDaysAhead: true,
       reminderNotificationsEnabled: true,
@@ -27,8 +29,11 @@ export default async function SettingsPage() {
       currentPeriodEnd: true,
       pausedUntil: true,
       stripeSubscriptionId: true,
+      accounts: { select: { provider: true } },
     },
   });
+
+  const linkedToGoogle = user.accounts.some((a) => a.provider === "google");
 
   const subUser = {
     plan: user.plan,
@@ -77,6 +82,14 @@ export default async function SettingsPage() {
             currentPlan={user.plan}
             currentPeriod={currentPeriod}
           />
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="w-5 h-5 text-green-600" />
+            <h2 className="text-lg font-semibold text-gray-900">Account</h2>
+          </div>
+          <EmailSection initialEmail={user.email} linkedToGoogle={linkedToGoogle} />
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6">
