@@ -565,7 +565,7 @@ export async function GET(req: NextRequest) {
 
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: subscriber.stripeCustomerId!,
-        return_url: `${process.env.NEXTAUTH_URL ?? "https://yardanalyzer.app"}/settings`,
+        return_url: `${process.env.NEXTAUTH_URL ?? "https://yardanalyzer.com"}/settings`,
       });
 
       const { subject, html } = buildCardExpiringEmail({
@@ -578,7 +578,7 @@ export async function GET(req: NextRequest) {
       });
 
       await resend.emails.send({
-        from: "Yard Analyzer <noreply@yardanalyzer.app>",
+        from: "Yard Analyzer <noreply@yardanalyzer.com>",
         to: subscriber.email,
         subject,
         html,

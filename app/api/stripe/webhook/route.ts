@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
 
         const portalSession = await stripe.billingPortal.sessions.create({
           customer: customerId,
-          return_url: `${process.env.NEXTAUTH_URL ?? "https://yardanalyzer.app"}/settings`,
+          return_url: `${process.env.NEXTAUTH_URL ?? "https://yardanalyzer.com"}/settings`,
         });
 
         const { subject, html } = buildPaymentFailedEmail({
@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
         });
 
         await resend.emails.send({
-          from: "Yard Analyzer <noreply@yardanalyzer.app>",
+          from: "Yard Analyzer <noreply@yardanalyzer.com>",
           to: user.email,
           subject,
           html,
