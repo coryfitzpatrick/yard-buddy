@@ -227,7 +227,7 @@ function YardSummaryHero({ section, yardId }: { section: SectionSummary; yardId:
       </div>
       <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
         <Link
-          href={`/yard/${yardId}/sections/new`}
+          href={`/yard/${yardId}/split`}
           className="flex items-center gap-1 text-xs text-gray-500 hover:text-green-700 font-medium"
         >
           <Plus className="w-3 h-3" /> Split into sections
