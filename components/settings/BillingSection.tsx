@@ -5,6 +5,13 @@ import { CreditCard, PauseCircle, PlayCircle, XCircle, ExternalLink } from "luci
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
+interface PaymentMethod {
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+}
+
 interface Props {
   plan: string;
   planStatus: string;
@@ -13,6 +20,8 @@ interface Props {
   currentPeriodEnd: string | null;
   pausedUntil: string | null;
   hasStripeSubscription: boolean;
+  hasStripeCustomer: boolean;
+  paymentMethod: PaymentMethod | null;
   trialDaysLeft: number | null;
   canPauseSubscription: boolean;
   currentPlan: string;
@@ -36,6 +45,8 @@ export function BillingSection({
   currentPeriodEnd,
   pausedUntil,
   hasStripeSubscription,
+  hasStripeCustomer,
+  paymentMethod,
   trialDaysLeft,
   canPauseSubscription,
   currentPlan,
@@ -162,6 +173,32 @@ export function BillingSection({
           )}
         </div>
       </div>
+
+      {/* Payment method — any customer who has ever billed (active or canceled) */}
+      {hasStripeCustomer && (
+        <div className="border-t border-gray-100 pt-4 space-y-2">
+          <p className="text-sm font-medium text-gray-700">Payment method</p>
+          <div className="flex items-center justify-between gap-3 flex-wrap rounded-lg bg-gray-50 border border-gray-200 px-4 py-3">
+            {paymentMethod ? (
+              <div className="text-sm">
+                <span className="font-medium text-gray-800 capitalize">{paymentMethod.brand}</span>{" "}
+                <span className="text-gray-600">•••• {paymentMethod.last4}</span>
+                <span className="text-xs text-gray-400 ml-2">
+                  Expires {String(paymentMethod.expMonth).padStart(2, "0")}/{String(paymentMethod.expYear).slice(-2)}
+                </span>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">No card on file</div>
+            )}
+            <a href="/api/stripe/portal?flow=payment_method_update">
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <CreditCard className="w-3.5 h-3.5" />
+                {paymentMethod ? "Update" : "Add card"}
+              </Button>
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Change plan — only for active paid subscribers */}
       {showSubscriptionControls && !isTrial && (

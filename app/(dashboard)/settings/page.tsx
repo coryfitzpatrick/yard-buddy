@@ -42,6 +42,7 @@ export default async function SettingsPage({
       trialEndsAt: true,
       currentPeriodEnd: true,
       pausedUntil: true,
+      stripeCustomerId: true,
       stripeSubscriptionId: true,
       accounts: { select: { provider: true } },
     },
@@ -70,6 +71,29 @@ export default async function SettingsPage({
     const activePriceId = sub.items.data[0]?.price.id ?? "";
     for (const periods of Object.values(STRIPE_PRICES)) {
       if (periods.annual === activePriceId) { currentPeriod = "annual"; break; }
+    }
+  }
+
+  // Fetch default payment method so we can show it inline.
+  let paymentMethod: { brand: string; last4: string; expMonth: number; expYear: number } | null = null;
+  if (user.stripeCustomerId) {
+    try {
+      const customer = await stripe.customers.retrieve(user.stripeCustomerId, {
+        expand: ["invoice_settings.default_payment_method"],
+      });
+      if (customer && !customer.deleted) {
+        const pm = customer.invoice_settings?.default_payment_method;
+        if (pm && typeof pm !== "string" && pm.card) {
+          paymentMethod = {
+            brand: pm.card.brand,
+            last4: pm.card.last4,
+            expMonth: pm.card.exp_month,
+            expYear: pm.card.exp_year,
+          };
+        }
+      }
+    } catch {
+      // Don't fail the page if Stripe is slow / unavailable
     }
   }
 
@@ -103,6 +127,8 @@ export default async function SettingsPage({
             currentPeriodEnd={user.currentPeriodEnd?.toISOString() ?? null}
             pausedUntil={user.pausedUntil?.toISOString() ?? null}
             hasStripeSubscription={!!user.stripeSubscriptionId}
+            hasStripeCustomer={!!user.stripeCustomerId}
+            paymentMethod={paymentMethod}
             trialDaysLeft={trialDaysLeft}
             canPauseSubscription={canPauseSubscription}
             currentPlan={user.plan}

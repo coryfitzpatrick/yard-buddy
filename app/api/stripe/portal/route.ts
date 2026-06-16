@@ -19,9 +19,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/pricing", req.url));
   }
 
+  const flow = req.nextUrl.searchParams.get("flow");
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: user.stripeCustomerId,
     return_url: `${process.env.NEXTAUTH_URL}/settings`,
+    ...(flow === "payment_method_update"
+      ? {
+          flow_data: {
+            type: "payment_method_update",
+            after_completion: {
+              type: "redirect",
+              redirect: { return_url: `${process.env.NEXTAUTH_URL}/settings` },
+            },
+          },
+        }
+      : {}),
   });
 
   return NextResponse.redirect(portalSession.url);
