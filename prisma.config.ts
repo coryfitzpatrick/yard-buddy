@@ -11,6 +11,8 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: env("DATABASE_URL"),
+    // Migrations run against the direct DB — DATABASE_URL points at the
+    // transaction pooler (port 6543) which doesn't support migrate ops.
+    url: env("DIRECT_URL"),
   },
 });
