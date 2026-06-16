@@ -166,6 +166,10 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
         </p>
       </div>
 
+      <p className="text-xs text-gray-400 text-center">
+        {populated.length}/{MAX_PHOTOS} photos added
+      </p>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {(() => {
           // Count slots per kind so we can enforce maxPerKind on "+ Add another".
@@ -204,10 +208,6 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
           });
         })()}
       </div>
-
-      <p className="text-xs text-gray-400 text-center">
-        {populated.length}/{MAX_PHOTOS} photos added
-      </p>
 
       {!hideSubmitButton && populated.length > 0 && !analyzing && (
         <Button

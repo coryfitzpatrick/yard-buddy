@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { yardSectionSchema, YardSectionInput, YardSectionFormInput } from "@/lib/validations/yard";
 import { GrassTypeSelector } from "./GrassTypeSelector";
 import { AreaTypeSelector } from "./AreaTypeSelector";
@@ -82,6 +82,10 @@ export function YardSetupForm() {
   const activeSteps: readonly number[] =
     createdYardId || setupMode === "sections" ? BY_SECTION_FLOW : WHOLE_YARD_FLOW;
   const activeStepIdx = activeSteps.indexOf(step);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
 
   function handleSetupModeChange(mode: "whole" | "sections") {
     setSetupMode(mode);
