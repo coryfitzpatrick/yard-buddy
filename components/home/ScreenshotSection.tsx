@@ -10,10 +10,10 @@ interface Screenshot {
 }
 
 const HERO: Screenshot = {
-  src: "/screenshots/dashboard.png",
+  src: "/screenshots/dashboard.webp",
   alt: "Yard Analyzer dashboard showing weather, yards, and scheduled tasks",
   width: 1600,
-  height: 1971,
+  height: 1932,
   title: "Your whole lawn, one screen",
   caption:
     "Local weather, every yard, and the next thing to do — all on the page the moment you sign in.",
@@ -21,37 +21,37 @@ const HERO: Screenshot = {
 
 const GRID: Screenshot[] = [
   {
-    src: "/screenshots/section.png",
+    src: "/screenshots/section.webp",
     alt: "Front yard section showing a health score of 88 and a chart over time",
     width: 1600,
-    height: 1031,
+    height: 1035,
     title: "Watch your lawn actually improve",
     caption:
       "Score your lawn from a single photo. Watch the chart climb as treatments take hold — 32 to 88 in three months.",
   },
   {
-    src: "/screenshots/calendar.png",
+    src: "/screenshots/calendar.webp",
     alt: "Calendar view of scheduled lawn-care tasks across June",
     width: 1600,
-    height: 1031,
+    height: 1035,
     title: "A schedule that fits your weather",
     caption:
       "Fertilizer, fungicide, mowing, overseeding — all stacked in a calendar that respects your climate and grass type.",
   },
   {
-    src: "/screenshots/yard-detail.png",
+    src: "/screenshots/yard-detail.webp",
     alt: "Yard detail page with four sections, each with its own health score and grass type",
     width: 1600,
-    height: 1031,
+    height: 1035,
     title: "Section by section, not one-size-fits-all",
     caption:
       "Front, back, side, border — different grass, different soil, different plan. We track each one separately.",
   },
   {
-    src: "/screenshots/my-yards.png",
+    src: "/screenshots/my-yards.webp",
     alt: "My Yards page showing two properties with their sections and watering schedules",
     width: 1600,
-    height: 1031,
+    height: 1035,
     title: "Multiple properties? Handled.",
     caption:
       "Manage your home, your rental, your parents' place — each with its own spreader, schedule, and section list.",

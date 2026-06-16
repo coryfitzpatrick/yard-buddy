@@ -1,4 +1,4 @@
-const LOGO_SRC = "/yard-analyzer-logo-v3.png";
+const LOGO_SRC = "/yard-analyzer-logo.webp";
 const LOGO_INTRINSIC_WIDTH = 200;
 const LOGO_INTRINSIC_HEIGHT = 302;
 

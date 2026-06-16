@@ -114,7 +114,7 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
     <div
       className="relative rounded-xl overflow-hidden"
       style={{
-        backgroundImage: `url('/weather/${theme.slot}.jpg')`,
+        backgroundImage: `url('/weather/${theme.slot}.webp')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
