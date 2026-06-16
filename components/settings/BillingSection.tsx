@@ -205,10 +205,14 @@ export function BillingSection({
         <div className="border-t border-gray-100 pt-4 space-y-3">
           <p className="text-sm font-medium text-gray-700">Change plan</p>
 
-          {changePlanKey ? (
+          {changePlanKey ? (() => {
+            const selectedPlan = CHANGE_PLANS.find((p) => p.key === changePlanKey);
+            const billedAmount = changePeriod === "monthly" ? selectedPlan?.monthly : selectedPlan?.annual;
+            const billedSuffix = changePeriod === "monthly" ? "per month" : "per year";
+            return (
             <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 space-y-3">
               <p className="text-sm font-medium text-gray-800">
-                Switch to {CHANGE_PLANS.find((p) => p.key === changePlanKey)?.label}?
+                Switch to {selectedPlan?.label}?
               </p>
               <div className="flex gap-2">
                 <button
@@ -219,7 +223,7 @@ export function BillingSection({
                       : "border-gray-200 text-gray-600 hover:border-gray-300"
                   }`}
                 >
-                  Monthly
+                  Monthly · ${selectedPlan?.monthly}/mo
                 </button>
                 <button
                   onClick={() => setChangePeriod("annual")}
@@ -229,8 +233,13 @@ export function BillingSection({
                       : "border-gray-200 text-gray-600 hover:border-gray-300"
                   }`}
                 >
-                  Annual (save 2 months)
+                  Annual · ${selectedPlan?.annual}/yr (save 2 months)
                 </button>
+              </div>
+              <div className="rounded-md bg-white border border-gray-200 px-3 py-2 text-sm">
+                <span className="text-gray-500">You&apos;ll be billed </span>
+                <span className="font-semibold text-gray-900">${billedAmount} {billedSuffix}</span>
+                <span className="text-gray-500"> going forward.</span>
               </div>
               <p className="text-xs text-gray-500">
                 Your billing will be adjusted immediately. You will be charged or credited the prorated difference for the remaining time in your billing period.
@@ -249,7 +258,8 @@ export function BillingSection({
                 </Button>
               </div>
             </div>
-          ) : (
+            );
+          })() : (
             <div className="space-y-1">
               {CHANGE_PLANS.map((p) => {
                 const isCurrent = p.key === currentPlan;
@@ -264,7 +274,9 @@ export function BillingSection({
                       <span className={`text-sm font-medium ${isCurrent ? "text-green-800" : "text-gray-700"}`}>
                         {p.label}
                       </span>
-                      <span className="text-xs text-gray-400 ml-2">${p.monthly} per month</span>
+                      <span className="text-xs text-gray-400 ml-2">
+                        ${p.monthly}/mo · ${p.annual}/yr
+                      </span>
                     </div>
                     {isCurrent ? (
                       <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
