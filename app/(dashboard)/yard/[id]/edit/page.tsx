@@ -4,6 +4,9 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { YardEditForm } from "@/components/yard/YardEditForm";
+import { SectionForm } from "@/components/yard/SectionForm";
+import type { AreaType } from "@/types";
+import type { YardSectionInput } from "@/lib/validations/yard";
 
 export default async function EditYardPage({
   params,
@@ -20,15 +23,44 @@ export default async function EditYardPage({
       id: true,
       name: true,
       zipCode: true,
+      streetAddress: true,
+      lotSqft: true,
+      buildingSqft: true,
       spreaderType: true,
       spreaderModel: true,
       wateringDaysPerWeek: true,
       wateringMinutesPerSession: true,
       mowingSchedule: true,
       wateringSchedule: true,
+      sections: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          areaType: true,
+          grassType: true,
+          yardSizeSqft: true,
+          soilPh: true,
+          nitrogenPpm: true,
+          phosphorusPpm: true,
+          potassiumPpm: true,
+          soilTestSource: true,
+          soilTestedAt: true,
+          soilMoisture: true,
+          notes: true,
+          mowingSchedule: true,
+          wateringSchedule: true,
+        },
+      },
     },
   });
   if (!yard) notFound();
+
+  // When the yard hasn't been split into sections (still just the auto-created
+  // "Whole Yard" entry), we treat the lone section as part of the yard and
+  // offer its fields inline so users don't have to dig into a separate editor.
+  const onlySection = yard.sections.length === 1 ? yard.sections[0] : null;
 
   return (
     <div className="px-4 py-8">
@@ -38,7 +70,8 @@ export default async function EditYardPage({
       >
         <ChevronLeft className="w-4 h-4" /> {yard.name}
       </Link>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Property</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Yard</h1>
+
       <YardEditForm
         yardId={yard.id}
         yardSlug={id}
@@ -53,6 +86,44 @@ export default async function EditYardPage({
           wateringSchedule: yard.wateringSchedule ?? undefined,
         }}
       />
+
+      {onlySection && (
+        <>
+          <div className="border-t border-gray-200 my-10" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Lawn details</h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Grass, soil, and notes for your lawn. These move with the section if you split your yard later.
+          </p>
+          <SectionForm
+            yardId={yard.id}
+            yardSlug={id}
+            zipCode={yard.zipCode}
+            lotSqft={yard.lotSqft ?? undefined}
+            buildingSqft={yard.buildingSqft ?? undefined}
+            streetAddress={yard.streetAddress ?? undefined}
+            yardMowingSchedule={yard.mowingSchedule}
+            yardWateringSchedule={yard.wateringSchedule}
+            initialData={{
+              id: onlySection.id,
+              slug: onlySection.slug,
+              name: onlySection.name,
+              areaType: onlySection.areaType as AreaType | undefined,
+              grassType: onlySection.grassType as YardSectionInput["grassType"],
+              yardSizeSqft: onlySection.yardSizeSqft ?? undefined,
+              soilPh: onlySection.soilPh ?? undefined,
+              nitrogenPpm: onlySection.nitrogenPpm ?? undefined,
+              phosphorusPpm: onlySection.phosphorusPpm ?? undefined,
+              potassiumPpm: onlySection.potassiumPpm ?? undefined,
+              soilTestSource: onlySection.soilTestSource ?? undefined,
+              soilTestedAt: onlySection.soilTestedAt ? onlySection.soilTestedAt.toISOString().slice(0, 10) : undefined,
+              soilMoisture: onlySection.soilMoisture as "dry" | "moderate" | "moist" | undefined,
+              notes: onlySection.notes ?? undefined,
+              mowingSchedule: onlySection.mowingSchedule ?? undefined,
+              wateringSchedule: onlySection.wateringSchedule ?? undefined,
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }

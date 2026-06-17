@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PhotoUpload, type UploadedPhoto } from "@/components/analysis/PhotoUpload";
+import { PhotoUpload, type PhotoUploadHandle, type UploadedPhoto } from "@/components/analysis/PhotoUpload";
 import { AnalysisResults } from "@/components/analysis/AnalysisResults";
 import { SoilQuickEdit, type SoilQuickEditHandle } from "@/components/analysis/SoilQuickEdit";
 import type { AnalysisResult, AreaType } from "@/types";
@@ -44,6 +44,9 @@ export default function AnalyzePage() {
   const [invalidPhotos, setInvalidPhotos] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const soilRef = useRef<SoilQuickEditHandle | null>(null);
+  const photoUploadRef = useRef<PhotoUploadHandle | null>(null);
+  const [photoCount, setPhotoCount] = useState(0);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
   useEffect(() => {
     fetch("/api/yard")
@@ -238,7 +241,14 @@ export default function AnalyzePage() {
             if (!sec) return null;
             return (
               <div className="space-y-4">
-                <PhotoUpload onUploaded={handleUploaded} analyzing={analyzing} onReset={cancelAnalysis} />
+                <PhotoUpload
+                  ref={photoUploadRef}
+                  hideSubmitButton
+                  onUploaded={handleUploaded}
+                  onSelectionChange={setPhotoCount}
+                  analyzing={analyzing}
+                  onReset={cancelAnalysis}
+                />
                 <SoilQuickEdit
                   ref={soilRef}
                   yardId={selectedYard.id}
@@ -253,6 +263,35 @@ export default function AnalyzePage() {
                   soilTestSource={sec.soilTestSource}
                   soilTestedAt={sec.soilTestedAt}
                 />
+                {!analyzing && (
+                  <div className="flex">
+                    <span
+                      title={photoCount === 0 ? "Add at least one photo to analyze" : undefined}
+                      className="inline-block"
+                    >
+                      <Button
+                        onClick={async () => {
+                          setUploadingPhotos(true);
+                          try {
+                            await photoUploadRef.current?.upload();
+                          } finally {
+                            setUploadingPhotos(false);
+                          }
+                        }}
+                        disabled={photoCount === 0 || uploadingPhotos}
+                        className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:text-gray-500"
+                      >
+                        {uploadingPhotos ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</>
+                        ) : photoCount === 0 ? (
+                          "Analyze"
+                        ) : (
+                          `Analyze ${photoCount} Photo${photoCount > 1 ? "s" : ""}`
+                        )}
+                      </Button>
+                    </span>
+                  </div>
+                )}
               </div>
             );
           })()}
