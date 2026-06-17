@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
@@ -111,6 +111,26 @@ function YardCardItem({
 
 export function YardCarousel({ yards, selectedYardId, onSelect }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const update = () => {
+      // 1px slop to absorb sub-pixel rounding from scroll-snap.
+      setCanScrollLeft(el.scrollLeft > 1);
+      setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, [yards.length]);
 
   const scrollBy = (dir: 1 | -1) => {
     const el = scrollRef.current;
@@ -152,22 +172,26 @@ export function YardCarousel({ yards, selectedYardId, onSelect }: Props) {
           </div>
         ))}
       </div>
-      <button
-        type="button"
-        onClick={() => scrollBy(-1)}
-        aria-label="Previous yards"
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 w-7 h-7 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center z-10 hover:bg-gray-50"
-      >
-        <ChevronLeft className="w-4 h-4 text-gray-600" />
-      </button>
-      <button
-        type="button"
-        onClick={() => scrollBy(1)}
-        aria-label="Next yards"
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 w-7 h-7 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center z-10 hover:bg-gray-50"
-      >
-        <ChevronRight className="w-4 h-4 text-gray-600" />
-      </button>
+      {canScrollLeft && (
+        <button
+          type="button"
+          onClick={() => scrollBy(-1)}
+          aria-label="Previous yards"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 w-7 h-7 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center z-10 hover:bg-gray-50"
+        >
+          <ChevronLeft className="w-4 h-4 text-gray-600" />
+        </button>
+      )}
+      {canScrollRight && (
+        <button
+          type="button"
+          onClick={() => scrollBy(1)}
+          aria-label="Next yards"
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 w-7 h-7 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center z-10 hover:bg-gray-50"
+        >
+          <ChevronRight className="w-4 h-4 text-gray-600" />
+        </button>
+      )}
     </div>
   );
 }
