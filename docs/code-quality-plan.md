@@ -34,27 +34,17 @@
 
 ## Tier 3 — Big refactor wins (delete code, prevent drift)
 
-- [ ] **3.1 — Extract `ScheduleEditor`**
-  - `SectionForm` (458–577) and `YardEditForm` (156–251) ship identical day-picker + time/height Select JSX, plus duplicated `DAYS / TIME_OPTIONS / MOWING_HEIGHTS / WATERING_MINUTES / parseSchedule / serializeSchedule`.
-  - Plan: new `components/yard/ScheduleEditor.tsx` with `kind: "mow" | "water"` + `lib/schedule.ts` for parse/serialize. Replace both call sites.
-  - Expected: ~250 lines deleted.
-  - Done in:
+- [x] **3.1 — Extract `ScheduleEditor`**
+  - Done in: `be449f5` — `lib/schedule.ts` owns the constants and `parseSchedule` / `serializeSchedule` / `formatScheduleSummary`. `components/yard/ScheduleEditor.tsx` is reused by `YardEditForm` and `SectionForm`. Yard page also calls `parseSchedule` instead of inlining JSON parsing. Net ~250 lines deleted.
 
-- [ ] **3.2 — Extract `GrassIdentifyUpload`**
-  - `YardSetupForm.tsx:555-640` and `SectionForm.tsx:277-343` duplicate the camera/file inputs and `identifyGrass()` logic verbatim.
-  - Plan: new `components/yard/GrassIdentifyUpload.tsx` exposing an `onIdentified(grassType, confidence, explanation)` callback. Replace both call sites.
-  - Expected: ~150 lines deleted.
-  - Done in:
+- [x] **3.2 — Extract `GrassIdentifyUpload`**
+  - Done in: `be449f5` — `components/yard/GrassIdentifyUpload.tsx` (forwardRef) holds the camera/file inputs, identify state, and the upload→identify-grass fetch. `YardSetupForm` and `SectionForm` now mount the component and reset it via the imperative handle when the user picks a grass type by hand.
 
-- [ ] **3.3 — Extract `SoilFields`**
-  - `SectionForm.tsx:411-451` and `SoilQuickEdit.tsx:137-218` are already drifting (`organicMatterPct` is in SoilQuickEdit only).
-  - Plan: new `components/yard/SoilFields.tsx` (controlled component). Use in both. Drives a single source of truth for the soil schema.
-  - Done in:
+- [~] **3.3 — Extract `SoilFields`** (partial)
+  - Done in: `be449f5` — drift plugged. `organicMatterPct` now lives in `SectionForm` (with pre-fill on both edit pages) so it matches `SoilQuickEdit`. Full controlled-component extraction deferred until a third call site or the next round of drift; the RHF↔controlled bridge isn't worth the refactor risk yet.
 
-- [ ] **3.4 — Co-locate `AREA_NAME_MAP`**
-  - Defined identically in `YardSetupForm.tsx:45` and `SectionForm.tsx:69`.
-  - Fix: move to `components/yard/AreaTypeSelector.tsx` next to `AREA_CONFIG`, export.
-  - Done in:
+- [x] **3.4 — Co-locate `AREA_NAME_MAP`**
+  - Done in: `d2c532f` — exported from `AreaTypeSelector` alongside `AREA_CONFIG`; duplicate copies removed from `YardSetupForm` and `SectionForm`.
 
 ## Tier 4 — Cleanup
 
