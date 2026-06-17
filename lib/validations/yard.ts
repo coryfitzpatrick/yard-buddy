@@ -53,7 +53,15 @@ export const yardSectionSchema = z.object({
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().min(0).max(2000).optional()
   ),
+  organicMatterPct: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().min(0).max(100).optional()
+  ),
   soilTestSource: z.string().max(200).optional(),
+  soilTestedAt: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : new Date(v as string)),
+    z.date().optional()
+  ),
   soilMoisture: z.enum(["dry", "moderate", "moist"]).optional(),
   notes: z.string().max(2000).optional(),
   mowingSchedule: z.string().optional(),

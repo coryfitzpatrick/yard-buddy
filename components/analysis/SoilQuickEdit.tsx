@@ -5,45 +5,106 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, FlaskConical, Check } from "lucide-react";
+import { Loader2, FlaskConical, Check, ChevronDown, ChevronUp } from "lucide-react";
 
-interface Props {
+export interface SoilInitialValues {
+  soilPh: number | null;
+  soilMoisture: "dry" | "moderate" | "moist" | null;
+  notes: string | null;
+  nitrogenPpm: number | null;
+  phosphorusPpm: number | null;
+  potassiumPpm: number | null;
+  organicMatterPct: number | null;
+  soilTestSource: string | null;
+  soilTestedAt: string | null; // ISO date string
+}
+
+interface Props extends SoilInitialValues {
   yardId: string;
   sectionId: string;
-  initialSoilPh: number | null;
-  initialSoilMoisture: "dry" | "moderate" | "moist" | null;
-  initialNotes: string | null;
   onSaved?: () => void;
+}
+
+function numToStr(n: number | null): string {
+  return n != null ? String(n) : "";
+}
+function strToNumOrNull(s: string): number | null {
+  return s === "" ? null : Number(s);
+}
+function isoToDateInput(iso: string | null): string {
+  if (!iso) return "";
+  return iso.slice(0, 10);
 }
 
 export function SoilQuickEdit({
   yardId,
   sectionId,
-  initialSoilPh,
-  initialSoilMoisture,
-  initialNotes,
+  soilPh,
+  soilMoisture,
+  notes,
+  nitrogenPpm,
+  phosphorusPpm,
+  potassiumPpm,
+  organicMatterPct,
+  soilTestSource,
+  soilTestedAt,
   onSaved,
 }: Props) {
-  const [soilPh, setSoilPh] = useState(initialSoilPh != null ? String(initialSoilPh) : "");
-  const [soilMoisture, setSoilMoisture] = useState<"dry" | "moderate" | "moist" | "">(initialSoilMoisture ?? "");
-  const [notes, setNotes] = useState(initialNotes ?? "");
+  const [ph, setPh] = useState(numToStr(soilPh));
+  const [moisture, setMoisture] = useState<"dry" | "moderate" | "moist" | "">(soilMoisture ?? "");
+  const [notesValue, setNotesValue] = useState(notes ?? "");
+  const [n, setN] = useState(numToStr(nitrogenPpm));
+  const [p, setP] = useState(numToStr(phosphorusPpm));
+  const [k, setK] = useState(numToStr(potassiumPpm));
+  const [om, setOm] = useState(numToStr(organicMatterPct));
+  const [source, setSource] = useState(soilTestSource ?? "");
+  const [testedAt, setTestedAt] = useState(isoToDateInput(soilTestedAt));
+
+  const hasTestData = nitrogenPpm != null || phosphorusPpm != null || potassiumPpm != null
+    || organicMatterPct != null || soilTestSource != null || soilTestedAt != null;
+  const [showTestResults, setShowTestResults] = useState(hasTestData);
+
   const [saving, setSaving] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Reset local state when the parent swaps in a different section.
+  // Reset local state when the parent swaps in a different section or
+  // refreshes after a save.
   useEffect(() => {
-    setSoilPh(initialSoilPh != null ? String(initialSoilPh) : "");
-    setSoilMoisture(initialSoilMoisture ?? "");
-    setNotes(initialNotes ?? "");
+    setPh(numToStr(soilPh));
+    setMoisture(soilMoisture ?? "");
+    setNotesValue(notes ?? "");
+    setN(numToStr(nitrogenPpm));
+    setP(numToStr(phosphorusPpm));
+    setK(numToStr(potassiumPpm));
+    setOm(numToStr(organicMatterPct));
+    setSource(soilTestSource ?? "");
+    setTestedAt(isoToDateInput(soilTestedAt));
     setError(null);
     setSavedFlash(false);
-  }, [sectionId, initialSoilPh, initialSoilMoisture, initialNotes]);
+  }, [sectionId, soilPh, soilMoisture, notes, nitrogenPpm, phosphorusPpm, potassiumPpm, organicMatterPct, soilTestSource, soilTestedAt]);
 
+  const current = {
+    ph: strToNumOrNull(ph),
+    moisture: moisture || null,
+    notesValue: notesValue || null,
+    n: strToNumOrNull(n),
+    p: strToNumOrNull(p),
+    k: strToNumOrNull(k),
+    om: strToNumOrNull(om),
+    source: source || null,
+    testedAt: testedAt || null,
+  };
   const dirty =
-    (soilPh === "" ? null : Number(soilPh)) !== initialSoilPh ||
-    (soilMoisture || null) !== initialSoilMoisture ||
-    (notes === "" ? null : notes) !== initialNotes;
+    current.ph !== soilPh ||
+    current.moisture !== soilMoisture ||
+    current.notesValue !== notes ||
+    current.n !== nitrogenPpm ||
+    current.p !== phosphorusPpm ||
+    current.k !== potassiumPpm ||
+    current.om !== organicMatterPct ||
+    current.source !== soilTestSource ||
+    current.testedAt !== isoToDateInput(soilTestedAt);
 
   async function save() {
     setSaving(true);
@@ -53,9 +114,15 @@ export function SoilQuickEdit({
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          soilPh: soilPh === "" ? null : Number(soilPh),
-          soilMoisture: soilMoisture || null,
-          notes: notes === "" ? null : notes,
+          soilPh: current.ph,
+          soilMoisture: current.moisture,
+          notes: current.notesValue,
+          nitrogenPpm: current.n,
+          phosphorusPpm: current.p,
+          potassiumPpm: current.k,
+          organicMatterPct: current.om,
+          soilTestSource: current.source,
+          soilTestedAt: current.testedAt, // ISO yyyy-mm-dd parses cleanly
         }),
       });
       if (!res.ok) {
@@ -89,14 +156,14 @@ export function SoilQuickEdit({
             min="4"
             max="9"
             placeholder="6.5"
-            value={soilPh}
-            onChange={(e) => setSoilPh(e.target.value)}
+            value={ph}
+            onChange={(e) => setPh(e.target.value)}
           />
         </div>
 
         <div className="space-y-1">
           <Label className="text-xs text-gray-600">Soil moisture</Label>
-          <Select value={soilMoisture || undefined} onValueChange={(v) => setSoilMoisture(v as "dry" | "moderate" | "moist")}>
+          <Select value={moisture || undefined} onValueChange={(v) => setMoisture(v as "dry" | "moderate" | "moist")}>
             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="dry">Dry</SelectItem>
@@ -111,12 +178,61 @@ export function SoilQuickEdit({
         <Label className="text-xs text-gray-600">Notes</Label>
         <Input
           placeholder="Anything we should know? Recent treatments, shady spots, etc."
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          value={notesValue}
+          onChange={(e) => setNotesValue(e.target.value)}
         />
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* Soil test results — collapsible since most users won't have these */}
+      <button
+        type="button"
+        onClick={() => setShowTestResults((v) => !v)}
+        className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900 mt-2"
+      >
+        {showTestResults ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        Soil test results
+      </button>
+
+      {showTestResults && (
+        <div className="pt-1 space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs text-gray-600">Nitrogen (ppm)</Label>
+              <Input type="number" min="0" max="1000" placeholder="20" value={n} onChange={(e) => setN(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-gray-600">Phosphorus (ppm)</Label>
+              <Input type="number" min="0" max="2000" placeholder="30" value={p} onChange={(e) => setP(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-gray-600">Potassium (ppm)</Label>
+              <Input type="number" min="0" max="2000" placeholder="100" value={k} onChange={(e) => setK(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-gray-600">Organic matter (%)</Label>
+              <Input type="number" min="0" max="100" step="0.1" placeholder="3" value={om} onChange={(e) => setOm(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs text-gray-600">Test source</Label>
+              <Input
+                placeholder="e.g. local extension lab, MySoil kit"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                maxLength={200}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-gray-600">Tested on</Label>
+              <Input type="date" value={testedAt} onChange={(e) => setTestedAt(e.target.value)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 pt-1">
         <Button
           type="button"
           onClick={save}

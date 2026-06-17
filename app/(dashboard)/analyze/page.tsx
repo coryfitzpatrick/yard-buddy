@@ -21,6 +21,12 @@ interface YardSection {
   soilPh: number | null;
   soilMoisture: "dry" | "moderate" | "moist" | null;
   notes: string | null;
+  nitrogenPpm: number | null;
+  phosphorusPpm: number | null;
+  potassiumPpm: number | null;
+  organicMatterPct: number | null;
+  soilTestSource: string | null;
+  soilTestedAt: string | null;
   analyses: { healthScore: number }[];
 }
 interface Yard { id: string; name: string; zipCode: string; sections: YardSection[]; }
@@ -231,9 +237,15 @@ export default function AnalyzePage() {
                 <SoilQuickEdit
                   yardId={selectedYard.id}
                   sectionId={sec.id}
-                  initialSoilPh={sec.soilPh}
-                  initialSoilMoisture={sec.soilMoisture}
-                  initialNotes={sec.notes}
+                  soilPh={sec.soilPh}
+                  soilMoisture={sec.soilMoisture}
+                  notes={sec.notes}
+                  nitrogenPpm={sec.nitrogenPpm}
+                  phosphorusPpm={sec.phosphorusPpm}
+                  potassiumPpm={sec.potassiumPpm}
+                  organicMatterPct={sec.organicMatterPct}
+                  soilTestSource={sec.soilTestSource}
+                  soilTestedAt={sec.soilTestedAt}
                   onSaved={() => {
                     // Refresh yards so the latest values back our pre-fill.
                     fetch("/api/yard")
