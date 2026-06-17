@@ -113,8 +113,8 @@ export default async function SettingsPage({
         </div>
       )}
 
-      <div className="max-w-5xl space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 lg:row-span-2">
+      <div className="max-w-5xl space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-5">
             <CreditCard className="w-5 h-5 text-green-600" />
             <h2 className="text-lg font-semibold text-gray-900">Plan & Billing</h2>
