@@ -424,7 +424,23 @@ export function YardSetupForm() {
                 </div>
                 <div className="space-y-1">
                   <Label>ZIP Code *</Label>
-                  <Input placeholder="90210" maxLength={5} value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
+                  <Input
+                    inputMode="numeric"
+                    autoComplete="postal-code"
+                    placeholder="90210"
+                    maxLength={5}
+                    value={zipCode}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, "").slice(0, 5);
+                      setZipCode(digits);
+                      if (zipError && digits.length === 5) setZipError(null);
+                    }}
+                    onBlur={() => {
+                      if (zipCode.length > 0 && zipCode.length < 5) {
+                        setZipError("ZIP code must be 5 digits");
+                      }
+                    }}
+                  />
                   {zipError && <p className="text-sm text-red-500">{zipError}</p>}
                 </div>
                 <div className="space-y-2 pt-2">
