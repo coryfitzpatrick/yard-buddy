@@ -4,26 +4,61 @@ import type { ScheduledReminder } from "@/lib/cron/reminder-scheduler";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
 
+// Maximum age accepted for an unsubscribe token. A leaked link past this point
+// won't silently disable a user's notifications.
+const UNSUBSCRIBE_TOKEN_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+
 export function generateUnsubscribeToken(userId: string): string {
+  const issuedAt = Date.now().toString();
+  const payload = `${userId}:${issuedAt}`;
   const hmac = crypto.createHmac("sha256", process.env.AUTH_SECRET!);
-  hmac.update(userId);
+  hmac.update(payload);
   const sig = hmac.digest("hex");
-  return `${Buffer.from(userId).toString("base64url")}.${sig}`;
+  return [
+    Buffer.from(userId).toString("base64url"),
+    Buffer.from(issuedAt).toString("base64url"),
+    sig,
+  ].join(".");
 }
 
 export function verifyUnsubscribeToken(token: string): string | null {
-  const dotIdx = token.lastIndexOf(".");
-  if (dotIdx === -1) return null;
-  const encoded = token.slice(0, dotIdx);
-  const sig = token.slice(dotIdx + 1);
+  const parts = token.split(".");
+
+  // Legacy 2-segment tokens ({base64(userId)}.{sig}) issued before we added
+  // issuedAt. Keep accepting them so links already in users' inboxes still
+  // work, but the format never refreshes on a leak. New tokens use 3 parts.
+  if (parts.length === 2) {
+    const [encodedUser, sig] = parts;
+    let userId: string;
+    try {
+      userId = Buffer.from(encodedUser, "base64url").toString();
+    } catch {
+      return null;
+    }
+    const hmac = crypto.createHmac("sha256", process.env.AUTH_SECRET!);
+    hmac.update(userId);
+    const expected = hmac.digest("hex");
+    if (sig.length !== expected.length) return null;
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+    return userId;
+  }
+
+  if (parts.length !== 3) return null;
+  const [encodedUser, encodedIssued, sig] = parts;
   let userId: string;
+  let issuedAtStr: string;
   try {
-    userId = Buffer.from(encoded, "base64url").toString();
+    userId = Buffer.from(encodedUser, "base64url").toString();
+    issuedAtStr = Buffer.from(encodedIssued, "base64url").toString();
   } catch {
     return null;
   }
+  const issuedAt = Number(issuedAtStr);
+  if (!Number.isFinite(issuedAt) || issuedAt <= 0) return null;
+  if (Date.now() - issuedAt > UNSUBSCRIBE_TOKEN_MAX_AGE_MS) return null;
+
   const hmac = crypto.createHmac("sha256", process.env.AUTH_SECRET!);
-  hmac.update(userId);
+  hmac.update(`${userId}:${issuedAtStr}`);
   const expected = hmac.digest("hex");
   if (sig.length !== expected.length) return null;
   if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
