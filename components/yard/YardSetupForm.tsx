@@ -6,15 +6,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { yardSectionSchema, YardSectionInput, YardSectionFormInput } from "@/lib/validations/yard";
 import { GrassTypeSelector } from "./GrassTypeSelector";
-import { AreaTypeSelector } from "./AreaTypeSelector";
+import { GrassIdentifyUpload, type GrassIdentifyUploadHandle } from "./GrassIdentifyUpload";
+import { AreaTypeSelector, AREA_NAME_MAP } from "./AreaTypeSelector";
 import type { AreaType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Camera, CheckCircle, CheckCircle2, Images, Loader2, Plus, Search } from "lucide-react";
-import { supabaseClient } from "@/lib/supabase-client";
+import { CheckCircle2, Loader2, Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhotoUpload, type PhotoUploadHandle } from "@/components/analysis/PhotoUpload";
 
@@ -42,11 +42,6 @@ const SPREADER_BRANDS: Record<string, string[]> = {
   none:      [],
 };
 
-const AREA_NAME_MAP: Record<AreaType, string> = {
-  front: "Front Yard", back: "Back Yard",
-  left_side: "Left Side Yard", right_side: "Right Side Yard",
-  other: "My Yard",
-};
 
 export function YardSetupForm() {
   const router = useRouter();
@@ -145,13 +140,8 @@ export function YardSetupForm() {
   const areaType = watch("areaType") as AreaType | undefined;
   const grassType = watch("grassType") as YardSectionInput["grassType"] | undefined;
 
-  const photoRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
   const uploadZoneRef = useRef<HTMLDivElement>(null);
-  const [identifying, setIdentifying] = useState(false);
-  const [identifyPhase, setIdentifyPhase] = useState<"uploading" | "analyzing">("uploading");
-  const [identifyError, setIdentifyError] = useState<string | null>(null);
-  const [identified, setIdentified] = useState<{ confidence: string; explanation: string } | null>(null);
+  const grassIdentifyRef = useRef<GrassIdentifyUploadHandle | null>(null);
   const [highlightUpload, setHighlightUpload] = useState(false);
 
   const [sizeUnit, setSizeUnit] = useState<"sqft" | "acres">("sqft");
@@ -203,44 +193,6 @@ export function YardSetupForm() {
     }
   }
 
-  async function identifyGrass(file: File) {
-    setIdentifying(true);
-    setIdentified(null);
-    setIdentifyError(null);
-    setIdentifyPhase("uploading");
-    try {
-      const signRes = await fetch("/api/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: file.type }),
-      });
-      if (!signRes.ok) {
-        const b = await signRes.json().catch(() => ({}));
-        setIdentifyError(`Upload failed (${signRes.status}): ${b.error ?? "unknown"}`);
-        return;
-      }
-      const { token, path, publicUrl } = await signRes.json();
-      const { error: uploadError } = await supabaseClient.storage
-        .from("lawn-photos")
-        .uploadToSignedUrl(path, token, file, { contentType: file.type });
-      if (uploadError) { setIdentifyError(`Upload failed: ${uploadError.message}`); return; }
-
-      setIdentifyPhase("analyzing");
-      const identifyRes = await fetch("/api/identify-grass", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: publicUrl }),
-      });
-      if (!identifyRes.ok) { setIdentifyError("Analysis failed. Try again."); return; }
-      const result = await identifyRes.json();
-      setValue("grassType", result.grassType);
-      setIdentified({ confidence: result.confidence, explanation: result.explanation });
-    } catch {
-      setIdentifyError("Something went wrong. Try again.");
-    } finally {
-      setIdentifying(false);
-    }
-  }
 
   async function onSubmit(sectionData: YardSectionInput) {
     setError(null);
@@ -368,8 +320,7 @@ export function YardSetupForm() {
     setSizeUnit("sqft");
     setStreetAddress("");
     setLookupNote(null);
-    setIdentified(null);
-    setIdentifyError(null);
+    grassIdentifyRef.current?.reset();
     setHighlightUpload(false);
     setShowSuccess(false);
     setAddingAnotherSection(true);
@@ -555,78 +506,18 @@ export function YardSetupForm() {
             {step === 2 && (
               <div className="space-y-4">
                 <p className="text-sm text-gray-500">Select your grass type, or upload a photo for AI identification.</p>
-                <div
-                  ref={uploadZoneRef}
-                  className={`rounded-lg border-2 border-dashed p-4 text-center transition-colors duration-300 ${highlightUpload ? "border-green-500 bg-green-50 animate-pulse" : "border-green-200"}`}
-                >
-                  <input
-                    ref={cameraRef}
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      e.target.value = "";
-                      setHighlightUpload(false);
-                      if (file) identifyGrass(file);
-                    }}
-                  />
-                  <input
-                    ref={photoRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      e.target.value = "";
-                      setHighlightUpload(false);
-                      if (file) identifyGrass(file);
-                    }}
-                  />
-                  {identifying ? (
-                    <div className="flex items-center justify-center gap-2 text-sm text-gray-500 py-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-green-500" />
-                      {identifyPhase === "uploading" ? "Uploading photo…" : "Analyzing your grass…"}
-                    </div>
-                  ) : identified ? (
-                    <div className="text-left space-y-1">
-                      <div className="flex items-center gap-2 text-sm font-medium text-green-700">
-                        <CheckCircle className="w-4 h-4" /> Identified at {identified.confidence} confidence
-                      </div>
-                      <p className="text-sm text-gray-500">{identified.explanation}</p>
-                      <button type="button" onClick={() => photoRef.current?.click()} className="text-sm text-green-600 underline">Try a different photo</button>
-                    </div>
-                  ) : identifyError ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-red-500">{identifyError}</p>
-                      <div className="flex items-center justify-center gap-3">
-                        <button type="button" onClick={() => cameraRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
-                          <Camera className="w-4 h-4" /> Take Photo
-                        </button>
-                        <span className="text-gray-300">|</span>
-                        <button type="button" onClick={() => photoRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
-                          <Images className="w-4 h-4" /> Choose Photo
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-3">
-                      <button type="button" onClick={() => cameraRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
-                        <Camera className="w-4 h-4" /> Take Photo
-                      </button>
-                      <span className="text-gray-300">|</span>
-                      <button type="button" onClick={() => photoRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
-                        <Images className="w-4 h-4" /> Choose Photo
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <GrassIdentifyUpload
+                  ref={grassIdentifyRef}
+                  containerRef={uploadZoneRef}
+                  highlight={highlightUpload}
+                  onFilePicked={() => setHighlightUpload(false)}
+                  onIdentified={(r) => setValue("grassType", r.grassType as YardSectionInput["grassType"])}
+                />
                 <GrassTypeSelector
                   value={grassType}
                   onChange={(v) => {
                     setValue("grassType", v);
-                    setIdentified(null);
+                    grassIdentifyRef.current?.reset();
                     if (v === "unknown") {
                       setHighlightUpload(true);
                       uploadZoneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });

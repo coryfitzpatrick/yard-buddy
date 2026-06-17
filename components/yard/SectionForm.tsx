@@ -6,48 +6,17 @@ import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import { yardSectionSchema, YardSectionInput, YardSectionFormInput } from "@/lib/validations/yard";
 import { GrassTypeSelector } from "./GrassTypeSelector";
-import { AreaTypeSelector } from "./AreaTypeSelector";
+import { AreaTypeSelector, AREA_NAME_MAP } from "./AreaTypeSelector";
+import { GrassIdentifyUpload, type GrassIdentifyUploadHandle } from "./GrassIdentifyUpload";
 import type { AreaType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Camera, CheckCircle, Images, Loader2, Search } from "lucide-react";
-import { supabaseClient } from "@/lib/supabase-client";
+import { Loader2, Search } from "lucide-react";
 import { toSqft, toDisplaySize } from "@/lib/size-utils";
-import { cn } from "@/lib/utils";
-
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
-
-const TIME_OPTIONS = Array.from({ length: 33 }, (_, i) => {
-  const totalMins = 300 + i * 30;
-  const h = Math.floor(totalMins / 60);
-  const m = totalMins % 60;
-  const ampm = h >= 12 ? "PM" : "AM";
-  const displayH = h > 12 ? h - 12 : h;
-  return {
-    label: `${displayH}:${m.toString().padStart(2, "0")} ${ampm}`,
-    value: `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`,
-  };
-});
-
-const MOWING_HEIGHTS = ["1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6"];
-const WATERING_MINUTES = ["5", "10", "15", "20", "25", "30", "40", "45", "60", "90"];
-
-function parseSchedule(raw: string | undefined | null) {
-  if (!raw) return { days: [] as string[], time: "", inches: "" };
-  try {
-    const p = JSON.parse(raw);
-    if (p && Array.isArray(p.days)) return p as { days: string[]; time: string; inches: string };
-  } catch {}
-  return { days: [] as string[], time: "", inches: "" };
-}
-
-function serializeSchedule(days: string[], time: string, inches: string): string | undefined {
-  if (!days.length && !time && !inches) return undefined;
-  return JSON.stringify({ days, time, inches });
-}
+import { ScheduleEditor } from "./ScheduleEditor";
 
 interface Props {
   yardId: string;
@@ -66,11 +35,6 @@ interface Props {
 }
 
 
-const AREA_NAME_MAP: Record<AreaType, string> = {
-  front: "Front Yard", back: "Back Yard",
-  left_side: "Left Side Yard", right_side: "Right Side Yard",
-  other: "My Yard",
-};
 
 export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule, hideSectionIdentity = false }: Props) {
   const router = useRouter();
@@ -89,6 +53,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         nitrogenPpm: initialData?.nitrogenPpm as never,
         phosphorusPpm: initialData?.phosphorusPpm as never,
         potassiumPpm: initialData?.potassiumPpm as never,
+        organicMatterPct: initialData?.organicMatterPct as never,
         soilTestSource: initialData?.soilTestSource ?? undefined,
         soilTestedAt: initialData?.soilTestedAt as never,
         notes: initialData?.notes ?? undefined,
@@ -102,12 +67,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
   const areaType = watch("areaType") as AreaType | undefined;
 
   // Grass photo identification
-  const photoRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
-  const [identifying, setIdentifying] = useState(false);
-  const [identifyPhase, setIdentifyPhase] = useState<"uploading" | "analyzing">("uploading");
-  const [identifyError, setIdentifyError] = useState<string | null>(null);
-  const [identified, setIdentified] = useState<{ confidence: string; explanation: string } | null>(null);
+  const grassIdentifyRef = useRef<GrassIdentifyUploadHandle | null>(null);
 
   // Lot size lookup + controlled size input
   const usableSqft = lotSqft && buildingSqft ? lotSqft - buildingSqft : lotSqft ?? null;
@@ -117,24 +77,8 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
   const [lookupNote, setLookupNote] = useState<string | null>(null);
   const [sizeUnit, setSizeUnit] = useState<"sqft" | "acres">("sqft");
 
-  // Structured schedule state
-  const initMowing = parseSchedule(initialData?.mowingSchedule);
-  const initWatering = parseSchedule(initialData?.wateringSchedule);
-  const [mowingDays, setMowingDays] = useState<string[]>(initMowing.days);
-  const [mowingTime, setMowingTime] = useState(initMowing.time);
-  const [mowingInches, setMowingInches] = useState(initMowing.inches);
-  const [wateringDays, setWateringDays] = useState<string[]>(initWatering.days);
-  const [wateringTime, setWateringTime] = useState(initWatering.time);
-  const [wateringInches, setWateringInches] = useState(initWatering.inches);
-
-  function updateMowing(days: string[], time: string, inches: string) {
-    setMowingDays(days); setMowingTime(time); setMowingInches(inches);
-    setValue("mowingSchedule", serializeSchedule(days, time, inches));
-  }
-  function updateWatering(days: string[], time: string, inches: string) {
-    setWateringDays(days); setWateringTime(time); setWateringInches(inches);
-    setValue("wateringSchedule", serializeSchedule(days, time, inches));
-  }
+  const mowingSchedule = watch("mowingSchedule") as string | undefined;
+  const wateringSchedule = watch("wateringSchedule") as string | undefined;
 
   const [sizeDisplay, setSizeDisplay] = useState(() => {
     if (initialData?.yardSizeSqft) return String(initialData.yardSizeSqft);
@@ -152,44 +96,6 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
     if (cur) setSizeDisplay(toDisplaySize(cur, next));
   }
 
-  async function identifyGrass(file: File) {
-    setIdentifying(true);
-    setIdentified(null);
-    setIdentifyError(null);
-    setIdentifyPhase("uploading");
-    try {
-      const signRes = await fetch("/api/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: file.type }),
-      });
-      if (!signRes.ok) {
-        const b = await signRes.json().catch(() => ({}));
-        setIdentifyError(`Upload failed (${signRes.status}): ${b.error ?? "unknown"}`);
-        return;
-      }
-      const { token, path, publicUrl } = await signRes.json();
-      const { error: uploadError } = await supabaseClient.storage
-        .from("lawn-photos")
-        .uploadToSignedUrl(path, token, file, { contentType: file.type });
-      if (uploadError) { setIdentifyError(`Upload failed: ${uploadError.message}`); return; }
-
-      setIdentifyPhase("analyzing");
-      const identifyRes = await fetch("/api/identify-grass", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: publicUrl }),
-      });
-      if (!identifyRes.ok) { setIdentifyError("Analysis failed. Try again."); return; }
-      const result = await identifyRes.json();
-      setValue("grassType", result.grassType);
-      setIdentified({ confidence: result.confidence, explanation: result.explanation });
-    } catch {
-      setIdentifyError("Something went wrong. Try again.");
-    } finally {
-      setIdentifying(false);
-    }
-  }
 
   async function lookupYardSize() {
     if (!streetAddress.trim()) return;
@@ -276,69 +182,17 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
       {/* Grass type identification */}
       <div className="space-y-2">
         <Label>Grass Type *</Label>
-        <div className="rounded-lg border-2 border-dashed border-green-200 p-4 text-center">
-          <input
-            ref={cameraRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              e.target.value = "";
-              if (file) identifyGrass(file);
-            }}
-          />
-          <input
-            ref={photoRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              e.target.value = "";
-              if (file) identifyGrass(file);
-            }}
-          />
-          {identifying ? (
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500 py-1">
-              <Loader2 className="w-4 h-4 animate-spin text-green-500" />
-              {identifyPhase === "uploading" ? "Uploading photo…" : "Analyzing your grass…"}
-            </div>
-          ) : identified ? (
-            <div className="text-left space-y-1">
-              <div className="flex items-center gap-2 text-sm font-medium text-green-700">
-                <CheckCircle className="w-4 h-4" /> Identified at {identified.confidence} confidence
-              </div>
-              <p className="text-sm text-gray-500">{identified.explanation}</p>
-              <button type="button" onClick={() => photoRef.current?.click()} className="text-sm text-green-600 underline">Try a different photo</button>
-            </div>
-          ) : identifyError ? (
-            <div className="space-y-2">
-              <p className="text-sm text-red-500">{identifyError}</p>
-              <div className="flex items-center justify-center gap-3">
-                <button type="button" onClick={() => cameraRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
-                  <Camera className="w-4 h-4" /> Take Photo
-                </button>
-                <span className="text-gray-300">|</span>
-                <button type="button" onClick={() => photoRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
-                  <Images className="w-4 h-4" /> Choose Photo
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-3">
-              <button type="button" onClick={() => cameraRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
-                <Camera className="w-4 h-4" /> Take Photo
-              </button>
-              <span className="text-gray-300">|</span>
-              <button type="button" onClick={() => photoRef.current?.click()} className="flex items-center gap-1.5 text-sm text-green-600 font-medium hover:text-green-700">
-                <Images className="w-4 h-4" /> Choose Photo
-              </button>
-            </div>
-          )}
-        </div>
-        <GrassTypeSelector value={grassType} onChange={(v) => { setValue("grassType", v); setIdentified(null); }} />
+        <GrassIdentifyUpload
+          ref={grassIdentifyRef}
+          onIdentified={(r) => setValue("grassType", r.grassType as YardSectionInput["grassType"])}
+        />
+        <GrassTypeSelector
+          value={grassType}
+          onChange={(v) => {
+            setValue("grassType", v);
+            grassIdentifyRef.current?.reset();
+          }}
+        />
         {errors.grassType && <p className="text-sm text-red-500">{errors.grassType.message || "Please select a grass type"}</p>}
       </div>
 
@@ -429,6 +283,11 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           {errors.potassiumPpm && <p className="text-sm text-red-500">{errors.potassiumPpm.message || "Must be between 0 and 2000 ppm"}</p>}
         </div>
         <div className="space-y-1">
+          <Label>Organic Matter, % <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Input type="number" step="0.1" min="0" max="100" placeholder="e.g. 3" {...register("organicMatterPct")} />
+          {errors.organicMatterPct && <p className="text-sm text-red-500">{errors.organicMatterPct.message || "Must be between 0 and 100"}</p>}
+        </div>
+        <div className="space-y-1">
           <Label>Soil Test Source <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
           <Input placeholder="e.g. Lowe's test kit, UGA Extension Lab" {...register("soilTestSource")} />
           <p className="text-sm text-gray-400">Where did your soil numbers come from? Helps us give better context.</p>
@@ -458,119 +317,21 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         <div id="schedule" className="space-y-4 border-t border-gray-100 pt-4">
           <h3 className="text-sm font-semibold text-gray-700">Personalized Reminders</h3>
 
-          <div className="space-y-2">
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <Label>Mowing schedule</Label>
-              {mowingDays.length === 0 && yardMowingSchedule && (() => {
-                try {
-                  const p = JSON.parse(yardMowingSchedule);
-                  if (Array.isArray(p.days) && p.days.length > 0) {
-                    const parts = [p.days.join(", ")];
-                    if (p.time) { const [h,m] = p.time.split(":").map(Number); parts.push(`${h > 12 ? h-12 : h||12}:${String(m).padStart(2,"0")} ${h >= 12 ? "PM" : "AM"}`); }
-                    if (p.inches) parts.push(`${p.inches} in`);
-                    return <span className="text-xs text-gray-400">Yard default: {parts.join(" · ")}</span>;
-                  }
-                } catch {}
-              })()}
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {DAYS.map((day) => (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => {
-                    const next = mowingDays.includes(day)
-                      ? mowingDays.filter((d) => d !== day)
-                      : [...mowingDays, day];
-                    updateMowing(next, mowingTime, mowingInches);
-                  }}
-                  className={cn(
-                    "px-2.5 py-1 rounded text-xs font-medium border transition-colors",
-                    mowingDays.includes(day)
-                      ? "bg-green-600 text-white border-green-600"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-green-300"
-                  )}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Select value={mowingTime} onValueChange={(v) => updateMowing(mowingDays, v ?? "", mowingInches)}>
-                <SelectTrigger className="flex-1 min-w-0"><SelectValue placeholder="Time">{TIME_OPTIONS.find((o) => o.value === mowingTime)?.label}</SelectValue></SelectTrigger>
-                <SelectContent>
-                  {TIME_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={mowingInches} onValueChange={(v) => updateMowing(mowingDays, mowingTime, v ?? "")}>
-                <SelectTrigger className="w-28 shrink-0"><SelectValue placeholder="Height">{mowingInches ? `${mowingInches} in` : undefined}</SelectValue></SelectTrigger>
-                <SelectContent>
-                  {MOWING_HEIGHTS.map((h) => (
-                    <SelectItem key={h} value={h}>{h} in</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <ScheduleEditor
+            kind="mow"
+            label="Mowing schedule"
+            value={mowingSchedule}
+            onChange={(v) => setValue("mowingSchedule", v)}
+            yardDefault={yardMowingSchedule}
+          />
 
-          <div className="space-y-2">
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <Label>Watering schedule</Label>
-              {wateringDays.length === 0 && yardWateringSchedule && (() => {
-                try {
-                  const p = JSON.parse(yardWateringSchedule);
-                  if (Array.isArray(p.days) && p.days.length > 0) {
-                    const parts = [p.days.join(", ")];
-                    if (p.time) { const [h,m] = p.time.split(":").map(Number); parts.push(`${h > 12 ? h-12 : h||12}:${String(m).padStart(2,"0")} ${h >= 12 ? "PM" : "AM"}`); }
-                    if (p.inches) parts.push(`${p.inches} min`);
-                    return <span className="text-xs text-gray-400">Yard default: {parts.join(" · ")}</span>;
-                  }
-                } catch {}
-              })()}
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {DAYS.map((day) => (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => {
-                    const next = wateringDays.includes(day)
-                      ? wateringDays.filter((d) => d !== day)
-                      : [...wateringDays, day];
-                    updateWatering(next, wateringTime, wateringInches);
-                  }}
-                  className={cn(
-                    "px-2.5 py-1 rounded text-xs font-medium border transition-colors",
-                    wateringDays.includes(day)
-                      ? "bg-green-600 text-white border-green-600"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-green-300"
-                  )}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Select value={wateringTime} onValueChange={(v) => updateWatering(wateringDays, v ?? "", wateringInches)}>
-                <SelectTrigger className="flex-1 min-w-0"><SelectValue placeholder="Time">{TIME_OPTIONS.find((o) => o.value === wateringTime)?.label}</SelectValue></SelectTrigger>
-                <SelectContent>
-                  {TIME_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={wateringInches} onValueChange={(v) => updateWatering(wateringDays, wateringTime, v ?? "")}>
-                <SelectTrigger className="w-28 shrink-0"><SelectValue placeholder="Duration">{wateringInches ? `${wateringInches} min` : undefined}</SelectValue></SelectTrigger>
-                <SelectContent>
-                  {WATERING_MINUTES.map((a) => (
-                    <SelectItem key={a} value={a}>{a} min</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <ScheduleEditor
+            kind="water"
+            label="Watering schedule"
+            value={wateringSchedule}
+            onChange={(v) => setValue("wateringSchedule", v)}
+            yardDefault={yardWateringSchedule}
+          />
 
           <p className="text-xs text-gray-400">
             These are your own notes. They won&apos;t affect AI analysis.

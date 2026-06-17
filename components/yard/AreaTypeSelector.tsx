@@ -15,6 +15,16 @@ export const AREA_CONFIG: Record<AreaType, AreaConfig> = {
   other:      { label: "Other",       icon: MapPin,     hint: "Custom area" },
 };
 
+// Default section name to assign when a user picks an area type. Used by
+// forms that auto-fill the section name from the area selection.
+export const AREA_NAME_MAP: Record<AreaType, string> = {
+  front: "Front Yard",
+  back: "Back Yard",
+  left_side: "Left Side Yard",
+  right_side: "Right Side Yard",
+  other: "My Yard",
+};
+
 interface Props {
   value: AreaType | null | undefined;
   onChange: (v: AreaType) => void;
