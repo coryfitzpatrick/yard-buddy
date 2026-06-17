@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const KEY = process.env.OPENWEATHERMAP_API_KEY!;
 
 export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const rate = await checkRateLimit(`validate-zip:${session.user.id}`, 30, 60 * 60 * 1000);
+  if (rate.limited) {
+    return NextResponse.json({ valid: false, reason: "rate_limited" }, { status: 429 });
+  }
 
   const zip = req.nextUrl.searchParams.get("zip");
   if (!zip || !/^\d{5}$/.test(zip)) {

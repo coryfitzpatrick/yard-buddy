@@ -5,6 +5,8 @@ import { analyzeImages, validateLawnImages } from "@/lib/claude";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
 import { deduplicateRecommendations } from "@/lib/analysis-utils";
 import { canRunAnalysis, getPlanLimits } from "@/lib/subscription";
+import { isOwnedLawnPhotoUrl } from "@/lib/storage-url";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
@@ -27,6 +29,16 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Each user gets ~10 analyses/hr regardless of plan-level monthly caps —
+  // tight bound because every call fans out to multiple paid Claude requests.
+  const rate = await checkRateLimit(`analyze:${session.user.id}`, 10, 60 * 60 * 1000);
+  if (rate.limited) {
+    return NextResponse.json(
+      { error: "rate_limited", message: "Too many analyses in the last hour. Try again shortly." },
+      { status: 429 },
+    );
+  }
+
   const body = await req.json();
   const { sectionId } = body;
   // Accept either { photos: [{url, kind}] } (new) or { imageUrls: [...] } (legacy).
@@ -40,6 +52,13 @@ export async function POST(req: NextRequest) {
 
   if (!sectionId || photos.length === 0) {
     return NextResponse.json({ error: "sectionId and photos[] required" }, { status: 400 });
+  }
+  // Block users from forwarding arbitrary URLs to Claude on our dime — every
+  // photo URL must be a public lawn-photos URL scoped to this user's prefix.
+  for (const p of photos) {
+    if (!isOwnedLawnPhotoUrl(p.url, session.user.id)) {
+      return NextResponse.json({ error: "invalid_photo_url" }, { status: 400 });
+    }
   }
   const { MAX_PHOTOS, PHOTO_KIND_META } = await import("@/lib/photo-kinds");
   if (photos.length > MAX_PHOTOS) {

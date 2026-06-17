@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { generateRecommendations } from "@/lib/claude";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -13,6 +14,11 @@ function addDays(date: Date, days: number): Date {
 export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const rate = await checkRateLimit(`recommendations:${session.user.id}`, 20, 60 * 60 * 1000);
+  if (rate.limited) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
 
   const sectionId = req.nextUrl.searchParams.get("sectionId");
   if (!sectionId) return NextResponse.json({ error: "sectionId required" }, { status: 400 });

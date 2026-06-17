@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { z } from "zod";
+
+const lookupSchema = z.object({ address: z.string().min(3).max(200) });
 
 function polygonAreaSqft(coords: [number, number][]): number {
   let area = 0;
@@ -21,8 +25,14 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { address } = await req.json();
-  if (!address?.trim()) return NextResponse.json({ error: "address required" }, { status: 400 });
+  const rate = await checkRateLimit(`lookup-yard-size:${session.user.id}`, 30, 60 * 60 * 1000);
+  if (rate.limited) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
+
+  const parsed = lookupSchema.safeParse(await req.json());
+  if (!parsed.success) return NextResponse.json({ error: "address required" }, { status: 400 });
+  const { address } = parsed.data;
 
   const ua = "yard-analyzer/1.0 (lawn care app; contact@yardanalyzer.com)";
 

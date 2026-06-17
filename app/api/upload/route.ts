@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,12 +22,17 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { contentType } = await req.json();
-  if (!contentType?.startsWith("image/")) {
-    return NextResponse.json({ error: "File must be an image" }, { status: 400 });
+  const rate = await checkRateLimit(`upload:${session.user.id}`, 60, 60 * 60 * 1000);
+  if (rate.limited) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  const ext = MIME_TO_EXT[contentType] ?? "jpg";
+  const { contentType } = await req.json();
+  if (!contentType || !MIME_TO_EXT[contentType]) {
+    return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
+  }
+
+  const ext = MIME_TO_EXT[contentType];
   const path = `${session.user.id}/${Date.now()}.${ext}`;
 
   const { data, error } = await supabase.storage
