@@ -212,7 +212,7 @@ export const SoilQuickEdit = forwardRef<SoilQuickEditHandle, Props>(function Soi
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-gray-600">Tested on</Label>
+              <Label className="text-xs text-gray-600">Last tested on</Label>
               <Input type="date" value={testedAt} onChange={(e) => setTestedAt(e.target.value)} />
             </div>
           </div>

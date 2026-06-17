@@ -86,6 +86,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         phosphorusPpm: initialData?.phosphorusPpm as never,
         potassiumPpm: initialData?.potassiumPpm as never,
         soilTestSource: initialData?.soilTestSource ?? undefined,
+        soilTestedAt: initialData?.soilTestedAt as never,
         notes: initialData?.notes ?? undefined,
         mowingSchedule: initialData?.mowingSchedule ?? undefined,
         wateringSchedule: initialData?.wateringSchedule ?? undefined,
@@ -424,6 +425,11 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           <Input placeholder="e.g. Lowe's test kit, UGA Extension Lab" {...register("soilTestSource")} />
           <p className="text-sm text-gray-400">Where did your soil numbers come from? Helps us give better context.</p>
           {errors.soilTestSource && <p className="text-sm text-red-500">{errors.soilTestSource.message}</p>}
+        </div>
+        <div className="space-y-1">
+          <Label>Last tested on <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+          <Input type="date" {...register("soilTestedAt")} />
+          <p className="text-sm text-gray-400">When you last ran a soil test. Helps us judge how current the results are.</p>
         </div>
         <div className="space-y-1">
           <Label>Soil Moisture</Label>

@@ -677,6 +677,11 @@ export function YardSetupForm() {
                   <p className="text-sm text-gray-400">Test with a soil kit from your local hardware store</p>
                 </div>
                 <div className="space-y-1">
+                  <Label>Last tested on <span className="text-gray-400 font-normal">(optional)</span></Label>
+                  <Input type="date" {...register("soilTestedAt")} />
+                  <p className="text-sm text-gray-400">When you last ran a soil test. Helps us judge how current the results are.</p>
+                </div>
+                <div className="space-y-1">
                   <Label>Soil Moisture</Label>
                   <Select onValueChange={(v) => setValue("soilMoisture", v as "dry" | "moderate" | "moist")}>
                     <SelectTrigger><SelectValue placeholder="Select moisture level" /></SelectTrigger>

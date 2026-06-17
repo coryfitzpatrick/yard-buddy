@@ -53,6 +53,7 @@ export default async function EditSectionPage({
           phosphorusPpm: section.phosphorusPpm ?? undefined,
           potassiumPpm: section.potassiumPpm ?? undefined,
           soilTestSource: section.soilTestSource ?? undefined,
+          soilTestedAt: section.soilTestedAt ? section.soilTestedAt.toISOString().slice(0, 10) : undefined,
           soilMoisture: section.soilMoisture as "dry" | "moderate" | "moist" | undefined,
           notes: section.notes ?? undefined,
           mowingSchedule: section.mowingSchedule ?? undefined,

@@ -194,7 +194,7 @@ export default function AnalyzePage() {
           )}
           {selectedYard && selectedYard.sections.length > 1 && (
             <div className="mb-6">
-              <p className="text-sm font-medium text-gray-700 mb-3">Which section are you photographing?</p>
+              <p className="text-sm font-medium text-gray-700 mb-3">Which section are you analyzing?</p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {selectedYard.sections.map((s) => {
                   const areaCfg = s.areaType ? AREA_CONFIG[s.areaType as AreaType] : null;
@@ -238,6 +238,7 @@ export default function AnalyzePage() {
             if (!sec) return null;
             return (
               <div className="space-y-4">
+                <PhotoUpload onUploaded={handleUploaded} analyzing={analyzing} onReset={cancelAnalysis} />
                 <SoilQuickEdit
                   ref={soilRef}
                   yardId={selectedYard.id}
@@ -252,7 +253,6 @@ export default function AnalyzePage() {
                   soilTestSource={sec.soilTestSource}
                   soilTestedAt={sec.soilTestedAt}
                 />
-                <PhotoUpload onUploaded={handleUploaded} analyzing={analyzing} onReset={cancelAnalysis} />
               </div>
             );
           })()}
