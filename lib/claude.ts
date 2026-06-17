@@ -286,6 +286,50 @@ function extractJsonText(raw: string): string {
     .trim();
 }
 
+// Static schema + sequencing rules block included in every analyzeImages /
+// analyzeImagesBase64 call. Lives in its own text block placed before the
+// images so it can carry a prompt-cache breakpoint — without that, the JSON
+// schema (~1500 tokens) is re-sent at full input price on every call.
+const ANALYZE_SCHEMA_BLOCK = `You will analyze a lawn photo set. Return ONLY a JSON object — no markdown, no code fences, no explanation outside the JSON.
+
+Return this exact JSON structure:
+{
+  "issues": ["array using only these keys: grubs, weeds_broadleaf, weeds_grassy, fungus, drought_stress, overwatering, bare_spots, thatch, compaction, nutrient_deficiency, pests, healthy"],
+  "healthScore": number (0-100),
+  "summary": "2-3 sentence plain English description of what you see, naming specific weed/pest/disease species observed",
+  "grassTypeDetected": "one of: bermuda, kentucky_bluegrass, tall_fescue, fine_fescue, zoysia, st_augustine, centipede, buffalo, ryegrass, unknown",
+  "confidence": number (0-100, your confidence in the analysis given image quality),
+  "recommendations": [
+    {
+      "title": "string (name specific weed/pest species if applicable, not generic categories)",
+      "description": "string (include species name and why it's a problem for this grass type)",
+      "priority": "urgent" | "high" | "medium" | "low",
+      "timing": "string",
+      "scheduledStartDays": number (integer, days from today to start — 0 means today),
+      "scheduledEndDays": number (integer, days from today for hard cutoff — must be >= scheduledStartDays),
+      "weatherCondition": "no_rain_48h" | "dry_day" | "soil_moist" | "any",
+      "productSuggestion": "string (brand + product name, optional)",
+      "productSearchQuery": "string (concise search term for online retailers, omit if no product)",
+      "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
+      "applicationRate": "string (optional)",
+      "spreaderSetting": "string (optional)",
+      "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional),
+      "taskMode": "corrective" | "maintenance" | "improvement"
+        (corrective = fixing a problem; maintenance = ongoing care; improvement = optional upgrade for a healthy lawn)
+    }
+  ]
+}
+
+DEDUPLICATION RULE — never recommend the same type of treatment more than once. If multiple issues both call for the same treatment, combine them into a single task.
+
+TASK SEQUENCING RULES:
+- Aeration before overseeding: only if compaction/thatch > 0.5" is evident.
+- Pre-emergent herbicides completely prevent seed germination — NEVER recommend them with overseeding.
+- Post-emergent herbicides: minimum 4 weeks gap from overseeding.
+- Use scheduledStartDays/scheduledEndDays to reflect correct task order.
+
+For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic windows. Example: if rain is Thursday-Friday, schedule a fungicide application for today-Wednesday (scheduledStartDays: 0, scheduledEndDays: 2) with weatherCondition "no_rain_48h". Use "any" only for tasks where weather does not matter (e.g. mowing, edging).`;
+
 async function runCritique(
   context: LawnContext,
   factsBlock: string,
@@ -412,7 +456,9 @@ export async function analyzeImages(
     });
   });
 
-  // Build section-aware system prompt when enriched context is available
+  // Build section-aware system prompt when enriched context is available.
+  // The big static schema + sequencing rules block lives in the user content
+  // instead of being appended here so it can carry its own cache breakpoint.
   const systemPrompt = context.weatherData
     ? buildSectionAnalysisPrompt({
         section: {
@@ -429,34 +475,10 @@ export async function analyzeImages(
           currentRoutine: context.currentRoutine ?? null,
         },
         weather: context.weatherData,
-      }).systemPrompt + `
-
-ADDITIONAL CONTEXT FOR JSON RESPONSE:
-You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.
-
-DEDUPLICATION RULE — never recommend the same type of treatment more than once. If multiple issues both call for the same treatment, combine them into a single task.
-
-TASK SEQUENCING RULES:
-- Aeration before overseeding: only if compaction/thatch > 0.5" is evident.
-- Pre-emergent herbicides completely prevent seed germination — NEVER recommend them with overseeding.
-- Post-emergent herbicides: minimum 4 weeks gap from overseeding.
-- Use scheduledStartDays/scheduledEndDays to reflect correct task order.`
+      }).systemPrompt
     : buildSystemPrompt(context.grassType);
 
-  const message = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 3000,
-    system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
-    messages: [
-      {
-        role: "user",
-        content: [
-          ...imageContent,
-          {
-            type: "text" as const,
-            text: `Analyze this lawn. Return a JSON object only.
-
-Known context:
+  const knownContext = `Known context:
 - Grass Type: ${context.grassType.replace(/_/g, " ")}
 - ZIP Code: ${context.zipCode}
 ${context.areaType ? `- Yard Area: ${context.areaType.replace(/_/g, " ")} (${
@@ -474,36 +496,21 @@ ${context.forecastText ? `- 5-Day Forecast:\n${context.forecastText}` : context.
 ${context.notes ? `- Notes: <notes>${context.notes.slice(0, 500)}</notes>` : ""}
 ${context.currentRoutine ? `- Current Routine: <current_routine>${context.currentRoutine.slice(0, 1000)}</current_routine>` : ""}
 
-Return this exact JSON structure:
-{
-  "issues": ["array using only these keys: grubs, weeds_broadleaf, weeds_grassy, fungus, drought_stress, overwatering, bare_spots, thatch, compaction, nutrient_deficiency, pests, healthy"],
-  "healthScore": number (0-100),
-  "summary": "2-3 sentence plain English description of what you see, naming specific weed/pest/disease species observed",
-  "grassTypeDetected": "one of: bermuda, kentucky_bluegrass, tall_fescue, fine_fescue, zoysia, st_augustine, centipede, buffalo, ryegrass, unknown",
-  "confidence": number (0-100, your confidence in the analysis given image quality),
-  "recommendations": [
-    {
-      "title": "string (name specific weed/pest species if applicable, not generic categories)",
-      "description": "string (include species name and why it's a problem for this grass type)",
-      "priority": "urgent" | "high" | "medium" | "low",
-      "timing": "string",
-      "scheduledStartDays": number (integer, days from today to start — 0 means today),
-      "scheduledEndDays": number (integer, days from today for hard cutoff — must be >= scheduledStartDays),
-      "weatherCondition": "no_rain_48h" | "dry_day" | "soil_moist" | "any",
-      "productSuggestion": "string (brand + product name, optional)",
-      "productSearchQuery": "string (concise search term for online retailers, omit if no product)",
-      "estimatedPrice": "string (typical price range, e.g. '$18-28', omit if unknown)",
-      "applicationRate": "string (optional)",
-      "spreaderSetting": "string (optional)",
-      "spreaderType": "broadcast" | "drop" | "handheld" | "liquid" | "none" (optional),
-      "taskMode": "corrective" | "maintenance" | "improvement"
-        (corrective = fixing a problem; maintenance = ongoing care; improvement = optional upgrade for a healthy lawn)
-    }
-  ]
-}
+Now analyze the lawn photos above and return the JSON object.`;
 
-For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic windows. Example: if rain is Thursday-Friday, schedule a fungicide application for today-Wednesday (scheduledStartDays: 0, scheduledEndDays: 2) with weatherCondition "no_rain_48h". Use "any" only for tasks where weather does not matter (e.g. mowing, edging).`,
-          },
+  const message = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 3000,
+    system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
+    messages: [
+      {
+        role: "user",
+        content: [
+          // Static schema block lives first so it shares a cached prefix with
+          // every prior analyze call regardless of grass type / section.
+          { type: "text" as const, text: ANALYZE_SCHEMA_BLOCK, cache_control: { type: "ephemeral" } },
+          ...imageContent,
+          { type: "text" as const, text: knownContext },
         ],
       },
     ],
@@ -544,10 +551,7 @@ export async function analyzeImagesBase64(
           currentRoutine: context.currentRoutine ?? null,
         },
         weather: context.weatherData,
-      }).systemPrompt + `
-
-ADDITIONAL CONTEXT FOR JSON RESPONSE:
-You must return valid JSON only — no markdown, no code fences, no explanation text outside the JSON structure.`
+      }).systemPrompt
     : buildSystemPrompt(context.grassType);
 
   const scenarioText = [
@@ -567,20 +571,7 @@ You must return valid JSON only — no markdown, no code fences, no explanation 
   });
   const ragBlock = formatChunksForPrompt(ragChunks);
 
-  const message = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 3000,
-    system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
-    messages: [
-      {
-        role: "user",
-        content: [
-          ...base64Images,
-          {
-            type: "text" as const,
-            text: `Analyze this lawn from the photos. Return the same JSON structure used by analyzeImages.
-${ragBlock ? `\n${ragBlock}` : ""}
-Context:
+  const knownContext = `${ragBlock ? `${ragBlock}\n\n` : ""}Context:
 - Grass Type: ${context.grassType.replace(/_/g, " ")}
 - ZIP Code: ${context.zipCode}
 ${context.yardSizeSqft ? `- Yard Size: ${context.yardSizeSqft} sq ft` : ""}
@@ -589,8 +580,19 @@ ${context.soilMoisture ? `- Soil Moisture: ${context.soilMoisture}` : ""}
 ${context.weatherSummary ? `- Weather: ${context.weatherSummary}` : ""}
 ${context.notes ? `- Notes: ${context.notes.slice(0, 500)}` : ""}
 
-Return the exact AnalysisResult JSON shape with fields: issues (string[]), healthScore (0-100), summary, grassTypeDetected, confidence (0-100), recommendations (array of the standard recommendation shape).`,
-          },
+Now analyze the lawn photos above and return the JSON object described.`;
+
+  const message = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 3000,
+    system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text" as const, text: ANALYZE_SCHEMA_BLOCK, cache_control: { type: "ephemeral" } },
+          ...base64Images,
+          { type: "text" as const, text: knownContext },
         ],
       },
     ],

@@ -65,7 +65,8 @@
 - [ ] **5.2 — Replace `router.refresh()` with server actions + `revalidatePath`** (9 call sites).
 - [ ] **5.3 — Memoize TaskList priority groups** (`TaskList.tsx:307-322`).
 - [ ] **5.4 — Move magic time constants to `lib/time.ts`** (`DAY_MS`, `DAYS_30_MS`, `TRIAL_GRACE_DAYS`).
-- [ ] **5.5 — Add a second prompt cache breakpoint** in `analyzeImages*` covering the static JSON-schema block, not just the system prompt.
+- [x] **5.5 — Add a second prompt cache breakpoint** in `analyzeImages*` covering the static JSON-schema block, not just the system prompt.
+  - Done in: extracted the ~1500-token JSON schema + sequencing rules into a single `ANALYZE_SCHEMA_BLOCK` constant. Both `analyzeImages` and `analyzeImagesBase64` now place it as a separate `text` block before the image content with its own `cache_control: ephemeral`, so the schema prefix caches across calls regardless of grass type or section. System prompt keeps its existing breakpoint.
 - [ ] **5.6 — Add tests** for `lib/slug.ts`, `lib/rate-limit.ts`, and `claude.ts`'s pure helpers (`detectDataGaps`, `buildContextWarnings`, `buildDataGapWarning`).
 - [ ] **5.7 — Fix `app/(dashboard)/dashboard/page.tsx:90`** — `yards[0]?.weatherRefreshedAt` masquerades as global; either rename or take the max across yards.
 
