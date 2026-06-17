@@ -103,6 +103,7 @@ export default async function EditYardPage({
             streetAddress={yard.streetAddress ?? undefined}
             yardMowingSchedule={yard.mowingSchedule}
             yardWateringSchedule={yard.wateringSchedule}
+            hideSectionIdentity
             initialData={{
               id: onlySection.id,
               slug: onlySection.slug,

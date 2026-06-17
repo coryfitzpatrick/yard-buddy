@@ -59,6 +59,10 @@ interface Props {
   initialData?: Partial<YardSectionFormInput & { id: string; slug: string }>;
   yardMowingSchedule?: string | null;
   yardWateringSchedule?: string | null;
+  // Hide the area-type picker and section-name input. Useful when the section
+  // represents the whole yard (only section in the yard) and these fields
+  // would just confuse the user.
+  hideSectionIdentity?: boolean;
 }
 
 
@@ -68,7 +72,7 @@ const AREA_NAME_MAP: Record<AreaType, string> = {
   garden: "Garden", other: "My Yard",
 };
 
-export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule }: Props) {
+export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule, hideSectionIdentity = false }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const isEdit = !!initialData?.id;
@@ -246,24 +250,28 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
 
-      <div className="space-y-2">
-        <Label>Area Type</Label>
-        <AreaTypeSelector
-          value={areaType}
-          onChange={(v) => {
-            setValue("areaType", v);
-            const defaultNames = new Set(Object.values(AREA_NAME_MAP));
-            const curName = watch("name") ?? "";
-            if (!curName || defaultNames.has(curName)) setValue("name", AREA_NAME_MAP[v]);
-          }}
-        />
-      </div>
+      {!hideSectionIdentity && (
+        <>
+          <div className="space-y-2">
+            <Label>Area Type</Label>
+            <AreaTypeSelector
+              value={areaType}
+              onChange={(v) => {
+                setValue("areaType", v);
+                const defaultNames = new Set(Object.values(AREA_NAME_MAP));
+                const curName = watch("name") ?? "";
+                if (!curName || defaultNames.has(curName)) setValue("name", AREA_NAME_MAP[v]);
+              }}
+            />
+          </div>
 
-      <div className="space-y-1">
-        <Label>Section Name</Label>
-        <Input placeholder="Front Yard" {...register("name")} />
-        {errors.name && <p className="text-sm text-red-500">{errors.name.message || "Section name is required"}</p>}
-      </div>
+          <div className="space-y-1">
+            <Label>Section Name</Label>
+            <Input placeholder="Front Yard" {...register("name")} />
+            {errors.name && <p className="text-sm text-red-500">{errors.name.message || "Section name is required"}</p>}
+          </div>
+        </>
+      )}
 
       {/* Grass type identification */}
       <div className="space-y-2">
