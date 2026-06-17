@@ -66,7 +66,40 @@ export function YardSetupForm() {
   const [propertyName, setPropertyName] = useState("My Property");
   const [zipCode, setZipCode] = useState("");
   const [zipError, setZipError] = useState<string | null>(null);
+  const [zipChecking, setZipChecking] = useState(false);
+  const [zipVerifiedFor, setZipVerifiedFor] = useState<string | null>(null);
+  const [zipCity, setZipCity] = useState<string | null>(null);
   const [setupMode, setSetupMode] = useState<"whole" | "sections">("whole");
+
+  async function verifyZip(value: string): Promise<boolean> {
+    if (zipVerifiedFor === value) return true;
+    setZipChecking(true);
+    setZipError(null);
+    try {
+      const res = await fetch(`/api/validate-zip?zip=${value}`);
+      const data = await res.json();
+      if (data.valid) {
+        setZipVerifiedFor(value);
+        setZipCity(data.city ?? null);
+        return true;
+      }
+      setZipError(
+        data.reason === "not_found"
+          ? "That ZIP doesn't match a US location"
+          : "Couldn't verify ZIP, try again",
+      );
+      setZipVerifiedFor(null);
+      setZipCity(null);
+      return false;
+    } catch {
+      setZipError("Couldn't verify ZIP, try again");
+      setZipVerifiedFor(null);
+      setZipCity(null);
+      return false;
+    } finally {
+      setZipChecking(false);
+    }
+  }
 
   const { handleSubmit, watch, setValue, register, reset, trigger, formState: { errors, isSubmitting } } =
     useForm<YardSectionFormInput, unknown, YardSectionInput>({
@@ -319,7 +352,10 @@ export function YardSetupForm() {
   const canAdvance = async () => {
     if (step === 0) {
       if (!zipCode.match(/^\d{5}$/)) { setZipError("Enter a valid 5-digit ZIP code"); return false; }
-      setZipError(null);
+      if (zipVerifiedFor !== zipCode) {
+        const ok = await verifyZip(zipCode);
+        if (!ok) return false;
+      }
       return true;
     }
     if (step === 2) return trigger(["grassType"]);
@@ -433,14 +469,25 @@ export function YardSetupForm() {
                     onChange={(e) => {
                       const digits = e.target.value.replace(/\D/g, "").slice(0, 5);
                       setZipCode(digits);
-                      if (zipError && digits.length === 5) setZipError(null);
+                      if (zipVerifiedFor && zipVerifiedFor !== digits) {
+                        setZipVerifiedFor(null);
+                        setZipCity(null);
+                      }
+                      if (zipError) setZipError(null);
                     }}
                     onBlur={() => {
-                      if (zipCode.length > 0 && zipCode.length < 5) {
+                      if (zipCode.length === 0) return;
+                      if (zipCode.length < 5) {
                         setZipError("ZIP code must be 5 digits");
+                        return;
                       }
+                      verifyZip(zipCode);
                     }}
                   />
+                  {zipChecking && <p className="text-sm text-gray-400">Checking ZIP…</p>}
+                  {!zipChecking && zipCity && zipVerifiedFor === zipCode && (
+                    <p className="text-sm text-green-700">{zipCity}</p>
+                  )}
                   {zipError && <p className="text-sm text-red-500">{zipError}</p>}
                 </div>
                 <div className="space-y-2 pt-2">
