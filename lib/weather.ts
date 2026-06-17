@@ -3,8 +3,38 @@ import { WeatherData } from "@/types";
 const BASE = "https://api.openweathermap.org/data/2.5";
 const KEY = process.env.OPENWEATHERMAP_API_KEY!;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildWeatherData(current: any, forecast: any, fallbackLocation: string): WeatherData {
+// Minimal slices of the OpenWeatherMap 2.5 response shapes we actually read.
+// See https://openweathermap.org/current and https://openweathermap.org/forecast5.
+interface OwmWeatherDescriptor {
+  description: string;
+  icon: string;
+}
+
+interface OwmCurrent {
+  cod: number | string;
+  message?: string;
+  main: { temp: number; humidity: number };
+  weather: OwmWeatherDescriptor[];
+  wind: { speed: number };
+  name?: string;
+}
+
+interface OwmForecastItem {
+  dt_txt: string;
+  pop?: number;
+  main: { temp_max: number; temp_min: number };
+  weather: OwmWeatherDescriptor[];
+}
+
+interface OwmForecast {
+  list?: OwmForecastItem[];
+}
+
+function buildWeatherData(
+  current: OwmCurrent,
+  forecast: OwmForecast,
+  fallbackLocation: string,
+): WeatherData {
   const dailyMap = new Map<string, { high: number; low: number; description: string; precipChance: number }>();
   for (const item of forecast.list ?? []) {
     const date = item.dt_txt.split(" ")[0];
@@ -27,9 +57,8 @@ function buildWeatherData(current: any, forecast: any, fallbackLocation: string)
     }
   }
 
-  const currentPrecipChance = forecast.list?.[0]?.pop != null
-    ? Math.round(forecast.list[0].pop * 100)
-    : 0;
+  const firstItem = forecast.list?.[0];
+  const currentPrecipChance = firstItem?.pop != null ? Math.round(firstItem.pop * 100) : 0;
 
   return {
     temp: Math.round(current.main.temp),
@@ -52,20 +81,20 @@ function buildWeatherData(current: any, forecast: any, fallbackLocation: string)
 }
 
 export async function getWeatherByZip(zip: string, country = "us"): Promise<WeatherData> {
-  const [current, forecast] = await Promise.all([
+  const [current, forecast] = (await Promise.all([
     fetch(`${BASE}/weather?zip=${zip},${country}&appid=${KEY}&units=imperial`).then((r) => r.json()),
     fetch(`${BASE}/forecast?zip=${zip},${country}&appid=${KEY}&units=imperial&cnt=40`).then((r) => r.json()),
-  ]);
+  ])) as [OwmCurrent, OwmForecast];
 
   if (current.cod !== 200) throw new Error(`Weather API error: ${current.message ?? current.cod}`);
   return buildWeatherData(current, forecast, zip);
 }
 
 export async function getWeatherByLatLon(lat: number, lon: number): Promise<WeatherData> {
-  const [current, forecast] = await Promise.all([
+  const [current, forecast] = (await Promise.all([
     fetch(`${BASE}/weather?lat=${lat}&lon=${lon}&appid=${KEY}&units=imperial`).then((r) => r.json()),
     fetch(`${BASE}/forecast?lat=${lat}&lon=${lon}&appid=${KEY}&units=imperial&cnt=40`).then((r) => r.json()),
-  ]);
+  ])) as [OwmCurrent, OwmForecast];
 
   if (current.cod !== 200) throw new Error(`Weather API error: ${current.message ?? current.cod}`);
   return buildWeatherData(current, forecast, `${lat.toFixed(2)},${lon.toFixed(2)}`);

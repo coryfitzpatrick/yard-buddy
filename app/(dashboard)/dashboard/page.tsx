@@ -28,8 +28,10 @@ export default async function DashboardPage() {
       sections: {
         orderBy: { createdAt: "asc" },
         include: {
+          // Latest healthScore per section drives the dashboard summary
+          // pills. Tasks are fetched separately below to control the
+          // selected columns precisely.
           analyses: { orderBy: { createdAt: "desc" }, take: 1, select: { healthScore: true } },
-          tasks: { select: { status: true } },
         },
       },
     },

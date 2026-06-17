@@ -14,9 +14,12 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
+// Lazy-resolves the underlying Stripe client on every property access. Lets
+// us keep `import { stripe }` at the top of route files without crashing when
+// STRIPE_SECRET_KEY is unset at module load (e.g. during prerender).
 export const stripe = new Proxy({} as Stripe, {
   get(_, prop) {
-    return (getStripe() as any)[prop];
+    return Reflect.get(getStripe(), prop);
   },
 });
 

@@ -49,17 +49,17 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         areaType: initialData?.areaType as AreaType | undefined,
         grassType: (initialData?.grassType as YardSectionInput["grassType"]) ?? "unknown",
         soilMoisture: initialData?.soilMoisture as YardSectionInput["soilMoisture"] | undefined,
-        soilPh: initialData?.soilPh as never,
-        nitrogenPpm: initialData?.nitrogenPpm as never,
-        phosphorusPpm: initialData?.phosphorusPpm as never,
-        potassiumPpm: initialData?.potassiumPpm as never,
-        organicMatterPct: initialData?.organicMatterPct as never,
+        soilPh: initialData?.soilPh as YardSectionFormInput["soilPh"],
+        nitrogenPpm: initialData?.nitrogenPpm as YardSectionFormInput["nitrogenPpm"],
+        phosphorusPpm: initialData?.phosphorusPpm as YardSectionFormInput["phosphorusPpm"],
+        potassiumPpm: initialData?.potassiumPpm as YardSectionFormInput["potassiumPpm"],
+        organicMatterPct: initialData?.organicMatterPct as YardSectionFormInput["organicMatterPct"],
         soilTestSource: initialData?.soilTestSource ?? undefined,
-        soilTestedAt: initialData?.soilTestedAt as never,
+        soilTestedAt: initialData?.soilTestedAt as YardSectionFormInput["soilTestedAt"],
         notes: initialData?.notes ?? undefined,
         mowingSchedule: initialData?.mowingSchedule ?? undefined,
         wateringSchedule: initialData?.wateringSchedule ?? undefined,
-        yardSizeSqft: (initialData?.yardSizeSqft ?? (lotSqft && !initialData ? (lotSqft - (buildingSqft ?? 0)) || lotSqft : undefined)) as never,
+        yardSizeSqft: (initialData?.yardSizeSqft ?? (lotSqft && !initialData ? (lotSqft - (buildingSqft ?? 0)) || lotSqft : undefined)) as YardSectionFormInput["yardSizeSqft"],
       },
     });
 
@@ -88,7 +88,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
 
   function handleSizeInput(raw: string) {
     setSizeDisplay(raw);
-    setValue("yardSizeSqft", toSqft(raw, sizeUnit) as never, { shouldDirty: true, shouldValidate: true });
+    setValue("yardSizeSqft", toSqft(raw, sizeUnit) as YardSectionFormInput["yardSizeSqft"], { shouldDirty: true, shouldValidate: true });
   }
   function handleUnitChange(next: "sqft" | "acres") {
     const cur = toSqft(sizeDisplay, sizeUnit);
@@ -111,7 +111,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
       const sqft = data.usableSqft ?? data.lotSqft;
       if (sqft) {
         setSizeDisplay(toDisplaySize(sqft, sizeUnit));
-        setValue("yardSizeSqft", sqft as never);
+        setValue("yardSizeSqft", sqft as YardSectionFormInput["yardSizeSqft"]);
         if (data.usableSqft && data.buildingSqft) {
           setLookupNote(
             `Lot: ~${data.lotSqft.toLocaleString()} sq ft · Home: ~${data.buildingSqft.toLocaleString()} sq ft · Lawn: ~${data.usableSqft.toLocaleString()} sq ft. Adjust below for just this section.`

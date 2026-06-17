@@ -153,7 +153,7 @@ export function YardSetupForm() {
 
   function handleSizeInput(raw: string) {
     setSizeDisplay(raw);
-    setValue("yardSizeSqft", toSqft(raw, sizeUnit) as never);
+    setValue("yardSizeSqft", toSqft(raw, sizeUnit) as YardSectionFormInput["yardSizeSqft"]);
   }
   function handleUnitChange(next: "sqft" | "acres") {
     const cur = toSqft(sizeDisplay, sizeUnit);
@@ -174,7 +174,7 @@ export function YardSetupForm() {
       const data = await res.json();
       const sqft = data.usableSqft ?? data.lotSqft;
       if (sqft) {
-        setValue("yardSizeSqft", sqft as never);
+        setValue("yardSizeSqft", sqft as YardSectionFormInput["yardSizeSqft"]);
         setSizeDisplay(toDisplaySize(sqft, sizeUnit));
         setLotData({ lotSqft: data.lotSqft ?? null, buildingSqft: data.buildingSqft ?? null });
         if (data.usableSqft && data.buildingSqft) {
