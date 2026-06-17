@@ -1,5 +1,5 @@
 /**
- * Grant professional_plus/active status to specific accounts.
+ * Grant admin/active status to specific accounts.
  * Run with: npx tsx scripts/grant-pro.ts
  */
 import "dotenv/config";
@@ -20,7 +20,7 @@ async function main() {
     const user = await db.user.upsert({
       where: { email },
       update: {
-        plan: "professional_plus",
+        plan: "admin",
         planStatus: "active",
         trialEndsAt: null,
         currentPeriodEnd: FAR_FUTURE,
@@ -28,12 +28,12 @@ async function main() {
       },
       create: {
         email,
-        plan: "professional_plus",
+        plan: "admin",
         planStatus: "active",
         currentPeriodEnd: FAR_FUTURE,
       },
     });
-    console.log(`✓ ${email} → professional_plus/active (id: ${user.id})`);
+    console.log(`✓ ${email} → admin/active (id: ${user.id})`);
   }
 }
 

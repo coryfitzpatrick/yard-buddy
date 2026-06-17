@@ -47,14 +47,17 @@ export default async function SectionDetailPage({
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
   const monthlyAnalysisCount = await db.lawnAnalysis.count({
-    where: { yardSectionId: sectionId, createdAt: { gte: startOfMonth } },
+    where: {
+      yardSection: { yardId },
+      createdAt: { gte: startOfMonth },
+    },
   });
 
   const analysisLimitReached = !canRunAnalysis(subscriptionUser, monthlyAnalysisCount);
   const analysisLimitText =
-    limits.maxAnalysesPerSectionPerMonth === -1
+    limits.maxAnalysesPerYardPerMonth === -1
       ? null
-      : `${monthlyAnalysisCount} of ${limits.maxAnalysesPerSectionPerMonth} analyses used this month`;
+      : `${monthlyAnalysisCount} of ${limits.maxAnalysesPerYardPerMonth} analyses used for this yard this month`;
 
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yardId },

@@ -89,18 +89,22 @@ export async function POST(req: NextRequest) {
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Count analyses for this section in the current calendar month
+  // Count analyses for the entire yard this calendar month — limits are now
+  // yard-scoped so splitting a yard into sections doesn't reset the pool.
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
   const monthlyCount = await db.lawnAnalysis.count({
-    where: { yardSectionId: section.id, createdAt: { gte: startOfMonth } },
+    where: {
+      yardSection: { yardId: section.yardId },
+      createdAt: { gte: startOfMonth },
+    },
   });
 
   if (!canRunAnalysis(subUser, monthlyCount)) {
     const limits = getPlanLimits(subUser);
     const message = limits.canRunAnalysis
-      ? `You have used all ${limits.maxAnalysesPerSectionPerMonth} analyses for this section this month. Your limit resets on the 1st of next month.`
+      ? `You have used all ${limits.maxAnalysesPerYardPerMonth} analyses for this yard this month. Your limit resets on the 1st of next month.`
       : "Upgrade your plan to analyze your lawn with AI.";
     return NextResponse.json({ error: "analysis_limit_reached", message }, { status: 403 });
   }

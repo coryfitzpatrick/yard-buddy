@@ -31,10 +31,9 @@ interface Props {
 type Dialog = "pause" | "cancel" | null;
 
 const CHANGE_PLANS = [
-  { key: "home_basic",        label: "Home Basic",        monthly: 7.99,  annual: 79  },
-  { key: "home_plus",         label: "Home Plus",         monthly: 14.99, annual: 139 },
-  { key: "professional",      label: "Professional",      monthly: 24.99, annual: 229 },
-  { key: "professional_plus", label: "Professional Plus", monthly: 49.99, annual: 449 },
+  { key: "home_basic",   label: "Home Basic",   monthly: 7.99,  annual: 79  },
+  { key: "home_plus",    label: "Home Plus",    monthly: 14.99, annual: 139 },
+  { key: "professional", label: "Professional", monthly: 24.99, annual: 229 },
 ] as const;
 
 export function BillingSection({

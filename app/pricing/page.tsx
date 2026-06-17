@@ -16,7 +16,7 @@ const PLANS = [
     annual: 79,
     highlight: false,
     yards: "1 yard",
-    analyses: "2 analyses per section per month",
+    analyses: "8 analyses per yard per month",
     features: [
       "All AI task recommendations",
       "Schedule reminders by email",
@@ -31,7 +31,7 @@ const PLANS = [
     annual: 139,
     highlight: true,
     yards: "Up to 3 yards",
-    analyses: "3 analyses per section per month",
+    analyses: "8 analyses per yard per month",
     features: [
       "Everything in Home Basic",
       "Multi-yard dashboard",
@@ -45,25 +45,10 @@ const PLANS = [
     annual: 229,
     highlight: false,
     yards: "Up to 10 yards",
-    analyses: "Unlimited analyses",
+    analyses: "8 analyses per yard per month",
     features: [
       "Everything in Home Plus",
-      "Unlimited photo analyses",
       "Ideal for rental owners and HOAs",
-    ],
-  },
-  {
-    name: "Professional Plus",
-    key: "professional_plus",
-    monthly: 49.99,
-    annual: 449,
-    highlight: false,
-    yards: "Unlimited yards",
-    analyses: "Unlimited analyses",
-    features: [
-      "Everything in Professional",
-      "Unlimited yards",
-      "Ideal for landscapers and property managers",
     ],
   },
 ];
@@ -109,7 +94,7 @@ export default async function PricingPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
           {/* Free Trial card */}
           {!isActivePaid && (
@@ -132,7 +117,7 @@ export default async function PricingPage() {
 
               <ul className="space-y-2 mb-6 flex-1 text-sm text-gray-600">
                 <li className="font-semibold text-gray-900">1 yard</li>
-                <li className="font-medium text-gray-700">1 analysis per section</li>
+                <li className="font-medium text-gray-700">2 analyses for your yard</li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
                   First AI task recommendation

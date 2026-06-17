@@ -21,17 +21,16 @@ export const stripe = new Proxy({} as Stripe, {
 });
 
 // All valid plan keys. Used to validate user input — never trust raw request params.
-export const VALID_PLANS = ["home_basic", "home_plus", "professional", "professional_plus"] as const;
+export const VALID_PLANS = ["home_basic", "home_plus", "professional"] as const;
 export type StripePlan = typeof VALID_PLANS[number];
 
 export const VALID_PERIODS = ["monthly", "annual"] as const;
 export type StripePeriod = typeof VALID_PERIODS[number];
 
 export const STRIPE_PRICES: Record<StripePlan, Record<StripePeriod, string>> = {
-  home_basic:        { monthly: process.env.STRIPE_PRICE_HOME_BASIC_MONTHLY ?? "",  annual: process.env.STRIPE_PRICE_HOME_BASIC_ANNUAL ?? "" },
-  home_plus:         { monthly: process.env.STRIPE_PRICE_HOME_PLUS_MONTHLY ?? "",   annual: process.env.STRIPE_PRICE_HOME_PLUS_ANNUAL ?? "" },
-  professional:      { monthly: process.env.STRIPE_PRICE_PRO_MONTHLY ?? "",         annual: process.env.STRIPE_PRICE_PRO_ANNUAL ?? "" },
-  professional_plus: { monthly: process.env.STRIPE_PRICE_PRO_PLUS_MONTHLY ?? "",    annual: process.env.STRIPE_PRICE_PRO_PLUS_ANNUAL ?? "" },
+  home_basic:   { monthly: process.env.STRIPE_PRICE_HOME_BASIC_MONTHLY ?? "", annual: process.env.STRIPE_PRICE_HOME_BASIC_ANNUAL ?? "" },
+  home_plus:    { monthly: process.env.STRIPE_PRICE_HOME_PLUS_MONTHLY ?? "",  annual: process.env.STRIPE_PRICE_HOME_PLUS_ANNUAL ?? "" },
+  professional: { monthly: process.env.STRIPE_PRICE_PRO_MONTHLY ?? "",        annual: process.env.STRIPE_PRICE_PRO_ANNUAL ?? "" },
 };
 
 /** Derive plan name from a Stripe price ID. Returns null if the price is unrecognized. */

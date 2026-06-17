@@ -1,10 +1,13 @@
-export type Plan = "trial" | "home_basic" | "home_plus" | "professional" | "professional_plus";
+// "admin" is a hidden, unlimited plan — not exposed on the pricing page or in
+// Stripe checkout. Assigned manually via scripts/grant-pro.ts for demo accounts
+// and internal use.
+export type Plan = "trial" | "home_basic" | "home_plus" | "professional" | "admin";
 export type PlanStatus = "trialing" | "active" | "past_due" | "paused" | "expired" | "canceled";
 
 export interface PlanLimits {
-  maxYards: number;                       // -1 = unlimited
-  maxAnalysesPerSectionPerMonth: number;  // -1 = unlimited, 0 = blocked
-  maxVisibleTasks: number;                // -1 = unlimited, 1 = first task only
+  maxYards: number;                     // -1 = unlimited
+  maxAnalysesPerYardPerMonth: number;   // -1 = unlimited, 0 = blocked
+  maxVisibleTasks: number;              // -1 = unlimited, 1 = first task only
   canRunAnalysis: boolean;
 }
 
@@ -17,20 +20,20 @@ export type SubscriptionUser = {
 };
 
 const LIMITS: Record<string, PlanLimits> = {
-  trial:             { maxYards: 1,  maxAnalysesPerSectionPerMonth: 1,  maxVisibleTasks: 1,  canRunAnalysis: true  },
-  expired:           { maxYards: 1,  maxAnalysesPerSectionPerMonth: 0,  maxVisibleTasks: 1,  canRunAnalysis: false },
-  home_basic:        { maxYards: 1,  maxAnalysesPerSectionPerMonth: 2,  maxVisibleTasks: -1, canRunAnalysis: true  },
-  home_plus:         { maxYards: 3,  maxAnalysesPerSectionPerMonth: 3,  maxVisibleTasks: -1, canRunAnalysis: true  },
-  professional:      { maxYards: 10, maxAnalysesPerSectionPerMonth: -1, maxVisibleTasks: -1, canRunAnalysis: true  },
-  professional_plus: { maxYards: -1, maxAnalysesPerSectionPerMonth: -1, maxVisibleTasks: -1, canRunAnalysis: true  },
+  trial:        { maxYards: 1,  maxAnalysesPerYardPerMonth: 2,  maxVisibleTasks: 1,  canRunAnalysis: true  },
+  expired:      { maxYards: 1,  maxAnalysesPerYardPerMonth: 0,  maxVisibleTasks: 1,  canRunAnalysis: false },
+  home_basic:   { maxYards: 1,  maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
+  home_plus:    { maxYards: 3,  maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
+  professional: { maxYards: 10, maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
+  admin:        { maxYards: -1, maxAnalysesPerYardPerMonth: -1, maxVisibleTasks: -1, canRunAnalysis: true  },
 };
 
 export const PLAN_LABELS: Record<string, string> = {
-  trial:             "Free Trial",
-  home_basic:        "Home Basic",
-  home_plus:         "Home Plus",
-  professional:      "Professional",
-  professional_plus: "Professional Plus",
+  trial:        "Free Trial",
+  home_basic:   "Home Basic",
+  home_plus:    "Home Plus",
+  professional: "Professional",
+  admin:        "Admin",
 };
 
 function isEffectivelyExpired(user: SubscriptionUser): boolean {
@@ -49,11 +52,11 @@ export function getPlanLimits(user: SubscriptionUser): PlanLimits {
   return LIMITS[user.plan] ?? LIMITS.trial;
 }
 
-export function canRunAnalysis(user: SubscriptionUser, currentMonthCount: number): boolean {
+export function canRunAnalysis(user: SubscriptionUser, currentYardMonthCount: number): boolean {
   const limits = getPlanLimits(user);
   if (!limits.canRunAnalysis) return false;
-  if (limits.maxAnalysesPerSectionPerMonth === -1) return true;
-  return currentMonthCount < limits.maxAnalysesPerSectionPerMonth;
+  if (limits.maxAnalysesPerYardPerMonth === -1) return true;
+  return currentYardMonthCount < limits.maxAnalysesPerYardPerMonth;
 }
 
 export function canCreateYard(user: SubscriptionUser, currentYardCount: number): boolean {
