@@ -510,7 +510,7 @@ export async function GET(req: NextRequest) {
 
       await db.user.delete({ where: { id: user.id } });
       deletedCount++;
-      console.log(`Deleted expired account: ${user.email}`);
+      console.log(`Deleted expired account: ${user.id}`);
     } catch (err) {
       console.error(`Failed to delete user ${user.id}:`, err);
     }
@@ -589,9 +589,9 @@ export async function GET(req: NextRequest) {
         data: { cardExpiryWarningSentAt: new Date() },
       });
 
-      console.log(`Card expiry warning sent to ${subscriber.email}`);
+      console.log(`Card expiry warning sent to user ${subscriber.id}`);
     } catch (err) {
-      console.error(`Card expiry check failed for ${subscriber.email}:`, err);
+      console.error(`Card expiry check failed for user ${subscriber.id}:`, err);
     }
   }
 
