@@ -20,25 +20,17 @@
 
 ## Tier 2 — This week
 
-- [ ] **2.1 — Hash password-reset + email-change tokens**
-  - Files: `prisma/schema.prisma:187-208`, `app/api/auth/reset-password/route.ts:27-32`, `app/api/user/email/confirm/route.ts:15-19`, the routes that *issue* tokens too.
-  - Fix: store `sha256(token)`, mail the raw token to the user, look up by hash. Migration to clear old tokens.
-  - Done in:
+- [x] **2.1 — Hash password-reset + email-change tokens**
+  - Done in: `9855927` — `lib/token-hash.ts` shared between both flows; migration `20260617130000_purge_plaintext_tokens` clears the rows that pre-date the hash so they can't be replayed.
 
-- [ ] **2.2 — Zod-validate `/api/tasks/[id]` PATCH body**
-  - Files: `app/api/tasks/[id]/route.ts:13-37`
-  - Fix: add a strict Zod schema, parse before update.
-  - Done in:
+- [x] **2.2 — Zod-validate `/api/tasks/[id]` PATCH body**
+  - Done in: `7a04426` — strict schema with both `status` and `stillWorthDoing` optional, requires at least one, rejects unknown fields.
 
-- [ ] **2.3 — Stop logging raw emails in cron**
-  - Files: `app/api/cron/daily/route.ts:155, 513, 592, 594`
-  - Fix: log `user.id`. Never the email/IP.
-  - Done in:
+- [x] **2.3 — Stop logging raw emails in cron**
+  - Done in: `d6df1e1` — flipped `${user.email}` to `${user.id}` for the account-deletion and card-expiry log lines.
 
-- [ ] **2.4 — Harden unsubscribe link**
-  - Files: `app/api/notifications/unsubscribe/route.ts:5-19`
-  - Fix: require a POST/confirm click so prefetchers can't disable; add an issuedAt claim with a sane window so leaked tokens age out.
-  - Done in:
+- [x] **2.4 — Harden unsubscribe link**
+  - Done in: `e15e984` — GET now renders a confirm page; POST is required to actually opt out. Token format adds an issuedAt; tokens older than 90 days are rejected. Legacy two-segment tokens are still accepted so existing emails keep working. Confirm page is no-store + noindex.
 
 ## Tier 3 — Big refactor wins (delete code, prevent drift)
 
