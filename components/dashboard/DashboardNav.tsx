@@ -30,7 +30,7 @@ export function DashboardNav({ signOutAction }: Props) {
       {/* Top nav */}
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
-          <Link href="/dashboard" className="flex items-center gap-1 font-bold text-green-700 text-lg">
+          <Link href="/dashboard" className="flex items-end gap-2 font-bold text-green-700 text-[26px] leading-none">
             <Logo className="h-8 w-auto" />
             Yard Analyzer
           </Link>
@@ -111,7 +111,10 @@ export function DashboardNav({ signOutAction }: Props) {
       </Sheet>
 
       {/* Bottom mobile nav */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 z-10">
+      <nav
+        className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 z-10"
+        style={{ paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom))" }}
+      >
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
           return (
