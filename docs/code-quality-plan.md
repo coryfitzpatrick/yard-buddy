@@ -48,16 +48,35 @@
 
 ## Tier 4 — Cleanup
 
-- [ ] **4.1 — Delete `lib/claude.ts.bak`** (83 KB dead file in the repo).
-- [ ] **4.2 — Add `*~lock~` to `.gitignore`** and remove the Affinity Designer lock file.
-- [ ] **4.3 — Replace `as never` casts** in `SectionForm.tsx:88-97, 147, 208` and `YardSetupForm.tsx:166, 187`. They silently swallow type errors.
-- [ ] **4.4 — Type `buildWeatherData`** in `lib/weather.ts:7` from real OWM response types.
-- [ ] **4.5 — `lib/stripe.ts:19`** — replace `(getStripe() as any)[prop]` with `Reflect.get`.
+- [x] **4.1 — Delete `lib/claude.ts.bak`**
+  - Already untracked; gitignore covers it via `*.bak`. Local file can be removed manually (`rm lib/claude.ts.bak`).
+
+- [x] **4.2 — Add `*~lock~` to `.gitignore`**
+  - Done in: `28d42c1` — Affinity Designer lock pattern added. Existing lock file is untracked; remove locally with `rm public/yard-analyzer-logo.af~lock~`.
+
+- [x] **4.3 — Replace `as never` casts**
+  - Done in: `28d42c1` — every `as never` in `SectionForm` and `YardSetupForm` swapped for `as YardSectionFormInput["<field>"]` so TypeScript still validates the field name.
+
+- [x] **4.4 — Type `buildWeatherData`**
+  - Done in: `28d42c1` — added `OwmCurrent` / `OwmForecast` / `OwmForecastItem` slices and typed `buildWeatherData` plus the `Promise.all` results.
+
+- [x] **4.5 — `lib/stripe.ts` Reflect.get**
+  - Done in: `28d42c1` — `(getStripe() as any)[prop]` → `Reflect.get(getStripe(), prop)`.
+
 - [ ] **4.6 — Split `YardSetupForm` (881 lines)** into a `useYardSetup()` hook + per-step components (`PropertyStep`, `AreaStep`, `GrassStep`, `SoilStep`, `PhotosStep`, `ReviewStep`).
+  - **Deferred.** Major refactor; warrants its own focused session.
+
 - [ ] **4.7 — Pre-fetch `/api/yard` server-side** on `app/(dashboard)/analyze/page.tsx:51-70`. Removes the loading spinner + searchParams effect dance.
-- [ ] **4.8 — Fix dashboard double-fetch** (`app/(dashboard)/dashboard/page.tsx:24-42`) — the `include` already pulls tasks; the second `lawnTask.findMany` is redundant.
-- [ ] **4.9 — Add `error.tsx` + `loading.tsx`** to `app/(dashboard)/`. Currently zero.
-- [ ] **4.10 — Move schedule parsing to `lib/schedule.ts`** (duplicated 4 places). Folds into 3.1.
+  - **Deferred.** Requires splitting the page into a server shell + `AnalyzeClient` client island; ~260 lines of client logic to migrate.
+
+- [x] **4.8 — Fix dashboard double-fetch**
+  - Done in: `28d42c1` — `tasks: { select: { status: true } }` include was unused (no `s.tasks` reference anywhere on the page). Dropped from the yards query.
+
+- [x] **4.9 — Add `error.tsx` + `loading.tsx`**
+  - Done in: `28d42c1` — `app/(dashboard)/error.tsx` (route-segment error boundary with reset + dashboard link) and `app/(dashboard)/loading.tsx` (spinner).
+
+- [x] **4.10 — Move schedule parsing to `lib/schedule.ts`**
+  - Done in: `be449f5` (folded into 3.1).
 
 ## Tier 5 — Polish
 
