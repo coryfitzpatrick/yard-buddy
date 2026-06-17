@@ -94,7 +94,11 @@ export default async function PricingPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${
+            isActivePaid ? "lg:grid-cols-3 lg:max-w-4xl mx-auto" : "lg:grid-cols-4"
+          }`}
+        >
 
           {/* Free Trial card */}
           {!isActivePaid && (
