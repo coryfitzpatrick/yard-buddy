@@ -5,20 +5,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowRight, Pencil } from "lucide-react";
 import { YardDeleteButton } from "@/components/yard/YardDeleteButton";
+import { parseSchedule } from "@/lib/schedule";
 
 function parseScheduleSummary(raw: string | null): { days: string; time: string; amount: string } | null {
-  if (!raw) return null;
-  try {
-    const p = JSON.parse(raw);
-    if (!p || !Array.isArray(p.days) || p.days.length === 0) return null;
-    const h = p.time ? Number(p.time.split(":")[0]) : null;
-    const m = p.time ? Number(p.time.split(":")[1]) : null;
-    return {
-      days: p.days.join(", "),
-      time: h !== null && m !== null ? `${h > 12 ? h - 12 : h || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}` : "",
-      amount: p.inches ?? "",
-    };
-  } catch { return null; }
+  const p = parseSchedule(raw);
+  if (p.days.length === 0) return null;
+  const h = p.time ? Number(p.time.split(":")[0]) : null;
+  const m = p.time ? Number(p.time.split(":")[1]) : null;
+  return {
+    days: p.days.join(", "),
+    time: h !== null && m !== null ? `${h > 12 ? h - 12 : h || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}` : "",
+    amount: p.inches ?? "",
+  };
 }
 
 export default async function YardPage() {
