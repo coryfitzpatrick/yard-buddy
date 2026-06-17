@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PhotoUpload, type UploadedPhoto } from "@/components/analysis/PhotoUpload";
 import { AnalysisResults } from "@/components/analysis/AnalysisResults";
-import { SoilQuickEdit } from "@/components/analysis/SoilQuickEdit";
+import { SoilQuickEdit, type SoilQuickEditHandle } from "@/components/analysis/SoilQuickEdit";
 import type { AnalysisResult, AreaType } from "@/types";
 import { Loader2, ArrowRight, Plus, Camera } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,6 +43,7 @@ export default function AnalyzePage() {
   const [analysisLimitReached, setAnalysisLimitReached] = useState(false);
   const [invalidPhotos, setInvalidPhotos] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const soilRef = useRef<SoilQuickEditHandle | null>(null);
 
   useEffect(() => {
     fetch("/api/yard")
@@ -87,6 +88,9 @@ export default function AnalyzePage() {
     setResult(null);
     setAnalysisError(null);
     setAnalysisLimitReached(false);
+    // Persist any pending soil edits first so the analyze route sees the new
+    // values. Best-effort: failure here doesn't block the analysis itself.
+    await soilRef.current?.saveIfDirty();
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
@@ -235,6 +239,7 @@ export default function AnalyzePage() {
             return (
               <div className="space-y-4">
                 <SoilQuickEdit
+                  ref={soilRef}
                   yardId={selectedYard.id}
                   sectionId={sec.id}
                   soilPh={sec.soilPh}
@@ -246,13 +251,6 @@ export default function AnalyzePage() {
                   organicMatterPct={sec.organicMatterPct}
                   soilTestSource={sec.soilTestSource}
                   soilTestedAt={sec.soilTestedAt}
-                  onSaved={() => {
-                    // Refresh yards so the latest values back our pre-fill.
-                    fetch("/api/yard")
-                      .then((r) => r.json())
-                      .then((data: Yard[]) => Array.isArray(data) && setYards(data))
-                      .catch(() => {});
-                  }}
                 />
                 <PhotoUpload onUploaded={handleUploaded} analyzing={analyzing} onReset={cancelAnalysis} />
               </div>

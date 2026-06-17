@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, FlaskConical, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { FlaskConical, ChevronDown, ChevronUp } from "lucide-react";
 
 export interface SoilInitialValues {
   soilPh: number | null;
@@ -22,7 +21,13 @@ export interface SoilInitialValues {
 interface Props extends SoilInitialValues {
   yardId: string;
   sectionId: string;
-  onSaved?: () => void;
+}
+
+export interface SoilQuickEditHandle {
+  // Persists any dirty soil values; resolves true on success or no-op,
+  // false if a PATCH was attempted and failed. The caller can decide
+  // whether to still proceed with analysis on failure.
+  saveIfDirty: () => Promise<boolean>;
 }
 
 function numToStr(n: number | null): string {
@@ -36,20 +41,22 @@ function isoToDateInput(iso: string | null): string {
   return iso.slice(0, 10);
 }
 
-export function SoilQuickEdit({
-  yardId,
-  sectionId,
-  soilPh,
-  soilMoisture,
-  notes,
-  nitrogenPpm,
-  phosphorusPpm,
-  potassiumPpm,
-  organicMatterPct,
-  soilTestSource,
-  soilTestedAt,
-  onSaved,
-}: Props) {
+export const SoilQuickEdit = forwardRef<SoilQuickEditHandle, Props>(function SoilQuickEdit(
+  {
+    yardId,
+    sectionId,
+    soilPh,
+    soilMoisture,
+    notes,
+    nitrogenPpm,
+    phosphorusPpm,
+    potassiumPpm,
+    organicMatterPct,
+    soilTestSource,
+    soilTestedAt,
+  },
+  ref,
+) {
   const [ph, setPh] = useState(numToStr(soilPh));
   const [moisture, setMoisture] = useState<"dry" | "moderate" | "moist" | "">(soilMoisture ?? "");
   const [notesValue, setNotesValue] = useState(notes ?? "");
@@ -64,12 +71,7 @@ export function SoilQuickEdit({
     || organicMatterPct != null || soilTestSource != null || soilTestedAt != null;
   const [showTestResults, setShowTestResults] = useState(hasTestData);
 
-  const [saving, setSaving] = useState(false);
-  const [savedFlash, setSavedFlash] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Reset local state when the parent swaps in a different section or
-  // refreshes after a save.
+  // Reset local state when the parent swaps in a different section.
   useEffect(() => {
     setPh(numToStr(soilPh));
     setMoisture(soilMoisture ?? "");
@@ -80,71 +82,56 @@ export function SoilQuickEdit({
     setOm(numToStr(organicMatterPct));
     setSource(soilTestSource ?? "");
     setTestedAt(isoToDateInput(soilTestedAt));
-    setError(null);
-    setSavedFlash(false);
   }, [sectionId, soilPh, soilMoisture, notes, nitrogenPpm, phosphorusPpm, potassiumPpm, organicMatterPct, soilTestSource, soilTestedAt]);
 
-  const current = {
-    ph: strToNumOrNull(ph),
-    moisture: moisture || null,
-    notesValue: notesValue || null,
-    n: strToNumOrNull(n),
-    p: strToNumOrNull(p),
-    k: strToNumOrNull(k),
-    om: strToNumOrNull(om),
-    source: source || null,
-    testedAt: testedAt || null,
-  };
-  const dirty =
-    current.ph !== soilPh ||
-    current.moisture !== soilMoisture ||
-    current.notesValue !== notes ||
-    current.n !== nitrogenPpm ||
-    current.p !== phosphorusPpm ||
-    current.k !== potassiumPpm ||
-    current.om !== organicMatterPct ||
-    current.source !== soilTestSource ||
-    current.testedAt !== isoToDateInput(soilTestedAt);
-
-  async function save() {
-    setSaving(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/yard/${yardId}/sections/${sectionId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          soilPh: current.ph,
-          soilMoisture: current.moisture,
-          notes: current.notesValue,
-          nitrogenPpm: current.n,
-          phosphorusPpm: current.p,
-          potassiumPpm: current.k,
-          organicMatterPct: current.om,
-          soilTestSource: current.source,
-          soilTestedAt: current.testedAt, // ISO yyyy-mm-dd parses cleanly
-        }),
-      });
-      if (!res.ok) {
-        setError("Couldn't save. Try again.");
-        return;
+  useImperativeHandle(ref, () => ({
+    async saveIfDirty() {
+      const current = {
+        soilPh: strToNumOrNull(ph),
+        soilMoisture: (moisture || null) as "dry" | "moderate" | "moist" | null,
+        notes: notesValue || null,
+        nitrogenPpm: strToNumOrNull(n),
+        phosphorusPpm: strToNumOrNull(p),
+        potassiumPpm: strToNumOrNull(k),
+        organicMatterPct: strToNumOrNull(om),
+        soilTestSource: source || null,
+        soilTestedAt: testedAt || null,
+      };
+      const dirty =
+        current.soilPh !== soilPh ||
+        current.soilMoisture !== soilMoisture ||
+        current.notes !== notes ||
+        current.nitrogenPpm !== nitrogenPpm ||
+        current.phosphorusPpm !== phosphorusPpm ||
+        current.potassiumPpm !== potassiumPpm ||
+        current.organicMatterPct !== organicMatterPct ||
+        current.soilTestSource !== soilTestSource ||
+        current.soilTestedAt !== isoToDateInput(soilTestedAt);
+      if (!dirty) return true;
+      try {
+        const res = await fetch(`/api/yard/${yardId}/sections/${sectionId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(current),
+        });
+        return res.ok;
+      } catch {
+        return false;
       }
-      setSavedFlash(true);
-      onSaved?.();
-      setTimeout(() => setSavedFlash(false), 2000);
-    } catch {
-      setError("Network error. Try again.");
-    } finally {
-      setSaving(false);
-    }
-  }
+    },
+  }), [
+    ph, moisture, notesValue, n, p, k, om, source, testedAt,
+    soilPh, soilMoisture, notes, nitrogenPpm, phosphorusPpm, potassiumPpm,
+    organicMatterPct, soilTestSource, soilTestedAt,
+    yardId, sectionId,
+  ]);
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
       <div className="flex items-center gap-2">
         <FlaskConical className="w-4 h-4 text-green-600" />
         <h3 className="text-sm font-semibold text-gray-900">Soil details</h3>
-        <span className="text-xs text-gray-400">Optional but improves analysis</span>
+        <span className="text-xs text-gray-400">Optional. Saved when you analyze.</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -231,24 +218,6 @@ export function SoilQuickEdit({
           </div>
         </div>
       )}
-
-      <div className="flex items-center gap-2 pt-1">
-        <Button
-          type="button"
-          onClick={save}
-          disabled={!dirty || saving}
-          size="sm"
-          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:text-gray-500"
-        >
-          {saving ? <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Saving</> : "Save soil details"}
-        </Button>
-        {savedFlash && (
-          <span className="text-xs text-green-700 inline-flex items-center gap-1">
-            <Check className="w-3 h-3" /> Saved
-          </span>
-        )}
-        {error && <span className="text-xs text-red-600">{error}</span>}
-      </div>
     </div>
   );
-}
+});
