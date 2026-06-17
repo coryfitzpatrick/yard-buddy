@@ -116,7 +116,7 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
       style={{
         backgroundImage: `url('/weather/${theme.slot}.webp')`,
         backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundPosition: "center bottom",
       }}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient}`} />
