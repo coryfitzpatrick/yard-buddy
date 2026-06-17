@@ -6,6 +6,7 @@ import {
   computeGridRange,
   sectionColor,
   getBarPosition,
+  taskOverlapsWeekRange,
   COLOR_CLASSES,
   type CalendarTask,
 } from "@/lib/calendar-utils";
@@ -27,11 +28,6 @@ function isSameDay(a: Date, b: Date): boolean {
   return a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10);
 }
 
-function taskOverlapsWeek(task: CalendarTask, weekDays: Date[]): boolean {
-  const start = new Date(task.scheduledStart);
-  const end = new Date(task.scheduledEnd);
-  return start <= weekDays[6] && end >= weekDays[0];
-}
 
 export function MonthCalendar({ tasks, month, gridStart, yards, selectedYard, selectedSection }: Props) {
   const [activeTask, setActiveTask] = useState<CalendarTask | null>(null);
@@ -63,7 +59,7 @@ export function MonthCalendar({ tasks, month, gridStart, yards, selectedYard, se
 
       {/* Week rows */}
       {weeks.map((weekDays, wi) => {
-        const weekTasks = tasks.filter((t) => taskOverlapsWeek(t, weekDays));
+        const weekTasks = tasks.filter((t) => taskOverlapsWeekRange(t, weekDays));
 
         return (
           <div key={wi} className="border-b border-gray-50 last:border-b-0">

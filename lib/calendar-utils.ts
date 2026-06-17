@@ -49,12 +49,21 @@ export function sectionColor(sectionId: string): ColorKey {
   return COLORS[hash % COLORS.length];
 }
 
+// Truncate to UTC midnight so timezone-shifted timestamps (e.g. a task stored
+// at 04:00Z for local midnight EDT) bucket onto the correct calendar day
+// instead of slipping into the next UTC day.
+function startOfUTCDay(d: Date): Date {
+  const x = new Date(d);
+  x.setUTCHours(0, 0, 0, 0);
+  return x;
+}
+
 export function getBarPosition(
   task: Pick<CalendarTask, "scheduledStart" | "scheduledEnd">,
   weekDays: Date[]
 ): { startCol: number; colSpan: number; continuesBefore: boolean; continuesAfter: boolean } {
-  const taskStart = new Date(task.scheduledStart);
-  const taskEnd = new Date(task.scheduledEnd);
+  const taskStart = startOfUTCDay(new Date(task.scheduledStart));
+  const taskEnd = startOfUTCDay(new Date(task.scheduledEnd));
   const weekStart = weekDays[0];
   const weekEnd = weekDays[6];
 
@@ -68,6 +77,15 @@ export function getBarPosition(
   const colSpan = Math.round((clampedEnd.getTime() - clampedStart.getTime()) / 86400000) + 1;
 
   return { startCol, colSpan, continuesBefore, continuesAfter };
+}
+
+export function taskOverlapsWeekRange(
+  task: Pick<CalendarTask, "scheduledStart" | "scheduledEnd">,
+  weekDays: Date[]
+): boolean {
+  const start = startOfUTCDay(new Date(task.scheduledStart));
+  const end = startOfUTCDay(new Date(task.scheduledEnd));
+  return start <= weekDays[6] && end >= weekDays[0];
 }
 
 export const COLOR_CLASSES: Record<ColorKey, { bg: string; text: string }> = {
