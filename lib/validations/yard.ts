@@ -28,7 +28,7 @@ export type YardInput = z.infer<typeof yardSchema>;
 
 export const yardSectionSchema = z.object({
   name: z.string().min(1).default("Front Yard"),
-  areaType: z.enum(["front", "back", "left_side", "right_side", "garden", "other"]).optional(),
+  areaType: z.enum(["front", "back", "left_side", "right_side", "other"]).optional(),
   yardSizeSqft: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().min(1).max(500000).optional()

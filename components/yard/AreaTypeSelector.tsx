@@ -2,7 +2,7 @@
 
 import type { AreaType } from "@/types";
 import { cn } from "@/lib/utils";
-import { Home, TreePine, PanelLeft, PanelRight, Flower2, MapPin } from "lucide-react";
+import { Home, TreePine, PanelLeft, PanelRight, MapPin } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 interface AreaConfig { label: string; icon: LucideIcon; hint: string; }
@@ -12,7 +12,6 @@ export const AREA_CONFIG: Record<AreaType, AreaConfig> = {
   back:       { label: "Back Yard",   icon: TreePine,   hint: "Private, recreational space" },
   left_side:  { label: "Left Side",   icon: PanelLeft,  hint: "Side yard, left of house" },
   right_side: { label: "Right Side",  icon: PanelRight, hint: "Side yard, right of house" },
-  garden:     { label: "Garden",      icon: Flower2,    hint: "Garden or landscaped area" },
   other:      { label: "Other",       icon: MapPin,     hint: "Custom area" },
 };
 

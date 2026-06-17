@@ -245,7 +245,6 @@ ${context.areaType ? `Yard Area: ${context.areaType.replace(/_/g, " ")} (${
   context.areaType === "back"       ? "recreational use, durability matters" :
   context.areaType === "left_side" || context.areaType === "right_side"
                                     ? "narrow side yard, often shaded" :
-  context.areaType === "garden"     ? "garden or landscaped area" :
   "custom area"
 })` : ""}
 ${context.yardSizeSqft ? `Yard Size: ${context.yardSizeSqft} sq ft` : ""}
@@ -465,7 +464,6 @@ ${context.areaType ? `- Yard Area: ${context.areaType.replace(/_/g, " ")} (${
   context.areaType === "back"       ? "recreational use, durability matters" :
   context.areaType === "left_side" || context.areaType === "right_side"
                                     ? "narrow side yard, often shaded" :
-  context.areaType === "garden"     ? "garden or landscaped area" :
   "custom area"
 })` : ""}
 ${context.yardSizeSqft ? `- Yard Size: ${context.yardSizeSqft} sq ft` : ""}

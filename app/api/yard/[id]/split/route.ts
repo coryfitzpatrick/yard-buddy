@@ -6,9 +6,9 @@ import { z } from "zod";
 
 const splitSchema = z.object({
   areaTypes: z
-    .array(z.enum(["front", "back", "left_side", "right_side", "garden"]))
-    .min(2, "Pick at least two sections — fewer than two isn't really splitting.")
-    .max(5),
+    .array(z.enum(["front", "back", "left_side", "right_side"]))
+    .min(2, "Pick at least two sections; fewer than two isn't really splitting.")
+    .max(4),
 });
 
 const AREA_NAMES: Record<string, string> = {
@@ -16,7 +16,6 @@ const AREA_NAMES: Record<string, string> = {
   back: "Back Yard",
   left_side: "Left Side Yard",
   right_side: "Right Side Yard",
-  garden: "Garden",
 };
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

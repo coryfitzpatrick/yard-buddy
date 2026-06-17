@@ -125,7 +125,7 @@ async function main() {
       yardId: yard.id,
       name: "Back Patio Border",
       slug: "back-patio-border",
-      areaType: "garden",
+      areaType: "other",
       grassType: "st_augustine",
       yardSizeSqft: 440,
       soilPh: 6.4,

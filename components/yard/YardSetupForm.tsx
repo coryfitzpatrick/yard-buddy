@@ -45,7 +45,7 @@ const SPREADER_BRANDS: Record<string, string[]> = {
 const AREA_NAME_MAP: Record<AreaType, string> = {
   front: "Front Yard", back: "Back Yard",
   left_side: "Left Side Yard", right_side: "Right Side Yard",
-  garden: "Garden", other: "My Yard",
+  other: "My Yard",
 };
 
 export function YardSetupForm() {

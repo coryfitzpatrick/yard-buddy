@@ -3,7 +3,6 @@ export type AreaType =
   | "back"
   | "left_side"
   | "right_side"
-  | "garden"
   | "other";
 
 export type GrassType =

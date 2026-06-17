@@ -6,14 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type AreaKey = "front" | "back" | "left_side" | "right_side" | "garden";
+type AreaKey = "front" | "back" | "left_side" | "right_side";
 
 const AREA_OPTIONS: { key: AreaKey; label: string; description: string }[] = [
   { key: "front", label: "Front Yard", description: "Curb-side, usually most visible" },
   { key: "back", label: "Back Yard", description: "Behind the house" },
   { key: "left_side", label: "Left Side Yard", description: "Between house and left fence" },
   { key: "right_side", label: "Right Side Yard", description: "Between house and right fence" },
-  { key: "garden", label: "Garden / Border", description: "Decorative planting or border strip" },
 ];
 
 interface Props {
