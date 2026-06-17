@@ -135,14 +135,21 @@ export function YardCarousel({ yards, selectedYardId, onSelect }: Props) {
   const scrollBy = (dir: 1 | -1) => {
     const el = scrollRef.current;
     if (!el) return;
-    // Each card is 50% of container minus half the gap (gap-3 = 12px)
-    const amount = el.clientWidth / 2 + 6;
+    // Scroll by the actual first-card width so it stays correct at any breakpoint.
+    const child = el.firstElementChild as HTMLElement | null;
+    const amount = child ? child.offsetWidth + 12 : el.clientWidth / 2 + 6;
     el.scrollBy({ left: dir * amount, behavior: "smooth" });
   };
 
-  if (yards.length <= 2) {
+  if (yards.length <= 4) {
+    const gridCols = {
+      1: "grid-cols-1",
+      2: "grid-cols-2",
+      3: "grid-cols-2 sm:grid-cols-3",
+      4: "grid-cols-2 sm:grid-cols-4",
+    }[yards.length as 1 | 2 | 3 | 4];
     return (
-      <div className={cn("grid gap-3", yards.length === 1 ? "grid-cols-1" : "grid-cols-2")}>
+      <div className={cn("grid gap-3", gridCols)}>
         {yards.map((yard) => (
           <YardCardItem
             key={yard.id}
@@ -163,7 +170,7 @@ export function YardCarousel({ yards, selectedYardId, onSelect }: Props) {
         style={{ scrollbarWidth: "none" }}
       >
         {yards.map((yard) => (
-          <div key={yard.id} className="shrink-0 w-[calc(50%-6px)] snap-start">
+          <div key={yard.id} className="shrink-0 w-[calc(50%-6px)] sm:w-[calc(25%-9px)] snap-start">
             <YardCardItem
               yard={yard}
               selected={yard.id === selectedYardId}
