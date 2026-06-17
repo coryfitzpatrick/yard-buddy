@@ -6,13 +6,23 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PhotoUpload, type UploadedPhoto } from "@/components/analysis/PhotoUpload";
 import { AnalysisResults } from "@/components/analysis/AnalysisResults";
+import { SoilQuickEdit } from "@/components/analysis/SoilQuickEdit";
 import type { AnalysisResult, AreaType } from "@/types";
 import { Loader2, ArrowRight, Plus, Camera } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 
-interface YardSection { id: string; name: string; areaType: string | null; grassType: string; analyses: { healthScore: number }[]; }
+interface YardSection {
+  id: string;
+  name: string;
+  areaType: string | null;
+  grassType: string;
+  soilPh: number | null;
+  soilMoisture: "dry" | "moderate" | "moist" | null;
+  notes: string | null;
+  analyses: { healthScore: number }[];
+}
 interface Yard { id: string; name: string; zipCode: string; sections: YardSection[]; }
 
 export default function AnalyzePage() {
@@ -213,7 +223,29 @@ export default function AnalyzePage() {
             </div>
           )}
 
-          {selectedSectionId && <PhotoUpload onUploaded={handleUploaded} analyzing={analyzing} onReset={cancelAnalysis} />}
+          {selectedSectionId && selectedYard && (() => {
+            const sec = selectedYard.sections.find((s) => s.id === selectedSectionId);
+            if (!sec) return null;
+            return (
+              <div className="space-y-4">
+                <SoilQuickEdit
+                  yardId={selectedYard.id}
+                  sectionId={sec.id}
+                  initialSoilPh={sec.soilPh}
+                  initialSoilMoisture={sec.soilMoisture}
+                  initialNotes={sec.notes}
+                  onSaved={() => {
+                    // Refresh yards so the latest values back our pre-fill.
+                    fetch("/api/yard")
+                      .then((r) => r.json())
+                      .then((data: Yard[]) => Array.isArray(data) && setYards(data))
+                      .catch(() => {});
+                  }}
+                />
+                <PhotoUpload onUploaded={handleUploaded} analyzing={analyzing} onReset={cancelAnalysis} />
+              </div>
+            );
+          })()}
 
           {analyzing && (
             <div className="flex flex-col items-center gap-3 py-8">

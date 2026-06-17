@@ -209,18 +209,29 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
         })()}
       </div>
 
-      {!hideSubmitButton && populated.length > 0 && !analyzing && (
-        <Button
-          onClick={uploadAll}
-          disabled={uploading}
-          className="w-full bg-green-600 hover:bg-green-700"
-        >
-          {uploading ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</>
-          ) : (
-            `Analyze ${populated.length} Photo${populated.length > 1 ? "s" : ""}`
-          )}
-        </Button>
+      {!hideSubmitButton && !analyzing && (
+        <div className="flex">
+          {/* Span wrapper carries the title so it still shows when the button is
+              disabled (Base UI disables pointer events on disabled buttons). */}
+          <span
+            title={populated.length === 0 ? "Add at least one photo to analyze" : undefined}
+            className="inline-block"
+          >
+            <Button
+              onClick={uploadAll}
+              disabled={uploading || populated.length === 0}
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:text-gray-500"
+            >
+              {uploading ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</>
+              ) : populated.length === 0 ? (
+                "Analyze"
+              ) : (
+                `Analyze ${populated.length} Photo${populated.length > 1 ? "s" : ""}`
+              )}
+            </Button>
+          </span>
+        </div>
       )}
     </div>
   );

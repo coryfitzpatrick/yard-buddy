@@ -181,7 +181,7 @@ export function NotificationPreferences({
             Best day alerts
           </Label>
           <p className="text-sm text-gray-500 mt-0.5">
-            Alert when GDD thresholds indicate the optimal day for treatments like pre-emergent, grub control, or overseeding.
+            Alert on the best day for time-sensitive treatments like pre-emergent, grub control, or overseeding. We track accumulated warmth from spring, called Growing Degree Days (GDD), to predict when weeds, pests, and grass hit the development stage where each treatment works best.
           </p>
         </div>
         <Switch
