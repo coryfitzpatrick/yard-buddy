@@ -45,6 +45,7 @@ export function DashboardNav({ signOutAction }: Props) {
                     variant="ghost"
                     size="sm"
                     className={cn(
+                      "text-base",
                       active && "bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-700"
                     )}
                   >
@@ -87,7 +88,7 @@ export function DashboardNav({ signOutAction }: Props) {
                 <SheetClose key={href} render={<Link href={href} />}>
                   <span
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                      "flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors",
                       active
                         ? "bg-green-50 text-green-700"
                         : "text-gray-700 hover:bg-gray-100"

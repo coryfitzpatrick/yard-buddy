@@ -142,6 +142,16 @@ export default async function SettingsPage({
             <h2 className="text-lg font-semibold text-gray-900">Account</h2>
           </div>
           <EmailSection initialEmail={user.email} linkedToGoogle={linkedToGoogle} />
+          {user.passwordHash && (
+            <>
+              <hr className="my-6 border-gray-200" />
+              <div className="flex items-center gap-2 mb-4">
+                <Lock className="w-4 h-4 text-green-600" />
+                <h3 className="text-sm font-semibold text-gray-700">Change password</h3>
+              </div>
+              <ChangePassword />
+            </>
+          )}
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -158,16 +168,6 @@ export default async function SettingsPage({
             initialGddBestDayReminderDays={user.gddBestDayReminderDays}
           />
         </div>
-
-        {user.passwordHash && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Lock className="w-5 h-5 text-green-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Change Password</h2>
-            </div>
-            <ChangePassword />
-          </div>
-        )}
       </div>
     </div>
   );
