@@ -87,6 +87,17 @@ export function YardSetupForm() {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [step]);
 
+  // Cooldown that disables Save for a beat after Review first appears, so a
+  // phantom tap from the Next click (touchend → click landing on the newly
+  // rendered Save button at the same screen position) can't auto-submit.
+  const [saveArmed, setSaveArmed] = useState(false);
+  useEffect(() => {
+    if (step !== 5) { setSaveArmed(false); return; }
+    setSaveArmed(false);
+    const t = setTimeout(() => setSaveArmed(true), 1200);
+    return () => clearTimeout(t);
+  }, [step]);
+
   function handleSetupModeChange(mode: "whole" | "sections") {
     setSetupMode(mode);
     if (mode === "whole") {
@@ -778,14 +789,19 @@ export function YardSetupForm() {
               ) : (
                 <Button
                   type="button"
-                  disabled={isSubmitting || postSaveStatus !== "idle"}
+                  disabled={isSubmitting || postSaveStatus !== "idle" || !saveArmed}
                   onClick={handleSubmit(onSubmit)}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 shadow-sm"
                 >
                   {postSaveStatus === "saving" && "Saving…"}
                   {postSaveStatus === "uploading" && "Uploading photos…"}
                   {postSaveStatus === "analyzing" && "Analyzing your lawn…"}
-                  {postSaveStatus === "idle" && (setupPhotoCount > 0 ? "Save & analyze" : "Save")}
+                  {postSaveStatus === "idle" &&
+                    (!saveArmed
+                      ? "Review above…"
+                      : setupPhotoCount > 0
+                        ? "Save & analyze"
+                        : "Save")}
                 </Button>
               )}
             </div>
