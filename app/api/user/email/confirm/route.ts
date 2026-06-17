@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
+import { hashToken } from "@/lib/token-hash";
 
 function redirectToSettings(req: NextRequest, status: "success" | "expired" | "invalid" | "taken" | "error") {
   const url = new URL("/settings", req.url);
@@ -13,7 +14,7 @@ export async function GET(req: NextRequest) {
   if (!token) return redirectToSettings(req, "invalid");
 
   const request = await db.emailChangeRequest.findUnique({
-    where: { token },
+    where: { token: hashToken(token) },
     include: { user: { select: { id: true, stripeCustomerId: true } } },
   });
   if (!request) return redirectToSettings(req, "invalid");

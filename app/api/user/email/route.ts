@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { changeEmailSchema } from "@/lib/validations/auth";
 import { resend, buildEmailChangeConfirmEmail } from "@/lib/email";
+import { hashToken } from "@/lib/token-hash";
 
 export async function PUT(req: NextRequest) {
   const session = await auth();
@@ -51,9 +52,10 @@ export async function PUT(req: NextRequest) {
   await db.emailChangeRequest.deleteMany({ where: { userId: user.id } });
 
   const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
   await db.emailChangeRequest.create({
-    data: { userId: user.id, newEmail, token, expiresAt },
+    data: { userId: user.id, newEmail, token: tokenHash, expiresAt },
   });
 
   const baseUrl =

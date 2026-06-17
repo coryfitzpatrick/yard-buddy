@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { resetPasswordSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { hashToken } from "@/lib/token-hash";
 
 export async function POST(req: NextRequest) {
   const { limited } = await checkRateLimit(`reset-password:${getClientIp(req)}`, 10, 60 * 60 * 1000);
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
   const { token, password } = parsed.data;
 
   const record = await db.passwordResetToken.findUnique({
-    where: { token },
+    where: { token: hashToken(token) },
     include: { user: { select: { id: true, passwordHash: true } } },
   });
 

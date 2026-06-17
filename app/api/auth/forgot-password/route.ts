@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { forgotPasswordSchema } from "@/lib/validations/auth";
 import { resend, buildPasswordResetEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { hashToken } from "@/lib/token-hash";
 
 export async function POST(req: NextRequest) {
   const { limited } = await checkRateLimit(`forgot-password:${getClientIp(req)}`, 5, 60 * 60 * 1000);
@@ -27,11 +28,12 @@ export async function POST(req: NextRequest) {
   // Only send email if user exists and has a password (not OAuth-only).
   if (user?.passwordHash) {
     const token = crypto.randomBytes(32).toString("hex");
+    const tokenHash = hashToken(token);
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
     await db.passwordResetToken.deleteMany({ where: { userId: user.id } });
     const tokenRecord = await db.passwordResetToken.create({
-      data: { userId: user.id, token, expiresAt },
+      data: { userId: user.id, token: tokenHash, expiresAt },
     });
 
     const baseUrl = process.env.NEXTAUTH_URL
