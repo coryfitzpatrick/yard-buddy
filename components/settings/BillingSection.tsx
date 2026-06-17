@@ -31,9 +31,27 @@ interface Props {
 type Dialog = "pause" | "cancel" | null;
 
 const CHANGE_PLANS = [
-  { key: "home_basic",   label: "Home Basic",   monthly: 7.99,  annual: 79  },
-  { key: "home_plus",    label: "Home Plus",    monthly: 14.99, annual: 139 },
-  { key: "professional", label: "Professional", monthly: 24.99, annual: 229 },
+  {
+    key: "home_basic",
+    label: "Home Basic",
+    monthly: 7.99,
+    annual: 79,
+    summary: "1 yard · 8 analyses/yard/month",
+  },
+  {
+    key: "home_plus",
+    label: "Home Plus",
+    monthly: 14.99,
+    annual: 139,
+    summary: "Up to 3 yards · 8 analyses/yard/month · multi-yard dashboard",
+  },
+  {
+    key: "professional",
+    label: "Professional",
+    monthly: 24.99,
+    annual: 229,
+    summary: "Up to 10 yards · 8 analyses/yard/month · for rentals & HOAs",
+  },
 ] as const;
 
 export function BillingSection({
@@ -202,7 +220,15 @@ export function BillingSection({
       {/* Change plan — only for active paid subscribers */}
       {showSubscriptionControls && !isTrial && (
         <div className="border-t border-gray-100 pt-4 space-y-3">
-          <p className="text-sm font-medium text-gray-700">Change plan</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-medium text-gray-700">Change plan</p>
+            <Link
+              href="/pricing"
+              className="text-xs text-green-700 hover:text-green-800 underline"
+            >
+              Compare plans
+            </Link>
+          </div>
 
           {changePlanKey ? (() => {
             const selectedPlan = CHANGE_PLANS.find((p) => p.key === changePlanKey);
@@ -269,13 +295,16 @@ export function BillingSection({
                       isCurrent ? "bg-green-50 border border-green-200" : "hover:bg-gray-50"
                     }`}
                   >
-                    <div>
-                      <span className={`text-sm font-medium ${isCurrent ? "text-green-800" : "text-gray-700"}`}>
-                        {p.label}
-                      </span>
-                      <span className="text-xs text-gray-400 ml-2">
-                        ${p.monthly}/mo · ${p.annual}/yr
-                      </span>
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className={`text-sm font-medium ${isCurrent ? "text-green-800" : "text-gray-700"}`}>
+                          {p.label}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          ${p.monthly}/mo · ${p.annual}/yr
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5">{p.summary}</p>
                     </div>
                     {isCurrent ? (
                       <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
