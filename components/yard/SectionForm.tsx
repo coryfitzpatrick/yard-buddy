@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import { yardSectionSchema, YardSectionInput, YardSectionFormInput } from "@/lib/validations/yard";
+import { createSectionAction, updateSectionAction } from "@/app/_actions/sections";
 import { GrassTypeSelector } from "./GrassTypeSelector";
 import { AreaTypeSelector, AREA_NAME_MAP } from "./AreaTypeSelector";
 import { GrassIdentifyUpload, type GrassIdentifyUploadHandle } from "./GrassIdentifyUpload";
@@ -131,25 +132,14 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
 
   async function onSubmit(data: YardSectionInput) {
     setError(null);
-    try {
-      const url = isEdit
-        ? `/api/yard/${yardId}/sections/${initialData!.id}`
-        : `/api/yard/${yardId}/sections`;
-      const res = await fetch(url, {
-        method: isEdit ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) { setError("Failed to save. Please try again."); return; }
-      const saved = await res.json();
-      if (isEdit) {
-        router.push(`/yard/${yardSlug ?? yardId}/sections/${saved.slug ?? initialData!.id}`);
-      } else {
-        router.push(`/analyze?sectionId=${saved.id}`);
-      }
-      router.refresh();
-    } catch {
-      setError("Network error. Please check your connection.");
+    if (isEdit) {
+      const result = await updateSectionAction(yardId, initialData!.id!, data);
+      if (!result.ok) { setError("Failed to save. Please try again."); return; }
+      router.push(`/yard/${yardSlug ?? yardId}/sections/${result.slug}`);
+    } else {
+      const result = await createSectionAction(yardId, data);
+      if (!result.ok) { setError("Failed to save. Please try again."); return; }
+      router.push(`/analyze?sectionId=${result.id}`);
     }
   }
 

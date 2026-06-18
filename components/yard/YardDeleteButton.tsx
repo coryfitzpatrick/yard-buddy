@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { deleteYardAction } from "@/app/_actions/yards";
 import { Button } from "@/components/ui/button";
 import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 import { Trash2 } from "lucide-react";
@@ -14,11 +15,10 @@ export function YardDeleteButton({ yardId, yardName }: { yardId: string; yardNam
   async function handleDelete() {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/yard/${yardId}`, { method: "DELETE" });
-      if (res.ok) {
+      const result = await deleteYardAction(yardId);
+      if (result.ok) {
         setOpen(false);
         router.push("/yard");
-        router.refresh();
       }
     } finally {
       setDeleting(false);

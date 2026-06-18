@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { updateTaskStatusAction, resetTaskOverdueAction } from "@/app/_actions/tasks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -255,23 +255,14 @@ export function TaskList({
   hiddenTaskCount?: number;
 }) {
   const [tasks, setTasks] = useState(initial);
-  const router = useRouter();
 
-  async function patchTask(id: string, status: string) {
+  async function patchTask(id: string, status: "pending" | "completed" | "skipped") {
     const target = tasks.find((t) => t.id === id);
     const ids = target?.mergedIds ?? [id];
     const prev = target?.status ?? "pending";
     setTasks((t) => t.map((task) => (ids.includes(task.id) ? { ...task, status } : task)));
-    try {
-      await Promise.all(ids.map((tid) =>
-        fetch(`/api/tasks/${tid}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status }),
-        }).then((r) => { if (!r.ok) throw new Error("Failed"); })
-      ));
-      router.refresh();
-    } catch {
+    const results = await Promise.all(ids.map((tid) => updateTaskStatusAction(tid, status)));
+    if (results.some((r) => !r.ok)) {
       setTasks((t) => t.map((task) => (ids.includes(task.id) ? { ...task, status: prev } : task)));
     }
   }
@@ -281,16 +272,8 @@ export function TaskList({
     if (!prev) return;
     // Optimistic update: clear stillWorthDoing so task moves back to pending groups
     setTasks((t) => t.map((task) => (task.id === id ? { ...task, stillWorthDoing: null } : task)));
-    try {
-      const res = await fetch(`/api/tasks/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stillWorthDoing: null }),
-      });
-      if (!res.ok) throw new Error("Failed");
-      router.refresh();
-    } catch {
-      // Rollback
+    const result = await resetTaskOverdueAction(id);
+    if (!result.ok) {
       setTasks((t) => t.map((task) => (task.id === id ? prev : task)));
     }
   }

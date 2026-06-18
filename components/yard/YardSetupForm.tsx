@@ -356,10 +356,7 @@ export function YardSetupForm() {
               <Button
                 type="button"
                 className="bg-green-600 hover:bg-green-700"
-                onClick={() => {
-                  router.push(`/yard/${createdYardSlug}/sections/${analyzedSectionSlug}`);
-                  router.refresh();
-                }}
+                onClick={() => router.push(`/yard/${createdYardSlug}/sections/${analyzedSectionSlug}`)}
               >
                 View analysis
               </Button>
@@ -367,7 +364,7 @@ export function YardSetupForm() {
               <Button
                 type="button"
                 className="bg-green-600 hover:bg-green-700"
-                onClick={() => { router.push("/dashboard"); router.refresh(); }}
+                onClick={() => router.push("/dashboard")}
               >
                 Go to Dashboard
               </Button>

@@ -2,9 +2,13 @@
 import { render, screen, cleanup } from "@testing-library/react";
 import { describe, it, expect, afterEach, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
-import { TaskList } from "../TaskList";
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+vi.mock("@/app/_actions/tasks", () => ({
+  updateTaskStatusAction: vi.fn(async () => ({ ok: true })),
+  resetTaskOverdueAction: vi.fn(async () => ({ ok: true })),
+}));
+
+import { TaskList } from "../TaskList";
 
 const baseTask = {
   id: "t1",

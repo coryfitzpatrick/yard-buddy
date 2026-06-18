@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { z } from "zod";
 import { yardSchema, YardInput } from "@/lib/validations/yard";
+import { updateYardAction } from "@/app/_actions/yards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,19 +54,12 @@ export function YardEditForm({ yardId, yardSlug, initialData }: Props) {
 
   async function onSubmit(data: YardInput) {
     setError(null);
-    try {
-      const res = await fetch(`/api/yard/${yardId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) { setError("Failed to save. Please try again."); return; }
-      const saved = await res.json();
-      router.push(`/yard/${saved.slug ?? yardSlug}`);
-      router.refresh();
-    } catch {
-      setError("Network error. Please check your connection.");
+    const result = await updateYardAction(yardId, data);
+    if (!result.ok) {
+      setError("Failed to save. Please try again.");
+      return;
     }
+    router.push(`/yard/${result.slug ?? yardSlug}`);
   }
 
   return (

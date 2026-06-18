@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { acceptTermsAction } from "@/app/_actions/terms";
 
 export default function AcceptTermsPage() {
   const router = useRouter();
@@ -15,15 +16,13 @@ export default function AcceptTermsPage() {
     if (!accepted) return;
     setSubmitting(true);
     setError(null);
-    try {
-      const res = await fetch("/api/auth/accept-terms", { method: "POST" });
-      if (!res.ok) throw new Error("Failed to save acceptance");
-      router.refresh();
-      router.push("/dashboard");
-    } catch {
+    const result = await acceptTermsAction();
+    if (!result.ok) {
       setError("Something went wrong. Please try again.");
       setSubmitting(false);
+      return;
     }
+    router.push("/dashboard");
   }
 
   return (

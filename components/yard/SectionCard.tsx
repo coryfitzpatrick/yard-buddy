@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { deleteSectionAction } from "@/app/_actions/sections";
 import { Button } from "@/components/ui/button";
 import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 import { Pencil, Trash2, Ruler, Sprout, ArrowRight } from "lucide-react";
@@ -19,7 +19,6 @@ interface Section {
 }
 
 export function SectionCard({ section }: { section: Section }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -29,11 +28,8 @@ export function SectionCard({ section }: { section: Section }) {
   async function handleDelete() {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/yard/${section.yardId}/sections/${section.id}`, { method: "DELETE" });
-      if (res.ok) {
-        setOpen(false);
-        router.refresh();
-      }
+      const result = await deleteSectionAction(section.yardId, section.id);
+      if (result.ok) setOpen(false);
     } finally {
       setDeleting(false);
     }

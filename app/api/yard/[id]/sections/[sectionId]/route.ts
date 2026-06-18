@@ -42,18 +42,3 @@ export async function PATCH(
   });
   return NextResponse.json(updated);
 }
-
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string; sectionId: string }> }
-) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const { sectionId } = await params;
-  const section = await getOwnedSection(sectionId, session.user.id);
-  if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-  await db.yardSection.delete({ where: { id: sectionId } });
-  return NextResponse.json({ success: true });
-}

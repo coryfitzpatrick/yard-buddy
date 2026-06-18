@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { splitYardAction } from "@/app/_actions/yards";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,20 +45,12 @@ export function SplitYardForm({ yardId, yardSlug, currentGrassType }: Props) {
     setError(null);
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/yard/${yardId}/split`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ areaTypes: Array.from(selected) }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(typeof data.error === "string" ? data.error : "Couldn't split yard. Try again.");
+      const result = await splitYardAction(yardId, Array.from(selected));
+      if (!result.ok) {
+        setError(result.error || "Couldn't split yard. Try again.");
         return;
       }
       router.push(`/yard/${yardSlug}`);
-      router.refresh();
-    } catch {
-      setError("Network error. Try again.");
     } finally {
       setSubmitting(false);
     }
