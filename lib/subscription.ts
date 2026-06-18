@@ -84,3 +84,8 @@ export function getDaysUntilDeletion(user: SubscriptionUser): number | null {
   const deleteAt = new Date(expiryDate.getTime() + 30 * 24 * 60 * 60 * 1000);
   return Math.ceil((deleteAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
 }
+
+export function daysUntilTrialEnd(trialEndsAt: Date | null | undefined): number | null {
+  if (!trialEndsAt) return null;
+  return Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
+}

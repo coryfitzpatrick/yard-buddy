@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Camera, Pencil, Images } from "lucide-react";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
@@ -254,9 +255,11 @@ export default async function SectionDetailPage({
             <div className="flex flex-wrap gap-2">
               {latestAnalysis.imageUrls.map((url, i) => (
                 <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                  <img
+                  <Image
                     src={url}
                     alt={`Analysis image ${i + 1}`}
+                    width={80}
+                    height={80}
                     className="w-20 h-20 object-cover rounded-lg border border-gray-200 hover:opacity-80 transition-opacity"
                   />
                 </a>
@@ -319,9 +322,11 @@ export default async function SectionDetailPage({
                     <div className="flex flex-wrap gap-1.5">
                       {a.imageUrls.map((url, i) => (
                         <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                          <img
+                          <Image
                             src={url}
                             alt={`Analysis image ${i + 1}`}
+                            width={56}
+                            height={56}
                             className="w-14 h-14 object-cover rounded-md border border-gray-200 hover:opacity-80 transition-opacity"
                           />
                         </a>

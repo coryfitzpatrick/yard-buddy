@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { groupPhotosByMonth, type Photo } from '@/lib/sections/photo-history'
 
 type Props = {
@@ -29,11 +30,13 @@ export function PhotoTimeline({ photos, sectionName }: Props) {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {group.photos.map((photo) => (
               <div key={photo.id} className="group relative rounded-lg overflow-hidden aspect-square bg-gray-100">
-                <a href={photo.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                  <img
+                <a href={photo.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full relative">
+                  <Image
                     src={photo.url}
-                    alt={`${sectionName} — ${new Date(photo.createdAt).toLocaleDateString()}`}
-                    className="w-full h-full object-cover"
+                    alt={`${sectionName}, ${new Date(photo.createdAt).toLocaleDateString()}`}
+                    fill
+                    sizes="(min-width: 640px) 33vw, 50vw"
+                    className="object-cover"
                   />
                 </a>
                 {photo.analysis && (

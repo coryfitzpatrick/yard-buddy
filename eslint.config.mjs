@@ -12,7 +12,20 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated and out-of-tree:
+    "coverage/**",
+    ".worktrees/**",
   ]),
+  {
+    rules: {
+      // Underscore prefix is the conventional opt-out for an unused arg or var
+      // (e.g. signature-required `_req` on a route handler).
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

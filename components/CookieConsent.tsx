@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import {
   ALL_DENIED,
@@ -53,10 +53,16 @@ export function CookieConsent() {
   // Banner visible until the user decides; preferences modal flips this open.
   const [showBanner, setShowBanner] = useState(false);
   const [showPrefs, setShowPrefs] = useState(false);
-  const draftRef = useRef<ConsentState>(DEFAULT_CONSENT);
+  const [draft, setDraft] = useState<ConsentState>(DEFAULT_CONSENT);
 
+  // Hydrating from document.cookie has to happen post-mount: server has no
+  // cookies and we want SSR/CSR markup to match (see the consent === null
+  // early-return below). The effect intentionally seeds state from an external
+  // source, which the set-state-in-effect rule flags but the React docs
+  // explicitly allow for "subscribe to / read from external system" patterns.
   useEffect(() => {
     const stored = readConsentCookie();
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (stored) {
       setConsent(stored);
       setShowBanner(false);
@@ -64,13 +70,14 @@ export function CookieConsent() {
       setConsent(DEFAULT_CONSENT);
       setShowBanner(true);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   // Settings (or anywhere else) can re-open the preferences modal by
   // dispatching this event — no need to pass refs across the tree.
   useEffect(() => {
     function open() {
-      draftRef.current = consent ?? DEFAULT_CONSENT;
+      setDraft(consent ?? DEFAULT_CONSENT);
       setShowPrefs(true);
       setShowBanner(false);
     }
@@ -114,7 +121,7 @@ export function CookieConsent() {
               <button
                 type="button"
                 onClick={() => {
-                  draftRef.current = consent;
+                  setDraft(consent);
                   setShowPrefs(true);
                 }}
                 className="text-sm font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 rounded-md px-3 py-2"
@@ -142,7 +149,7 @@ export function CookieConsent() {
 
       {showPrefs && (
         <PreferencesModal
-          initial={draftRef.current}
+          initial={draft}
           onClose={() => {
             // If they cancel before deciding for the first time, leave banner up.
             setShowPrefs(false);

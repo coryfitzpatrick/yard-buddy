@@ -34,13 +34,13 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
-  const requestGeolocation = useCallback(() => {
+  // Shared geolocation request used by both the initial effect and the
+  // "Try again" button. Returns true if the browser API call was kicked off,
+  // false if geolocation isn't available.
+  const askForLocation = useCallback((): boolean => {
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setLoading(false);
-      return;
+      return false;
     }
-    setLoading(true);
-    setGeoBlocked(false);
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => fetchByCoords(coords.latitude, coords.longitude),
       (err) => {
@@ -49,11 +49,27 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
       },
       { timeout: 8000 }
     );
+    return true;
   }, [fetchByCoords]);
 
-  useEffect(() => {
+  // Event-handler version for the "Try again" button. Sync setState is fine
+  // here because it's an event handler, not an effect body.
+  const requestGeolocation = useCallback(() => {
     setLoading(true);
     setGeoBlocked(false);
+    if (!askForLocation()) setLoading(false);
+  }, [askForLocation]);
+
+  // Reset loading/blocked when the input zip changes, adjusting state during
+  // render so the spinner shows immediately instead of after a paint.
+  const [prevZip, setPrevZip] = useState(zip);
+  if (prevZip !== zip) {
+    setPrevZip(zip);
+    setLoading(true);
+    setGeoBlocked(false);
+  }
+
+  useEffect(() => {
     if (zip) {
       fetch(`/api/weather?zip=${zip}`)
         .then((r) => r.json())
@@ -62,8 +78,12 @@ export function WeatherWidget({ zip, initialCollapsed = false }: Props) {
         .finally(() => setLoading(false));
       return;
     }
-    requestGeolocation();
-  }, [zip, requestGeolocation]);
+    if (!askForLocation()) {
+      // Defer so the setState fires after the effect commits, avoiding the
+      // cascading-renders pattern. Loading will flip false on the next tick.
+      queueMicrotask(() => setLoading(false));
+    }
+  }, [zip, askForLocation]);
 
   const handleToggle = useCallback(() => {
     setCollapsed((prev) => {

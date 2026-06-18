@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         hostname: "openweathermap.org",
         pathname: "/img/wn/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/lawn-photos/**",
+      },
     ],
   },
   async headers() {

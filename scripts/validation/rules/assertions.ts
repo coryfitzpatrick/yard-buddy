@@ -1,4 +1,4 @@
-import type { Rule, RuleResult, Scenario } from "../types";
+import type { Rule, RuleResult } from "../types";
 
 function contains(response: string, ...terms: string[]): boolean {
   const lower = response.toLowerCase();

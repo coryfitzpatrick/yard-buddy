@@ -49,7 +49,7 @@ export function ForgotPasswordForm() {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl">Forgot password</CardTitle>
-        <CardDescription>Enter your email and we'll send a reset link.</CardDescription>
+        <CardDescription>Enter your email and we&apos;ll send a reset link.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

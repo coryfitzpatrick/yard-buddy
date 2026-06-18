@@ -579,7 +579,7 @@ export function YardSetupForm() {
                       <SelectItem value="moist">Moist: stays damp, possible overwatering</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-sm text-gray-400">Push a screwdriver 6" into soil: slides in = moist, resistance = moderate, very hard = dry.</p>
+                  <p className="text-sm text-gray-400">Push a screwdriver 6&quot; into soil: slides in = moist, resistance = moderate, very hard = dry.</p>
                 </div>
                 <div className="space-y-1">
                   <Label>Spreader Type</Label>

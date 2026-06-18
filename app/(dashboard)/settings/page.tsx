@@ -6,7 +6,7 @@ import { ChangePassword } from "@/components/settings/ChangePassword";
 import { BillingSection } from "@/components/settings/BillingSection";
 import { EmailSection } from "@/components/settings/EmailSection";
 import { Bell, Lock, CreditCard, Mail } from "lucide-react";
-import { getDaysUntilDeletion, PLAN_LABELS, canPause } from "@/lib/subscription";
+import { getDaysUntilDeletion, PLAN_LABELS, canPause, daysUntilTrialEnd } from "@/lib/subscription";
 
 const EMAIL_CHANGE_MESSAGES: Record<string, { tone: "success" | "error"; text: string }> = {
   success: { tone: "success", text: "Email updated. You may need to sign in again." },
@@ -58,9 +58,7 @@ export default async function SettingsPage({
     pausedUntil: user.pausedUntil,
   };
   const daysUntilDeletion = getDaysUntilDeletion(subUser);
-  const trialDaysLeft = user.trialEndsAt
-    ? Math.max(0, Math.ceil((user.trialEndsAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
-    : null;
+  const trialDaysLeft = daysUntilTrialEnd(user.trialEndsAt);
   const canPauseSubscription = canPause(subUser);
 
   // Determine billing period from active Stripe price ID

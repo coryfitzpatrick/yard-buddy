@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
 import { Footer } from "@/components/Footer";
 import Link from "next/link";
+import { daysUntilTrialEnd } from "@/lib/subscription";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -19,9 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   const isTrial = user?.planStatus === "trialing" || user?.plan === "trial";
-  const trialDaysLeft = user?.trialEndsAt
-    ? Math.max(0, Math.ceil((user.trialEndsAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
-    : null;
+  const trialDaysLeft = daysUntilTrialEnd(user?.trialEndsAt);
 
   async function handleSignOut() {
     "use server";

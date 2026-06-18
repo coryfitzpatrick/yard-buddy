@@ -6,11 +6,7 @@ export function slugify(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export function uniqueSlug(
-  base: string,
-  existingSlugs: string[],
-  currentId?: string
-): string {
+export function uniqueSlug(base: string, existingSlugs: string[]): string {
   const slug = slugify(base) || "section";
   if (!existingSlugs.includes(slug)) return slug;
   let n = 1;

@@ -65,27 +65,6 @@ async function runInputTest(
   }
 }
 
-function assertUncertain(response: string, context: string): void {
-  const confidentPatterns = [
-    /apply \d+(?:\.\d+)?\s*(?:lb|lbs|pound|pounds|bag|bags)/i,
-    /fertilize\s+(?:now|this week|this weekend|immediately|today|tonight)/i,
-    /use\s+\d+-\d+-\d+/i,
-    /apply\s+(?:at\s+)?\d+(?:\.\d+)?\s*(?:lb|lbs)\s+per\s+\d+\s*(?:sq\s*ft|square)/i,
-    /spread\s+\d+(?:\.\d+)?\s*(?:lb|lbs)/i,
-  ];
-  const uncertainPatterns = [
-    "unknown", "unable to", "cannot", "don't know", "not sure",
-    "please provide", "would help to know", "unclear", "uncertain",
-    "not specified", "insufficient", "more information",
-  ];
-  const lower = response.toLowerCase();
-  const isConfident = confidentPatterns.some((p) => p.test(response));
-  const isUncertain = uncertainPatterns.some((p) => lower.includes(p));
-  if (isConfident && !isUncertain) {
-    throw new Error(`Confident specific advice for ${context} without acknowledging uncertainty`);
-  }
-}
-
 export async function runInputGuardTests(): Promise<InputTestResult[]> {
   const results: InputTestResult[] = [];
 

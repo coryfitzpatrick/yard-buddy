@@ -47,9 +47,9 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-2">3. Third-Party Services</h2>
             <p>Yard Analyzer relies on the following providers to operate:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li><strong>Anthropic:</strong> photos and lawn data are sent to Anthropic's API for AI analysis. Anthropic's usage policies apply to this data.</li>
-              <li><strong>Supabase:</strong> your data and uploaded photos are stored in Supabase's managed PostgreSQL and object storage.</li>
-              <li><strong>OpenWeatherMap:</strong> your yard's ZIP code is sent to retrieve local weather data.</li>
+              <li><strong>Anthropic:</strong> photos and lawn data are sent to Anthropic&apos;s API for AI analysis. Anthropic&apos;s usage policies apply to this data.</li>
+              <li><strong>Supabase:</strong> your data and uploaded photos are stored in Supabase&apos;s managed PostgreSQL and object storage.</li>
+              <li><strong>OpenWeatherMap:</strong> your yard&apos;s ZIP code is sent to retrieve local weather data.</li>
               <li><strong>Resend:</strong> your email address is used to deliver transactional emails and care reminders.</li>
             </ul>
           </section>
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">7. Children's Privacy</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">7. Children&apos;s Privacy</h2>
             <p>Yard Analyzer is not directed at children under 13. We do not knowingly collect data from children. If you believe a child has provided us personal information, please contact us and we will remove it promptly.</p>
           </section>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
@@ -33,12 +33,14 @@ export function ScheduleEditor({ kind, label, value, onChange, yardDefault }: Pr
 
   // Reset local state when the upstream value swaps (e.g. on edit form for a
   // different section). Inputs are otherwise self-controlled.
-  useEffect(() => {
+  const [prevValue, setPrevValue] = useState(value);
+  if (prevValue !== value) {
     const next = parseSchedule(value);
+    setPrevValue(value);
     setDays(next.days);
     setTime(next.time);
     setInches(next.inches);
-  }, [value]);
+  }
 
   function push(nextDays: string[], nextTime: string, nextInches: string) {
     setDays(nextDays);
