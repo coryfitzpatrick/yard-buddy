@@ -63,11 +63,11 @@
 - [x] **4.5 — `lib/stripe.ts` Reflect.get**
   - Done in: `28d42c1` — `(getStripe() as any)[prop]` → `Reflect.get(getStripe(), prop)`.
 
-- [ ] **4.6 — Split `YardSetupForm` (881 lines)** into a `useYardSetup()` hook + per-step components (`PropertyStep`, `AreaStep`, `GrassStep`, `SoilStep`, `PhotosStep`, `ReviewStep`).
-  - **Deferred.** Major refactor; warrants its own focused session.
+- [x] **4.6 — Split `YardSetupForm` (881 lines)** into a `useYardSetup()` hook + per-step components (`PropertyStep`, `AreaStep`, `GrassStep`, `SoilStep`, `PhotosStep`, `ReviewStep`).
+  - Done in: `358b692` — `components/yard/setup/useYardSetup.ts` owns all step navigation, RHF, ZIP validation, equipment/watering state, yard-size lookup, refs, and the submit/canAdvance/handleAddAnotherSection handlers. Six step components (PropertyStep, AreaStep, GrassStep, SoilStep, PhotosStep, ReviewStep) plus a SuccessScreen consume a single `YardSetupController` prop. The 769-line YardSetupForm is now a 105-line shell. Surfaced + fixed a real cascading-renders lint in the saveArmed cooldown effect.
 
-- [ ] **4.7 — Pre-fetch `/api/yard` server-side** on `app/(dashboard)/analyze/page.tsx:51-70`. Removes the loading spinner + searchParams effect dance.
-  - **Deferred.** Requires splitting the page into a server shell + `AnalyzeClient` client island; ~260 lines of client logic to migrate.
+- [x] **4.7 — Pre-fetch `/api/yard` server-side** on `app/(dashboard)/analyze/page.tsx:51-70`. Removes the loading spinner + searchParams effect dance.
+  - Done in: `85d8b54` — page is now a server component that auths, queries yards via Prisma, resolves the `searchParams.sectionId` preselect, and hands props to a new `AnalyzeClient` island. First paint is the right yard/section instead of a spinner, and the /api/yard round trip is gone for this page.
 
 - [x] **4.8 — Fix dashboard double-fetch**
   - Done in: `28d42c1` — `tasks: { select: { status: true } }` include was unused (no `s.tasks` reference anywhere on the page). Dropped from the yards query.
