@@ -491,11 +491,12 @@ git commit -m "Add callClaude wrapper that records per-call cost rows"
 
 ## Task 4: Convert the `analyze` call site (smoke test)
 
-This is the largest conversion because `analyzeImages` calls the critique + revise helpers. We do this one end-to-end first so any signature issues surface here, not across seven call sites.
+**Note (corrected during execution):** the plan originally said critique + revise helpers belong to this task, but reading the code shows they live inside `generateRecommendations` (`lib/claude.ts:381`), not the analyze functions. They moved to Task 6.
 
 **Files:**
-- Modify: `lib/claude.ts` — convert `analyzeImages`, `analyzeImagesBase64`, the critique helper (line ~339), the revise helper (line ~620).
+- Modify: `lib/claude.ts` — convert `analyzeImages` and `analyzeImagesBase64` only.
 - Modify: `app/api/analyze/route.ts` — thread `session.user.id` into the `analyzeImages` call.
+- Modify: `scripts/validation/run-image.ts` — pass `userId: null` to `analyzeImagesBase64` (dev-only script, no user session).
 
 - [ ] **Step 1: Add the import to `lib/claude.ts`**
 
