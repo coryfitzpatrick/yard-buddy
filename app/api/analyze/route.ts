@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
 
   let validation: { valid: boolean; feedback: string | null };
   try {
-    validation = await validateLawnImages(imageUrls);
+    validation = await validateLawnImages(imageUrls, { userId: session.user.id, feature: "analyze" });
   } catch {
     validation = { valid: true, feedback: null };
   }
