@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { updateTaskStatusAction, resetTaskOverdueAction } from "@/app/_actions/tasks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -280,29 +280,36 @@ export function TaskList({
 
   // Tasks stay in pending until the cron assesses them (sets stillWorthDoing).
   // A task with a past scheduledEnd but stillWorthDoing === null remains in pending, not overdue.
-  const allPending = tasks.filter((t) => t.status === "pending" && t.stillWorthDoing === null);
-  const maintenancePending = allPending.filter((t) => t.taskMode === "maintenance");
-  const pending = allPending.filter((t) => t.taskMode !== "maintenance");
-  const overdue = tasks.filter((t) => t.status === "pending" && t.stillWorthDoing !== null);
-  const completed = tasks.filter((t) => t.status === "completed");
+  // All derived buckets recompute only when `tasks` changes.
+  const { maintenancePending, overdue, completed, groups } = useMemo(() => {
+    const allPending = tasks.filter((t) => t.status === "pending" && t.stillWorthDoing === null);
+    const maintenance = allPending.filter((t) => t.taskMode === "maintenance");
+    const pending = allPending.filter((t) => t.taskMode !== "maintenance");
+    const overdueTasks = tasks.filter((t) => t.status === "pending" && t.stillWorthDoing !== null);
+    const completedTasks = tasks.filter((t) => t.status === "completed");
 
-  // Group pending tasks by priority group, preserving order within group by scheduledStart
-  const groups: Array<{ label: "Urgent" | "High" | "Routine"; tasks: Task[] }> = [];
-
-  for (const groupLabel of ["Urgent", "High", "Routine"] as const) {
-    const groupTasks = pending
-      .filter((t) => (PRIORITY_GROUP[t.priority] ?? "Routine") === groupLabel)
-      .sort((a, b) => {
-        if (a.scheduledStart && b.scheduledStart) {
-          return new Date(a.scheduledStart).getTime() - new Date(b.scheduledStart).getTime();
-        }
-        return (PRIORITY_ORDER[a.priority] ?? 3) - (PRIORITY_ORDER[b.priority] ?? 3);
-      });
-
-    if (groupTasks.length > 0) {
-      groups.push({ label: groupLabel, tasks: groupTasks });
+    const groupedPending: Array<{ label: "Urgent" | "High" | "Routine"; tasks: Task[] }> = [];
+    for (const groupLabel of ["Urgent", "High", "Routine"] as const) {
+      const groupTasks = pending
+        .filter((t) => (PRIORITY_GROUP[t.priority] ?? "Routine") === groupLabel)
+        .sort((a, b) => {
+          if (a.scheduledStart && b.scheduledStart) {
+            return new Date(a.scheduledStart).getTime() - new Date(b.scheduledStart).getTime();
+          }
+          return (PRIORITY_ORDER[a.priority] ?? 3) - (PRIORITY_ORDER[b.priority] ?? 3);
+        });
+      if (groupTasks.length > 0) {
+        groupedPending.push({ label: groupLabel, tasks: groupTasks });
+      }
     }
-  }
+
+    return {
+      maintenancePending: maintenance,
+      overdue: overdueTasks,
+      completed: completedTasks,
+      groups: groupedPending,
+    };
+  }, [tasks]);
 
   return (
     <div className="space-y-6">
