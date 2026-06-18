@@ -362,8 +362,8 @@ function fmtUsd(n: number): string {
 function rowHtml(r: UserCostRow): string {
   const marginColor = r.marginUsd < 0 ? "#b91c1c" : "#15803d";
   return `<tr>
-    <td style="padding:4px 8px;">${r.email}</td>
-    <td style="padding:4px 8px;">${r.plan}</td>
+    <td style="padding:4px 8px;">${escapeHtml(r.email)}</td>
+    <td style="padding:4px 8px;">${escapeHtml(r.plan)}</td>
     <td style="padding:4px 8px;text-align:right;">${r.calls}</td>
     <td style="padding:4px 8px;text-align:right;">${fmtUsd(r.costUsd)}</td>
     <td style="padding:4px 8px;text-align:right;">${fmtUsd(r.revenueUsd)}</td>
