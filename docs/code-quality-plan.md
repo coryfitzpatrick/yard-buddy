@@ -80,7 +80,8 @@
 
 ## Tier 5 — Polish
 
-- [ ] **5.1 — Lift `SoilQuickEdit` state up**; remove `forwardRef` + `useImperativeHandle` for a single caller.
+- [x] **5.1 — Lift `SoilQuickEdit` state up**; remove `forwardRef` + `useImperativeHandle` for a single caller.
+  - Done in: `0e6656f` — `useSoilQuickEdit` hook owns the soil form state and `saveIfDirty`. Analyze page calls the hook and passes its return to a controlled `SoilQuickEdit`; the `soilRef` and the per-section IIFE are gone. Section-change reset moved from `useEffect` to React's adjust-state-during-render pattern, which also clears the cascading-renders lint that surfaced once the linter recognized the hook.
 - [ ] **5.2 — Replace `router.refresh()` with server actions + `revalidatePath`** (9 call sites).
 - [ ] **5.3 — Memoize TaskList priority groups** (`TaskList.tsx:307-322`).
 - [ ] **5.4 — Move magic time constants to `lib/time.ts`** (`DAY_MS`, `DAYS_30_MS`, `TRIAL_GRACE_DAYS`).
