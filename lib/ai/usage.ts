@@ -18,12 +18,12 @@ export interface AiCallCtx {
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function callClaude(
-  params: Anthropic.MessageCreateParams,
+  params: Omit<Anthropic.MessageCreateParams, "stream"> & { stream?: false },
   ctx: AiCallCtx,
 ): Promise<Anthropic.Message> {
   try {
     const response = await client.messages.create(params) as Anthropic.Message;
-    void recordUsage({
+    await recordUsage({
       ...ctx,
       model: response.model,
       usage: response.usage as AiUsageInput,
@@ -31,7 +31,7 @@ export async function callClaude(
     });
     return response;
   } catch (err) {
-    void recordUsage({
+    await recordUsage({
       ...ctx,
       model: typeof params.model === "string" ? params.model : "unknown",
       usage: null,

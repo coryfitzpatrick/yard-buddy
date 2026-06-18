@@ -47,8 +47,6 @@ describe("callClaude success path", () => {
       userId: "user_1",
       feature: "analyze",
     });
-    // recordUsage is fire-and-forget. Flush microtasks.
-    await new Promise((r) => setImmediate(r));
     expect(mockUsageCreate).toHaveBeenCalledOnce();
     const data = mockUsageCreate.mock.calls[0][0].data;
     expect(data).toMatchObject({
@@ -74,7 +72,6 @@ describe("callClaude success path", () => {
       userId: null,
       feature: "analyze",
     });
-    await new Promise((r) => setImmediate(r));
     expect(mockUsageCreate.mock.calls[0][0].data.userId).toBeNull();
   });
 });
@@ -89,7 +86,6 @@ describe("callClaude error path", () => {
         feature: "analyze",
       }),
     ).rejects.toThrow("boom");
-    await new Promise((r) => setImmediate(r));
     expect(mockUsageCreate).toHaveBeenCalledOnce();
     const data = mockUsageCreate.mock.calls[0][0].data;
     expect(data.success).toBe(false);
@@ -110,7 +106,6 @@ describe("callClaude error path", () => {
         feature: "analyze",
       }),
     ).rejects.toThrow();
-    await new Promise((r) => setImmediate(r));
     expect(mockUsageCreate.mock.calls[0][0].data.errorCode).toBe("rate_limit_error");
   });
 });
@@ -131,7 +126,6 @@ describe("recordUsage robustness", () => {
         feature: "analyze",
       }),
     ).resolves.toBeDefined();
-    await new Promise((r) => setImmediate(r));
     expect(warn).toHaveBeenCalled();
   });
 });
