@@ -84,12 +84,16 @@
   - Done in: `0e6656f` — `useSoilQuickEdit` hook owns the soil form state and `saveIfDirty`. Analyze page calls the hook and passes its return to a controlled `SoilQuickEdit`; the `soilRef` and the per-section IIFE are gone. Section-change reset moved from `useEffect` to React's adjust-state-during-render pattern, which also clears the cascading-renders lint that surfaced once the linter recognized the hook.
 - [x] **5.2 — Replace `router.refresh()` with server actions + `revalidatePath`** (9 call sites).
   - Done in: `8098937` — added `app/_actions/{tasks,yards,sections,terms}.ts`; rewired TaskList (status + overdue reset), SectionCard, YardDeleteButton, YardEditForm, SplitYardForm, SectionForm (create + edit), and the terms-accept page. The two `router.refresh()` calls in `YardSetupForm` were post-navigation no-ops and just deleted. Dead routes removed: `/api/auth/accept-terms`, `/api/tasks/[id]`, `/api/yard/[id]/split`, plus the `DELETE` methods on `/api/yard/[id]` and the section route. Net -71 lines.
-- [ ] **5.3 — Memoize TaskList priority groups** (`TaskList.tsx:307-322`).
-- [ ] **5.4 — Move magic time constants to `lib/time.ts`** (`DAY_MS`, `DAYS_30_MS`, `TRIAL_GRACE_DAYS`).
+- [x] **5.3 — Memoize TaskList priority groups** (`TaskList.tsx:307-322`).
+  - Done in: `e94bc53` — pending/maintenance/overdue/completed splits and the urgent/high/routine grouping all live in a single `useMemo` keyed on `tasks`.
+- [x] **5.4 — Move magic time constants to `lib/time.ts`** (`DAY_MS`, `DAYS_30_MS`, `TRIAL_GRACE_DAYS`).
+  - Done in: `59cf629` — added `lib/time.ts` (SECOND_MS / MINUTE_MS / HOUR_MS / DAY_MS / DAYS_30_MS / TRIAL_GRACE_DAYS). Replaced inline `24 * 60 * 60 * 1000` math across cron daily, register, email TTL, and subscription helpers.
 - [x] **5.5 — Add a second prompt cache breakpoint** in `analyzeImages*` covering the static JSON-schema block, not just the system prompt.
   - Done in: extracted the ~1500-token JSON schema + sequencing rules into a single `ANALYZE_SCHEMA_BLOCK` constant. Both `analyzeImages` and `analyzeImagesBase64` now place it as a separate `text` block before the image content with its own `cache_control: ephemeral`, so the schema prefix caches across calls regardless of grass type or section. System prompt keeps its existing breakpoint.
-- [ ] **5.6 — Add tests** for `lib/slug.ts`, `lib/rate-limit.ts`, and `claude.ts`'s pure helpers (`detectDataGaps`, `buildContextWarnings`, `buildDataGapWarning`).
-- [ ] **5.7 — Fix `app/(dashboard)/dashboard/page.tsx:90`** — `yards[0]?.weatherRefreshedAt` masquerades as global; either rename or take the max across yards.
+- [x] **5.6 — Add tests** for `lib/slug.ts`, `lib/rate-limit.ts`, and `claude.ts`'s pure helpers (`detectDataGaps`, `buildContextWarnings`, `buildDataGapWarning`).
+  - Done in: `8cc5748` — new `lib/__tests__/{slug,rate-limit,claude-helpers}.test.ts` files (38 tests). Required exporting `buildContextWarnings`. Tests surfaced a real bug — an empty `x-forwarded-for` header returned `""` instead of `"unknown"`, which would let a misconfigured proxy collide rate-limit keys across many clients. Fixed in the same commit.
+- [x] **5.7 — Fix `app/(dashboard)/dashboard/page.tsx:90`** — `yards[0]?.weatherRefreshedAt` masquerades as global; either rename or take the max across yards.
+  - Done in: `2256701` — reduced to the most recent timestamp across yards. Multi-yard users no longer see a stale indicator just because the first yard hadn't refreshed yet.
 
 ---
 
