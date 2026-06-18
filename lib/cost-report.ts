@@ -1,12 +1,17 @@
 import { db } from "@/lib/db";
 
+// Mirror of the monthly list prices in app/pricing/page.tsx. The cost report
+// compares one month of AI spend against one month of subscription revenue,
+// so annual subscribers are slightly under-represented (they pay less per
+// month at the annual rate). Update both this map and the pricing page when
+// prices change; ideally lift to a single source like lib/plans.ts.
 export const PLAN_MONTHLY_REVENUE_USD: Record<string, number> = {
   trial:        0,
   admin:        0,
   expired:      0,
-  home_basic:   4.99,
-  home_plus:    9.99,
-  professional: 19.99,
+  home_basic:   7.99,
+  home_plus:    14.99,
+  professional: 24.99,
 };
 
 export interface UserCostRow {
