@@ -100,7 +100,7 @@ const WARM_SEASON_GRASSES = new Set(["bermuda", "zoysia", "st_augustine", "centi
 
 const COOL_SEASON_GRASSES = new Set(["kentucky_bluegrass", "tall_fescue", "fine_fescue", "ryegrass"]);
 
-function buildContextWarnings(context: LawnContext): string {
+export function buildContextWarnings(context: LawnContext): string {
   const warnings: string[] = [];
   const temp = context.weatherData?.temp;
   const isWarmSeason = WARM_SEASON_GRASSES.has(context.grassType);

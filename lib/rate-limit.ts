@@ -3,7 +3,8 @@ import { NextRequest } from "next/server";
 
 export function getClientIp(req: NextRequest | Request): string {
   const fwd = req.headers.get("x-forwarded-for");
-  return fwd?.split(",")[0]?.trim() ?? "unknown";
+  const first = fwd?.split(",")[0]?.trim();
+  return first || "unknown";
 }
 
 export async function checkRateLimit(
