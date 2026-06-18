@@ -1,6 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+import { callClaude, type AiCallCtx } from "@/lib/ai/usage";
 
 export interface OverdueTaskInput {
   id: string;
@@ -18,7 +16,8 @@ export interface OverdueAssessment {
 export async function assessOverdueTasks(
   tasks: OverdueTaskInput[],
   weatherSummary: string,
-  today: Date = new Date()
+  ctx: AiCallCtx,
+  today: Date = new Date(),
 ): Promise<OverdueAssessment[]> {
   if (tasks.length === 0) return [];
 
@@ -32,7 +31,7 @@ export async function assessOverdueTasks(
     })
     .join("\n");
 
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 2048,
     messages: [
@@ -62,9 +61,10 @@ Return a JSON array only:
 ]`,
       },
     ],
-  });
+  }, ctx);
 
-  const text = (message.content[0] as Anthropic.TextBlock).text.trim();
+  const firstBlock = message.content[0];
+  const text = (firstBlock.type === "text" ? firstBlock.text : "").trim();
   const jsonStart = text.indexOf("[");
   const jsonEnd = text.lastIndexOf("]");
   if (jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {

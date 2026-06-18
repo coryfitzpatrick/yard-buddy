@@ -147,7 +147,7 @@ export async function GET(req: NextRequest) {
 
   const overdueBySection = new Map<
     string,
-    { tasks: SectionTasks; grassType: string; zip: string }
+    { tasks: SectionTasks; grassType: string; zip: string; userId: string }
   >();
 
   for (const yard of yards) {
@@ -193,6 +193,7 @@ export async function GET(req: NextRequest) {
           tasks: newlyOverdue,
           grassType: section.grassType,
           zip: yard.zipCode,
+          userId: yard.userId,
         });
       }
     }
@@ -284,7 +285,7 @@ export async function GET(req: NextRequest) {
   }
 
   // 5. Assess newly overdue tasks per section
-  for (const [, { tasks, grassType, zip }] of overdueBySection) {
+  for (const [, { tasks, grassType, zip, userId }] of overdueBySection) {
     const weather = weatherByZip.get(zip);
     const weatherSummary = weather
       ? `${weather.temp}F, ${weather.description}, ${weather.precipitationChance}% rain`
@@ -300,7 +301,8 @@ export async function GET(req: NextRequest) {
             scheduledEnd: t.scheduledEnd!,
             grassType,
           })),
-        weatherSummary
+        weatherSummary,
+        { userId, feature: "overdue-assessor" },
       );
 
       for (const a of assessments) {
