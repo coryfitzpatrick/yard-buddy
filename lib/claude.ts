@@ -334,10 +334,11 @@ For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic wind
 async function runCritique(
   context: LawnContext,
   factsBlock: string,
-  draftJson: string
+  draftJson: string,
+  ctx: AiCallCtx,
 ): Promise<string[]> {
   try {
-    const message = await client.messages.create({
+    const message = await callClaude({
       model: CRITIQUE_MODEL,
       max_tokens: 800,
       messages: [
@@ -346,7 +347,7 @@ async function runCritique(
           content: buildCritiquePrompt({ context, factsBlock, draftJson }),
         },
       ],
-    });
+    }, { ...ctx, feature: "critique" });
     const text = (message.content[0] as Anthropic.TextBlock).text.trim();
     const cleaned = text.replace(/```(?:json)?\n?/g, "").replace(/^[^{]*/s, "").trim();
     const parsed = JSON.parse(cleaned) as { violations?: unknown };
@@ -363,9 +364,10 @@ async function runRevise(
   systemPrompt: string,
   originalUserPrompt: string,
   draftJson: string,
-  violations: string[]
+  violations: string[],
+  ctx: AiCallCtx,
 ): Promise<string> {
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
@@ -375,11 +377,14 @@ async function runRevise(
         content: buildRevisePrompt({ originalUserPrompt, draftJson, violations }),
       },
     ],
-  });
+  }, { ...ctx, feature: "critique" });
   return (message.content[0] as Anthropic.TextBlock).text.trim();
 }
 
-export async function generateRecommendations(context: LawnContext): Promise<RecommendationItem[]> {
+export async function generateRecommendations(
+  context: LawnContext,
+  ctx: AiCallCtx,
+): Promise<RecommendationItem[]> {
   const systemPrompt = buildSystemPrompt(context.grassType);
 
   const profileText = buildProfileText(context);
@@ -395,12 +400,12 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
 
   const userPrompt = buildGenerateUserPrompt(context, ragBlock, factsBlock);
 
-  const draft = await client.messages.create({
+  const draft = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
     messages: [{ role: "user", content: userPrompt }],
-  });
+  }, ctx);
 
   const draftRaw = (draft.content[0] as Anthropic.TextBlock).text.trim();
   let workingJson = extractJsonText(draftRaw);
@@ -409,13 +414,13 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
   _lastRevised = false;
 
   if (CRITIQUE_ENABLED) {
-    const violations = await runCritique(context, factsBlock, workingJson);
+    const violations = await runCritique(context, factsBlock, workingJson, ctx);
     const realViolations = violations.filter((v) => v !== "critique_call_failed");
 
     if (realViolations.length > 0) {
       _lastCritiqueFlags = realViolations;
       try {
-        const revisedRaw = await runRevise(systemPrompt, userPrompt, workingJson, realViolations);
+        const revisedRaw = await runRevise(systemPrompt, userPrompt, workingJson, realViolations, ctx);
         const revisedJson = extractJsonText(revisedRaw);
         JSON.parse(revisedJson);
         workingJson = revisedJson;

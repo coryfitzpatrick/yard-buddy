@@ -93,7 +93,7 @@ async function main(): Promise<void> {
   for (const id of SCENARIO_IDS) {
     const scenario = loadScenario(id);
     process.stdout.write(`[${id}] generating recs... `);
-    const recs = await generateRecommendations(scenario.profile);
+    const recs = await generateRecommendations(scenario.profile, { userId: null, feature: "recommendations" });
     const recsJson = JSON.stringify(recs, null, 2);
     process.stdout.write(`done. judging ${N}x: `);
 

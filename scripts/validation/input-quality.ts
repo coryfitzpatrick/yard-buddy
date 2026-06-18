@@ -111,7 +111,7 @@ export async function runInputGuardTests(): Promise<InputTestResult[]> {
   results.push(
     await runInputTest("incomplete-unknown-grass", async () => {
       const ctx: LawnContext = { grassType: "unknown", zipCode: "10001" };
-      const recs = await generateRecommendations(ctx);
+      const recs = await generateRecommendations(ctx, { userId: null, feature: "recommendations" });
       const text = JSON.stringify(recs).toLowerCase();
       const hasAcknowledgment =
         text.includes("unknown") ||
@@ -128,7 +128,7 @@ export async function runInputGuardTests(): Promise<InputTestResult[]> {
   results.push(
     await runInputTest("incomplete-no-location", async () => {
       const ctx: LawnContext = { grassType: "bermuda", zipCode: "" };
-      const recs = await generateRecommendations(ctx);
+      const recs = await generateRecommendations(ctx, { userId: null, feature: "recommendations" });
       if (!recs || recs.length === 0) {
         throw new Error("Returned empty recommendations for missing location");
       }
@@ -150,7 +150,7 @@ export async function runInputGuardTests(): Promise<InputTestResult[]> {
   results.push(
     await runInputTest("incomplete-empty-profile", async () => {
       const ctx: LawnContext = { grassType: "unknown", zipCode: "00000" };
-      const recs = await generateRecommendations(ctx);
+      const recs = await generateRecommendations(ctx, { userId: null, feature: "recommendations" });
       if (!recs || recs.length === 0) {
         throw new Error("Returned empty recommendations for empty profile");
       }

@@ -78,7 +78,7 @@ async function judgeScenario(scenario: Scenario): Promise<JudgeResult> {
   try {
     const recs = await callWithRetry(
       `generate ${scenario.id}`,
-      () => generateRecommendations(scenario.profile),
+      () => generateRecommendations(scenario.profile, { userId: null, feature: "recommendations" }),
     );
     const responseText = JSON.stringify(recs, null, 2);
 
