@@ -40,6 +40,7 @@ model User {
   yards                Yard[]
   passwordResets       PasswordResetToken[]
   emailChangeRequests  EmailChangeRequest[]
+  aiUsageEvents        AiUsageEvent[]
 }
 
 model Account {
@@ -229,4 +230,23 @@ model GddRecord {
   yard Yard @relation(fields: [yardId], references: [id], onDelete: Cascade)
 
   @@unique([yardId, year])
+}
+
+model AiUsageEvent {
+  id                     String   @id @default(cuid())
+  userId                 String?
+  feature                String
+  model                  String
+  inputTokens            Int      @default(0)
+  outputTokens           Int      @default(0)
+  cacheReadTokens        Int      @default(0)
+  cacheCreationTokens    Int      @default(0)
+  costUsd                Decimal  @db.Decimal(10, 6)
+  success                Boolean  @default(true)
+  errorCode              String?
+  createdAt              DateTime @default(now())
+  user                   User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
 }
