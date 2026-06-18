@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
       streetAddress: section.yard.streetAddress,
       sunExposure: null, // YardSection.sunExposure not yet in schema; passes null rather than wrong areaType
       weatherData: enrichedWeather,
-    });
+    }, { userId: session.user.id, feature: "analyze" });
 
     result.recommendations = deduplicateRecommendations(result.recommendations);
 

@@ -6,6 +6,7 @@ import { buildSystemPrompt } from "@/lib/prompts";
 import { retrieveRelevant, formatChunksForPrompt, inferTopicHints } from "@/lib/rag";
 import { getRelevantFacts } from "@/lib/facts";
 import { buildCritiquePrompt, buildRevisePrompt } from "@/lib/prompts/critique";
+import { callClaude, type AiCallCtx } from "@/lib/ai/usage";
 import type { Base64Image } from "../scripts/validation/load-photos";
 
 const CRITIQUE_MODEL = process.env.CRITIQUE_MODEL || "claude-haiku-4-5-20251001";
@@ -436,7 +437,8 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
 
 export async function analyzeImages(
   photos: Array<{ url: string; kind: string }>,
-  context: LawnContext
+  context: LawnContext,
+  ctx: AiCallCtx,
 ): Promise<AnalysisResult> {
   const { promptLabelFor } = await import("@/lib/photo-kinds");
   // Interleave a short text label before each image so Claude knows the
@@ -498,7 +500,7 @@ ${context.currentRoutine ? `- Current Routine: <current_routine>${context.curren
 
 Now analyze the lawn photos above and return the JSON object.`;
 
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
@@ -514,7 +516,7 @@ Now analyze the lawn photos above and return the JSON object.`;
         ],
       },
     ],
-  });
+  }, ctx);
 
   const text = (message.content[0] as Anthropic.TextBlock).text.trim();
   const cleaned = text
@@ -533,7 +535,8 @@ Now analyze the lawn photos above and return the JSON object.`;
 
 export async function analyzeImagesBase64(
   base64Images: Base64Image[],
-  context: LawnContext
+  context: LawnContext,
+  ctx: AiCallCtx,
 ): Promise<AnalysisResult> {
   const systemPrompt = context.weatherData
     ? buildSectionAnalysisPrompt({
@@ -582,7 +585,7 @@ ${context.notes ? `- Notes: ${context.notes.slice(0, 500)}` : ""}
 
 Now analyze the lawn photos above and return the JSON object described.`;
 
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
@@ -596,7 +599,7 @@ Now analyze the lawn photos above and return the JSON object described.`;
         ],
       },
     ],
-  });
+  }, ctx);
 
   const text = (message.content[0] as Anthropic.TextBlock).text.trim();
   const cleaned = text

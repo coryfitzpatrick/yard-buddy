@@ -90,7 +90,10 @@ async function main() {
     try {
       const photos = loadPhotosForScenario(scenario.id, scenario.photos);
       photoMap.set(scenario.id, photos);
-      const result = await analyzeImagesBase64(photos, scenario.profile);
+      const result = await analyzeImagesBase64(photos, scenario.profile, {
+        userId: null,
+        feature: "analyze",
+      });
       aiResults.set(scenario.id, result);
       const responseText = JSON.stringify(result);
       for (const rule of IMAGE_RULES) {
