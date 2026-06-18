@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import crypto from "crypto";
 import type { ScheduledReminder } from "@/lib/cron/reminder-scheduler";
+import type { CostReport, UserCostRow } from "@/lib/cost-report";
 import { DAY_MS } from "@/lib/time";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
@@ -351,4 +352,56 @@ export function buildCardExpiringEmail(opts: {
     subject: `Your Yard Analyzer payment card (ending ${cardLast4}) expires ${expiryStr}`,
     html,
   };
+}
+
+function fmtUsd(n: number): string {
+  const sign = n < 0 ? "-" : "";
+  return `${sign}$${Math.abs(n).toFixed(2)}`;
+}
+
+function rowHtml(r: UserCostRow): string {
+  const marginColor = r.marginUsd < 0 ? "#b91c1c" : "#15803d";
+  return `<tr>
+    <td style="padding:4px 8px;">${r.email}</td>
+    <td style="padding:4px 8px;">${r.plan}</td>
+    <td style="padding:4px 8px;text-align:right;">${r.calls}</td>
+    <td style="padding:4px 8px;text-align:right;">${fmtUsd(r.costUsd)}</td>
+    <td style="padding:4px 8px;text-align:right;">${fmtUsd(r.revenueUsd)}</td>
+    <td style="padding:4px 8px;text-align:right;color:${marginColor};">${fmtUsd(r.marginUsd)}</td>
+  </tr>`;
+}
+
+export function buildCostReportEmail(report: CostReport): { subject: string; html: string } {
+  const subject = `Cost report - ${report.month}`;
+  if (report.rows.length === 0) {
+    const html = `<div style="font-family:system-ui,sans-serif;">
+      <h2>Cost report - ${report.month}</h2>
+      <p>No events recorded for this month.</p>
+    </div>`;
+    return { subject, html };
+  }
+  const tableRows = report.rows.map(rowHtml).join("");
+  const summaryColor = report.totals.netUsd < 0 ? "#b91c1c" : "#15803d";
+  const html = `<div style="font-family:system-ui,sans-serif;color:#111;">
+    <h2 style="margin-bottom:4px;">Cost report - ${report.month}</h2>
+    <p style="color:#444;margin-top:0;">
+      Net margin: <strong style="color:${summaryColor};">${fmtUsd(report.totals.netUsd)}</strong>
+      &nbsp;(Revenue ${fmtUsd(report.totals.revenueUsd)} &middot; Cost ${fmtUsd(report.totals.costUsd)})<br>
+      Users underwater: <strong>${report.totals.usersUnderwater} of ${report.rows.length}</strong>
+    </p>
+    <table style="border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:#f3f4f6;">
+          <th style="padding:4px 8px;text-align:left;">Email</th>
+          <th style="padding:4px 8px;text-align:left;">Plan</th>
+          <th style="padding:4px 8px;text-align:right;">Calls</th>
+          <th style="padding:4px 8px;text-align:right;">Cost</th>
+          <th style="padding:4px 8px;text-align:right;">Revenue</th>
+          <th style="padding:4px 8px;text-align:right;">Margin</th>
+        </tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+  </div>`;
+  return { subject, html };
 }
