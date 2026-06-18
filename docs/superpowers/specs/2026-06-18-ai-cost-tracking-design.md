@@ -87,13 +87,12 @@ export type AiFeature =
 export type AiCallCtx = { userId: string | null; feature: AiFeature };
 
 export async function callClaude(
-  client: Anthropic,
-  params: Anthropic.MessageCreateParams,
+  params: Omit<Anthropic.MessageCreateParams, "stream"> & { stream?: false },
   ctx: AiCallCtx,
 ): Promise<Anthropic.Message> {
   try {
     const response = await client.messages.create(params);
-    void recordUsage({
+    await recordUsage({
       ...ctx,
       model: response.model,
       usage: response.usage,
@@ -101,7 +100,7 @@ export async function callClaude(
     });
     return response;
   } catch (err) {
-    void recordUsage({
+    await recordUsage({
       ...ctx,
       model: typeof params.model === "string" ? params.model : "unknown",
       usage: null,
@@ -114,8 +113,16 @@ export async function callClaude(
 ```
 
 - `recordUsage()` does the DB write inside its own try/catch and `console.warn`s
-  on failure. It is fire-and-forget (`void ...`); the user's API request never
-  blocks on logging and never fails because logging failed.
+  on failure. The wrapper `await`s the write before returning so cost events
+  are not lost when the Vercel serverless / Edge runtime freezes the handler
+  the moment a response is sent. A single indexed `INSERT` adds tens of
+  milliseconds at most — invisible against a 20-40s analyze call — and the
+  inner try/catch still guarantees the user's request never fails because
+  logging failed.
+- The `params` type omits the `stream` field. The SDK returns a `Stream` when
+  it's `true`, which would invalidate the `as Message` cast. None of our call
+  sites stream; if that ever changes, the wrapper signature needs widening
+  deliberately.
 - The wrapper re-throws Anthropic errors so existing call-site error handling
   (`invalid_photos`, `analysis_failed`, etc.) is unchanged.
 - Failed calls produce a row with `success: false`, zeros for token counts (or
