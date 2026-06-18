@@ -82,7 +82,8 @@
 
 - [x] **5.1 — Lift `SoilQuickEdit` state up**; remove `forwardRef` + `useImperativeHandle` for a single caller.
   - Done in: `0e6656f` — `useSoilQuickEdit` hook owns the soil form state and `saveIfDirty`. Analyze page calls the hook and passes its return to a controlled `SoilQuickEdit`; the `soilRef` and the per-section IIFE are gone. Section-change reset moved from `useEffect` to React's adjust-state-during-render pattern, which also clears the cascading-renders lint that surfaced once the linter recognized the hook.
-- [ ] **5.2 — Replace `router.refresh()` with server actions + `revalidatePath`** (9 call sites).
+- [x] **5.2 — Replace `router.refresh()` with server actions + `revalidatePath`** (9 call sites).
+  - Done in: `8098937` — added `app/_actions/{tasks,yards,sections,terms}.ts`; rewired TaskList (status + overdue reset), SectionCard, YardDeleteButton, YardEditForm, SplitYardForm, SectionForm (create + edit), and the terms-accept page. The two `router.refresh()` calls in `YardSetupForm` were post-navigation no-ops and just deleted. Dead routes removed: `/api/auth/accept-terms`, `/api/tasks/[id]`, `/api/yard/[id]/split`, plus the `DELETE` methods on `/api/yard/[id]` and the section route. Net -71 lines.
 - [ ] **5.3 — Memoize TaskList priority groups** (`TaskList.tsx:307-322`).
 - [ ] **5.4 — Move magic time constants to `lib/time.ts`** (`DAY_MS`, `DAYS_30_MS`, `TRIAL_GRACE_DAYS`).
 - [x] **5.5 — Add a second prompt cache breakpoint** in `analyzeImages*` covering the static JSON-schema block, not just the system prompt.
