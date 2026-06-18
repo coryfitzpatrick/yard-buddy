@@ -661,7 +661,7 @@ git commit -m "Route recommendations through callClaude"
 
 ## Task 7: Convert the `watering` call sites
 
-There are two watering calls in `lib/claude.ts`: a Sonnet one (~line 585) and a Haiku one (`generateWateringRecommendation`, ~line 666). Both get the `watering` tag.
+**Note (corrected during execution):** the plan originally said two watering calls existed; reading the code shows the "Sonnet ~585" call was actually `analyzeImagesBase64` (already converted in Task 4). Only `generateWateringRecommendation` (Haiku, dead code with zero callers) is a real watering site. The plan also missed `validateLawnImages` (Haiku, live, called from the analyze route). Task 7 as executed bundled both remaining `lib/claude.ts` Claude calls: `validateLawnImages` tagged `"analyze"` (it's a precondition of the analyze flow) and `generateWateringRecommendation` tagged `"watering"` (defensive conversion so a future revival inherits cost tracking).
 
 **Files:**
 - Modify: `lib/claude.ts`

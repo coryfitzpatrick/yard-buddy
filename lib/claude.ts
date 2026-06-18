@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import type Anthropic from "@anthropic-ai/sdk";
 import { GrassType, AnalysisResult, RecommendationItem } from "@/types";
 import { buildSectionAnalysisPrompt } from "@/lib/ai/analysis-prompt";
 import { buildWateringPrompt, WateringPromptOpts } from "@/lib/ai/watering-prompt";
