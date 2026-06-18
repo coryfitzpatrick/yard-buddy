@@ -89,7 +89,14 @@ export default async function DashboardPage() {
     })),
   }));
 
-  const weatherRefreshedAt = yards[0]?.weatherRefreshedAt?.toISOString() ?? null;
+  // The most recent refresh across all yards. Sending the per-yard array would
+  // be more accurate, but the consuming widget only shows one timestamp - and
+  // the freshest one is what the user actually wants to see.
+  const weatherRefreshedAt = yards
+    .map((y: (typeof yards)[number]) => y.weatherRefreshedAt)
+    .filter((d): d is Date => d != null)
+    .reduce<Date | null>((latest, d) => (latest && latest >= d ? latest : d), null)
+    ?.toISOString() ?? null;
 
   const allSections = yards.flatMap((y: (typeof yards)[number]) =>
     y.sections.map((s: (typeof yards)[number]["sections"][number]) => ({
