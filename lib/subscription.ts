@@ -1,3 +1,5 @@
+import { DAY_MS, TRIAL_GRACE_DAYS } from "@/lib/time";
+
 // "admin" is a hidden, unlimited plan — not exposed on the pricing page or in
 // Stripe checkout. Assigned manually via scripts/grant-pro.ts for demo accounts
 // and internal use.
@@ -81,11 +83,11 @@ export function getDaysUntilDeletion(user: SubscriptionUser): number | null {
   if (!isEffectivelyExpired(user)) return null;
   const expiryDate = user.trialEndsAt ?? user.currentPeriodEnd;
   if (!expiryDate) return null;
-  const deleteAt = new Date(expiryDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-  return Math.ceil((deleteAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+  const deleteAt = new Date(expiryDate.getTime() + TRIAL_GRACE_DAYS * DAY_MS);
+  return Math.ceil((deleteAt.getTime() - Date.now()) / DAY_MS);
 }
 
 export function daysUntilTrialEnd(trialEndsAt: Date | null | undefined): number | null {
   if (!trialEndsAt) return null;
-  return Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
+  return Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / DAY_MS));
 }

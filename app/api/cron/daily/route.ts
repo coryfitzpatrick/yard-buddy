@@ -8,6 +8,7 @@ import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
 import { resend, buildDigestEmail, buildTrialReminderEmail, buildCardExpiringEmail, generateUnsubscribeToken } from "@/lib/email";
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
 import { stripe } from "@/lib/stripe";
+import { DAY_MS, DAYS_30_MS } from "@/lib/time";
 import Stripe from "stripe";
 
 function addDays(date: Date, days: number): Date {
@@ -460,7 +461,7 @@ export async function GET(req: NextRequest) {
   }
 
   // === Expired account data deletion ===
-  const deletionCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const deletionCutoff = new Date(Date.now() - DAYS_30_MS);
 
   const usersToDelete = await db.user.findMany({
     where: {
@@ -517,8 +518,8 @@ export async function GET(req: NextRequest) {
   }
 
   // === Card expiry warning ===
-  const expiryWarnCutoff = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000);
-  const upcomingBillingCutoff = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  const expiryWarnCutoff = new Date(Date.now() - 25 * DAY_MS);
+  const upcomingBillingCutoff = new Date(Date.now() + DAYS_30_MS);
 
   const activeSubscribers = await db.user.findMany({
     where: {
@@ -597,7 +598,7 @@ export async function GET(req: NextRequest) {
 
   // Purge rate limit attempts older than 24h
   await db.rateLimitAttempt.deleteMany({
-    where: { createdAt: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+    where: { createdAt: { lt: new Date(Date.now() - DAY_MS) } },
   });
 
   return NextResponse.json({ ok: true, processed: userMap.size, deletedAccounts: deletedCount });

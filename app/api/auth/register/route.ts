@@ -3,9 +3,10 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { registerSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { DAY_MS, HOUR_MS } from "@/lib/time";
 
 export async function POST(req: NextRequest) {
-  const { limited } = await checkRateLimit(`register:${getClientIp(req)}`, 5, 60 * 60 * 1000);
+  const { limited } = await checkRateLimit(`register:${getClientIp(req)}`, 5, HOUR_MS);
   if (limited) {
     return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
       name: parsed.data.name,
       email: parsed.data.email,
       passwordHash,
-      trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      trialEndsAt: new Date(Date.now() + 14 * DAY_MS),
       termsAcceptedAt: new Date(),
     },
   });

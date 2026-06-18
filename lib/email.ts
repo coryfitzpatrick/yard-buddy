@@ -1,12 +1,13 @@
 import { Resend } from "resend";
 import crypto from "crypto";
 import type { ScheduledReminder } from "@/lib/cron/reminder-scheduler";
+import { DAY_MS } from "@/lib/time";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
 
 // Maximum age accepted for an unsubscribe token. A leaked link past this point
 // won't silently disable a user's notifications.
-const UNSUBSCRIBE_TOKEN_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+const UNSUBSCRIBE_TOKEN_MAX_AGE_MS = 90 * DAY_MS;
 
 export function generateUnsubscribeToken(userId: string): string {
   const issuedAt = Date.now().toString();
