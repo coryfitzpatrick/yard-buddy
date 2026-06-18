@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import Anthropic from "@anthropic-ai/sdk";
 import { GrassType } from "@/types";
 import { isOwnedLawnPhotoUrl } from "@/lib/storage-url";
 import { checkRateLimit } from "@/lib/rate-limit";
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+import { callClaude } from "@/lib/ai/usage";
 
 const VALID_GRASS_TYPES: GrassType[] = [
   "bermuda", "kentucky_bluegrass", "tall_fescue", "fine_fescue",
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid_image_url" }, { status: 400 });
   }
 
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 500,
     messages: [{
@@ -49,7 +47,7 @@ Return JSON only, no other text:
         },
       ],
     }],
-  });
+  }, { userId: session.user.id, feature: "identify-grass" });
 
   const text = (message.content[0] as { type: string; text: string }).text;
   const match = text.match(/\{[\s\S]*\}/);
