@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,15 +18,32 @@ export interface SoilInitialValues {
   soilTestedAt: string | null; // ISO date string
 }
 
-interface Props extends SoilInitialValues {
+export interface UseSoilQuickEditArgs extends SoilInitialValues {
   yardId: string;
   sectionId: string;
 }
 
-export interface SoilQuickEditHandle {
-  // Persists any dirty soil values; resolves true on success or no-op,
-  // false if a PATCH was attempted and failed. The caller can decide
-  // whether to still proceed with analysis on failure.
+export interface SoilQuickEditState {
+  ph: string;
+  setPh: (v: string) => void;
+  moisture: "dry" | "moderate" | "moist" | "";
+  setMoisture: (v: "dry" | "moderate" | "moist" | "") => void;
+  notesValue: string;
+  setNotesValue: (v: string) => void;
+  nitrogen: string;
+  setNitrogen: (v: string) => void;
+  phosphorus: string;
+  setPhosphorus: (v: string) => void;
+  potassium: string;
+  setPotassium: (v: string) => void;
+  organicMatter: string;
+  setOrganicMatter: (v: string) => void;
+  source: string;
+  setSource: (v: string) => void;
+  testedAt: string;
+  setTestedAt: (v: string) => void;
+  showTestResults: boolean;
+  toggleTestResults: () => void;
   saveIfDirty: () => Promise<boolean>;
 }
 
@@ -41,8 +58,8 @@ function isoToDateInput(iso: string | null): string {
   return iso.slice(0, 10);
 }
 
-export const SoilQuickEdit = forwardRef<SoilQuickEditHandle, Props>(function SoilQuickEdit(
-  {
+export function useSoilQuickEdit(args: UseSoilQuickEditArgs): SoilQuickEditState {
+  const {
     yardId,
     sectionId,
     soilPh,
@@ -54,77 +71,110 @@ export const SoilQuickEdit = forwardRef<SoilQuickEditHandle, Props>(function Soi
     organicMatterPct,
     soilTestSource,
     soilTestedAt,
-  },
-  ref,
-) {
+  } = args;
+
   const [ph, setPh] = useState(numToStr(soilPh));
   const [moisture, setMoisture] = useState<"dry" | "moderate" | "moist" | "">(soilMoisture ?? "");
   const [notesValue, setNotesValue] = useState(notes ?? "");
-  const [n, setN] = useState(numToStr(nitrogenPpm));
-  const [p, setP] = useState(numToStr(phosphorusPpm));
-  const [k, setK] = useState(numToStr(potassiumPpm));
-  const [om, setOm] = useState(numToStr(organicMatterPct));
+  const [nitrogen, setNitrogen] = useState(numToStr(nitrogenPpm));
+  const [phosphorus, setPhosphorus] = useState(numToStr(phosphorusPpm));
+  const [potassium, setPotassium] = useState(numToStr(potassiumPpm));
+  const [organicMatter, setOrganicMatter] = useState(numToStr(organicMatterPct));
   const [source, setSource] = useState(soilTestSource ?? "");
   const [testedAt, setTestedAt] = useState(isoToDateInput(soilTestedAt));
-
   const hasTestData = nitrogenPpm != null || phosphorusPpm != null || potassiumPpm != null
     || organicMatterPct != null || soilTestSource != null || soilTestedAt != null;
   const [showTestResults, setShowTestResults] = useState(hasTestData);
 
-  // Reset local state when the parent swaps in a different section.
-  useEffect(() => {
+  // Reset on section change: adjusting state during render rather than in an
+  // effect so React applies the reset before painting the new section.
+  const [prevSectionId, setPrevSectionId] = useState(sectionId);
+  if (prevSectionId !== sectionId) {
+    setPrevSectionId(sectionId);
     setPh(numToStr(soilPh));
     setMoisture(soilMoisture ?? "");
     setNotesValue(notes ?? "");
-    setN(numToStr(nitrogenPpm));
-    setP(numToStr(phosphorusPpm));
-    setK(numToStr(potassiumPpm));
-    setOm(numToStr(organicMatterPct));
+    setNitrogen(numToStr(nitrogenPpm));
+    setPhosphorus(numToStr(phosphorusPpm));
+    setPotassium(numToStr(potassiumPpm));
+    setOrganicMatter(numToStr(organicMatterPct));
     setSource(soilTestSource ?? "");
     setTestedAt(isoToDateInput(soilTestedAt));
-  }, [sectionId, soilPh, soilMoisture, notes, nitrogenPpm, phosphorusPpm, potassiumPpm, organicMatterPct, soilTestSource, soilTestedAt]);
+    setShowTestResults(hasTestData);
+  }
 
-  useImperativeHandle(ref, () => ({
-    async saveIfDirty() {
-      const current = {
-        soilPh: strToNumOrNull(ph),
-        soilMoisture: (moisture || null) as "dry" | "moderate" | "moist" | null,
-        notes: notesValue || null,
-        nitrogenPpm: strToNumOrNull(n),
-        phosphorusPpm: strToNumOrNull(p),
-        potassiumPpm: strToNumOrNull(k),
-        organicMatterPct: strToNumOrNull(om),
-        soilTestSource: source || null,
-        soilTestedAt: testedAt || null,
-      };
-      const dirty =
-        current.soilPh !== soilPh ||
-        current.soilMoisture !== soilMoisture ||
-        current.notes !== notes ||
-        current.nitrogenPpm !== nitrogenPpm ||
-        current.phosphorusPpm !== phosphorusPpm ||
-        current.potassiumPpm !== potassiumPpm ||
-        current.organicMatterPct !== organicMatterPct ||
-        current.soilTestSource !== soilTestSource ||
-        current.soilTestedAt !== isoToDateInput(soilTestedAt);
-      if (!dirty) return true;
-      try {
-        const res = await fetch(`/api/yard/${yardId}/sections/${sectionId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(current),
-        });
-        return res.ok;
-      } catch {
-        return false;
-      }
-    },
-  }), [
-    ph, moisture, notesValue, n, p, k, om, source, testedAt,
+  const toggleTestResults = useCallback(() => setShowTestResults((v) => !v), []);
+
+  const saveIfDirty = useCallback(async (): Promise<boolean> => {
+    if (!yardId || !sectionId) return true;
+    const current = {
+      soilPh: strToNumOrNull(ph),
+      soilMoisture: (moisture || null) as "dry" | "moderate" | "moist" | null,
+      notes: notesValue || null,
+      nitrogenPpm: strToNumOrNull(nitrogen),
+      phosphorusPpm: strToNumOrNull(phosphorus),
+      potassiumPpm: strToNumOrNull(potassium),
+      organicMatterPct: strToNumOrNull(organicMatter),
+      soilTestSource: source || null,
+      soilTestedAt: testedAt || null,
+    };
+    const dirty =
+      current.soilPh !== soilPh ||
+      current.soilMoisture !== soilMoisture ||
+      current.notes !== notes ||
+      current.nitrogenPpm !== nitrogenPpm ||
+      current.phosphorusPpm !== phosphorusPpm ||
+      current.potassiumPpm !== potassiumPpm ||
+      current.organicMatterPct !== organicMatterPct ||
+      current.soilTestSource !== soilTestSource ||
+      current.soilTestedAt !== isoToDateInput(soilTestedAt);
+    if (!dirty) return true;
+    try {
+      const res = await fetch(`/api/yard/${yardId}/sections/${sectionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(current),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }, [
+    yardId, sectionId,
+    ph, moisture, notesValue, nitrogen, phosphorus, potassium, organicMatter, source, testedAt,
     soilPh, soilMoisture, notes, nitrogenPpm, phosphorusPpm, potassiumPpm,
     organicMatterPct, soilTestSource, soilTestedAt,
-    yardId, sectionId,
   ]);
+
+  return {
+    ph, setPh,
+    moisture, setMoisture,
+    notesValue, setNotesValue,
+    nitrogen, setNitrogen,
+    phosphorus, setPhosphorus,
+    potassium, setPotassium,
+    organicMatter, setOrganicMatter,
+    source, setSource,
+    testedAt, setTestedAt,
+    showTestResults,
+    toggleTestResults,
+    saveIfDirty,
+  };
+}
+
+export function SoilQuickEdit({ state }: { state: SoilQuickEditState }) {
+  const {
+    ph, setPh,
+    moisture, setMoisture,
+    notesValue, setNotesValue,
+    nitrogen, setNitrogen,
+    phosphorus, setPhosphorus,
+    potassium, setPotassium,
+    organicMatter, setOrganicMatter,
+    source, setSource,
+    testedAt, setTestedAt,
+    showTestResults, toggleTestResults,
+  } = state;
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
@@ -173,7 +223,7 @@ export const SoilQuickEdit = forwardRef<SoilQuickEditHandle, Props>(function Soi
       {/* Soil test results — collapsible since most users won't have these */}
       <button
         type="button"
-        onClick={() => setShowTestResults((v) => !v)}
+        onClick={toggleTestResults}
         className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900 mt-2"
       >
         {showTestResults ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -185,19 +235,19 @@ export const SoilQuickEdit = forwardRef<SoilQuickEditHandle, Props>(function Soi
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="space-y-1">
               <Label className="text-xs text-gray-600">Nitrogen (ppm)</Label>
-              <Input type="number" min="0" max="1000" placeholder="20" value={n} onChange={(e) => setN(e.target.value)} />
+              <Input type="number" min="0" max="1000" placeholder="20" value={nitrogen} onChange={(e) => setNitrogen(e.target.value)} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-gray-600">Phosphorus (ppm)</Label>
-              <Input type="number" min="0" max="2000" placeholder="30" value={p} onChange={(e) => setP(e.target.value)} />
+              <Input type="number" min="0" max="2000" placeholder="30" value={phosphorus} onChange={(e) => setPhosphorus(e.target.value)} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-gray-600">Potassium (ppm)</Label>
-              <Input type="number" min="0" max="2000" placeholder="100" value={k} onChange={(e) => setK(e.target.value)} />
+              <Input type="number" min="0" max="2000" placeholder="100" value={potassium} onChange={(e) => setPotassium(e.target.value)} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-gray-600">Organic matter (%)</Label>
-              <Input type="number" min="0" max="100" step="0.1" placeholder="3" value={om} onChange={(e) => setOm(e.target.value)} />
+              <Input type="number" min="0" max="100" step="0.1" placeholder="3" value={organicMatter} onChange={(e) => setOrganicMatter(e.target.value)} />
             </div>
           </div>
 
@@ -220,4 +270,4 @@ export const SoilQuickEdit = forwardRef<SoilQuickEditHandle, Props>(function Soi
       )}
     </div>
   );
-});
+}

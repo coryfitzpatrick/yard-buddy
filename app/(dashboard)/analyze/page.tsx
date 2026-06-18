@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PhotoUpload, type PhotoUploadHandle, type UploadedPhoto } from "@/components/analysis/PhotoUpload";
 import { AnalysisResults } from "@/components/analysis/AnalysisResults";
-import { SoilQuickEdit, type SoilQuickEditHandle } from "@/components/analysis/SoilQuickEdit";
+import { SoilQuickEdit, useSoilQuickEdit } from "@/components/analysis/SoilQuickEdit";
 import type { AnalysisResult, AreaType } from "@/types";
 import { Loader2, ArrowRight, Plus, Camera } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,7 +43,6 @@ export default function AnalyzePage() {
   const [analysisLimitReached, setAnalysisLimitReached] = useState(false);
   const [invalidPhotos, setInvalidPhotos] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
-  const soilRef = useRef<SoilQuickEditHandle | null>(null);
   const photoUploadRef = useRef<PhotoUploadHandle | null>(null);
   const [photoCount, setPhotoCount] = useState(0);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
@@ -70,6 +69,21 @@ export default function AnalyzePage() {
   }, [searchParams]);
 
   const selectedYard = yards.find((y) => y.id === selectedYardId) ?? null;
+  const selectedSection = selectedYard?.sections.find((s) => s.id === selectedSectionId) ?? null;
+
+  const soilState = useSoilQuickEdit({
+    yardId: selectedYard?.id ?? "",
+    sectionId: selectedSection?.id ?? "",
+    soilPh: selectedSection?.soilPh ?? null,
+    soilMoisture: selectedSection?.soilMoisture ?? null,
+    notes: selectedSection?.notes ?? null,
+    nitrogenPpm: selectedSection?.nitrogenPpm ?? null,
+    phosphorusPpm: selectedSection?.phosphorusPpm ?? null,
+    potassiumPpm: selectedSection?.potassiumPpm ?? null,
+    organicMatterPct: selectedSection?.organicMatterPct ?? null,
+    soilTestSource: selectedSection?.soilTestSource ?? null,
+    soilTestedAt: selectedSection?.soilTestedAt ?? null,
+  });
 
   function handleYardSelect(yardId: string) {
     if (yardId === selectedYardId) return;
@@ -93,7 +107,7 @@ export default function AnalyzePage() {
     setAnalysisLimitReached(false);
     // Persist any pending soil edits first so the analyze route sees the new
     // values. Best-effort: failure here doesn't block the analysis itself.
-    await soilRef.current?.saveIfDirty();
+    await soilState.saveIfDirty();
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
@@ -236,65 +250,48 @@ export default function AnalyzePage() {
             </div>
           )}
 
-          {selectedSectionId && selectedYard && (() => {
-            const sec = selectedYard.sections.find((s) => s.id === selectedSectionId);
-            if (!sec) return null;
-            return (
-              <div className="space-y-4">
-                <PhotoUpload
-                  ref={photoUploadRef}
-                  hideSubmitButton
-                  onUploaded={handleUploaded}
-                  onSelectionChange={setPhotoCount}
-                  analyzing={analyzing}
-                  onReset={cancelAnalysis}
-                />
-                <SoilQuickEdit
-                  ref={soilRef}
-                  yardId={selectedYard.id}
-                  sectionId={sec.id}
-                  soilPh={sec.soilPh}
-                  soilMoisture={sec.soilMoisture}
-                  notes={sec.notes}
-                  nitrogenPpm={sec.nitrogenPpm}
-                  phosphorusPpm={sec.phosphorusPpm}
-                  potassiumPpm={sec.potassiumPpm}
-                  organicMatterPct={sec.organicMatterPct}
-                  soilTestSource={sec.soilTestSource}
-                  soilTestedAt={sec.soilTestedAt}
-                />
-                {!analyzing && (
-                  <div className="flex">
-                    <span
-                      title={photoCount === 0 ? "Add at least one photo to analyze" : undefined}
-                      className="inline-block"
+          {selectedSection && (
+            <div className="space-y-4">
+              <PhotoUpload
+                ref={photoUploadRef}
+                hideSubmitButton
+                onUploaded={handleUploaded}
+                onSelectionChange={setPhotoCount}
+                analyzing={analyzing}
+                onReset={cancelAnalysis}
+              />
+              <SoilQuickEdit state={soilState} />
+              {!analyzing && (
+                <div className="flex">
+                  <span
+                    title={photoCount === 0 ? "Add at least one photo to analyze" : undefined}
+                    className="inline-block"
+                  >
+                    <Button
+                      onClick={async () => {
+                        setUploadingPhotos(true);
+                        try {
+                          await photoUploadRef.current?.upload();
+                        } finally {
+                          setUploadingPhotos(false);
+                        }
+                      }}
+                      disabled={photoCount === 0 || uploadingPhotos}
+                      className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:text-gray-500"
                     >
-                      <Button
-                        onClick={async () => {
-                          setUploadingPhotos(true);
-                          try {
-                            await photoUploadRef.current?.upload();
-                          } finally {
-                            setUploadingPhotos(false);
-                          }
-                        }}
-                        disabled={photoCount === 0 || uploadingPhotos}
-                        className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:text-gray-500"
-                      >
-                        {uploadingPhotos ? (
-                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</>
-                        ) : photoCount === 0 ? (
-                          "Analyze"
-                        ) : (
-                          `Analyze ${photoCount} Photo${photoCount > 1 ? "s" : ""}`
-                        )}
-                      </Button>
-                    </span>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
+                      {uploadingPhotos ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</>
+                      ) : photoCount === 0 ? (
+                        "Analyze"
+                      ) : (
+                        `Analyze ${photoCount} Photo${photoCount > 1 ? "s" : ""}`
+                      )}
+                    </Button>
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {analyzing && (
             <div className="flex flex-col items-center gap-3 py-8">
