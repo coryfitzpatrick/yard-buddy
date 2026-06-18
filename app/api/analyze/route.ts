@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
 
   let validation: { valid: boolean; feedback: string | null };
   try {
-    validation = await validateLawnImages(imageUrls);
+    validation = await validateLawnImages(imageUrls, { userId: session.user.id, feature: "analyze" });
   } catch {
     validation = { valid: true, feedback: null };
   }
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
       streetAddress: section.yard.streetAddress,
       sunExposure: null, // YardSection.sunExposure not yet in schema; passes null rather than wrong areaType
       weatherData: enrichedWeather,
-    });
+    }, { userId: session.user.id, feature: "analyze" });
 
     result.recommendations = deduplicateRecommendations(result.recommendations);
 

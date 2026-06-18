@@ -84,7 +84,7 @@ async function main() {
   for (const scenario of scenarios) {
     process.stdout.write(`  ${scenario.id}... `);
     try {
-      const recs = await generateRecommendations(scenario.profile);
+      const recs = await generateRecommendations(scenario.profile, { userId: null, feature: "recommendations" });
       const responseText = JSON.stringify(recs);
       critiqueMeta[scenario.id] = getLastCritiqueMetadata();
       for (const rule of ALL_RULES) {

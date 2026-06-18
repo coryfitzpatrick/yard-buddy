@@ -39,18 +39,21 @@ export async function GET(req: NextRequest) {
 
   try {
     const today = new Date();
-    const recommendations = await generateRecommendations({
-      grassType: section.grassType as import("@/types").GrassType,
-      zipCode: section.yard.zipCode,
-      areaType: section.areaType,
-      yardSizeSqft: section.yardSizeSqft,
-      spreaderType: section.yard.spreaderType,
-      soilPh: section.soilPh,
-      soilMoisture: section.soilMoisture ?? undefined,
-      weatherSummary,
-      forecastText,
-      notes: section.notes,
-    });
+    const recommendations = await generateRecommendations(
+      {
+        grassType: section.grassType as import("@/types").GrassType,
+        zipCode: section.yard.zipCode,
+        areaType: section.areaType,
+        yardSizeSqft: section.yardSizeSqft,
+        spreaderType: section.yard.spreaderType,
+        soilPh: section.soilPh,
+        soilMoisture: section.soilMoisture ?? undefined,
+        weatherSummary,
+        forecastText,
+        notes: section.notes,
+      },
+      { userId: session.user.id, feature: "recommendations" },
+    );
 
     await db.lawnTask.createMany({
       data: recommendations.map((r) => ({

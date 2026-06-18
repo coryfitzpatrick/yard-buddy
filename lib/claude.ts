@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import type Anthropic from "@anthropic-ai/sdk";
 import { GrassType, AnalysisResult, RecommendationItem } from "@/types";
 import { buildSectionAnalysisPrompt } from "@/lib/ai/analysis-prompt";
 import { buildWateringPrompt, WateringPromptOpts } from "@/lib/ai/watering-prompt";
@@ -6,6 +6,7 @@ import { buildSystemPrompt } from "@/lib/prompts";
 import { retrieveRelevant, formatChunksForPrompt, inferTopicHints } from "@/lib/rag";
 import { getRelevantFacts } from "@/lib/facts";
 import { buildCritiquePrompt, buildRevisePrompt } from "@/lib/prompts/critique";
+import { callClaude, type AiCallCtx } from "@/lib/ai/usage";
 import type { Base64Image } from "../scripts/validation/load-photos";
 
 const CRITIQUE_MODEL = process.env.CRITIQUE_MODEL || "claude-haiku-4-5-20251001";
@@ -61,8 +62,6 @@ export function buildDataGapWarning(gaps: DataGapField[]): string | null {
   }
   return `You only shared photos and your ZIP. These recommendations are general for your climate and what's visible — sharing a soil test, grass type, yard size, and notes about specific problems would tighten them considerably. Missing fields: ${gaps.join(', ')}.`;
 }
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export interface LawnContext {
   grassType: GrassType;
@@ -333,10 +332,11 @@ For scheduledStartDays/scheduledEndDays: use the forecast to pick realistic wind
 async function runCritique(
   context: LawnContext,
   factsBlock: string,
-  draftJson: string
+  draftJson: string,
+  ctx: AiCallCtx,
 ): Promise<string[]> {
   try {
-    const message = await client.messages.create({
+    const message = await callClaude({
       model: CRITIQUE_MODEL,
       max_tokens: 800,
       messages: [
@@ -345,7 +345,7 @@ async function runCritique(
           content: buildCritiquePrompt({ context, factsBlock, draftJson }),
         },
       ],
-    });
+    }, { ...ctx, feature: "critique" });
     const text = (message.content[0] as Anthropic.TextBlock).text.trim();
     const cleaned = text.replace(/```(?:json)?\n?/g, "").replace(/^[^{]*/s, "").trim();
     const parsed = JSON.parse(cleaned) as { violations?: unknown };
@@ -362,9 +362,10 @@ async function runRevise(
   systemPrompt: string,
   originalUserPrompt: string,
   draftJson: string,
-  violations: string[]
+  violations: string[],
+  ctx: AiCallCtx,
 ): Promise<string> {
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
@@ -374,11 +375,14 @@ async function runRevise(
         content: buildRevisePrompt({ originalUserPrompt, draftJson, violations }),
       },
     ],
-  });
+  }, { ...ctx, feature: "critique" });
   return (message.content[0] as Anthropic.TextBlock).text.trim();
 }
 
-export async function generateRecommendations(context: LawnContext): Promise<RecommendationItem[]> {
+export async function generateRecommendations(
+  context: LawnContext,
+  ctx: AiCallCtx,
+): Promise<RecommendationItem[]> {
   const systemPrompt = buildSystemPrompt(context.grassType);
 
   const profileText = buildProfileText(context);
@@ -394,12 +398,12 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
 
   const userPrompt = buildGenerateUserPrompt(context, ragBlock, factsBlock);
 
-  const draft = await client.messages.create({
+  const draft = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
     messages: [{ role: "user", content: userPrompt }],
-  });
+  }, ctx);
 
   const draftRaw = (draft.content[0] as Anthropic.TextBlock).text.trim();
   let workingJson = extractJsonText(draftRaw);
@@ -408,13 +412,13 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
   _lastRevised = false;
 
   if (CRITIQUE_ENABLED) {
-    const violations = await runCritique(context, factsBlock, workingJson);
+    const violations = await runCritique(context, factsBlock, workingJson, ctx);
     const realViolations = violations.filter((v) => v !== "critique_call_failed");
 
     if (realViolations.length > 0) {
       _lastCritiqueFlags = realViolations;
       try {
-        const revisedRaw = await runRevise(systemPrompt, userPrompt, workingJson, realViolations);
+        const revisedRaw = await runRevise(systemPrompt, userPrompt, workingJson, realViolations, ctx);
         const revisedJson = extractJsonText(revisedRaw);
         JSON.parse(revisedJson);
         workingJson = revisedJson;
@@ -436,7 +440,8 @@ export async function generateRecommendations(context: LawnContext): Promise<Rec
 
 export async function analyzeImages(
   photos: Array<{ url: string; kind: string }>,
-  context: LawnContext
+  context: LawnContext,
+  ctx: AiCallCtx,
 ): Promise<AnalysisResult> {
   const { promptLabelFor } = await import("@/lib/photo-kinds");
   // Interleave a short text label before each image so Claude knows the
@@ -498,7 +503,7 @@ ${context.currentRoutine ? `- Current Routine: <current_routine>${context.curren
 
 Now analyze the lawn photos above and return the JSON object.`;
 
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
@@ -514,7 +519,7 @@ Now analyze the lawn photos above and return the JSON object.`;
         ],
       },
     ],
-  });
+  }, ctx);
 
   const text = (message.content[0] as Anthropic.TextBlock).text.trim();
   const cleaned = text
@@ -533,7 +538,8 @@ Now analyze the lawn photos above and return the JSON object.`;
 
 export async function analyzeImagesBase64(
   base64Images: Base64Image[],
-  context: LawnContext
+  context: LawnContext,
+  ctx: AiCallCtx,
 ): Promise<AnalysisResult> {
   const systemPrompt = context.weatherData
     ? buildSectionAnalysisPrompt({
@@ -582,7 +588,7 @@ ${context.notes ? `- Notes: ${context.notes.slice(0, 500)}` : ""}
 
 Now analyze the lawn photos above and return the JSON object described.`;
 
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-sonnet-4-6",
     max_tokens: 3000,
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
@@ -596,7 +602,7 @@ Now analyze the lawn photos above and return the JSON object described.`;
         ],
       },
     ],
-  });
+  }, ctx);
 
   const text = (message.content[0] as Anthropic.TextBlock).text.trim();
   const cleaned = text
@@ -610,14 +616,15 @@ Now analyze the lawn photos above and return the JSON object described.`;
 }
 
 export async function validateLawnImages(
-  imageUrls: string[]
+  imageUrls: string[],
+  ctx: AiCallCtx,
 ): Promise<{ valid: boolean; feedback: string | null }> {
   const imageContent = imageUrls.map((url) => ({
     type: "image" as const,
     source: { type: "url" as const, url },
   }));
 
-  const message = await client.messages.create({
+  const message = await callClaude({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 200,
     messages: [
@@ -645,7 +652,7 @@ Set valid=false with feedback when: any image clearly isn't a lawn, all images a
         ],
       },
     ],
-  });
+  }, ctx);
 
   try {
     const text = message.content[0]?.type === "text" ? message.content[0].text.trim() : "";
@@ -661,15 +668,16 @@ Set valid=false with feedback when: any image clearly isn't a lawn, all images a
 }
 
 export async function generateWateringRecommendation(
-  opts: WateringPromptOpts
+  opts: WateringPromptOpts,
+  ctx: AiCallCtx,
 ): Promise<{ schedule: string; deviates: boolean }> {
-  const msg = await client.messages.create({
+  const msg = await callClaude({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 256,
     system:
       "You are an expert lawn care agronomist. Given lawn section details, provide a concise watering schedule recommendation. Return valid JSON only — no markdown, no text outside the JSON object.",
     messages: [{ role: "user", content: buildWateringPrompt(opts) }],
-  });
+  }, ctx);
   const text = msg.content[0].type === "text" ? msg.content[0].text.trim() : "";
   try {
     return JSON.parse(text) as { schedule: string; deviates: boolean };

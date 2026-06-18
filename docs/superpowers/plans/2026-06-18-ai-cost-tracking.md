@@ -491,11 +491,12 @@ git commit -m "Add callClaude wrapper that records per-call cost rows"
 
 ## Task 4: Convert the `analyze` call site (smoke test)
 
-This is the largest conversion because `analyzeImages` calls the critique + revise helpers. We do this one end-to-end first so any signature issues surface here, not across seven call sites.
+**Note (corrected during execution):** the plan originally said critique + revise helpers belong to this task, but reading the code shows they live inside `generateRecommendations` (`lib/claude.ts:381`), not the analyze functions. They moved to Task 6.
 
 **Files:**
-- Modify: `lib/claude.ts` — convert `analyzeImages`, `analyzeImagesBase64`, the critique helper (line ~339), the revise helper (line ~620).
+- Modify: `lib/claude.ts` — convert `analyzeImages` and `analyzeImagesBase64` only.
 - Modify: `app/api/analyze/route.ts` — thread `session.user.id` into the `analyzeImages` call.
+- Modify: `scripts/validation/run-image.ts` — pass `userId: null` to `analyzeImagesBase64` (dev-only script, no user session).
 
 - [ ] **Step 1: Add the import to `lib/claude.ts`**
 
@@ -660,7 +661,7 @@ git commit -m "Route recommendations through callClaude"
 
 ## Task 7: Convert the `watering` call sites
 
-There are two watering calls in `lib/claude.ts`: a Sonnet one (~line 585) and a Haiku one (`generateWateringRecommendation`, ~line 666). Both get the `watering` tag.
+**Note (corrected during execution):** the plan originally said two watering calls existed; reading the code shows the "Sonnet ~585" call was actually `analyzeImagesBase64` (already converted in Task 4). Only `generateWateringRecommendation` (Haiku, dead code with zero callers) is a real watering site. The plan also missed `validateLawnImages` (Haiku, live, called from the analyze route). Task 7 as executed bundled both remaining `lib/claude.ts` Claude calls: `validateLawnImages` tagged `"analyze"` (it's a precondition of the analyze flow) and `generateWateringRecommendation` tagged `"watering"` (defensive conversion so a future revival inherits cost tracking).
 
 **Files:**
 - Modify: `lib/claude.ts`
