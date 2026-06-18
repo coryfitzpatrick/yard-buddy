@@ -22,16 +22,29 @@ export async function GET(req: NextRequest) {
   }
 
   const month = previousMonth(new Date());
-  const report = await buildCostReport(month);
+
+  let report;
+  try {
+    report = await buildCostReport(month);
+  } catch (err) {
+    console.error("monthly-cost-report: buildCostReport failed", { month, err });
+    return NextResponse.json({ ok: false, month, stage: "build" }, { status: 500 });
+  }
+
   const { subject, html } = buildCostReportEmail(report);
   const to = process.env.COST_REPORT_RECIPIENT ?? DEFAULT_COST_REPORT_RECIPIENT;
 
-  await resend.emails.send({
-    from: "Yard Analyzer <noreply@yardanalyzer.com>",
-    to,
-    subject,
-    html,
-  });
+  try {
+    await resend.emails.send({
+      from: "Yard Analyzer <noreply@yardanalyzer.com>",
+      to,
+      subject,
+      html,
+    });
+  } catch (err) {
+    console.error("monthly-cost-report: resend send failed", { month, to, err });
+    return NextResponse.json({ ok: false, month, stage: "send" }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true, month, rows: report.rows.length });
 }
