@@ -1,19 +1,94 @@
-# Yard Analyzer — Session Handoff (last updated 2026-06-15, session 2 end)
+# Yard Analyzer — Session Handoff (last updated 2026-06-18, scaling-audit session end)
 
 ## Quick state summary
+
+**Most recent session (2026-06-18):** scaling audit & refactor. Three commits pushed to `main`. App is prepared for traffic growth — pooled DB, Upstash rate limiting, split crons, batched fan-out sends, bounded AI-event retention. See "Latest" section below.
+
+**Prior session (2026-06-15):** image-path validation baseline. Detailed below; suite scores still current.
 
 | Suite | Path | Sonnet mean | Opus mean | Status |
 |---|---|---|---|---|
 | **Text** (`generateRecommendations`) | `npm run validate` | 87.5 (R44) | **91.3** (R36) | 90+ releasable, not yet 95+ |
 | **Image** (`analyzeImages` / `analyzeImagesBase64`) | `npm run validate:image` | **93.9** | **93.3** | **releasable**, climbing toward 95+ |
 
-This session lifted the image path from R05 84.5 → 93.3 Opus (+8.8) via RAG wire-up, prompt rules, ground-truth realignments, photo swaps, and a photo-first diagnostic priority rule.
-
 **Detailed image-path handoff:** see `docs/image-validation-handoff.md` for the full work log, per-scenario state, prompt anatomy, known P2 failures, cost reference, and next-session execution plan.
 
 ---
 
-## Latest: Image-path validation baseline (2026-06-15)
+## Latest: Scaling audit & refactor (2026-06-18)
+
+Three commits pushed to `main`. All scaling cliffs from the audit are addressed except two low-priority items intentionally skipped.
+
+### Commits (live on main)
+
+- **`1b52b97`** — Refactor for scale: pooled DB, Upstash rate limit, split daily cron
+- **`64df696`** — Parallelize per-yard processing in daily-tasks cron
+- **`27f14d9`** — Purge AiUsageEvent rows older than 3 months after monthly report
+
+### Audit punch list
+
+| # | Item | Status |
+|---|---|---|
+| 1 | `DATABASE_URL` on Supavisor transaction pooler (6543, `?pgbouncer=true&connection_limit=1`); `DIRECT_URL` on session pooler (5432) | ✅ done — env-only |
+| 2 | Split monolithic `/api/cron/daily` into 4 routes with `maxDuration=300` each | ✅ done |
+| 3 | Composite `LawnAnalysis[yardSectionId, createdAt]` index; migration applied to prod DB | ✅ done |
+| 4 | Rate limiting moved from Postgres to Upstash Redis via `@upstash/ratelimit` sliding window | ✅ done |
+| 5 | Batched fan-out sends (10 emails, 5 Stripe calls in flight) via `mapWithConcurrency` | ✅ done |
+| 6 | AiUsageEvent 3-month rolling purge after monthly report succeeds | ✅ done |
+| 7 | Combine 7d/1d trial-reminder queries | ⏭ skipped — trivial, low value |
+| 8 | ISR/Cache-Control on public pages | ⏭ N/A — build report confirms `/`, `/privacy`, `/terms`, `/contact` already static. `/pricing` is dynamic by design (uses `auth()` for personalization); making it cacheable would require splitting into static shell + client island, which isn't worth doing yet. |
+
+### Key architectural decisions
+
+- **Supabase connection split.** `DATABASE_URL` → transaction pooler (port 6543) with `?pgbouncer=true&connection_limit=1` to prevent connection exhaustion across Vercel Fluid instances. `DIRECT_URL` → session pooler (port 5432) rather than the direct `db.<ref>.supabase.co` hostname, which is IPv6-only and unreachable from most networks. **Both must be set on Vercel and `.env.local`.**
+- **Cron split into 4 routes.** `/api/cron/daily-tasks`, `/api/cron/trial-reminders`, `/api/cron/account-deletion`, `/api/cron/card-expiry`. Staggered at 8:00 / 8:05 / 8:10 / 8:15 UTC. Each has its own 300s budget; failure in one no longer kills the others. Effective budget: 4× the original.
+- **Per-yard parallelism in `daily-tasks`.** Outer yards loop wrapped in `mapWithConcurrency` with `YARD_CONCURRENCY = 5`. Each yard's internal work stays sequential (GDD read-modify-write requires it), but yards don't share mutable state. ~5× throughput on the slowest phase.
+- **Upstash Redis** chosen over Vercel Runtime Cache because rate limits must be accurate across regions; Runtime Cache is per-region. Free tier (10k commands/day). Auto-injected env vars from Vercel Marketplace install: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. `lib/rate-limit.ts` has an in-memory fallback for tests/dev without env vars.
+- **AiUsageEvent 3-month rolling purge** instead of partitioning. The table is append-only with a single consumer (monthly cost report) and Yard Analyzer bills flat-rate, so historical per-event detail has no audit value. Partitioning was rejected as Prisma-awkward and operationally heavy for zero current benefit. Purge runs only after a successful email send so a failed report doesn't lose the data needed for the retry.
+
+### New shared helpers
+
+- `lib/cron/auth.ts` — `verifyCronAuth(req)` using `timingSafeEqual` Bearer check
+- `lib/cron/concurrency.ts` — `mapWithConcurrency(items, limit, fn)` bounded-parallel worker pool
+
+### Pending verification (do this first when picking back up)
+
+1. **Watch the first cron run** — new crons fire for the first time at 8:00 UTC daily. First opportunity: **2026-06-19**. Check Vercel function logs for each route; confirm digest/trial/card-expiry emails went out where expected.
+2. **Confirm Upstash is receiving traffic** — hit a rate-limited endpoint in prod (e.g. `/api/analyze`, `/api/weather`), then check the Upstash dashboard. Should see commands flowing. If not, env vars on Vercel may not be set correctly.
+3. **Watch for `prepared statement` errors** in Vercel logs after deploy. If they appear, the `?pgbouncer=true` flag isn't being respected by Prisma.
+
+### Cleanup deferred (not urgent)
+
+- `RateLimitAttempt` Prisma model is now unused but left in schema. Drop in a follow-up migration once Upstash is verified working in prod for a week or two.
+- The four route files duplicate small date helpers (`addDays`, `startOfToday`, etc.). Could be extracted to `lib/cron/date-utils.ts` if it bothers you, but the duplication is small and each file is self-contained.
+
+### Suggested next directions (audit-orthogonal)
+
+1. **Observability** — `@axiomhq/nextjs` is installed (`package.json`) but didn't appear systematically wired up. Cron success/failure metrics, rate-limit-hit counts, AI cost per user — all would be valuable. Without dashboards/alerts, problems surface as customer complaints rather than monitoring.
+2. **Security review** — codebase has grown substantially. Running `/security-review` against the current branch would validate the rate-limit/cron refactor doesn't introduce anything subtle.
+3. **Back to product features** — scaling and observability are infra. The next user-visible feature may be more valuable than further infra investment right now.
+
+### Files touched this session
+
+```
+A  app/api/cron/account-deletion/route.ts        (new, 70 lines)
+A  app/api/cron/card-expiry/route.ts             (new, 107 lines)
+A  app/api/cron/daily-tasks/route.ts             (new, 429 lines)
+A  app/api/cron/trial-reminders/route.ts         (new, 70 lines)
+D  app/api/cron/daily/route.ts                   (deleted, was 607 lines)
+M  app/api/cron/monthly-cost-report/route.ts     (added 3-month purge)
+A  lib/cron/auth.ts                              (new, 16 lines)
+A  lib/cron/concurrency.ts                       (new, 23 lines)
+M  lib/rate-limit.ts                             (Postgres → Upstash + memory fallback)
+M  package.json, package-lock.json               (+@upstash/redis, @upstash/ratelimit)
+M  prisma/schema.prisma                          (LawnAnalysis index → composite)
+A  prisma/migrations/20260618220000_add_lawn_analysis_section_createdat_index/migration.sql
+M  vercel.json                                   (1 daily entry → 4 staggered)
+```
+
+---
+
+## Prior: Image-path validation baseline (2026-06-15)
 
 ### Architecture
 
