@@ -10,6 +10,11 @@ import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOver
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
 
 const EMAIL_CONCURRENCY = 10;
+// Each yard's processing is a small read-modify-write sequence on its own
+// GDD record plus a handful of task updates. Yards don't share state, so
+// processing in parallel is safe. Bounded at 5 to keep DB connections in
+// check (each yard can have ~5-10 in-flight queries).
+const YARD_CONCURRENCY = 5;
 
 export const maxDuration = 300;
 
@@ -145,11 +150,11 @@ export async function GET(req: NextRequest) {
     { tasks: SectionTasks; grassType: string; zip: string; userId: string }
   >();
 
-  for (const yard of yards) {
+  await mapWithConcurrency(yards, YARD_CONCURRENCY, async (yard) => {
     const weather = weatherByZip.get(yard.zipCode);
     if (!weather) {
       console.warn(`[cron] No weather data for ZIP ${yard.zipCode}, skipping yard ${yard.id}`);
-      continue;
+      return;
     }
 
     for (const section of yard.sections) {
@@ -277,7 +282,7 @@ export async function GET(req: NextRequest) {
         db.gddRecord.update({ where: { id: gddRecord.id }, data: { overseedingFired: true } }),
       ]);
     }
-  }
+  });
 
   // 5. Assess newly overdue tasks per section
   for (const [, { tasks, grassType, zip, userId }] of overdueBySection) {
