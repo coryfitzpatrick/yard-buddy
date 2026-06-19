@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { timingSafeEqual } from "crypto";
 import { db } from "@/lib/db";
+import { verifyCronAuth } from "@/lib/cron/auth";
 import { getWeatherByZip } from "@/lib/weather";
 import { computeNewWindow } from "@/lib/cron/weather-scheduler";
 import { assessOverdueTasks } from "@/lib/cron/overdue-assessor";
 import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
-import { resend, buildDigestEmail, buildTrialReminderEmail, buildCardExpiringEmail, generateUnsubscribeToken } from "@/lib/email";
+import { resend, buildDigestEmail, generateUnsubscribeToken } from "@/lib/email";
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
-import { stripe } from "@/lib/stripe";
-import { DAY_MS, DAYS_30_MS } from "@/lib/time";
-import Stripe from "stripe";
+import { mapWithConcurrency } from "@/lib/cron/concurrency";
+
+const EMAIL_CONCURRENCY = 10;
+
+export const maxDuration = 300;
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -31,15 +33,8 @@ function sameDay(a: Date, b: Date): boolean {
 }
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  const expected = `Bearer ${process.env.CRON_SECRET}`;
-  const provided = authHeader ?? "";
-  const tokensMatch =
-    provided.length === expected.length &&
-    timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
-  if (!tokensMatch) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = verifyCronAuth(req);
+  if (unauthorized) return unauthorized;
 
   const today = startOfToday();
   const currentYear = today.getUTCFullYear();
@@ -336,10 +331,11 @@ export async function GET(req: NextRequest) {
     userMap.set(ru.id, { ...existing, reminderUser: ru });
   }
 
-  for (const [userId, { taskUser, reminderUser }] of userMap) {
+  const userEntries = Array.from(userMap.entries());
+  await mapWithConcurrency(userEntries, EMAIL_CONCURRENCY, async ([userId, { taskUser, reminderUser }]) => {
     const user = taskUser ?? reminderUser!;
-    if (!user.email) continue;
-    if (user.lastNotifiedAt && sameDay(user.lastNotifiedAt, today)) continue;
+    if (!user.email) return;
+    if (user.lastNotifiedAt && sameDay(user.lastNotifiedAt, today)) return;
 
     // Collect task content
     let overdueTasks: Array<{ title: string; sectionName: string; overdueNote: string | null }> = [];
@@ -396,7 +392,7 @@ export async function GET(req: NextRequest) {
       scheduledReminders = getTodayReminders(sections, today, user.reminderDaysBefore);
     }
 
-    if (overdueTasks.length === 0 && upcomingTasks.length === 0 && scheduledReminders.length === 0) continue;
+    if (overdueTasks.length === 0 && upcomingTasks.length === 0 && scheduledReminders.length === 0) return;
 
     const unsubToken = generateUnsubscribeToken(userId);
     const { subject, html } = buildDigestEmail({
@@ -422,186 +418,7 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       console.error("Email send failed for user:", userId, err);
     }
-  }
-
-  // === Trial expiry reminders (7 days out and 1 day out) ===
-  const pricingUrl = `${baseUrl}/pricing`;
-  const reminderDays = [7, 1];
-
-  for (const daysLeft of reminderDays) {
-    const targetDate = addDays(today, daysLeft);
-
-    const trialUsers = await db.user.findMany({
-      where: {
-        planStatus: "trialing",
-        trialEndsAt: {
-          gte: targetDate,
-          lt: addDays(targetDate, 1),
-        },
-      },
-      select: { id: true, email: true, name: true },
-    });
-
-    for (const user of trialUsers) {
-      if (!user.email) continue;
-      const { subject, html } = buildTrialReminderEmail({
-        userName: user.name?.split(" ")[0] ?? "there",
-        daysLeft,
-        pricingUrl,
-      });
-      try {
-        await resend.emails.send({
-          from: "Yard Analyzer <noreply@yardanalyzer.com>",
-          to: user.email,
-          subject,
-          html,
-        });
-      } catch (err) {
-        console.error(`Trial reminder (${daysLeft}d) failed for user ${user.id}:`, err);
-      }
-    }
-  }
-
-  // === Expired account data deletion ===
-  const deletionCutoff = new Date(Date.now() - DAYS_30_MS);
-
-  const usersToDelete = await db.user.findMany({
-    where: {
-      OR: [
-        {
-          planStatus: { in: ["trialing", "expired"] },
-          trialEndsAt: { lt: deletionCutoff },
-          stripeSubscriptionId: null,
-        },
-        {
-          planStatus: "canceled",
-          currentPeriodEnd: { lt: deletionCutoff },
-        },
-      ],
-    },
-    select: { id: true, email: true },
-    take: 50,
   });
 
-  const { createClient } = await import("@supabase/supabase-js");
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  let deletedCount = 0;
-  for (const user of usersToDelete) {
-    try {
-      const analyses = await db.lawnAnalysis.findMany({
-        where: { yardSection: { yard: { userId: user.id } } },
-        select: { imageUrls: true },
-      });
-      const allUrls = analyses.flatMap((a) => a.imageUrls);
-
-      if (allUrls.length > 0) {
-        const paths = allUrls
-          .map((url) => {
-            const match = url.match(/\/object\/public\/[^/]+\/(.+)$/);
-            return match ? match[1] : null;
-          })
-          .filter((p): p is string => p !== null);
-
-        if (paths.length > 0) {
-          await supabase.storage.from("lawn-photos").remove(paths);
-        }
-      }
-
-      await db.user.delete({ where: { id: user.id } });
-      deletedCount++;
-      console.log(`Deleted expired account: ${user.id}`);
-    } catch (err) {
-      console.error(`Failed to delete user ${user.id}:`, err);
-    }
-  }
-
-  // === Card expiry warning ===
-  const expiryWarnCutoff = new Date(Date.now() - 25 * DAY_MS);
-  const upcomingBillingCutoff = new Date(Date.now() + DAYS_30_MS);
-
-  const activeSubscribers = await db.user.findMany({
-    where: {
-      planStatus: { in: ["active", "past_due"] },
-      stripeCustomerId: { not: null },
-      stripeSubscriptionId: { not: null },
-      currentPeriodEnd: { lte: upcomingBillingCutoff, gte: today },
-      OR: [
-        { cardExpiryWarningSentAt: null },
-        { cardExpiryWarningSentAt: { lt: expiryWarnCutoff } },
-      ],
-    },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      stripeCustomerId: true,
-      currentPeriodEnd: true,
-    },
-    take: 50,
-  });
-
-  for (const subscriber of activeSubscribers) {
-    try {
-      const customer = await stripe.customers.retrieve(subscriber.stripeCustomerId!, {
-        expand: ["invoice_settings.default_payment_method"],
-      });
-      if (customer.deleted) continue;
-
-      const pm = (customer as Stripe.Customer).invoice_settings?.default_payment_method;
-      if (!pm || typeof pm === "string") continue;
-      if (pm.type !== "card" || !pm.card) continue;
-
-      const { exp_month, exp_year, last4 } = pm.card;
-      const nextBilling = subscriber.currentPeriodEnd!;
-      const billingYear = nextBilling.getUTCFullYear();
-      const billingMonth = nextBilling.getUTCMonth() + 1;
-
-      const cardExpiresBeforeBilling =
-        exp_year < billingYear ||
-        (exp_year === billingYear && exp_month < billingMonth);
-
-      if (!cardExpiresBeforeBilling) continue;
-
-      const portalSession = await stripe.billingPortal.sessions.create({
-        customer: subscriber.stripeCustomerId!,
-        return_url: `${process.env.NEXTAUTH_URL ?? "https://yardanalyzer.com"}/settings`,
-      });
-
-      const { subject, html } = buildCardExpiringEmail({
-        userName: subscriber.name ?? subscriber.email,
-        cardLast4: last4,
-        expiryMonth: exp_month,
-        expiryYear: exp_year,
-        nextBillingDate: nextBilling,
-        billingPortalUrl: portalSession.url,
-      });
-
-      await resend.emails.send({
-        from: "Yard Analyzer <noreply@yardanalyzer.com>",
-        to: subscriber.email,
-        subject,
-        html,
-      });
-
-      await db.user.update({
-        where: { id: subscriber.id },
-        data: { cardExpiryWarningSentAt: new Date() },
-      });
-
-      console.log(`Card expiry warning sent to user ${subscriber.id}`);
-    } catch (err) {
-      console.error(`Card expiry check failed for user ${subscriber.id}:`, err);
-    }
-  }
-
-  // Purge rate limit attempts older than 24h
-  await db.rateLimitAttempt.deleteMany({
-    where: { createdAt: { lt: new Date(Date.now() - DAY_MS) } },
-  });
-
-  return NextResponse.json({ ok: true, processed: userMap.size, deletedAccounts: deletedCount });
+  return NextResponse.json({ ok: true, processed: userMap.size });
 }

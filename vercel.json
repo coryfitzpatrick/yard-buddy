@@ -1,8 +1,20 @@
 {
   "crons": [
     {
-      "path": "/api/cron/daily",
+      "path": "/api/cron/daily-tasks",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/trial-reminders",
+      "schedule": "5 8 * * *"
+    },
+    {
+      "path": "/api/cron/account-deletion",
+      "schedule": "10 8 * * *"
+    },
+    {
+      "path": "/api/cron/card-expiry",
+      "schedule": "15 8 * * *"
     },
     {
       "path": "/api/cron/monthly-cost-report",
