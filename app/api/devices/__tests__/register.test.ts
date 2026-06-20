@@ -24,7 +24,7 @@ describe("POST /api/devices/register", () => {
       method: "POST",
       body: JSON.stringify({ token: "abc", platform: "ios" }),
     });
-    const res = await POST(req as never);
+    const res = await POST(req as never, undefined as never);
     expect(res.status).toBe(401);
     expect(mockUpsert).not.toHaveBeenCalled();
   });
@@ -35,7 +35,7 @@ describe("POST /api/devices/register", () => {
       method: "POST",
       body: JSON.stringify({ token: "abc", platform: "windows" }),
     });
-    const res = await POST(req as never);
+    const res = await POST(req as never, undefined as never);
     expect(res.status).toBe(400);
     expect(mockUpsert).not.toHaveBeenCalled();
   });
@@ -47,7 +47,7 @@ describe("POST /api/devices/register", () => {
       method: "POST",
       body: JSON.stringify({ token: "fcm-token-abc", platform: "ios" }),
     });
-    const res = await POST(req as never);
+    const res = await POST(req as never, undefined as never);
     expect(res.status).toBe(200);
     expect(mockUpsert).toHaveBeenCalledWith(
       expect.objectContaining({
