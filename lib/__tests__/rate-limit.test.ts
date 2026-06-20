@@ -1,5 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { getClientIp } from "@/lib/rate-limit";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import * as events from "@/lib/observability/events";
+
+vi.mock("@axiomhq/nextjs", () => ({
+  createAxiomRouteHandler: <T,>(_logger: unknown, _opts?: unknown) => (handler: T) => handler,
+  nextJsFormatters: [],
+}));
 
 function makeReq(headers: Record<string, string>): Request {
   return new Request("https://example.com/", { headers });
@@ -28,5 +34,32 @@ describe("getClientIp", () => {
 
   it("returns 'unknown' for an empty x-forwarded-for header", () => {
     expect(getClientIp(makeReq({ "x-forwarded-for": "" }))).toBe("unknown");
+  });
+});
+
+describe("checkRateLimit emits rate_limit.hit on limit", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("emits when the in-memory fallback returns limited", async () => {
+    const spy = vi.spyOn(events, "emitRateLimitHit").mockImplementation(() => {});
+    const key = `test:${Math.random()}`;
+    const ctx = { route: "/api/test", ip: "203.0.113.9", userId: "user_x" };
+
+    // First call below the limit — should NOT emit
+    await checkRateLimit(key, 1, 60_000, ctx);
+    expect(spy).not.toHaveBeenCalled();
+
+    // Second call exceeds the limit — should emit exactly once
+    await checkRateLimit(key, 1, 60_000, ctx);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith({
+      route: "/api/test",
+      ip: "203.0.113.9",
+      userId: "user_x",
+      maxAttempts: 1,
+      windowMs: 60_000,
+    });
   });
 });

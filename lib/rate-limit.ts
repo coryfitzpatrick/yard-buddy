@@ -54,15 +54,35 @@ function memoryCheck(key: string, maxAttempts: number, windowMs: number): { limi
   return { limited: false };
 }
 
+export interface RateLimitContext {
+  route: string;
+  ip: string;
+  userId: string | null;
+}
+
 export async function checkRateLimit(
   key: string,
   maxAttempts: number,
   windowMs: number,
+  ctx?: RateLimitContext,
 ): Promise<{ limited: boolean }> {
   const limiter = getLimiter(maxAttempts, windowMs);
-  if (!limiter) {
-    return memoryCheck(key, maxAttempts, windowMs);
+  const result = limiter
+    ? { limited: !(await limiter.limit(key)).success }
+    : memoryCheck(key, maxAttempts, windowMs);
+
+  if (result.limited && ctx) {
+    // Lazy import keeps the rate-limit module free of observability deps for
+    // any caller (tests, scripts) that doesn't pass ctx.
+    const { emitRateLimitHit } = await import("@/lib/observability/events");
+    emitRateLimitHit({
+      route: ctx.route,
+      ip: ctx.ip,
+      userId: ctx.userId,
+      maxAttempts,
+      windowMs,
+    });
   }
-  const { success } = await limiter.limit(key);
-  return { limited: !success };
+
+  return result;
 }
