@@ -8,6 +8,8 @@ import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
 import { resend, buildDigestEmail, generateUnsubscribeToken } from "@/lib/email";
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
+import { withAxiom, logger } from "@/lib/observability/logger";
+import { emitCronRun } from "@/lib/observability/events";
 
 const EMAIL_CONCURRENCY = 10;
 // Each yard's processing is a small read-modify-write sequence on its own
@@ -37,10 +39,13 @@ function sameDay(a: Date, b: Date): boolean {
   return a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10);
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withAxiom(async (req: NextRequest) => {
   const unauthorized = verifyCronAuth(req);
   if (unauthorized) return unauthorized;
 
+  const startedAt = Date.now();
+
+  try {
   const today = startOfToday();
   const currentYear = today.getUTCFullYear();
 
@@ -153,7 +158,7 @@ export async function GET(req: NextRequest) {
   await mapWithConcurrency(yards, YARD_CONCURRENCY, async (yard) => {
     const weather = weatherByZip.get(yard.zipCode);
     if (!weather) {
-      console.warn(`[cron] No weather data for ZIP ${yard.zipCode}, skipping yard ${yard.id}`);
+      logger.warn("daily-tasks: no weather data, skipping yard", { zipCode: yard.zipCode, yardId: yard.id });
       return;
     }
 
@@ -312,7 +317,9 @@ export async function GET(req: NextRequest) {
         });
       }
     } catch (err) {
-      console.error("Overdue assessment failed for section:", err);
+      logger.error("daily-tasks: overdue assessment failed", {
+        err: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 
@@ -421,9 +428,31 @@ export async function GET(req: NextRequest) {
         data: { lastNotifiedAt: new Date() },
       });
     } catch (err) {
-      console.error("Email send failed for user:", userId, err);
+      logger.error("daily-tasks: email send failed", {
+        userId,
+        err: err instanceof Error ? err.message : String(err),
+      });
     }
   });
 
+  emitCronRun({
+    route: "daily-tasks",
+    ok: true,
+    durationMs: Date.now() - startedAt,
+    counts: { yards: yards.length, usersProcessed: userMap.size },
+  });
   return NextResponse.json({ ok: true, processed: userMap.size });
-}
+  } catch (err) {
+    emitCronRun({
+      route: "daily-tasks",
+      ok: false,
+      durationMs: Date.now() - startedAt,
+      counts: {},
+      error: {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack?.slice(0, 500) : undefined,
+      },
+    });
+    throw err;
+  }
+});
