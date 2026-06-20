@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 
-const TOKEN = "YardAnalyzerApp/";
+export const TOKEN = "YardAnalyzerApp/";
 
 export async function isMobileApp(): Promise<boolean> {
   const ua = (await headers()).get("user-agent") ?? "";
