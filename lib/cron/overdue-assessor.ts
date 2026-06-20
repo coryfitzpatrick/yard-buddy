@@ -1,4 +1,5 @@
 import { callClaude, type AiCallCtx } from "@/lib/ai/usage";
+import { logger } from "@/lib/observability/logger";
 
 export interface OverdueTaskInput {
   id: string;
@@ -68,7 +69,7 @@ Return a JSON array only:
   const jsonStart = text.indexOf("[");
   const jsonEnd = text.lastIndexOf("]");
   if (jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {
-    console.error("assessOverdueTasks: no JSON array found in response");
+    logger.error("assessOverdueTasks: no JSON array found in response");
     return [];
   }
   const cleaned = text.slice(jsonStart, jsonEnd + 1);
@@ -76,7 +77,9 @@ Return a JSON array only:
   try {
     return JSON.parse(cleaned) as OverdueAssessment[];
   } catch (err) {
-    console.error("assessOverdueTasks: JSON.parse failed:", err);
+    logger.error("assessOverdueTasks: JSON.parse failed", {
+      err: err instanceof Error ? err.message : String(err),
+    });
     return [];
   }
 }
