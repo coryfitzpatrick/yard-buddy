@@ -7,6 +7,7 @@ import { BillingSection } from "@/components/settings/BillingSection";
 import { EmailSection } from "@/components/settings/EmailSection";
 import { Bell, Lock, CreditCard, Mail } from "lucide-react";
 import { getDaysUntilDeletion, PLAN_LABELS, canPause, daysUntilTrialEnd } from "@/lib/subscription";
+import { isMobileApp } from "@/lib/platform";
 
 const EMAIL_CHANGE_MESSAGES: Record<string, { tone: "success" | "error"; text: string }> = {
   success: { tone: "success", text: "Email updated. You may need to sign in again." },
@@ -25,6 +26,7 @@ export default async function SettingsPage({
   if (!session?.user?.id) redirect("/login");
   const { emailChange } = await searchParams;
   const emailChangeNotice = emailChange ? EMAIL_CHANGE_MESSAGES[emailChange] : null;
+  const inApp = await isMobileApp();
 
   const user = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
@@ -112,27 +114,29 @@ export default async function SettingsPage({
       )}
 
       <div className="max-w-5xl space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <CreditCard className="w-5 h-5 text-green-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Plan & Billing</h2>
+        {!inApp && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <CreditCard className="w-5 h-5 text-green-600" />
+              <h2 className="text-lg font-semibold text-gray-900">Plan & Billing</h2>
+            </div>
+            <BillingSection
+              plan={user.plan}
+              planStatus={user.planStatus}
+              planLabel={PLAN_LABELS[user.plan] ?? user.plan}
+              daysUntilDeletion={daysUntilDeletion}
+              currentPeriodEnd={user.currentPeriodEnd?.toISOString() ?? null}
+              pausedUntil={user.pausedUntil?.toISOString() ?? null}
+              hasStripeSubscription={!!user.stripeSubscriptionId}
+              hasStripeCustomer={!!user.stripeCustomerId}
+              paymentMethod={paymentMethod}
+              trialDaysLeft={trialDaysLeft}
+              canPauseSubscription={canPauseSubscription}
+              currentPlan={user.plan}
+              currentPeriod={currentPeriod}
+            />
           </div>
-          <BillingSection
-            plan={user.plan}
-            planStatus={user.planStatus}
-            planLabel={PLAN_LABELS[user.plan] ?? user.plan}
-            daysUntilDeletion={daysUntilDeletion}
-            currentPeriodEnd={user.currentPeriodEnd?.toISOString() ?? null}
-            pausedUntil={user.pausedUntil?.toISOString() ?? null}
-            hasStripeSubscription={!!user.stripeSubscriptionId}
-            hasStripeCustomer={!!user.stripeCustomerId}
-            paymentMethod={paymentMethod}
-            trialDaysLeft={trialDaysLeft}
-            canPauseSubscription={canPauseSubscription}
-            currentPlan={user.plan}
-            currentPeriod={currentPeriod}
-          />
-        </div>
+        )}
 
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-4">
