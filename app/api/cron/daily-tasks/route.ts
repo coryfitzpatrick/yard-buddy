@@ -443,6 +443,17 @@ export const GET = withAxiom(async (req: NextRequest) => {
   const progress = { yardsProcessed: 0, usersProcessed: 0 };
 
   try {
+    // Emit yesterday's AI cost summary (fire-and-forget — don't fail the cron
+    // if this aggregate query has a hiccup; withAxiom captures any throw).
+    try {
+      const { emitYesterdaysAiSummary } = await import("@/lib/observability/ai-daily-summary");
+      await emitYesterdaysAiSummary();
+    } catch (err) {
+      logger.error("daily-tasks: ai daily summary failed", {
+        err: err instanceof Error ? err.message : String(err),
+      });
+    }
+
     await runDailyTasks(today, progress);
     emitCronRun({
       route: "daily-tasks",
