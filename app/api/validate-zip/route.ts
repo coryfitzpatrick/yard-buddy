@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { withAxiom } from "@/lib/observability/logger";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
 const KEY = process.env.OPENWEATHERMAP_API_KEY!;
 
@@ -37,7 +37,12 @@ export const GET = withAxiom(async (req: NextRequest) => {
     }
     const data = (await res.json()) as { name?: string; country?: string };
     return NextResponse.json({ valid: true, city: data.name ?? null });
-  } catch {
+  } catch (err) {
+    logger.warn("ZIP geocode upstream fetch failed", {
+      userId: session.user.id,
+      zip,
+      err: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json({ valid: false, reason: "upstream" }, { status: 502 });
   }
 });

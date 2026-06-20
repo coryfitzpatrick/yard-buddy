@@ -89,7 +89,12 @@ export const POST = withAxiom(async (req: NextRequest) => {
   let validation: { valid: boolean; feedback: string | null };
   try {
     validation = await validateLawnImages(imageUrls, { userId: session.user.id, feature: "analyze" });
-  } catch {
+  } catch (err) {
+    // Validator failures shouldn't block analysis — fall through as "valid".
+    logger.warn("Lawn image validation failed; allowing analysis to proceed", {
+      userId: session.user.id,
+      err: err instanceof Error ? err.message : String(err),
+    });
     validation = { valid: true, feedback: null };
   }
   if (!validation.valid) {

@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { changeEmailSchema } from "@/lib/validations/auth";
 import { resend, buildEmailChangeConfirmEmail } from "@/lib/email";
 import { hashToken } from "@/lib/token-hash";
-import { withAxiom } from "@/lib/observability/logger";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
 export const PUT = withAxiom(async (req: NextRequest) => {
   const session = await auth();
@@ -77,7 +77,11 @@ export const PUT = withAxiom(async (req: NextRequest) => {
       subject,
       html,
     });
-  } catch {
+  } catch (err) {
+    logger.error("Resend email send failed", {
+      userId: user.id,
+      err: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json(
       { error: "Couldn't send confirmation email. Try again in a few minutes." },
       { status: 500 }

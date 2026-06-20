@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { hashToken } from "@/lib/token-hash";
-import { withAxiom } from "@/lib/observability/logger";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
 function redirectToSettings(req: NextRequest, status: "success" | "expired" | "invalid" | "taken" | "error") {
   const url = new URL("/settings", req.url);
@@ -43,7 +43,11 @@ export const GET = withAxiom(async (req: NextRequest) => {
       }),
       db.emailChangeRequest.delete({ where: { id: request.id } }),
     ]);
-  } catch {
+  } catch (err) {
+    logger.error("Email change transaction failed", {
+      userId: request.userId,
+      err: err instanceof Error ? err.message : String(err),
+    });
     return redirectToSettings(req, "error");
   }
 
@@ -51,8 +55,11 @@ export const GET = withAxiom(async (req: NextRequest) => {
   if (request.user.stripeCustomerId) {
     try {
       await stripe.customers.update(request.user.stripeCustomerId, { email: request.newEmail });
-    } catch {
-      // Stripe sync failure shouldn't block the email change; log via Stripe dashboard if needed.
+    } catch (err) {
+      logger.warn("Stripe customer email sync failed", {
+        userId: request.userId,
+        err: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 
