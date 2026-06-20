@@ -1,8 +1,14 @@
+"use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Lock } from "lucide-react";
+import { isMobileAppClient } from "@/lib/platform";
 
 export function LockedTaskCard() {
+  const [inApp, setInApp] = useState(false);
+  useEffect(() => setInApp(isMobileAppClient()), []);
+
   return (
     <Card className="relative overflow-hidden">
       <CardContent className="p-4">
@@ -20,13 +26,20 @@ export function LockedTaskCard() {
         </div>
         {/* Upgrade overlay */}
         <div className="absolute inset-0 flex items-center justify-center bg-white/60">
-          <Link
-            href="/pricing"
-            className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-full px-3 py-1.5 transition-colors shadow-sm"
-          >
-            <Lock className="w-3 h-3" />
-            Upgrade to unlock
-          </Link>
+          {inApp ? (
+            <p className="flex items-center gap-1.5 bg-gray-700 text-white text-xs font-semibold rounded-full px-3 py-1.5 shadow-sm">
+              <Lock className="w-3 h-3" />
+              This feature requires the Pro plan.
+            </p>
+          ) : (
+            <Link
+              href="/pricing"
+              className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-full px-3 py-1.5 transition-colors shadow-sm"
+            >
+              <Lock className="w-3 h-3" />
+              Upgrade to unlock
+            </Link>
+          )}
         </div>
       </CardContent>
     </Card>
