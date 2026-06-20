@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { computeCostUsd, AI_PRICES_USD_PER_MTOK } from "@/lib/ai/prices";
+
+// prices.ts now imports the observability logger, which transitively pulls in
+// Axiom's Next.js route-handler wrapper. Stub it so Vitest's ESM resolver can
+// load the module under test.
+vi.mock("@axiomhq/nextjs", () => ({
+  createAxiomRouteHandler: <T,>(_logger: unknown, _opts?: unknown) => (handler: T) => handler,
+  nextJsFormatters: [],
+}));
+
+const { computeCostUsd, AI_PRICES_USD_PER_MTOK } = await import("@/lib/ai/prices");
+const { logger } = await import("@/lib/observability/logger");
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -40,14 +50,15 @@ describe("computeCostUsd", () => {
   });
 
   it("falls back to Sonnet pricing for unknown models and warns", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const warn = vi.spyOn(logger, "warn").mockImplementation(() => {});
     const cost = computeCostUsd("claude-future-99", {
       input_tokens: 1_000_000,
       output_tokens: 1_000_000,
     });
     expect(cost).toBeCloseTo(18, 6); // priced as Sonnet
     expect(warn).toHaveBeenCalledOnce();
-    expect(warn.mock.calls[0][0]).toMatch(/unknown model.*claude-future-99/i);
+    expect(warn.mock.calls[0][0]).toMatch(/unknown model/i);
+    expect(warn.mock.calls[0][1]).toMatchObject({ model: "claude-future-99" });
   });
 
   it("AI_PRICES_USD_PER_MTOK includes both models", () => {

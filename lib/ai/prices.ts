@@ -1,3 +1,5 @@
+import { logger } from "@/lib/observability/logger";
+
 // USD per 1M tokens. Update when Anthropic changes prices.
 export const AI_PRICES_USD_PER_MTOK: Record<string, {
   input: number;
@@ -21,7 +23,7 @@ export interface AiUsageInput {
 export function computeCostUsd(model: string, usage: AiUsageInput): number {
   let prices = AI_PRICES_USD_PER_MTOK[model];
   if (!prices) {
-    console.warn(`computeCostUsd: unknown model "${model}" - pricing as ${FALLBACK_MODEL}`);
+    logger.warn("computeCostUsd: unknown model", { model, fallback: FALLBACK_MODEL });
     prices = AI_PRICES_USD_PER_MTOK[FALLBACK_MODEL];
   }
   return (

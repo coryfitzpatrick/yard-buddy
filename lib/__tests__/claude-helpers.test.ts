@@ -1,10 +1,19 @@
-import { describe, it, expect } from "vitest";
-import {
+import { describe, it, expect, vi } from "vitest";
+import type { LawnContext } from "@/lib/claude";
+
+// @/lib/claude transitively imports the observability logger (via callClaude),
+// which pulls in Axiom's Next.js route-handler wrapper. Stub it so Vitest's
+// ESM resolver can load the module under test.
+vi.mock("@axiomhq/nextjs", () => ({
+  createAxiomRouteHandler: <T,>(_logger: unknown, _opts?: unknown) => (handler: T) => handler,
+  nextJsFormatters: [],
+}));
+
+const {
   detectDataGaps,
   buildDataGapWarning,
   buildContextWarnings,
-  type LawnContext,
-} from "@/lib/claude";
+} = await import("@/lib/claude");
 
 function ctx(over: Partial<LawnContext>): LawnContext {
   return {
