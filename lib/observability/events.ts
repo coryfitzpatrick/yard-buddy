@@ -34,13 +34,13 @@ interface CronRunArgs {
 
 export function emitCronRun(args: CronRunArgs): void {
   const payload = {
-    ...commonFields(),
-    kind: "cron.run" as const,
+    kind: "cron.run",
     route: args.route,
     ok: args.ok,
     durationMs: args.durationMs,
     counts: args.counts,
     ...(args.error ? { error: args.error } : {}),
+    ...commonFields(),
   };
   if (args.ok) logger.info("cron.run", payload);
   else logger.error("cron.run", payload);
@@ -55,27 +55,35 @@ interface RateLimitHitArgs {
 }
 
 export function emitRateLimitHit(args: RateLimitHitArgs): void {
-  const payload: Record<string, unknown> = {
-    ...commonFields(),
+  const payload = {
     kind: "rate_limit.hit",
     route: args.route,
     ipHash: hashIp(args.ip),
     limit: { maxAttempts: args.maxAttempts, windowMs: args.windowMs },
+    ...(args.userId ? { userIdHash: hashEmail(args.userId) } : {}),
+    ...commonFields(),
   };
-  if (args.userId) {
-    // Reuse the email-hash function — same shape, deterministic.
-    payload.userIdHash = hashEmail(args.userId);
-  }
   logger.warn("rate_limit.hit", payload);
 }
 
 const DEFAULT_COST_THRESHOLD = 0.05;
 const DEFAULT_INPUT_TOKEN_THRESHOLD = 50_000;
 
+function parseThreshold(raw: string | undefined, defaultValue: number): number {
+  if (!raw) return defaultValue;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) return defaultValue;
+  return parsed;
+}
+
 export function isExpensiveCall(args: { costUsd: number; inputTokens: number }): boolean {
-  const costThreshold = Number(process.env.AI_EVENT_COST_THRESHOLD_USD ?? DEFAULT_COST_THRESHOLD);
-  const tokenThreshold = Number(
-    process.env.AI_EVENT_INPUT_TOKEN_THRESHOLD ?? DEFAULT_INPUT_TOKEN_THRESHOLD,
+  const costThreshold = parseThreshold(
+    process.env.AI_EVENT_COST_THRESHOLD_USD,
+    DEFAULT_COST_THRESHOLD,
+  );
+  const tokenThreshold = parseThreshold(
+    process.env.AI_EVENT_INPUT_TOKEN_THRESHOLD,
+    DEFAULT_INPUT_TOKEN_THRESHOLD,
   );
   return args.costUsd > costThreshold || args.inputTokens > tokenThreshold;
 }
@@ -95,7 +103,7 @@ interface AiCallArgs {
 }
 
 export function emitAiCall(args: AiCallArgs): void {
-  const payload = { ...commonFields(), kind: "ai.call" as const, ...args };
+  const payload = { ...args, kind: "ai.call", ...commonFields() };
   if (!args.success) logger.error("ai.call", payload);
   else logger.warn("ai.call", payload);
 }
@@ -108,5 +116,6 @@ interface AiDailySummaryArgs {
 }
 
 export function emitAiDailySummary(args: AiDailySummaryArgs): void {
-  logger.info("ai.daily_summary", { ...commonFields(), kind: "ai.daily_summary", ...args });
+  const payload = { ...args, kind: "ai.daily_summary", ...commonFields() };
+  logger.info("ai.daily_summary", payload);
 }

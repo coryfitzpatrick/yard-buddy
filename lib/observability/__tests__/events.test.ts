@@ -119,6 +119,23 @@ describe("isExpensiveCall", () => {
     expect(isExpensiveCall({ costUsd: 0.5, inputTokens: 100 })).toBe(false);
     delete process.env.AI_EVENT_COST_THRESHOLD_USD;
   });
+  it("falls back to default when AI_EVENT_COST_THRESHOLD_USD is empty string", () => {
+    process.env.AI_EVENT_COST_THRESHOLD_USD = "";
+    expect(isExpensiveCall({ costUsd: 0.001, inputTokens: 100 })).toBe(false);
+    delete process.env.AI_EVENT_COST_THRESHOLD_USD;
+  });
+  it("falls back to default when AI_EVENT_COST_THRESHOLD_USD is non-numeric", () => {
+    process.env.AI_EVENT_COST_THRESHOLD_USD = "abc";
+    expect(isExpensiveCall({ costUsd: 0.001, inputTokens: 100 })).toBe(false);
+    delete process.env.AI_EVENT_COST_THRESHOLD_USD;
+  });
+  it("falls back to default when AI_EVENT_COST_THRESHOLD_USD is zero or negative", () => {
+    process.env.AI_EVENT_COST_THRESHOLD_USD = "-1";
+    expect(isExpensiveCall({ costUsd: 0.001, inputTokens: 100 })).toBe(false);
+    process.env.AI_EVENT_COST_THRESHOLD_USD = "0";
+    expect(isExpensiveCall({ costUsd: 0.001, inputTokens: 100 })).toBe(false);
+    delete process.env.AI_EVENT_COST_THRESHOLD_USD;
+  });
 });
 
 describe("emitAiCall", () => {
@@ -182,11 +199,59 @@ describe("emitAiDailySummary", () => {
 });
 
 describe("common fields on every event", () => {
-  it("includes env, service, version on cron.run payloads", () => {
-    const infoSpy = vi.spyOn(logger, "info").mockImplementation(() => {});
-    emitCronRun({ route: "trial-reminders", ok: true, durationMs: 1, counts: {} });
-    expect(infoSpy).toHaveBeenCalledWith(
+  const cases: Array<[string, () => void, "info" | "warn" | "error"]> = [
+    [
       "cron.run",
+      () => emitCronRun({ route: "trial-reminders", ok: true, durationMs: 1, counts: {} }),
+      "info",
+    ],
+    [
+      "rate_limit.hit",
+      () =>
+        emitRateLimitHit({
+          route: "/api/x",
+          ip: "1.2.3.4",
+          userId: null,
+          maxAttempts: 1,
+          windowMs: 1000,
+        }),
+      "warn",
+    ],
+    [
+      "ai.call",
+      () =>
+        emitAiCall({
+          userId: "u1",
+          feature: "analyze",
+          model: "claude-sonnet-4-6",
+          success: false,
+          costUsd: 0,
+          inputTokens: 0,
+          outputTokens: 0,
+          cacheReadTokens: 0,
+          cacheCreationTokens: 0,
+          reason: "failure",
+        }),
+      "error",
+    ],
+    [
+      "ai.daily_summary",
+      () =>
+        emitAiDailySummary({
+          date: "2026-06-19",
+          totals: { calls: 0, failures: 0, costUsd: 0 },
+          byFeature: {},
+          topUsers: [],
+        }),
+      "info",
+    ],
+  ];
+
+  it.each(cases)("includes env, service, version on %s", (kind, emit, level) => {
+    const spy = vi.spyOn(logger, level).mockImplementation(() => {});
+    emit();
+    expect(spy).toHaveBeenCalledWith(
+      kind,
       expect.objectContaining({
         env: expect.any(String),
         service: "yard-analyzer",
