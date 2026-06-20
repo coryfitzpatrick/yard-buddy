@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { updateTaskStatusAction, resetTaskOverdueAction } from "@/app/_actions/tasks";
+import { isMobileAppClient } from "@/lib/platform";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -255,6 +256,11 @@ export function TaskList({
   hiddenTaskCount?: number;
 }) {
   const [tasks, setTasks] = useState(initial);
+  // useState(false) intentional: in-app users never see the Upgrade copy
+  // even pre-mount. Flipping the default to true would create a paywall
+  // flash on hydration. See components/NotInApp.tsx for the same pattern.
+  const [inApp, setInApp] = useState(false);
+  useEffect(() => setInApp(isMobileAppClient()), []);
 
   async function patchTask(id: string, status: "pending" | "completed" | "skipped") {
     const target = tasks.find((t) => t.id === id);
@@ -411,7 +417,9 @@ export function TaskList({
         <div className="mt-4 space-y-2">
           <p className="text-sm font-medium text-gray-400 flex items-center gap-1.5">
             <Lock className="w-3.5 h-3.5" />
-            {hiddenTaskCount} more recommendation{hiddenTaskCount !== 1 ? "s" : ""}. Upgrade to see them.
+            {inApp
+              ? <>{hiddenTaskCount} more recommendation{hiddenTaskCount !== 1 ? "s" : ""}. Available on the Pro plan.</>
+              : <>{hiddenTaskCount} more recommendation{hiddenTaskCount !== 1 ? "s" : ""}. Upgrade to see them.</>}
           </p>
           {Array.from({ length: Math.min(hiddenTaskCount!, 3) }).map((_, i) => (
             <LockedTaskCard key={i} />

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import NotInApp from "@/components/NotInApp";
 import { STEP_LABELS, useYardSetup } from "./setup/useYardSetup";
 import { PropertyStep } from "./setup/PropertyStep";
 import { AreaStep } from "./setup/AreaStep";
@@ -46,9 +47,11 @@ export function YardSetupForm() {
           <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600 flex items-start justify-between gap-3">
             <span>{c.error}</span>
             {c.yardLimitReached && (
-              <a href="/pricing" className="shrink-0 underline font-semibold hover:text-red-800 whitespace-nowrap">
-                View plans
-              </a>
+              <NotInApp>
+                <a href="/pricing" className="shrink-0 underline font-semibold hover:text-red-800 whitespace-nowrap">
+                  View plans
+                </a>
+              </NotInApp>
             )}
           </div>
         )}

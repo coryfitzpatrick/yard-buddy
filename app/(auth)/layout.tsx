@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
+import NotInApp from "@/components/NotInApp";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +13,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <Logo className="h-8 w-auto" />
             <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
           </Link>
-          <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
+          <NotInApp>
+            <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
+          </NotInApp>
         </div>
       </nav>
       <div className="flex-1 flex items-center justify-center p-4">

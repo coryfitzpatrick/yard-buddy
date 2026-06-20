@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, Pencil } from "lucide-react";
 import { YardDetailInteractive } from "@/components/yard/YardDetailInteractive";
 import { getPlanLimits, getDaysUntilDeletion } from "@/lib/subscription";
+import NotInApp from "@/components/NotInApp";
 
 export default async function YardDetailPage({
   params,
@@ -111,16 +112,18 @@ export default async function YardDetailPage({
       </Link>
 
       {daysUntilDeletion !== null && (
-        <div className={`mb-4 rounded-lg px-4 py-3 text-sm ${
-          daysUntilDeletion <= 7
-            ? "bg-red-50 border border-red-200 text-red-700"
-            : "bg-amber-50 border border-amber-200 text-amber-700"
-        }`}>
-          {daysUntilDeletion > 0
-            ? <><strong>Your free trial has ended.</strong> Your data will be deleted in {daysUntilDeletion} day{daysUntilDeletion !== 1 ? "s" : ""} unless you <a href="/pricing" className="underline font-semibold">upgrade your plan</a>.</>
-            : <>Your free trial has ended and your data is scheduled for deletion. <a href="/pricing" className="underline font-semibold">Upgrade now</a> to keep your data.</>
-          }
-        </div>
+        <NotInApp>
+          <div className={`mb-4 rounded-lg px-4 py-3 text-sm ${
+            daysUntilDeletion <= 7
+              ? "bg-red-50 border border-red-200 text-red-700"
+              : "bg-amber-50 border border-amber-200 text-amber-700"
+          }`}>
+            {daysUntilDeletion > 0
+              ? <><strong>Your free trial has ended.</strong> Your data will be deleted in {daysUntilDeletion} day{daysUntilDeletion !== 1 ? "s" : ""} unless you <a href="/pricing" className="underline font-semibold">upgrade your plan</a>.</>
+              : <>Your free trial has ended and your data is scheduled for deletion. <a href="/pricing" className="underline font-semibold">Upgrade now</a> to keep your data.</>
+            }
+          </div>
+        </NotInApp>
       )}
 
       <div className="flex items-start justify-between mb-6">

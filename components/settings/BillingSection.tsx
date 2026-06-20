@@ -1,9 +1,16 @@
 "use client";
 
+// NOTE: This section is gated at the route level by app/(dashboard)/settings/page.tsx
+// via `await isMobileApp()`. In-app users never see this component today. The
+// in-section <NotInApp> wraps below provide defense-in-depth: if a future refactor
+// renders BillingSection in a context without the gate, its Upgrade/Subscribe
+// links won't resurface inside the mobile app.
+
 import Link from "next/link";
 import { CreditCard, PauseCircle, PlayCircle, XCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import NotInApp from "@/components/NotInApp";
 
 interface PaymentMethod {
   brand: string;
@@ -169,11 +176,13 @@ export function BillingSection({
             </p>
           )}
           {isExpired && (
-            <p className="text-sm text-red-600 font-medium mt-0.5">
-              {daysUntilDeletion! > 0
-                ? `Your data will be deleted in ${daysUntilDeletion} day${daysUntilDeletion !== 1 ? "s" : ""}. Upgrade to keep it.`
-                : "Your data is scheduled for deletion. Upgrade now."}
-            </p>
+            <NotInApp>
+              <p className="text-sm text-red-600 font-medium mt-0.5">
+                {daysUntilDeletion! > 0
+                  ? `Your data will be deleted in ${daysUntilDeletion} day${daysUntilDeletion !== 1 ? "s" : ""}. Upgrade to keep it.`
+                  : "Your data is scheduled for deletion. Upgrade now."}
+              </p>
+            </NotInApp>
           )}
         </div>
         <div className="shrink-0">
@@ -184,9 +193,11 @@ export function BillingSection({
               </Button>
             </a>
           ) : !isTrial ? null : (
-            <Link href="/pricing">
-              <Button size="sm" className="bg-green-600 hover:bg-green-700">Upgrade plan</Button>
-            </Link>
+            <NotInApp>
+              <Link href="/pricing">
+                <Button size="sm" className="bg-green-600 hover:bg-green-700">Upgrade plan</Button>
+              </Link>
+            </NotInApp>
           )}
         </div>
       </div>
@@ -222,12 +233,14 @@ export function BillingSection({
         <div className="border-t border-gray-100 pt-4 space-y-3">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-medium text-gray-700">Change plan</p>
-            <Link
-              href="/pricing"
-              className="text-xs text-green-700 hover:text-green-800 underline"
-            >
-              Compare plans
-            </Link>
+            <NotInApp>
+              <Link
+                href="/pricing"
+                className="text-xs text-green-700 hover:text-green-800 underline"
+              >
+                Compare plans
+              </Link>
+            </NotInApp>
           </div>
 
           {changePlanKey ? (() => {
@@ -437,14 +450,16 @@ export function BillingSection({
 
       {/* Trial upgrade prompt */}
       {isTrial && (
-        <div className="border-t border-gray-100 pt-4">
-          <p className="text-sm text-gray-500 mb-2">
-            Unlock unlimited recommendations, multiple yards, and more.
-          </p>
-          <Link href="/pricing">
-            <Button className="bg-green-600 hover:bg-green-700 w-full">See all plans</Button>
-          </Link>
-        </div>
+        <NotInApp>
+          <div className="border-t border-gray-100 pt-4">
+            <p className="text-sm text-gray-500 mb-2">
+              Unlock unlimited recommendations, multiple yards, and more.
+            </p>
+            <Link href="/pricing">
+              <Button className="bg-green-600 hover:bg-green-700 w-full">See all plans</Button>
+            </Link>
+          </div>
+        </NotInApp>
       )}
     </div>
   );

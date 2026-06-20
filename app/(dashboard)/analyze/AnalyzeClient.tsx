@@ -11,6 +11,7 @@ import { Loader2, ArrowRight, Plus, Camera } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
+import NotInApp from "@/components/NotInApp";
 
 export interface AnalyzeSection {
   id: string;
@@ -296,9 +297,11 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
                 <span>{analysisError}</span>
               </div>
               {analysisLimitReached && (
-                <a href="/pricing" className="shrink-0 underline font-semibold hover:text-red-800 whitespace-nowrap">
-                  View plans
-                </a>
+                <NotInApp>
+                  <a href="/pricing" className="shrink-0 underline font-semibold hover:text-red-800 whitespace-nowrap">
+                    View plans
+                  </a>
+                </NotInApp>
               )}
             </div>
           )}

@@ -12,6 +12,7 @@ import { TaskList } from "@/components/dashboard/TaskList";
 import { PersonalizedRemindersCard } from "@/components/sections/PersonalizedRemindersCard";
 import { format } from "date-fns";
 import { getPlanLimits, getDaysUntilDeletion, canRunAnalysis } from "@/lib/subscription";
+import NotInApp from "@/components/NotInApp";
 
 export default async function SectionDetailPage({
   params,
@@ -169,16 +170,18 @@ export default async function SectionDetailPage({
       </Link>
 
       {daysUntilDeletion !== null && (
-        <div className={`mb-4 rounded-lg px-4 py-3 text-sm ${
-          daysUntilDeletion <= 7
-            ? "bg-red-50 border border-red-200 text-red-700"
-            : "bg-amber-50 border border-amber-200 text-amber-700"
-        }`}>
-          {daysUntilDeletion > 0
-            ? <><strong>Your free trial has ended.</strong> Your data will be deleted in {daysUntilDeletion} day{daysUntilDeletion !== 1 ? "s" : ""} unless you <a href="/pricing" className="underline font-semibold">upgrade your plan</a>.</>
-            : <>Your free trial has ended and your data is scheduled for deletion. <a href="/pricing" className="underline font-semibold">Upgrade now</a> to keep your data.</>
-          }
-        </div>
+        <NotInApp>
+          <div className={`mb-4 rounded-lg px-4 py-3 text-sm ${
+            daysUntilDeletion <= 7
+              ? "bg-red-50 border border-red-200 text-red-700"
+              : "bg-amber-50 border border-amber-200 text-amber-700"
+          }`}>
+            {daysUntilDeletion > 0
+              ? <><strong>Your free trial has ended.</strong> Your data will be deleted in {daysUntilDeletion} day{daysUntilDeletion !== 1 ? "s" : ""} unless you <a href="/pricing" className="underline font-semibold">upgrade your plan</a>.</>
+              : <>Your free trial has ended and your data is scheduled for deletion. <a href="/pricing" className="underline font-semibold">Upgrade now</a> to keep your data.</>
+            }
+          </div>
+        </NotInApp>
       )}
 
       {/* Header */}
@@ -207,18 +210,20 @@ export default async function SectionDetailPage({
         </div>
       </div>
       {analysisLimitReached ? (
-        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 flex items-center justify-between gap-3 mb-4">
-          <span>
-            You have used all your analyses for this month.{" "}
-            <strong>Limit resets on the 1st of next month.</strong>
-          </span>
-          <a
-            href="/pricing"
-            className="shrink-0 text-green-700 font-semibold underline hover:text-green-900 whitespace-nowrap"
-          >
-            Upgrade for more
-          </a>
-        </div>
+        <NotInApp>
+          <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 flex items-center justify-between gap-3 mb-4">
+            <span>
+              You have used all your analyses for this month.{" "}
+              <strong>Limit resets on the 1st of next month.</strong>
+            </span>
+            <a
+              href="/pricing"
+              className="shrink-0 text-green-700 font-semibold underline hover:text-green-900 whitespace-nowrap"
+            >
+              Upgrade for more
+            </a>
+          </div>
+        </NotInApp>
       ) : analysisLimitText ? (
         <p className="text-xs text-gray-400 mt-1 mb-4">{analysisLimitText}</p>
       ) : null}

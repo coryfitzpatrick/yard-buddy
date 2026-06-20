@@ -6,6 +6,9 @@ import { Lock } from "lucide-react";
 import { isMobileAppClient } from "@/lib/platform";
 
 export function LockedTaskCard() {
+  // useState(false) intentional: in-app users never see the Upgrade link
+  // even pre-mount. Flipping the default to true would create a paywall
+  // flash on hydration. See components/NotInApp.tsx for the same pattern.
   const [inApp, setInApp] = useState(false);
   useEffect(() => setInApp(isMobileAppClient()), []);
 
