@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { isMobileApp } from "@/lib/platform";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const inApp = await isMobileApp();
   return (
     <div className="flex flex-col items-center gap-4 w-full max-w-md">
       <div className="text-center mb-2">
@@ -13,12 +15,18 @@ export default function LoginPage() {
         <p className="text-sm text-gray-500">Your AI lawn care assistant</p>
       </div>
       <LoginForm />
-      <p className="text-sm text-gray-600">
-        Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-green-600 font-medium hover:underline">
-          Sign up
-        </Link>
-      </p>
+      {inApp ? (
+        <p className="text-sm text-gray-600">
+          Need an account? Create one at yardanalyzer.com
+        </p>
+      ) : (
+        <p className="text-sm text-gray-600">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="text-green-600 font-medium hover:underline">
+            Sign up
+          </Link>
+        </p>
+      )}
     </div>
   );
 }
