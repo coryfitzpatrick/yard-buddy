@@ -6,7 +6,7 @@ import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
 import { deduplicateRecommendations } from "@/lib/analysis-utils";
 import { canRunAnalysis, getPlanLimits } from "@/lib/subscription";
 import { isOwnedLawnPhotoUrl } from "@/lib/storage-url";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
@@ -31,7 +31,12 @@ export async function POST(req: NextRequest) {
 
   // Each user gets ~10 analyses/hr regardless of plan-level monthly caps —
   // tight bound because every call fans out to multiple paid Claude requests.
-  const rate = await checkRateLimit(`analyze:${session.user.id}`, 10, 60 * 60 * 1000);
+  const rate = await checkRateLimit(
+    `analyze:${session.user.id}`,
+    10,
+    60 * 60 * 1000,
+    { route: "/api/analyze", ip: getClientIp(req), userId: session.user.id },
+  );
   if (rate.limited) {
     return NextResponse.json(
       { error: "rate_limited", message: "Too many analyses in the last hour. Try again shortly." },

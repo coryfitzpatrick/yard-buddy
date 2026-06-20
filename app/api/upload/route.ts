@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,7 +22,12 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const rate = await checkRateLimit(`upload:${session.user.id}`, 60, 60 * 60 * 1000);
+  const rate = await checkRateLimit(
+    `upload:${session.user.id}`,
+    60,
+    60 * 60 * 1000,
+    { route: "/api/upload", ip: getClientIp(req), userId: session.user.id },
+  );
   if (rate.limited) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }

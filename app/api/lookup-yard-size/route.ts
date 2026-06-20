@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const lookupSchema = z.object({ address: z.string().min(3).max(200) });
@@ -25,7 +25,12 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const rate = await checkRateLimit(`lookup-yard-size:${session.user.id}`, 30, 60 * 60 * 1000);
+  const rate = await checkRateLimit(
+    `lookup-yard-size:${session.user.id}`,
+    30,
+    60 * 60 * 1000,
+    { route: "/api/lookup-yard-size", ip: getClientIp(req), userId: session.user.id },
+  );
   if (rate.limited) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }

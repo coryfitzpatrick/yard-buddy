@@ -6,7 +6,12 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { DAY_MS, HOUR_MS } from "@/lib/time";
 
 export async function POST(req: NextRequest) {
-  const { limited } = await checkRateLimit(`register:${getClientIp(req)}`, 5, HOUR_MS);
+  const { limited } = await checkRateLimit(
+    `register:${getClientIp(req)}`,
+    5,
+    HOUR_MS,
+    { route: "/api/auth/register", ip: getClientIp(req), userId: null },
+  );
   if (limited) {
     return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { GrassType } from "@/types";
 import { isOwnedLawnPhotoUrl } from "@/lib/storage-url";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { callClaude } from "@/lib/ai/usage";
 
 const VALID_GRASS_TYPES: GrassType[] = [
@@ -14,7 +14,12 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const rate = await checkRateLimit(`identify-grass:${session.user.id}`, 10, 60 * 60 * 1000);
+  const rate = await checkRateLimit(
+    `identify-grass:${session.user.id}`,
+    10,
+    60 * 60 * 1000,
+    { route: "/api/identify-grass", ip: getClientIp(req), userId: session.user.id },
+  );
   if (rate.limited) {
     return NextResponse.json(
       { error: "rate_limited", message: "Too many identifications in the last hour. Try again shortly." },

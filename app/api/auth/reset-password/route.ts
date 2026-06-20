@@ -6,7 +6,12 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashToken } from "@/lib/token-hash";
 
 export async function POST(req: NextRequest) {
-  const { limited } = await checkRateLimit(`reset-password:${getClientIp(req)}`, 10, 60 * 60 * 1000);
+  const { limited } = await checkRateLimit(
+    `reset-password:${getClientIp(req)}`,
+    10,
+    60 * 60 * 1000,
+    { route: "/api/auth/reset-password", ip: getClientIp(req), userId: null },
+  );
   if (limited) {
     return NextResponse.json(
       { error: "Too many requests. Please try again later." },

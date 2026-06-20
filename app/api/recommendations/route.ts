@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { generateRecommendations } from "@/lib/claude";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -15,7 +15,12 @@ export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const rate = await checkRateLimit(`recommendations:${session.user.id}`, 20, 60 * 60 * 1000);
+  const rate = await checkRateLimit(
+    `recommendations:${session.user.id}`,
+    20,
+    60 * 60 * 1000,
+    { route: "/api/recommendations", ip: getClientIp(req), userId: session.user.id },
+  );
   if (rate.limited) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
