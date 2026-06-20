@@ -1,31 +1,32 @@
 {
   "name": "Yard Analyzer — Production Health",
   "description": "Day-one dashboard. Filter all charts on env: production.",
+  "fieldPathNote": "Axiom's nextJsFormatters flattens payload keys with literal dots: emitted `{ env, kind, ok, route, durationMs, ... }` lands as `fields.env`, `fields.kind`, etc. (single field name with a dot, not a nested object). APL needs the bracket-quote escape for these: `['fields.env']`. Top-level fields like `level`, `message`, `source`, `_time` need no escaping. Also note: when the code calls `logger.info(\"cron.run\", { ... })`, Axiom puts the string `cron.run` in the top-level `message` field, so `message == 'cron.run'` is a cleaner filter than `['fields.kind'] == 'cron.run'`.",
   "charts": [
     {
       "name": "Cron health (last 7 days)",
       "kind": "table",
-      "apl": "['yard-analyzer'] | where env == 'production' and kind == 'cron.run' | summarize ok = countif(ok == true), failed = countif(ok == false), p50_ms = percentile(durationMs, 50), p95_ms = percentile(durationMs, 95) by route, bin(_time, 1d) | order by _time desc"
+      "apl": "['yard-analyzer'] | where ['fields.env'] == 'production' and message == 'cron.run' | extend ok = ['fields.ok'], route = tostring(['fields.route']), durationMs = ['fields.durationMs'] | summarize ok_count = countif(ok == true), failed = countif(ok == false), p50_ms = percentile(durationMs, 50), p95_ms = percentile(durationMs, 95) by route, bin(_time, 1d) | order by _time desc"
     },
     {
       "name": "AI cost — daily totals",
       "kind": "timeseries",
-      "apl": "['yard-analyzer'] | where env == 'production' and kind == 'ai.daily_summary' | project _time, costUsd = totals.costUsd, failures = totals.failures | order by _time asc"
+      "apl": "['yard-analyzer'] | where ['fields.env'] == 'production' and message == 'ai.daily_summary' | summarize costUsd = max(todouble(['fields.totals.costUsd'])), failures = max(toint(['fields.totals.failures'])) by bin(_time, 1d)"
     },
     {
       "name": "AI cost — top 10 users (last 7d)",
       "kind": "table",
-      "apl": "['yard-analyzer'] | where env == 'production' and kind == 'ai.daily_summary' and _time > ago(7d) | mv-expand topUsers | summarize calls = sum(toint(topUsers.calls)), costUsd = sum(todouble(topUsers.costUsd)) by userId = tostring(topUsers.userId) | order by costUsd desc | take 10"
+      "apl": "['yard-analyzer'] | where ['fields.env'] == 'production' and message == 'ai.daily_summary' and _time > ago(7d) | extend topUsers = ['fields.topUsers'] | mv-expand topUsers | summarize calls = sum(toint(topUsers.calls)), costUsd = sum(todouble(topUsers.costUsd)) by userId = tostring(topUsers.userId) | order by costUsd desc | take 10"
     },
     {
       "name": "Rate-limit hits by route (last 24h)",
-      "kind": "bar",
-      "apl": "['yard-analyzer'] | where env == 'production' and kind == 'rate_limit.hit' and _time > ago(24h) | summarize hits = count() by route | order by hits desc"
+      "kind": "timeseries",
+      "apl": "['yard-analyzer'] | where ['fields.env'] == 'production' and message == 'rate_limit.hit' and _time > ago(24h) | summarize hits = count() by route = tostring(['fields.route']), bin(_time, 1h)"
     },
     {
       "name": "Errors (last 1h)",
       "kind": "table",
-      "apl": "['yard-analyzer'] | where env == 'production' and level == 'error' | order by _time desc | take 100"
+      "apl": "['yard-analyzer'] | where ['fields.env'] == 'production' and level == 'error' | order by _time desc | take 100"
     }
   ]
 }
