@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { timingSafeEqual } from "crypto";
 import { buildCostReport, DEFAULT_COST_REPORT_RECIPIENT } from "@/lib/cost-report";
 import { buildCostReportEmail, resend } from "@/lib/email";
 import { db } from "@/lib/db";
+import { verifyCronAuth } from "@/lib/cron/auth";
 
 // Rolling window — keep the reported month plus the two prior months for
 // ad-hoc lookbacks, plus the in-progress current month that's still being
@@ -17,15 +17,8 @@ function previousMonth(now: Date): string {
 }
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  const expected = `Bearer ${process.env.CRON_SECRET}`;
-  const provided = authHeader ?? "";
-  const tokensMatch =
-    provided.length === expected.length &&
-    timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
-  if (!tokensMatch) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = verifyCronAuth(req);
+  if (unauthorized) return unauthorized;
 
   const month = previousMonth(new Date());
 
