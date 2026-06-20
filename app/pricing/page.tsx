@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { CheckCircle } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { isMobileApp } from "@/lib/platform";
 
 export const metadata = { title: "Pricing – Yard Analyzer" };
 
@@ -54,6 +56,8 @@ const PLANS = [
 ];
 
 export default async function PricingPage() {
+  if (await isMobileApp()) redirect("/dashboard");
+
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
 
