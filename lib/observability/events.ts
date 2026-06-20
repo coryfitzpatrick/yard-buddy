@@ -36,6 +36,13 @@ export type RateLimitedRoute =
   | "/api/auth/forgot-password"
   | "/api/auth/reset-password";
 
+// `cron.run` events use a structured `error` field ({ message, code?, stack? })
+// because failure detail is part of the event schema. Free-form `logger.error`
+// calls elsewhere in the codebase use `err:` for the same shape. Dashboards
+// querying for failure text on cron events should reference `error.message`;
+// dashboards querying free-form errors should reference `err` (string). When
+// adding a new event kind, prefer `error` for typed failure schema and `err`
+// for opaque string-coerced exceptions.
 interface CronRunArgs {
   route: CronRoute;
   ok: boolean;

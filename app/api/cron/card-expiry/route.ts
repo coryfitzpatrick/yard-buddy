@@ -118,7 +118,7 @@ export const GET = withAxiom(async (req: NextRequest) => {
       durationMs: Date.now() - startedAt,
       counts: { warned, failed },
     });
-    return NextResponse.json({ ok: true, warned });
+    return NextResponse.json({ ok: true, warned, failed });
   } catch (err) {
     emitCronRun({
       route: "card-expiry",

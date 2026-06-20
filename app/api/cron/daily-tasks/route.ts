@@ -39,14 +39,10 @@ function sameDay(a: Date, b: Date): boolean {
   return a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10);
 }
 
-export const GET = withAxiom(async (req: NextRequest) => {
-  const unauthorized = verifyCronAuth(req);
-  if (unauthorized) return unauthorized;
-
-  const startedAt = Date.now();
-
-  try {
-  const today = startOfToday();
+async function runDailyTasks(
+  today: Date,
+  progress: { yardsProcessed: number; usersProcessed: number },
+): Promise<void> {
   const currentYear = today.getUTCFullYear();
 
   // 1. Fetch yards with pending tasks (for task processing + notifications)
@@ -288,6 +284,7 @@ export const GET = withAxiom(async (req: NextRequest) => {
       ]);
     }
   });
+  progress.yardsProcessed = yards.length;
 
   // 5. Assess newly overdue tasks per section
   for (const [, { tasks, grassType, zip, userId }] of overdueBySection) {
@@ -434,20 +431,32 @@ export const GET = withAxiom(async (req: NextRequest) => {
       });
     }
   });
+  progress.usersProcessed = userMap.size;
+}
 
-  emitCronRun({
-    route: "daily-tasks",
-    ok: true,
-    durationMs: Date.now() - startedAt,
-    counts: { yards: yards.length, usersProcessed: userMap.size },
-  });
-  return NextResponse.json({ ok: true, processed: userMap.size });
+export const GET = withAxiom(async (req: NextRequest) => {
+  const unauthorized = verifyCronAuth(req);
+  if (unauthorized) return unauthorized;
+
+  const startedAt = Date.now();
+  const today = startOfToday();
+  const progress = { yardsProcessed: 0, usersProcessed: 0 };
+
+  try {
+    await runDailyTasks(today, progress);
+    emitCronRun({
+      route: "daily-tasks",
+      ok: true,
+      durationMs: Date.now() - startedAt,
+      counts: { yards: progress.yardsProcessed, usersProcessed: progress.usersProcessed },
+    });
+    return NextResponse.json({ ok: true, processed: progress.usersProcessed });
   } catch (err) {
     emitCronRun({
       route: "daily-tasks",
       ok: false,
       durationMs: Date.now() - startedAt,
-      counts: {},
+      counts: { yards: progress.yardsProcessed, usersProcessed: progress.usersProcessed },
       error: {
         message: err instanceof Error ? err.message : String(err),
         stack: err instanceof Error ? err.stack?.slice(0, 500) : undefined,

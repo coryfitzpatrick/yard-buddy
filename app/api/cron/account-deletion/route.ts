@@ -82,7 +82,7 @@ export const GET = withAxiom(async (req: NextRequest) => {
       durationMs: Date.now() - startedAt,
       counts: { deleted, failed },
     });
-    return NextResponse.json({ ok: true, deletedAccounts: deleted });
+    return NextResponse.json({ ok: true, deletedAccounts: deleted, failed });
   } catch (err) {
     emitCronRun({
       route: "account-deletion",

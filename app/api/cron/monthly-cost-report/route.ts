@@ -37,8 +37,8 @@ export const GET = withAxiom(async (req: NextRequest) => {
       route: "monthly-cost-report",
       ok: false,
       durationMs: Date.now() - startedAt,
-      counts: { month: Number(month.replace("-", "")) },
-      error: { message: "buildCostReport failed", code: "build" },
+      counts: {},
+      error: { message: `buildCostReport failed for ${month}`, code: "build" },
     });
     return NextResponse.json({ ok: false, month, stage: "build" }, { status: 500 });
   }
@@ -97,6 +97,10 @@ export const GET = withAxiom(async (req: NextRequest) => {
     return NextResponse.json({ ok: true, month, rows: report.rows.length, purged: 0, purgeError: true });
   }
 
+  // Note: a purge failure does NOT downgrade ok→false (email already shipped,
+  // which is the user-visible success criterion). The discriminator between
+  // "purged 0 because nothing was eligible" and "purged 0 because we never
+  // tried" is the `purgeError: 1` flag in the purge-failure catch above.
   emitCronRun({
     route: "monthly-cost-report",
     ok: true,

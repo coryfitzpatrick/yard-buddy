@@ -82,7 +82,7 @@ export const GET = withAxiom(async (req: NextRequest) => {
       durationMs: Date.now() - startedAt,
       counts: { sent, failed },
     });
-    return NextResponse.json({ ok: true, sent });
+    return NextResponse.json({ ok: true, sent, failed });
   } catch (err) {
     emitCronRun({
       route: "trial-reminders",
