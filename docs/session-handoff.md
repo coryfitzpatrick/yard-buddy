@@ -86,6 +86,18 @@ A  prisma/migrations/20260618220000_add_lawn_analysis_section_createdat_index/mi
 M  vercel.json                                   (1 daily entry → 4 staggered)
 ```
 
+### Observability layer (2026-06-20)
+
+Wired Axiom for cron success/failure, rate-limit hits, and AI cost outliers. See `docs/superpowers/specs/2026-06-20-observability-axiom-design.md` and `ops/axiom-setup.md`.
+
+- Single `lib/observability/` module: `logger` (free-form), `withAxiom` (route wrapper), `events.emitX(...)` (typed signals).
+- All API routes wrapped with `withAxiom` for uncaught-exception capture.
+- All `console.*` calls in cron + library code replaced with structured `logger.{info,warn,error}` calls.
+- Three day-one email alerts: any cron failure, AI failure rate > 5% over 15 min (min 10-call floor), and AI daily summary absent for 36h+.
+- Dashboard config at `ops/axiom-dashboard.json`; setup checklist at `ops/axiom-setup.md`.
+
+**Pending verification:** complete the steps in `ops/axiom-setup.md` after `AXIOM_TOKEN` is set on Vercel.
+
 ---
 
 ## Prior: Image-path validation baseline (2026-06-15)
