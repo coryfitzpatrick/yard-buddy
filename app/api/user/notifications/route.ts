@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { notificationPrefsSchema } from "@/lib/validations/notifications";
+import { withAxiom } from "@/lib/observability/logger";
 
-export async function PUT(req: Request) {
+export const PUT = withAxiom(async (req: Request) => {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -28,4 +29,4 @@ export async function PUT(req: Request) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

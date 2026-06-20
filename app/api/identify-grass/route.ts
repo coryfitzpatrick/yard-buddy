@@ -4,13 +4,14 @@ import { GrassType } from "@/types";
 import { isOwnedLawnPhotoUrl } from "@/lib/storage-url";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { callClaude } from "@/lib/ai/usage";
+import { withAxiom } from "@/lib/observability/logger";
 
 const VALID_GRASS_TYPES: GrassType[] = [
   "bermuda", "kentucky_bluegrass", "tall_fescue", "fine_fescue",
   "zoysia", "st_augustine", "centipede", "buffalo", "ryegrass", "unknown",
 ];
 
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -62,4 +63,4 @@ Return JSON only, no other text:
   if (!VALID_GRASS_TYPES.includes(result.grassType)) result.grassType = "unknown";
 
   return NextResponse.json(result);
-}
+});

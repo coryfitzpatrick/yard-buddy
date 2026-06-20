@@ -3,12 +3,16 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { yardSchema } from "@/lib/validations/yard";
 import { uniqueSlug } from "@/lib/slug";
+import { withAxiom } from "@/lib/observability/logger";
 
 async function getOwnedYard(id: string, userId: string) {
   return db.yard.findFirst({ where: { id, userId } });
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withAxiom(async (
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -28,4 +32,4 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const updated = await db.yard.update({ where: { id }, data: { ...parsed.data, slug } });
   return NextResponse.json(updated);
-}
+});

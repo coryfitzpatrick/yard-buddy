@@ -4,8 +4,9 @@ import { db } from "@/lib/db";
 import { yardSchema } from "@/lib/validations/yard";
 import { canCreateYard, getPlanLimits } from "@/lib/subscription";
 import { uniqueSlug } from "@/lib/slug";
+import { withAxiom } from "@/lib/observability/logger";
 
-export async function GET() {
+export const GET = withAxiom(async (_req: Request) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -26,9 +27,9 @@ export async function GET() {
     },
   });
   return NextResponse.json(yards);
-}
+});
 
-export async function POST(req: Request) {
+export const POST = withAxiom(async (req: Request) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -64,4 +65,4 @@ export async function POST(req: Request) {
     data: { ...parsed.data, userId: session.user.id, slug },
   });
   return NextResponse.json(yard, { status: 201 });
-}
+});

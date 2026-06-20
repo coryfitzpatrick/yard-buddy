@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { hashToken } from "@/lib/token-hash";
+import { withAxiom } from "@/lib/observability/logger";
 
 function redirectToSettings(req: NextRequest, status: "success" | "expired" | "invalid" | "taken" | "error") {
   const url = new URL("/settings", req.url);
@@ -9,7 +10,7 @@ function redirectToSettings(req: NextRequest, status: "success" | "expired" | "i
   return NextResponse.redirect(url);
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withAxiom(async (req: NextRequest) => {
   const token = req.nextUrl.searchParams.get("token");
   if (!token) return redirectToSettings(req, "invalid");
 
@@ -56,4 +57,4 @@ export async function GET(req: NextRequest) {
   }
 
   return redirectToSettings(req, "success");
-}
+});

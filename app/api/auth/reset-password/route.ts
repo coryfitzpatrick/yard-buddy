@@ -4,8 +4,9 @@ import { db } from "@/lib/db";
 import { resetPasswordSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashToken } from "@/lib/token-hash";
+import { withAxiom } from "@/lib/observability/logger";
 
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   const ip = getClientIp(req);
   const { limited } = await checkRateLimit(
     `reset-password:${ip}`,
@@ -54,4 +55,4 @@ export async function POST(req: NextRequest) {
   ]);
 
   return NextResponse.json({ ok: true });
-}
+});

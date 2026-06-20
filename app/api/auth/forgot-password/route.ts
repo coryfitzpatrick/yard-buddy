@@ -5,8 +5,9 @@ import { forgotPasswordSchema } from "@/lib/validations/auth";
 import { resend, buildPasswordResetEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashToken } from "@/lib/token-hash";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   const ip = getClientIp(req);
   const { limited } = await checkRateLimit(
     `forgot-password:${ip}`,
@@ -58,11 +59,13 @@ export async function POST(req: NextRequest) {
         html,
       });
     } catch (err) {
-      console.error("Failed to send password reset email:", err);
+      logger.error("Failed to send password reset email", {
+        err: err instanceof Error ? err.message : String(err),
+      });
       await db.passwordResetToken.delete({ where: { id: tokenRecord.id } });
       // Still return ok to prevent enumeration; token has been cleaned up.
     }
   }
 
   return NextResponse.json({ ok: true });
-}
+});

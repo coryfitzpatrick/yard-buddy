@@ -7,6 +7,7 @@ import { deduplicateRecommendations } from "@/lib/analysis-utils";
 import { canRunAnalysis, getPlanLimits } from "@/lib/subscription";
 import { isOwnedLawnPhotoUrl } from "@/lib/storage-url";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
 export const maxDuration = 60;
 
@@ -25,7 +26,7 @@ function titleSimilarity(a: string, b: string): number {
   return union === 0 ? 0 : intersection / union;
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -270,7 +271,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ analysis, result });
   } catch (err) {
-    console.error("Analysis failed:", err);
+    logger.error("Analysis failed", {
+      err: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json({ error: "Analysis failed. Please try again." }, { status: 500 });
   }
-}
+});

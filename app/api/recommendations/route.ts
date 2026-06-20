@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { generateRecommendations } from "@/lib/claude";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -11,7 +12,7 @@ function addDays(date: Date, days: number): Date {
   return result;
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -83,7 +84,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(recommendations);
   } catch (err) {
-    console.error("Recommendations failed:", err);
+    logger.error("Recommendations failed", {
+      err: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json({ error: "Recommendations failed. Please try again." }, { status: 500 });
   }
-}
+});

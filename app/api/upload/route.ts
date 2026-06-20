@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +19,7 @@ const MIME_TO_EXT: Record<string, string> = {
 
 // Returns a signed upload URL — the client uploads directly to Supabase,
 // bypassing Vercel's 4.5MB serverless body limit.
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -45,10 +46,12 @@ export async function POST(req: NextRequest) {
     .createSignedUploadUrl(path);
 
   if (error) {
-    console.error("Failed to create signed upload URL:", error);
+    logger.error("Failed to create signed upload URL", {
+      err: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   const { data: { publicUrl } } = supabase.storage.from("lawn-photos").getPublicUrl(path);
   return NextResponse.json({ token: data.token, path, publicUrl });
-}
+});

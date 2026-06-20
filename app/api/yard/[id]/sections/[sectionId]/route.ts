@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { yardSectionSchema } from "@/lib/validations/yard";
 import { uniqueSlug } from "@/lib/slug";
+import { withAxiom } from "@/lib/observability/logger";
 
 async function getOwnedSection(sectionId: string, userId: string) {
   return db.yardSection.findFirst({
@@ -10,10 +11,10 @@ async function getOwnedSection(sectionId: string, userId: string) {
   });
 }
 
-export async function PATCH(
+export const PATCH = withAxiom(async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string; sectionId: string }> }
-) {
+  { params }: { params: Promise<{ id: string; sectionId: string }> },
+) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -41,4 +42,4 @@ export async function PATCH(
     data: { ...parsed.data, slug },
   });
   return NextResponse.json(updated);
-}
+});

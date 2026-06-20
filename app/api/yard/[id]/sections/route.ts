@@ -3,12 +3,16 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { yardSectionSchema } from "@/lib/validations/yard";
 import { uniqueSlug } from "@/lib/slug";
+import { withAxiom } from "@/lib/observability/logger";
 
 async function getOwnedYard(id: string, userId: string) {
   return db.yard.findFirst({ where: { id, userId } });
 }
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withAxiom(async (
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -21,9 +25,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     orderBy: { createdAt: "asc" },
   });
   return NextResponse.json(sections);
-}
+});
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withAxiom(async (
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -45,4 +52,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     data: { ...parsed.data, yardId: id, slug },
   });
   return NextResponse.json(section, { status: 201 });
-}
+});

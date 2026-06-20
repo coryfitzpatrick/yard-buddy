@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyUnsubscribeToken } from "@/lib/email";
+import { withAxiom } from "@/lib/observability/logger";
 
 function baseUrl(): string {
   return (
@@ -24,7 +25,7 @@ function htmlResponse(body: string, status = 200) {
 // GET renders a confirm page; the actual opt-out happens on POST so email
 // prefetchers (Gmail, Outlook safe-links, antivirus scanners) can't silently
 // disable a user's notifications by following the link.
-export async function GET(req: NextRequest) {
+export const GET = withAxiom(async (req: NextRequest) => {
   const token = req.nextUrl.searchParams.get("token");
   if (!token) {
     return htmlResponse("Invalid unsubscribe link.", 400);
@@ -53,9 +54,9 @@ export async function GET(req: NextRequest) {
 </body>
 </html>`,
   );
-}
+});
 
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   // Accept the token from either form-encoded POST (the confirm page) or a
   // JSON body for programmatic callers.
   let token: string | null = null;
@@ -100,4 +101,4 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`,
   );
-}
+});

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { stripe, STRIPE_PRICES, isValidPlan, isValidPeriod } from "@/lib/stripe";
+import { withAxiom } from "@/lib/observability/logger";
 
-export async function GET(req: NextRequest) {
+export const GET = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id || !session.user.email) {
     return NextResponse.redirect(new URL("/login", req.url));
@@ -64,4 +65,4 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.redirect(checkoutSession.url);
-}
+});

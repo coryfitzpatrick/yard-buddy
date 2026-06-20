@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getWeatherByZip, getWeatherByLatLon } from "@/lib/weather";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
 const CACHE = { headers: { "Cache-Control": "public, max-age=1800" } };
 
-export async function GET(req: NextRequest) {
+export const GET = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -36,7 +37,9 @@ export async function GET(req: NextRequest) {
     }
     return NextResponse.json({ error: "zip or lat/lon required" }, { status: 400 });
   } catch (err) {
-    console.error("Weather API error:", err);
+    logger.error("Weather API error", {
+      err: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json({ error: "Weather data unavailable" }, { status: 502 });
   }
-}
+});

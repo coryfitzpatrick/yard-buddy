@@ -4,8 +4,9 @@ import { db } from "@/lib/db";
 import { registerSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { DAY_MS, HOUR_MS } from "@/lib/time";
+import { withAxiom } from "@/lib/observability/logger";
 
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   const ip = getClientIp(req);
   const { limited } = await checkRateLimit(
     `register:${ip}`,
@@ -40,4 +41,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ id: user.id, email: user.email }, { status: 201 });
-}
+});

@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { stripe, planFromPriceId } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { resend, buildPaymentFailedEmail } from "@/lib/email";
+import { withAxiom, logger } from "@/lib/observability/logger";
 
 async function updateUserFromSubscription(sub: Stripe.Subscription) {
   // Look up user by our stored customerId — never trust payload userId directly
@@ -52,7 +53,7 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
   });
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
 
@@ -64,7 +65,9 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
-    console.error("Webhook signature verification failed:", err);
+    logger.error("Webhook signature verification failed", {
+      err: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
@@ -148,10 +151,13 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (err) {
-    console.error(`Webhook processing failed for event ${event.type}:`, err);
+    logger.error("Webhook processing failed", {
+      eventType: event.type,
+      err: err instanceof Error ? err.message : String(err),
+    });
     // Return 200 to prevent Stripe from retrying events we've already partially processed
     return NextResponse.json({ received: true, error: "Processing error" });
   }
 
   return NextResponse.json({ received: true });
-}
+});

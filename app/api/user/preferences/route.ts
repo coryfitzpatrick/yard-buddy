@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { userPreferencesSchema } from "@/lib/validations/userPreferences";
+import { withAxiom } from "@/lib/observability/logger";
 
-export async function PATCH(req: Request) {
+export const PATCH = withAxiom(async (req: Request) => {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -21,4 +22,4 @@ export async function PATCH(req: Request) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});

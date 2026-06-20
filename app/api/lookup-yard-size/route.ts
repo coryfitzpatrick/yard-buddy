@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { z } from "zod";
+import { withAxiom } from "@/lib/observability/logger";
 
 const lookupSchema = z.object({ address: z.string().min(3).max(200) });
 
@@ -21,7 +22,7 @@ function polygonAreaSqft(coords: [number, number][]): number {
   return Math.round(Math.abs(area / 2) * 10.7639);
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -103,4 +104,4 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ lotSqft: null, buildingSqft: null, usableSqft: null, lat, lon, message: "No size data found for this address" });
-}
+});

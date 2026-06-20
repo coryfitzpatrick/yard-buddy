@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { withAxiom } from "@/lib/observability/logger";
 
 const KEY = process.env.OPENWEATHERMAP_API_KEY!;
 
-export async function GET(req: NextRequest) {
+export const GET = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -39,4 +40,4 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json({ valid: false, reason: "upstream" }, { status: 502 });
   }
-}
+});

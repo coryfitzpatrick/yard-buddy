@@ -6,8 +6,9 @@ import { db } from "@/lib/db";
 import { changeEmailSchema } from "@/lib/validations/auth";
 import { resend, buildEmailChangeConfirmEmail } from "@/lib/email";
 import { hashToken } from "@/lib/token-hash";
+import { withAxiom } from "@/lib/observability/logger";
 
-export async function PUT(req: NextRequest) {
+export const PUT = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -84,4 +85,4 @@ export async function PUT(req: NextRequest) {
   }
 
   return NextResponse.json({ ok: true, pendingEmail: newEmail });
-}
+});
