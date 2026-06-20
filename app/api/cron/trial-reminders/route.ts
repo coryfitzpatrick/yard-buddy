@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { verifyCronAuth } from "@/lib/cron/auth";
 import { resend, buildTrialReminderEmail } from "@/lib/email";
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
+import { withAxiom, logger } from "@/lib/observability/logger";
+import { emitCronRun } from "@/lib/observability/events";
 
 export const maxDuration = 300;
 const EMAIL_CONCURRENCY = 10;
@@ -18,10 +20,11 @@ function startOfToday(): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withAxiom(async (req: NextRequest) => {
   const unauthorized = verifyCronAuth(req);
   if (unauthorized) return unauthorized;
 
+  const startedAt = Date.now();
   const today = startOfToday();
   const baseUrl =
     process.env.NEXTAUTH_URL ??
@@ -30,41 +33,67 @@ export async function GET(req: NextRequest) {
   const reminderDays = [7, 1];
 
   let sent = 0;
+  let failed = 0;
 
-  for (const daysLeft of reminderDays) {
-    const targetDate = addDays(today, daysLeft);
+  try {
+    for (const daysLeft of reminderDays) {
+      const targetDate = addDays(today, daysLeft);
 
-    const trialUsers = await db.user.findMany({
-      where: {
-        planStatus: "trialing",
-        trialEndsAt: {
-          gte: targetDate,
-          lt: addDays(targetDate, 1),
+      const trialUsers = await db.user.findMany({
+        where: {
+          planStatus: "trialing",
+          trialEndsAt: {
+            gte: targetDate,
+            lt: addDays(targetDate, 1),
+          },
         },
-      },
-      select: { id: true, email: true, name: true },
-    });
-
-    await mapWithConcurrency(trialUsers, EMAIL_CONCURRENCY, async (user) => {
-      if (!user.email) return;
-      const { subject, html } = buildTrialReminderEmail({
-        userName: user.name?.split(" ")[0] ?? "there",
-        daysLeft,
-        pricingUrl,
+        select: { id: true, email: true, name: true },
       });
-      try {
-        await resend.emails.send({
-          from: "Yard Analyzer <noreply@yardanalyzer.com>",
-          to: user.email,
-          subject,
-          html,
-        });
-        sent++;
-      } catch (err) {
-        console.error(`Trial reminder (${daysLeft}d) failed for user ${user.id}:`, err);
-      }
-    });
-  }
 
-  return NextResponse.json({ ok: true, sent });
-}
+      await mapWithConcurrency(trialUsers, EMAIL_CONCURRENCY, async (user) => {
+        if (!user.email) return;
+        const { subject, html } = buildTrialReminderEmail({
+          userName: user.name?.split(" ")[0] ?? "there",
+          daysLeft,
+          pricingUrl,
+        });
+        try {
+          await resend.emails.send({
+            from: "Yard Analyzer <noreply@yardanalyzer.com>",
+            to: user.email,
+            subject,
+            html,
+          });
+          sent++;
+        } catch (err) {
+          failed++;
+          logger.error("trial-reminders: email send failed", {
+            daysLeft,
+            userId: user.id,
+            err: err instanceof Error ? err.message : String(err),
+          });
+        }
+      });
+    }
+
+    emitCronRun({
+      route: "trial-reminders",
+      ok: true,
+      durationMs: Date.now() - startedAt,
+      counts: { sent, failed },
+    });
+    return NextResponse.json({ ok: true, sent });
+  } catch (err) {
+    emitCronRun({
+      route: "trial-reminders",
+      ok: false,
+      durationMs: Date.now() - startedAt,
+      counts: { sent, failed },
+      error: {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack?.slice(0, 500) : undefined,
+      },
+    });
+    throw err; // let withAxiom + the framework handle the 500
+  }
+});
