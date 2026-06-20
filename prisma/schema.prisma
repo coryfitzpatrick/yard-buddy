@@ -41,6 +41,7 @@ model User {
   passwordResets       PasswordResetToken[]
   emailChangeRequests  EmailChangeRequest[]
   aiUsageEvents        AiUsageEvent[]
+  deviceTokens         DeviceToken[]
 }
 
 model Account {
@@ -249,4 +250,17 @@ model AiUsageEvent {
 
   @@index([userId, createdAt])
   @@index([createdAt])
+}
+
+model DeviceToken {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token        String   @unique
+  platform     String   // "ios" | "android"
+  createdAt    DateTime @default(now())
+  lastUsedAt   DateTime @default(now())
+  failureCount Int      @default(0)
+
+  @@index([userId])
 }
