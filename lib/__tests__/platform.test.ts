@@ -4,7 +4,6 @@ import { isMobileAppClient } from "@/lib/platform";
 describe("isMobileAppClient", () => {
   it("returns false when navigator is undefined (SSR context)", () => {
     const orig = globalThis.navigator;
-    // @ts-expect-error - simulating SSR
     delete (globalThis as { navigator?: unknown }).navigator;
     expect(isMobileAppClient()).toBe(false);
     globalThis.navigator = orig;
