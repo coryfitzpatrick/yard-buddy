@@ -11,15 +11,8 @@ vi.mock("@/lib/db", () => ({
   db: { aiUsageEvent: { create: mockUsageCreate } },
 }));
 
-// The observability barrel transitively imports Next-only Axiom runtime types
-// via lib/observability/logger; stub them so Vitest's ESM resolver can load
-// usage.ts (which imports emitAiCall/isExpensiveCall from events).
-vi.mock("@axiomhq/nextjs", () => ({
-  createAxiomRouteHandler: <T,>(_logger: unknown, _opts?: unknown) => (handler: T) => handler,
-  nextJsFormatters: [],
-}));
-
 const events = await import("@/lib/observability/events");
+const { logger } = await import("@/lib/observability/logger");
 const { callClaude } = await import("@/lib/ai/usage");
 
 beforeEach(() => {
@@ -120,7 +113,8 @@ describe("callClaude error path", () => {
 });
 
 describe("recordUsage robustness", () => {
-  it("does not bubble DB errors to the caller", async () => {
+  it("does not bubble DB errors to the caller and logs structured fields", async () => {
+    const errorSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockCreate.mockResolvedValueOnce({
       id: "msg_1",
       model: "claude-sonnet-4-6",
@@ -134,7 +128,17 @@ describe("recordUsage robustness", () => {
         feature: "analyze",
       }),
     ).resolves.toBeDefined();
-    // Failure to write the AiUsageEvent row must not throw.
+    // Failure to write the AiUsageEvent row must not throw, and must log
+    // with structured fields so the failure is debuggable in Axiom.
+    expect(errorSpy).toHaveBeenCalledWith(
+      "recordUsage: failed to write AiUsageEvent",
+      expect.objectContaining({
+        feature: expect.any(String),
+        model: expect.any(String),
+        err: expect.any(String),
+      }),
+    );
+    errorSpy.mockRestore();
   });
 });
 

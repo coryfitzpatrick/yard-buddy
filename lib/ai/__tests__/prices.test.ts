@@ -1,13 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 
-// prices.ts now imports the observability logger, which transitively pulls in
-// Axiom's Next.js route-handler wrapper. Stub it so Vitest's ESM resolver can
-// load the module under test.
-vi.mock("@axiomhq/nextjs", () => ({
-  createAxiomRouteHandler: <T,>(_logger: unknown, _opts?: unknown) => (handler: T) => handler,
-  nextJsFormatters: [],
-}));
-
 const { computeCostUsd, AI_PRICES_USD_PER_MTOK } = await import("@/lib/ai/prices");
 const { logger } = await import("@/lib/observability/logger");
 

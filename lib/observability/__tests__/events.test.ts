@@ -1,15 +1,5 @@
 // lib/observability/__tests__/events.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
-
-// Mock @axiomhq/nextjs: its ESM build does `import * as next from "next/server"`
-// (no .js extension), which Node's strict ESM resolver rejects under Vitest.
-// logger.ts (transitively imported via events.ts) pulls in this module, so we
-// stub the bits it consumes (createAxiomRouteHandler + nextJsFormatters).
-vi.mock("@axiomhq/nextjs", () => ({
-  createAxiomRouteHandler: () => (handler: unknown) => handler,
-  nextJsFormatters: [],
-}));
-
 import { logger } from "@/lib/observability/logger";
 import {
   emitCronRun,

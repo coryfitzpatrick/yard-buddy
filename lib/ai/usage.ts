@@ -4,8 +4,6 @@ import { computeCostUsd, type AiUsageInput } from "./prices";
 import { logger } from "@/lib/observability/logger";
 import { emitAiCall, isExpensiveCall, type AiFeature } from "@/lib/observability/events";
 
-export type { AiFeature };
-
 export interface AiCallCtx {
   userId: string | null;
   feature: AiFeature;
@@ -20,6 +18,9 @@ export async function callClaude(
   try {
     const response = (await client.messages.create(params)) as Anthropic.Message;
     const usage = response.usage as AiUsageInput;
+    // Recomputed inside recordUsage as well; computeCostUsd is a pure function
+    // over ~6 multiplications. Deliberate redundancy keeps recordUsage self-
+    // contained and avoids coupling the two call sites.
     const costUsd = computeCostUsd(response.model, usage);
     const inputTokens = usage.input_tokens ?? 0;
 
@@ -28,18 +29,24 @@ export async function callClaude(
     // Mirror only outliers — failures and expensive calls — to Axiom.
     // Postgres remains the source of truth for the monthly margin report.
     if (isExpensiveCall({ costUsd, inputTokens })) {
-      emitAiCall({
-        userId: ctx.userId,
-        feature: ctx.feature,
-        model: response.model,
-        success: true,
-        costUsd,
-        inputTokens,
-        outputTokens: usage.output_tokens ?? 0,
-        cacheReadTokens: usage.cache_read_input_tokens ?? 0,
-        cacheCreationTokens: usage.cache_creation_input_tokens ?? 0,
-        reason: "expensive",
-      });
+      try {
+        emitAiCall({
+          userId: ctx.userId,
+          feature: ctx.feature,
+          model: response.model,
+          success: true,
+          costUsd,
+          inputTokens,
+          outputTokens: usage.output_tokens ?? 0,
+          cacheReadTokens: usage.cache_read_input_tokens ?? 0,
+          cacheCreationTokens: usage.cache_creation_input_tokens ?? 0,
+          reason: "expensive",
+        });
+      } catch (emitErr) {
+        logger.error("emitAiCall failed (success path)", {
+          err: emitErr instanceof Error ? emitErr.message : String(emitErr),
+        });
+      }
     }
 
     return response;
@@ -47,19 +54,25 @@ export async function callClaude(
     const model = typeof params.model === "string" ? params.model : "unknown";
     const errorCode = extractErrorCode(err);
     await recordUsage({ ...ctx, model, usage: null, success: false, errorCode });
-    emitAiCall({
-      userId: ctx.userId,
-      feature: ctx.feature,
-      model,
-      success: false,
-      costUsd: 0,
-      inputTokens: 0,
-      outputTokens: 0,
-      cacheReadTokens: 0,
-      cacheCreationTokens: 0,
-      errorCode,
-      reason: "failure",
-    });
+    try {
+      emitAiCall({
+        userId: ctx.userId,
+        feature: ctx.feature,
+        model,
+        success: false,
+        costUsd: 0,
+        inputTokens: 0,
+        outputTokens: 0,
+        cacheReadTokens: 0,
+        cacheCreationTokens: 0,
+        errorCode,
+        reason: "failure",
+      });
+    } catch (emitErr) {
+      logger.error("emitAiCall failed (failure path)", {
+        err: emitErr instanceof Error ? emitErr.message : String(emitErr),
+      });
+    }
     throw err;
   }
 }

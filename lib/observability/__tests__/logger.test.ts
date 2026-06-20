@@ -1,16 +1,6 @@
 // lib/observability/__tests__/logger.test.ts
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-// Mock @axiomhq/nextjs: its ESM build does `import * as next from "next/server"`
-// (no .js extension), which Node's strict ESM resolver rejects under Vitest.
-// We only use `createAxiomRouteHandler` and `nextJsFormatters` in logger.ts;
-// stub both so the module loads. The Next.js runtime resolves it natively
-// in real builds, so this only affects test execution.
-vi.mock("@axiomhq/nextjs", () => ({
-  createAxiomRouteHandler: () => (handler: unknown) => handler,
-  nextJsFormatters: [],
-}));
-
 const ORIG_ENV = { ...process.env };
 
 function setNodeEnv(value: string | undefined) {

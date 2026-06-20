@@ -3,17 +3,6 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import * as events from "@/lib/observability/events";
 import type { RateLimitedRoute } from "@/lib/observability/events";
 
-// Two-layer mock setup for the "emits rate_limit.hit" tests below:
-//  1. vi.mock("@axiomhq/nextjs") — the observability barrel transitively
-//     imports the Axiom logger module at import time; this stub keeps that
-//     graph from pulling Next-only runtime types under Vitest's ESM resolver.
-//  2. vi.spyOn(events, "emitRateLimitHit") inside the test — short-circuits
-//     the actual emit so we assert on call shape without any IO.
-vi.mock("@axiomhq/nextjs", () => ({
-  createAxiomRouteHandler: <T,>(_logger: unknown, _opts?: unknown) => (handler: T) => handler,
-  nextJsFormatters: [],
-}));
-
 function makeReq(headers: Record<string, string>): Request {
   return new Request("https://example.com/", { headers });
 }

@@ -9,6 +9,7 @@ export default defineConfig({
       RESEND_API_KEY: "test",
       AUTH_SECRET: "test-secret-for-vitest",
     },
+    setupFiles: ["./vitest.setup.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
