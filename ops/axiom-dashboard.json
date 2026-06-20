@@ -1,0 +1,31 @@
+{
+  "name": "Yard Analyzer — Production Health",
+  "description": "Day-one dashboard. Filter all charts on env: production.",
+  "charts": [
+    {
+      "name": "Cron health (last 7 days)",
+      "kind": "table",
+      "apl": "['yard-analyzer'] | where env == 'production' and kind == 'cron.run' | summarize ok = countif(ok == true), failed = countif(ok == false), p50_ms = percentile(durationMs, 50), p95_ms = percentile(durationMs, 95) by route, bin(_time, 1d) | order by _time desc"
+    },
+    {
+      "name": "AI cost — daily totals",
+      "kind": "timeseries",
+      "apl": "['yard-analyzer'] | where env == 'production' and kind == 'ai.daily_summary' | project _time, costUsd = totals.costUsd, failures = totals.failures | order by _time asc"
+    },
+    {
+      "name": "AI cost — top 10 users (last 7d)",
+      "kind": "table",
+      "apl": "['yard-analyzer'] | where env == 'production' and kind == 'ai.daily_summary' and _time > ago(7d) | mv-expand topUsers | summarize calls = sum(toint(topUsers.calls)), costUsd = sum(todouble(topUsers.costUsd)) by userId = tostring(topUsers.userId) | order by costUsd desc | take 10"
+    },
+    {
+      "name": "Rate-limit hits by route (last 24h)",
+      "kind": "bar",
+      "apl": "['yard-analyzer'] | where env == 'production' and kind == 'rate_limit.hit' and _time > ago(24h) | summarize hits = count() by route | order by hits desc"
+    },
+    {
+      "name": "Errors (last 1h)",
+      "kind": "table",
+      "apl": "['yard-analyzer'] | where env == 'production' and level == 'error' | order by _time desc | take 100"
+    }
+  ]
+}
