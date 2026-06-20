@@ -10,6 +10,7 @@ import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOver
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
 import { withAxiom, logger } from "@/lib/observability/logger";
 import { emitCronRun } from "@/lib/observability/events";
+import { emitYesterdaysAiSummary } from "@/lib/observability/ai-daily-summary";
 
 const EMAIL_CONCURRENCY = 10;
 // Each yard's processing is a small read-modify-write sequence on its own
@@ -446,7 +447,6 @@ export const GET = withAxiom(async (req: NextRequest) => {
     // Emit yesterday's AI cost summary (fire-and-forget — don't fail the cron
     // if this aggregate query has a hiccup; withAxiom captures any throw).
     try {
-      const { emitYesterdaysAiSummary } = await import("@/lib/observability/ai-daily-summary");
       await emitYesterdaysAiSummary();
     } catch (err) {
       logger.error("daily-tasks: ai daily summary failed", {

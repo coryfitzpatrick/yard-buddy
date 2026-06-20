@@ -127,14 +127,14 @@ export function emitAiCall(args: AiCallArgs): void {
   else logger.warn("ai.call", payload);
 }
 
-interface AiDailySummaryArgs {
+export interface AiDailySummary {
   date: string;
   totals: { calls: number; failures: number; costUsd: number };
   byFeature: Record<string, { calls: number; costUsd: number }>;
   topUsers: Array<{ userId: string; calls: number; costUsd: number }>;
 }
 
-export function emitAiDailySummary(args: AiDailySummaryArgs): void {
+export function emitAiDailySummary(args: AiDailySummary): void {
   const payload = { ...args, kind: "ai.daily_summary", ...commonFields() };
   logger.info("ai.daily_summary", payload);
 }
