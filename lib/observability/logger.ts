@@ -1,13 +1,15 @@
 // lib/observability/logger.ts
 import { Logger, AxiomJSTransport, ConsoleTransport, type Transport } from "@axiomhq/logging";
 import { createAxiomRouteHandler, nextJsFormatters } from "@axiomhq/nextjs";
-import { getAxiomClient, AXIOM_DATASET } from "./client";
+import { getAxiomClient, getAxiomDataset } from "./client";
 
 const NOOP_TRANSPORT: Transport = {
   log: () => {},
   flush: async () => {},
 };
 
+// Intentionally process-lifetime: AXIOM_TOKEN is read from env at boot and
+// won't appear mid-process, so a single warning per process is the desired UX.
 let warnedMissingToken = false;
 
 export function buildTransports(): Transport[] {
@@ -32,7 +34,7 @@ export function buildTransports(): Transport[] {
     return [new ConsoleTransport()];
   }
 
-  const axiomTransport = new AxiomJSTransport({ axiom, dataset: AXIOM_DATASET });
+  const axiomTransport = new AxiomJSTransport({ axiom, dataset: getAxiomDataset() });
 
   // Preview deploys get both — Axiom (tagged env: "preview") for dashboards
   // plus console for `vercel logs` debugging on PR branches.
@@ -43,7 +45,13 @@ export function buildTransports(): Transport[] {
   return [axiomTransport];
 }
 
-export function buildEnvScope(): Record<string, string> {
+export interface EnvScope {
+  env: string;
+  service: "yard-analyzer";
+  version: string;
+}
+
+export function buildEnvScope(): EnvScope {
   return {
     env:
       process.env.VERCEL_ENV ??

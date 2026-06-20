@@ -13,4 +13,6 @@ export function getAxiomClient(): Axiom | null {
   return client;
 }
 
-export const AXIOM_DATASET = process.env.AXIOM_DATASET ?? "yard-analyzer";
+export function getAxiomDataset(): string {
+  return process.env.AXIOM_DATASET ?? "yard-analyzer";
+}
