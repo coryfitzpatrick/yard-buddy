@@ -18,6 +18,7 @@ import {
   emitAiDailySummary,
   isExpensiveCall,
 } from "@/lib/observability/events";
+import type { RateLimitedRoute } from "@/lib/observability/events";
 
 describe("emitCronRun", () => {
   let infoSpy: ReturnType<typeof vi.spyOn>;
@@ -209,7 +210,9 @@ describe("common fields on every event", () => {
       "rate_limit.hit",
       () =>
         emitRateLimitHit({
-          route: "/api/x",
+          // Synthetic route for the common-fields matrix test; cast rather than
+          // widening RateLimitedRoute for a test-only value.
+          route: "/api/x" as RateLimitedRoute,
           ip: "1.2.3.4",
           userId: null,
           maxAttempts: 1,

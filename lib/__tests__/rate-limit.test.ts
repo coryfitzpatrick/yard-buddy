@@ -1,7 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import * as events from "@/lib/observability/events";
+import type { RateLimitedRoute } from "@/lib/observability/events";
 
+// Two-layer mock setup for the "emits rate_limit.hit" tests below:
+//  1. vi.mock("@axiomhq/nextjs") — the observability barrel transitively
+//     imports the Axiom logger module at import time; this stub keeps that
+//     graph from pulling Next-only runtime types under Vitest's ESM resolver.
+//  2. vi.spyOn(events, "emitRateLimitHit") inside the test — short-circuits
+//     the actual emit so we assert on call shape without any IO.
 vi.mock("@axiomhq/nextjs", () => ({
   createAxiomRouteHandler: <T,>(_logger: unknown, _opts?: unknown) => (handler: T) => handler,
   nextJsFormatters: [],
@@ -39,13 +46,19 @@ describe("getClientIp", () => {
 
 describe("checkRateLimit emits rate_limit.hit on limit", () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it("emits when the in-memory fallback returns limited", async () => {
     const spy = vi.spyOn(events, "emitRateLimitHit").mockImplementation(() => {});
     const key = `test:${Math.random()}`;
-    const ctx = { route: "/api/test", ip: "203.0.113.9", userId: "user_x" };
+    // Synthetic route used only by this test — cast to the union rather than
+    // widening RateLimitedRoute to accommodate test-only values.
+    const ctx = {
+      route: "/api/test" as RateLimitedRoute,
+      ip: "203.0.113.9",
+      userId: "user_x",
+    };
 
     // First call below the limit — should NOT emit
     await checkRateLimit(key, 1, 60_000, ctx);

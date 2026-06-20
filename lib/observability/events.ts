@@ -24,6 +24,18 @@ export type AiFeature =
   | "critique"
   | "overdue-assessor";
 
+export type RateLimitedRoute =
+  | "/api/analyze"
+  | "/api/weather"
+  | "/api/identify-grass"
+  | "/api/recommendations"
+  | "/api/upload"
+  | "/api/validate-zip"
+  | "/api/lookup-yard-size"
+  | "/api/auth/register"
+  | "/api/auth/forgot-password"
+  | "/api/auth/reset-password";
+
 interface CronRunArgs {
   route: CronRoute;
   ok: boolean;
@@ -47,7 +59,7 @@ export function emitCronRun(args: CronRunArgs): void {
 }
 
 interface RateLimitHitArgs {
-  route: string;
+  route: RateLimitedRoute;
   ip: string;
   userId: string | null;
   maxAttempts: number;

@@ -7,11 +7,12 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashToken } from "@/lib/token-hash";
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
   const { limited } = await checkRateLimit(
-    `forgot-password:${getClientIp(req)}`,
+    `forgot-password:${ip}`,
     5,
     60 * 60 * 1000,
-    { route: "/api/auth/forgot-password", ip: getClientIp(req), userId: null },
+    { route: "/api/auth/forgot-password", ip, userId: null },
   );
   if (limited) {
     // Return ok to avoid leaking rate limit status to email-enumeration attackers

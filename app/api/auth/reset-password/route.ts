@@ -6,11 +6,12 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashToken } from "@/lib/token-hash";
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
   const { limited } = await checkRateLimit(
-    `reset-password:${getClientIp(req)}`,
+    `reset-password:${ip}`,
     10,
     60 * 60 * 1000,
-    { route: "/api/auth/reset-password", ip: getClientIp(req), userId: null },
+    { route: "/api/auth/reset-password", ip, userId: null },
   );
   if (limited) {
     return NextResponse.json(

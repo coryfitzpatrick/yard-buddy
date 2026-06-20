@@ -1,6 +1,7 @@
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import { NextRequest } from "next/server";
+import type { RateLimitedRoute } from "@/lib/observability/events";
 
 export function getClientIp(req: NextRequest | Request): string {
   const fwd = req.headers.get("x-forwarded-for");
@@ -55,7 +56,7 @@ function memoryCheck(key: string, maxAttempts: number, windowMs: number): { limi
 }
 
 export interface RateLimitContext {
-  route: string;
+  route: RateLimitedRoute;
   ip: string;
   userId: string | null;
 }
