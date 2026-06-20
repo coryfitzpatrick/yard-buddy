@@ -1,14 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { db } from "@/lib/db";
 import { computeCostUsd, type AiUsageInput } from "./prices";
+import { logger } from "@/lib/observability/logger";
+import { emitAiCall, isExpensiveCall, type AiFeature } from "@/lib/observability/events";
 
-export type AiFeature =
-  | "analyze"
-  | "identify-grass"
-  | "recommendations"
-  | "watering"
-  | "critique"
-  | "overdue-assessor";
+export type { AiFeature };
 
 export interface AiCallCtx {
   userId: string | null;
@@ -22,21 +18,47 @@ export async function callClaude(
   ctx: AiCallCtx,
 ): Promise<Anthropic.Message> {
   try {
-    const response = await client.messages.create(params) as Anthropic.Message;
-    await recordUsage({
-      ...ctx,
-      model: response.model,
-      usage: response.usage as AiUsageInput,
-      success: true,
-    });
+    const response = (await client.messages.create(params)) as Anthropic.Message;
+    const usage = response.usage as AiUsageInput;
+    const costUsd = computeCostUsd(response.model, usage);
+    const inputTokens = usage.input_tokens ?? 0;
+
+    await recordUsage({ ...ctx, model: response.model, usage, success: true });
+
+    // Mirror only outliers — failures and expensive calls — to Axiom.
+    // Postgres remains the source of truth for the monthly margin report.
+    if (isExpensiveCall({ costUsd, inputTokens })) {
+      emitAiCall({
+        userId: ctx.userId,
+        feature: ctx.feature,
+        model: response.model,
+        success: true,
+        costUsd,
+        inputTokens,
+        outputTokens: usage.output_tokens ?? 0,
+        cacheReadTokens: usage.cache_read_input_tokens ?? 0,
+        cacheCreationTokens: usage.cache_creation_input_tokens ?? 0,
+        reason: "expensive",
+      });
+    }
+
     return response;
   } catch (err) {
-    await recordUsage({
-      ...ctx,
-      model: typeof params.model === "string" ? params.model : "unknown",
-      usage: null,
+    const model = typeof params.model === "string" ? params.model : "unknown";
+    const errorCode = extractErrorCode(err);
+    await recordUsage({ ...ctx, model, usage: null, success: false, errorCode });
+    emitAiCall({
+      userId: ctx.userId,
+      feature: ctx.feature,
+      model,
       success: false,
-      errorCode: extractErrorCode(err),
+      costUsd: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      cacheReadTokens: 0,
+      cacheCreationTokens: 0,
+      errorCode,
+      reason: "failure",
     });
     throw err;
   }
@@ -68,7 +90,11 @@ async function recordUsage(args: RecordArgs): Promise<void> {
       },
     });
   } catch (err) {
-    console.warn("recordUsage: failed to write AiUsageEvent", err);
+    logger.error("recordUsage: failed to write AiUsageEvent", {
+      err: err instanceof Error ? err.message : String(err),
+      feature: args.feature,
+      model: args.model,
+    });
   }
 }
 

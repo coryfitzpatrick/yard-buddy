@@ -11,6 +11,15 @@ vi.mock("@/lib/db", () => ({
   db: { aiUsageEvent: { create: mockUsageCreate } },
 }));
 
+// The observability barrel transitively imports Next-only Axiom runtime types
+// via lib/observability/logger; stub them so Vitest's ESM resolver can load
+// usage.ts (which imports emitAiCall/isExpensiveCall from events).
+vi.mock("@axiomhq/nextjs", () => ({
+  createAxiomRouteHandler: <T,>(_logger: unknown, _opts?: unknown) => (handler: T) => handler,
+  nextJsFormatters: [],
+}));
+
+const events = await import("@/lib/observability/events");
 const { callClaude } = await import("@/lib/ai/usage");
 
 beforeEach(() => {
@@ -119,13 +128,39 @@ describe("recordUsage robustness", () => {
       usage: {},
     });
     mockUsageCreate.mockRejectedValueOnce(new Error("DB exploded"));
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     await expect(
       callClaude({ model: "claude-sonnet-4-6", max_tokens: 1, messages: [] }, {
         userId: "user_1",
         feature: "analyze",
       }),
     ).resolves.toBeDefined();
-    expect(warn).toHaveBeenCalled();
+    // Failure to write the AiUsageEvent row must not throw.
+  });
+});
+
+describe("callClaude emits ai.call on failure", () => {
+  it("emits with reason=failure when the SDK throws", async () => {
+    const emitSpy = vi.spyOn(events, "emitAiCall").mockImplementation(() => {});
+    const err = Object.assign(new Error("boom"), {
+      status: 503,
+      error: { type: "overloaded_error" },
+    });
+    mockCreate.mockRejectedValueOnce(err);
+    await expect(
+      callClaude({ model: "claude-sonnet-4-6", max_tokens: 10, messages: [] }, {
+        userId: "u1",
+        feature: "analyze",
+      }),
+    ).rejects.toBeDefined();
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        reason: "failure",
+        success: false,
+        userId: "u1",
+        feature: "analyze",
+        model: "claude-sonnet-4-6",
+        errorCode: "overloaded_error",
+      }),
+    );
   });
 });
