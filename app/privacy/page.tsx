@@ -16,7 +16,7 @@ export default function PrivacyPage() {
 
       <main className="flex-1 max-w-3xl mx-auto px-6 py-12 w-full">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-        <p className="text-sm text-gray-400 mb-10">Last updated: June 10, 2026</p>
+        <p className="text-sm text-gray-400 mb-10">Last updated: June 21, 2026</p>
 
         <div className="space-y-8 text-gray-700 text-sm leading-relaxed">
 
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">2. How We Use Your Information</h2>
             <ul className="list-disc pl-5 space-y-1">
-              <li>To provide the Yard Analyzer service, including AI-powered lawn analysis and personalized recommendations</li>
+              <li>To provide the Yard Analyzer service, including automated lawn analysis and personalized recommendations</li>
               <li>To send you scheduled care reminders and account notifications by email</li>
               <li>To show weather-aware recommendations for your location</li>
               <li>To improve the product based on aggregated, anonymized usage patterns</li>
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-2">3. Third-Party Services</h2>
             <p>Yard Analyzer relies on the following providers to operate:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li><strong>Anthropic:</strong> photos and lawn data are sent to Anthropic&apos;s API for AI analysis. Anthropic&apos;s usage policies apply to this data.</li>
+              <li><strong>Anthropic:</strong> photos and lawn data are sent to Anthropic&apos;s API for automated analysis. Anthropic&apos;s usage policies apply to this data.</li>
               <li><strong>Supabase:</strong> your data and uploaded photos are stored in Supabase&apos;s managed PostgreSQL and object storage.</li>
               <li><strong>OpenWeatherMap:</strong> your yard&apos;s ZIP code is sent to retrieve local weather data.</li>
               <li><strong>Resend:</strong> your email address is used to deliver transactional emails and care reminders.</li>
