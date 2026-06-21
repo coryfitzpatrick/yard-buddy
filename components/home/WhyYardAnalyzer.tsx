@@ -9,7 +9,7 @@ const DIFFERENTIATORS = [
   },
   {
     heading: "Unbiased advice across all brands",
-    body: "Other apps push their own product line. Our AI recommends what's right for your lawn, whether that's Scotts, Jonathan Green, Milorganite, generic store brand, or organic options, with price ranges so you can choose what fits your budget.",
+    body: "Other apps push their own product line. We recommend what's right for your lawn, whether that's Scotts, Jonathan Green, Milorganite, generic store brand, or organic options, with price ranges so you can choose what fits your budget.",
   },
   {
     heading: "Watch your lawn actually improve",

@@ -10,7 +10,7 @@ export function GrassStep({ c }: { c: YardSetupController }) {
   const grassType = c.watch("grassType") as YardSectionInput["grassType"] | undefined;
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-500">Select your grass type, or upload a photo for AI identification.</p>
+      <p className="text-sm text-gray-500">Select your grass type, or upload a photo and we'll identify it for you.</p>
       <GrassIdentifyUpload
         ref={grassIdentifyRef}
         containerRef={uploadZoneRef}

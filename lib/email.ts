@@ -219,7 +219,7 @@ export function buildTrialReminderEmail(opts: {
   <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
   <p style="color:#374151;">
     ${isLastDay
-      ? "Your free trial ends <strong>tomorrow</strong>. After that you'll lose access to AI analysis and task recommendations."
+      ? "Your free trial ends <strong>tomorrow</strong>. After that you'll lose access to lawn analysis and task recommendations."
       : `Your free trial ends in <strong>${daysLeft} days</strong>. Subscribe now to keep your lawn care on track.`
     }
   </p>

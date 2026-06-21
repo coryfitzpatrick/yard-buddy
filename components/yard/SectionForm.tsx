@@ -324,7 +324,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           />
 
           <p className="text-xs text-gray-400">
-            These are your own notes. They won&apos;t affect AI analysis.
+            These are your own notes. They won&apos;t affect your lawn analysis.
           </p>
         </div>
       </div>

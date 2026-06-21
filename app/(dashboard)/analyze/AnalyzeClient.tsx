@@ -146,7 +146,7 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
           </Button>
         </Link>
       </div>
-      <p className="text-gray-500 mb-6">Upload photos and get AI-powered diagnosis and recommendations.</p>
+      <p className="text-gray-500 mb-6">Upload photos and get an expert diagnosis with tailored recommendations.</p>
 
       {yards.length === 0 ? (
         <Card>

@@ -20,7 +20,7 @@ const PLANS = [
     yards: "1 yard",
     analyses: "8 analyses per yard per month",
     features: [
-      "All AI task recommendations",
+      "All personalized task recommendations",
       "Schedule reminders by email",
       "5-day weather integration",
       "Seasonal billing pause",
@@ -128,7 +128,7 @@ export default async function PricingPage() {
                 <li className="font-medium text-gray-700">2 analyses for your yard</li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                  First AI task recommendation
+                  Your first personalized task
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />

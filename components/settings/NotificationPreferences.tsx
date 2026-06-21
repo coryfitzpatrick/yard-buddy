@@ -102,7 +102,7 @@ export function NotificationPreferences({
             Task reminders
           </Label>
           <p className="text-sm text-gray-500 mt-0.5">
-            Daily digest when AI-generated tasks are coming up or overdue.
+            Daily digest when scheduled tasks are coming up or overdue.
           </p>
         </div>
         <Switch
