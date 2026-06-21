@@ -9,7 +9,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
         <Link href="/" className="flex items-center gap-1">
-          <Logo className="h-7 w-auto" />
+          <Logo className="h-8 w-auto" />
           <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
       </nav>
