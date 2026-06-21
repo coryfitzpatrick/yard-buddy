@@ -8,7 +8,7 @@ interface LogoProps {
   className?: string;
 }
 
-export function Logo({ className = "h-8 w-auto" }: LogoProps) {
+export function Logo({ className = "h-6 w-auto" }: LogoProps) {
   return (
     <Image
       src={LOGO_SRC}
@@ -16,7 +16,7 @@ export function Logo({ className = "h-8 w-auto" }: LogoProps) {
       width={LOGO_INTRINSIC_WIDTH}
       height={LOGO_INTRINSIC_HEIGHT}
       className={className}
-      sizes="96px"
+      sizes="48px"
       priority
     />
   );

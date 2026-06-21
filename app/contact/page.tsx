@@ -24,8 +24,9 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-1">
-          <Logo className="h-8 w-auto" />
+        <Link href="/" className="flex items-center gap-2">
+          <Logo className="h-6 w-auto" />
+          <span className="text-gray-300">|</span>
           <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
         </Link>
       </nav>
