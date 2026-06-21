@@ -17,7 +17,7 @@ const robotoMono = Roboto_Mono({
 
 export const metadata: Metadata = {
   title: "Yard Analyzer",
-  description: "AI-powered lawn care assistant",
+  description: "Personalized lawn care assistant",
 };
 
 export default function RootLayout({

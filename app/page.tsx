@@ -7,7 +7,7 @@ import { ScreenshotSection } from "@/components/home/ScreenshotSection";
 import { Footer } from "@/components/Footer";
 
 const FEATURES = [
-  "AI-powered lawn diagnosis from photos",
+  "Lawn diagnosis from your photos",
   "Personalized care schedules by grass type",
   "Exact product amounts and spreader settings",
   "Weather-aware recommendations",
@@ -32,7 +32,7 @@ export default function HomePage() {
       </nav>
       <div className="max-w-4xl mx-auto px-6 pt-20 pb-10 text-center">
         <h1 className="text-5xl font-bold text-gray-900 mb-4 leading-tight">
-          Your AI lawn expert,<br />
+          Your lawn expert,<br />
           <span className="text-green-600">always on call.</span>
         </h1>
         <p className="text-xl text-gray-500 mb-8 max-w-xl mx-auto">
