@@ -20,6 +20,14 @@ export const yardSchema = z.object({
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().int().min(1).max(120).optional()
   ),
+  mowingDaysPerWeek: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().min(1).max(7).optional()
+  ),
+  mowingHeightInches: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().min(1).max(5).optional()
+  ),
   mowingSchedule: z.string().optional(),
   wateringSchedule: z.string().optional(),
 });

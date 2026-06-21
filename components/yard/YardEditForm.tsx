@@ -25,6 +25,8 @@ interface Props {
     spreaderModel?: string;
     wateringDaysPerWeek?: number;
     wateringMinutesPerSession?: number;
+    mowingDaysPerWeek?: number;
+    mowingHeightInches?: number;
     mowingSchedule?: string;
     wateringSchedule?: string;
   };
@@ -44,6 +46,8 @@ export function YardEditForm({ yardId, yardSlug, initialData }: Props) {
         spreaderModel: initialData.spreaderModel,
         wateringDaysPerWeek: initialData.wateringDaysPerWeek,
         wateringMinutesPerSession: initialData.wateringMinutesPerSession,
+        mowingDaysPerWeek: initialData.mowingDaysPerWeek,
+        mowingHeightInches: initialData.mowingHeightInches,
         mowingSchedule: initialData.mowingSchedule,
         wateringSchedule: initialData.wateringSchedule,
       },
@@ -111,6 +115,36 @@ export function YardEditForm({ yardId, yardSlug, initialData }: Props) {
           value={mowingSchedule}
           onChange={(v) => setValue("mowingSchedule", v)}
         />
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label>Mowing days / week <span className="text-gray-400 font-normal">(optional)</span></Label>
+            <Input
+              type="number"
+              min={1}
+              max={7}
+              placeholder="e.g. 2"
+              {...register("mowingDaysPerWeek")}
+            />
+            {errors.mowingDaysPerWeek && (
+              <p className="text-sm text-red-500">{errors.mowingDaysPerWeek.message}</p>
+            )}
+          </div>
+          <div className="space-y-1">
+            <Label>Mowing height (in.) <span className="text-gray-400 font-normal">(optional)</span></Label>
+            <Input
+              type="number"
+              min={1}
+              max={5}
+              step={0.5}
+              placeholder="e.g. 3"
+              {...register("mowingHeightInches")}
+            />
+            {errors.mowingHeightInches && (
+              <p className="text-sm text-red-500">{errors.mowingHeightInches.message}</p>
+            )}
+          </div>
+        </div>
 
         <div>
           <p className="text-sm font-semibold text-gray-700">Default Watering Schedule</p>
