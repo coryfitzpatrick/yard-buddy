@@ -42,6 +42,7 @@ model User {
   emailChangeRequests  EmailChangeRequest[]
   aiUsageEvents        AiUsageEvent[]
   deviceTokens         DeviceToken[]
+  biometricRefreshTokens BiometricRefreshToken[]
 }
 
 model Account {
@@ -261,6 +262,19 @@ model DeviceToken {
   createdAt    DateTime @default(now())
   lastUsedAt   DateTime @default(now())
   failureCount Int      @default(0)
+
+  @@index([userId])
+}
+
+model BiometricRefreshToken {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash         String    @unique   // sha256(plaintext token), hex
+  deviceFingerprint String?              // informational only: platform + app version + UA hash
+  createdAt         DateTime  @default(now())
+  lastUsedAt        DateTime  @default(now())
+  revokedAt         DateTime?            // null = active; non-null = revoked
 
   @@index([userId])
 }
