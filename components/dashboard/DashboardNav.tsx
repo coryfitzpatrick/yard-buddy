@@ -64,7 +64,7 @@ export function DashboardNav({ signOutAction }: Props) {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
           <Link href="/dashboard" className="flex items-end gap-2 font-bold text-green-700 text-[26px] leading-none">
-            <Logo className="h-6 w-auto" />
+            <Logo className="h-7 w-auto" />
             <span className="text-gray-300 font-normal">|</span>
             Yard Analyzer
           </Link>
@@ -111,7 +111,7 @@ export function DashboardNav({ signOutAction }: Props) {
         <SheetContent side="right" className="w-72 p-0">
           <SheetHeader className="px-5 pt-5 pb-3 border-b border-gray-100">
             <SheetTitle className="flex items-center gap-2 text-green-700">
-              <Logo className="h-6 w-auto" />
+              <Logo className="h-7 w-auto" />
               <span className="text-gray-300 font-normal">|</span>
               Yard Analyzer
             </SheetTitle>

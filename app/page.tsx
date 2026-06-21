@@ -20,7 +20,7 @@ export default function HomePage() {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-2">
-            <Logo className="h-6 w-auto" />
+            <Logo className="h-7 w-auto" />
             <span className="text-gray-300">|</span>
             <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
           </div>
