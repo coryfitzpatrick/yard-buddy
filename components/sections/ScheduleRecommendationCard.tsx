@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type Kind = "watering" | "mowing";
@@ -34,8 +35,10 @@ interface Props {
 }
 
 export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, effective, plan }: Props) {
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!latestAnalysis) {
     return (
@@ -76,7 +79,7 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <p className="text-sm text-amber-900">
           {kind === "watering" ? "Watering" : "Mowing"} schedule override, not following our guidance.
-          <button onClick={() => setExpanded(true)} className="ml-2 underline">Show suggestion</button>
+          <button onClick={() => setExpanded(true)} aria-expanded={expanded} className="ml-2 underline">Show suggestion</button>
         </p>
       </div>
     );
@@ -87,17 +90,41 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
     kind === "watering" ? `${v ?? "?"} min/session` : `${v ?? "?"} in`;
   const apply = async () => {
     setBusy(true);
+    setError(null);
     try {
       const res = await fetch(`/api/sections/${sectionId}/${kind}/apply`, { method: "POST" });
-      if (res.ok) location.reload();
-    } finally { setBusy(false); }
+      if (res.ok) {
+        router.refresh();
+      } else if (res.status === 400) {
+        setError("Couldn't apply. Try running a new analysis.");
+      } else if (res.status === 404) {
+        setError("Section or analysis not found. Refresh the page.");
+      } else {
+        setError("Something went wrong. Try again.");
+      }
+    } catch {
+      setError("Network error. Check your connection.");
+    } finally {
+      setBusy(false);
+    }
   };
   const dismiss = async () => {
     setBusy(true);
+    setError(null);
     try {
       const res = await fetch(`/api/sections/${sectionId}/${kind}/dismiss`, { method: "POST" });
-      if (res.ok) location.reload();
-    } finally { setBusy(false); }
+      if (res.ok) {
+        router.refresh();
+      } else if (res.status === 409) {
+        setError("Nothing to dismiss.");
+      } else {
+        setError("Something went wrong. Try again.");
+      }
+    } catch {
+      setError("Network error. Check your connection.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -124,6 +151,7 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
           Ignore
         </button>
       </div>
+      {error && <p role="alert" className="text-sm text-red-700 mt-2">{error}</p>}
       {plan === "home_basic" && (
         <p className="text-xs text-amber-700 mt-3">Applies to your whole yard. Upgrade to Home Plus to override per section.</p>
       )}

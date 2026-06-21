@@ -1,8 +1,12 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup } from "@testing-library/react";
-import { afterEach, describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import { ScheduleRecommendationCard } from "@/components/sections/ScheduleRecommendationCard";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
 
 afterEach(cleanup);
 
@@ -53,5 +57,23 @@ describe("ScheduleRecommendationCard - watering", () => {
     const matching = { daysPerWeek: 3, minutesPerSession: 15, heightInches: null };
     render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={dev} effective={matching} plan="home_basic" />);
     expect(screen.queryByText(/schedule override/i)).not.toBeInTheDocument();
+  });
+});
+
+describe("ScheduleRecommendationCard - mowing", () => {
+  const mowingAnalysis = {
+    ...baseAnalysis,
+    mowingSchedule: "Raise the deck to 3 inches.",
+    mowingDeviates: true,
+    mowingSuggestedDaysPerWeek: 1,
+    mowingSuggestedHeightInches: 3.0,
+  };
+
+  it("renders mowing-specific state C with height in inches", () => {
+    const effective = { daysPerWeek: 1, minutesPerSession: null, heightInches: 2.5 };
+    render(<ScheduleRecommendationCard kind="mowing" sectionId="sec_1" latestAnalysis={mowingAnalysis} effective={effective} plan="home_basic" />);
+    expect(screen.getByRole("button", { name: /apply/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/3 in/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/different mowing schedule/i)).toBeInTheDocument();
   });
 });
