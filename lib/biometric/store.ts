@@ -1,20 +1,29 @@
 // lib/biometric/store.ts
 //
-// Thin abstraction over @aparajita/capacitor-biometric-auth. Stores a
-// server-issued refresh token (NOT a session JWT) and gates retrieval on a
-// biometric prompt. Methods only run in the Capacitor app context; callers
-// should gate on isMobileAppClient() before invoking.
+// Thin abstraction over @capgo/capacitor-native-biometric. Stores a
+// server-issued refresh token (NOT a session JWT) in OS-level secure storage
+// (iOS Keychain / Android Keystore + EncryptedSharedPreferences) with a
+// hardware-backed biometric gate on reads.
 //
-// Note on the underlying primitive: the @aparajita plugin only exposes the
-// biometric prompt itself (checkBiometry/authenticate), not a Keychain
-// wrapper. Storage therefore goes through @capacitor/preferences, which is
-// backed by NSUserDefaults on iOS and SharedPreferences on Android. The
-// biometric gate is enforced by requiring a successful authenticate() call
-// before unlockRefreshToken() returns the stored value. If a future plugin
-// version (or a separate plugin) exposes Keychain ItemAccessibility
-// flags directly, swap the storage backend here -- the interface stays.
+// Security model: credentials are written with
+// AccessControl.BIOMETRY_CURRENT_SET, which means
+//   - iOS:     Keychain item is tagged with kSecAccessControlBiometryCurrentSet,
+//              so the OS itself surfaces the biometric prompt on read and the
+//              item is invalidated if the user re-enrolls a face/fingerprint.
+//   - Android: Keystore key has setUserAuthenticationRequired(true) and the
+//              plugin shows BiometricPrompt with a CryptoObject bound to the
+//              decryption key. JS cannot bypass this gate.
+// We read with getSecureCredentials() (NOT getCredentials()), which is the
+// biometric-gated retrieval path. No separate JS-side authenticate() call is
+// needed -- the prompt is part of the OS read.
+//
+// Methods only run in the Capacitor app context; callers should gate on
+// isMobileAppClient() before invoking.
 
-const PREFS_KEY = "yardanalyzer.biometric.refresh";
+const SERVER_KEY = "yardanalyzer.biometric.refresh";
+const USERNAME_SENTINEL = "refresh"; // Capgo stores {username,password}; we
+                                     // only need one secret, so the token
+                                     // goes in `password` under a fixed name.
 
 export interface BiometricStore {
   isAvailable(): Promise<boolean>;
@@ -24,38 +33,49 @@ export interface BiometricStore {
 }
 
 export async function getBiometricStore(): Promise<BiometricStore> {
-  const { BiometricAuth } = await import("@aparajita/capacitor-biometric-auth");
-  const { Preferences } = await import("@capacitor/preferences");
+  const { NativeBiometric, AccessControl } = await import(
+    "@capgo/capacitor-native-biometric"
+  );
 
   return {
     async isAvailable() {
       try {
-        const r = await BiometricAuth.checkBiometry();
+        const r = await NativeBiometric.isAvailable({ useFallback: false });
         return r.isAvailable;
       } catch {
         return false;
       }
     },
     async storeRefreshToken(token: string) {
-      await Preferences.set({ key: PREFS_KEY, value: token });
+      // BIOMETRY_CURRENT_SET binds the stored credential to the current
+      // biometric enrollment -- re-enrolling invalidates it, forcing a
+      // password sign-in (which is the desired behavior).
+      await NativeBiometric.setCredentials({
+        server: SERVER_KEY,
+        username: USERNAME_SENTINEL,
+        password: token,
+        accessControl: AccessControl.BIOMETRY_CURRENT_SET,
+      });
     },
     async unlockRefreshToken() {
       try {
-        // Throws BiometryError on cancel/fail; caught below.
-        await BiometricAuth.authenticate({
+        // Biometric prompt is shown by the OS as part of this read. Throws
+        // on cancel/fail/no-credential; caught below and surfaced as null
+        // so callers fall through to the password login flow.
+        const creds = await NativeBiometric.getSecureCredentials({
+          server: SERVER_KEY,
           reason: "Sign in to Yard Analyzer",
-          cancelTitle: "Use Password",
-          allowDeviceCredential: false,
+          title: "Unlock Yard Analyzer",
+          negativeButtonText: "Use Password",
         });
-        const { value } = await Preferences.get({ key: PREFS_KEY });
-        return value ?? null;
+        return creds.password ?? null;
       } catch {
         return null;
       }
     },
     async clear() {
       try {
-        await Preferences.remove({ key: PREFS_KEY });
+        await NativeBiometric.deleteCredentials({ server: SERVER_KEY });
       } catch {
         /* no-op if nothing stored */
       }
