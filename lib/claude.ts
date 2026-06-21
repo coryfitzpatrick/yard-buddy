@@ -1,7 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { GrassType, AnalysisResult, RecommendationItem } from "@/types";
 import { buildSectionAnalysisPrompt } from "@/lib/ai/analysis-prompt";
-import { buildWateringPrompt, WateringPromptOpts } from "@/lib/ai/watering-prompt";
+import { buildSchedulePrompt, SchedulePromptOpts } from "@/lib/ai/schedule-prompt";
 import { buildSystemPrompt } from "@/lib/prompts";
 import { retrieveRelevant, formatChunksForPrompt, inferTopicHints } from "@/lib/rag";
 import { getRelevantFacts } from "@/lib/facts";
@@ -667,21 +667,44 @@ Set valid=false with feedback when: any image clearly isn't a lawn, all images a
   }
 }
 
-export async function generateWateringRecommendation(
-  opts: WateringPromptOpts,
+export type ScheduleRecommendationResult = {
+  watering: { schedule: string; deviates: boolean; suggestedDaysPerWeek: number | null; suggestedMinutesPerSession: number | null };
+  mowing: { schedule: string; deviates: boolean; suggestedDaysPerWeek: number | null; suggestedHeightInches: number | null };
+};
+
+export async function generateScheduleRecommendation(
+  opts: SchedulePromptOpts,
   ctx: AiCallCtx,
-): Promise<{ schedule: string; deviates: boolean }> {
+): Promise<ScheduleRecommendationResult> {
   const msg = await callClaude({
     model: "claude-haiku-4-5-20251001",
-    max_tokens: 256,
+    max_tokens: 512,
     system:
-      "You are an expert lawn care agronomist. Given lawn section details, provide a concise watering schedule recommendation. Return valid JSON only — no markdown, no text outside the JSON object.",
-    messages: [{ role: "user", content: buildWateringPrompt(opts) }],
+      "You are an expert lawn care agronomist. Given lawn section details, provide concise watering and mowing schedule recommendations. Return valid JSON only — no markdown, no text outside the JSON object.",
+    messages: [{ role: "user", content: buildSchedulePrompt(opts) }],
   }, ctx);
   const text = msg.content[0].type === "text" ? msg.content[0].text.trim() : "";
+  let parsed: unknown;
   try {
-    return JSON.parse(text) as { schedule: string; deviates: boolean };
+    parsed = JSON.parse(text);
   } catch {
-    throw new Error(`generateWateringRecommendation: Claude returned non-JSON: ${text.slice(0, 200)}`);
+    throw new Error(`generateScheduleRecommendation: Claude returned non-JSON: ${text.slice(0, 200)}`);
   }
+  const obj = parsed as Record<string, unknown>;
+  const w = (obj?.watering ?? {}) as Record<string, unknown>;
+  const m = (obj?.mowing ?? {}) as Record<string, unknown>;
+  return {
+    watering: {
+      schedule: typeof w.schedule === "string" ? w.schedule : "",
+      deviates: w.deviates === true,
+      suggestedDaysPerWeek: typeof w.suggestedDaysPerWeek === "number" ? Math.round(w.suggestedDaysPerWeek) : null,
+      suggestedMinutesPerSession: typeof w.suggestedMinutesPerSession === "number" ? Math.round(w.suggestedMinutesPerSession) : null,
+    },
+    mowing: {
+      schedule: typeof m.schedule === "string" ? m.schedule : "",
+      deviates: m.deviates === true,
+      suggestedDaysPerWeek: typeof m.suggestedDaysPerWeek === "number" ? Math.round(m.suggestedDaysPerWeek) : null,
+      suggestedHeightInches: typeof m.suggestedHeightInches === "number" ? m.suggestedHeightInches : null,
+    },
+  };
 }
