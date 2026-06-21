@@ -8,9 +8,35 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { LayoutDashboard, Search, LogOut, Fence, Menu, Settings, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isMobileAppClient } from "@/lib/platform";
 
 interface Props {
   signOutAction: () => Promise<void>;
+}
+
+// Pre-signOut hook for the mobile app: revoke the refresh token on the server
+// (while the session cookie still authenticates us) and clear the local
+// Keychain-gated copy. Best-effort; failures don't block the signOut.
+async function runBiometricLogoutCleanup() {
+  if (!isMobileAppClient()) return;
+  try {
+    await fetch("/api/auth/biometric-revoke", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}), // empty body = revoke all for this user
+    });
+  } catch {
+    /* best-effort; user might already be offline */
+  }
+  try {
+    const { Preferences } = await import("@capacitor/preferences");
+    const { getBiometricStore } = await import("@/lib/biometric/store");
+    const store = await getBiometricStore();
+    await store.clear();
+    await Preferences.remove({ key: "biometric_enabled" });
+  } catch {
+    /* swallow; nothing left to clean */
+  }
 }
 
 const NAV_ITEMS = [
@@ -24,6 +50,13 @@ const NAV_ITEMS = [
 export function DashboardNav({ signOutAction }: Props) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Wrap the server action so client-side biometric cleanup runs first.
+  // The form action contract is async/void, so we await both in sequence.
+  async function handleSignOut() {
+    await runBiometricLogoutCleanup();
+    await signOutAction();
+  }
 
   return (
     <>
@@ -54,7 +87,7 @@ export function DashboardNav({ signOutAction }: Props) {
                 </Link>
               );
             })}
-            <form action={signOutAction}>
+            <form action={handleSignOut}>
               <Button variant="ghost" size="sm" type="submit">
                 <LogOut className="w-4 h-4 mr-1" /> Sign out
               </Button>
@@ -101,7 +134,7 @@ export function DashboardNav({ signOutAction }: Props) {
             })}
           </nav>
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
-            <form action={signOutAction}>
+            <form action={handleSignOut}>
               <Button type="submit" variant="ghost" className="w-full justify-start text-gray-600 hover:text-red-600 hover:bg-red-50">
                 <LogOut className="w-4 h-4 mr-3" /> Sign out
               </Button>
