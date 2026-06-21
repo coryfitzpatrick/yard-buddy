@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { isMobileApp } from "@/lib/platform";
+import { isMobileApp } from "@/lib/platform.server";
 
 export const metadata = { title: "Pricing | Yard Analyzer" };
 

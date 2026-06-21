@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { isMobileApp } from "@/lib/platform";
+import { isMobileApp } from "@/lib/platform.server";
 
 export default async function LoginPage() {
   const inApp = await isMobileApp();

@@ -55,7 +55,7 @@ describe("isMobileApp (server-side)", () => {
       headers: async () => new Headers({ "user-agent": "Mozilla/5.0 Capacitor YardAnalyzerApp/1.0" }),
     }));
     vi.resetModules();
-    const { isMobileApp } = await import("@/lib/platform");
+    const { isMobileApp } = await import("@/lib/platform.server");
     expect(await isMobileApp()).toBe(true);
     vi.doUnmock("next/headers");
   });
@@ -65,7 +65,7 @@ describe("isMobileApp (server-side)", () => {
       headers: async () => new Headers({ "user-agent": "Mozilla/5.0 (Macintosh) Safari" }),
     }));
     vi.resetModules();
-    const { isMobileApp } = await import("@/lib/platform");
+    const { isMobileApp } = await import("@/lib/platform.server");
     expect(await isMobileApp()).toBe(false);
     vi.doUnmock("next/headers");
   });
@@ -75,7 +75,7 @@ describe("isMobileApp (server-side)", () => {
       headers: async () => new Headers(),
     }));
     vi.resetModules();
-    const { isMobileApp } = await import("@/lib/platform");
+    const { isMobileApp } = await import("@/lib/platform.server");
     expect(await isMobileApp()).toBe(false);
     vi.doUnmock("next/headers");
   });

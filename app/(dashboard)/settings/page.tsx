@@ -7,7 +7,7 @@ import { BillingSection } from "@/components/settings/BillingSection";
 import { EmailSection } from "@/components/settings/EmailSection";
 import { Bell, Lock, CreditCard, Mail } from "lucide-react";
 import { getDaysUntilDeletion, PLAN_LABELS, canPause, daysUntilTrialEnd } from "@/lib/subscription";
-import { isMobileApp } from "@/lib/platform";
+import { isMobileApp } from "@/lib/platform.server";
 
 const EMAIL_CHANGE_MESSAGES: Record<string, { tone: "success" | "error"; text: string }> = {
   success: { tone: "success", text: "Email updated. You may need to sign in again." },
