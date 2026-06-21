@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { CookieConsent } from "@/components/CookieConsent";
+import BiometricUnlockGate from "@/components/mobile/BiometricUnlockGate";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -30,7 +31,7 @@ export default function RootLayout({
       className={`${roboto.variable} ${robotoMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <BiometricUnlockGate>{children}</BiometricUnlockGate>
         <CookieConsent />
       </body>
     </html>
