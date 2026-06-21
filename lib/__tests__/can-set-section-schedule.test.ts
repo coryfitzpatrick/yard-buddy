@@ -14,6 +14,9 @@ describe("canSetSectionSchedule", () => {
   it("returns true for professional", () => {
     expect(canSetSectionSchedule("professional")).toBe(true);
   });
+  it("returns true for admin", () => {
+    expect(canSetSectionSchedule("admin")).toBe(true);
+  });
   it("returns false for null", () => {
     expect(canSetSectionSchedule(null)).toBe(false);
   });

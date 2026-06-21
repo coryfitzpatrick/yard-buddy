@@ -32,6 +32,14 @@ describe("effectiveWatering", () => {
     const result = effectiveWatering(section({}), yard({}), "home_plus");
     expect(result).toEqual({ daysPerWeek: null, minutesPerSession: null });
   });
+  it("falls back to yard for each unset section field independently", () => {
+    const result = effectiveWatering(
+      section({ wDays: 3 }), // wMin omitted
+      yard({ wDays: 5, wMin: 30 }),
+      "home_plus",
+    );
+    expect(result).toEqual({ daysPerWeek: 3, minutesPerSession: 30 });
+  });
 });
 
 describe("effectiveMowing", () => {
