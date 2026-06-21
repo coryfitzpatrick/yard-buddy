@@ -18,7 +18,7 @@ const PLANS = [
     annual: 79,
     highlight: false,
     yards: "1 yard",
-    analyses: "8 analyses per yard per month",
+    analyses: "8 analyses per month",
     features: [
       "All personalized task recommendations",
       "Schedule reminders by email",
@@ -170,7 +170,7 @@ export default async function PricingPage() {
             >
               {plan.highlight && !isActivePaid && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                  Most popular
+                  Best value
                 </div>
               )}
               {currentPlan === plan.key && (
