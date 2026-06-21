@@ -3,7 +3,7 @@ import { Logo } from "@/components/Logo";
 import { Mail } from "lucide-react";
 import { Footer } from "@/components/Footer";
 
-export const metadata = { title: "Contact Us – Yard Analyzer" };
+export const metadata = { title: "Contact Us | Yard Analyzer" };
 
 const TOPICS = [
   {

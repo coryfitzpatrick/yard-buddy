@@ -98,7 +98,7 @@ export const POST = withAxiom(async (req: NextRequest) => {
       return NextResponse.json({
         lotSqft: sqft, buildingSqft: null, usableSqft: null, lat, lon,
         source: "map",
-        note: "Estimated from map data — may not reflect exact lot boundaries",
+        note: "Estimated from map data, may not reflect exact lot boundaries",
       });
     }
   }

@@ -61,7 +61,7 @@ export function TaskPopover({ task, onClose }: Props) {
           {task.sectionName} · {task.yardName}
         </div>
         <div className="text-xs text-gray-500 mb-3">
-          {formatDate(task.scheduledStart)} – {formatDate(task.scheduledEnd)}
+          {formatDate(task.scheduledStart)} to {formatDate(task.scheduledEnd)}
         </div>
 
         <div className="flex flex-col gap-2">

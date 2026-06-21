@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
 
-export const metadata = { title: "Privacy Policy – Yard Analyzer" };
+export const metadata = { title: "Privacy Policy | Yard Analyzer" };
 
 export default function PrivacyPage() {
   return (

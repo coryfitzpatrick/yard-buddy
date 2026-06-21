@@ -280,7 +280,7 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
             <div className="flex flex-col items-center gap-3 py-8">
               <div className="flex items-center gap-2 text-gray-500">
                 <Loader2 className="h-5 w-5 animate-spin text-green-500" />
-                <span>Analyzing… this usually takes 20–40 seconds</span>
+                <span>Analyzing… this usually takes 20 to 40 seconds</span>
               </div>
               <button
                 onClick={cancelAnalysis}

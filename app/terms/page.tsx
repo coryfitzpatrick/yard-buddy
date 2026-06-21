@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
 
-export const metadata = { title: "Terms of Use – Yard Analyzer" };
+export const metadata = { title: "Terms of Use | Yard Analyzer" };
 
 export default function TermsPage() {
   return (

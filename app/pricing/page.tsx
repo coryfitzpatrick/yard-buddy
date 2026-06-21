@@ -8,7 +8,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isMobileApp } from "@/lib/platform";
 
-export const metadata = { title: "Pricing – Yard Analyzer" };
+export const metadata = { title: "Pricing | Yard Analyzer" };
 
 const PLANS = [
   {
