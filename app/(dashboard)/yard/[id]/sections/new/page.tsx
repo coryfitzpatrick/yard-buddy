@@ -10,10 +10,29 @@ export default async function NewSectionPage({ params }: { params: Promise<{ id:
   if (!session?.user?.id) redirect("/login");
 
   const { id } = await params;
-  const yard = await db.yard.findFirst({
-    where: { slug: id, userId: session.user.id },
-    select: { id: true, name: true, zipCode: true, streetAddress: true, lotSqft: true, buildingSqft: true, mowingSchedule: true, wateringSchedule: true },
-  });
+  const [yard, subscriptionUser] = await Promise.all([
+    db.yard.findFirst({
+      where: { slug: id, userId: session.user.id },
+      select: {
+        id: true,
+        name: true,
+        zipCode: true,
+        streetAddress: true,
+        lotSqft: true,
+        buildingSqft: true,
+        mowingSchedule: true,
+        wateringSchedule: true,
+        wateringDaysPerWeek: true,
+        wateringMinutesPerSession: true,
+        mowingDaysPerWeek: true,
+        mowingHeightInches: true,
+      },
+    }),
+    db.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    }),
+  ]);
   if (!yard) notFound();
 
   return (
@@ -30,6 +49,11 @@ export default async function NewSectionPage({ params }: { params: Promise<{ id:
         buildingSqft={yard.buildingSqft ?? undefined}
         yardMowingSchedule={yard.mowingSchedule}
         yardWateringSchedule={yard.wateringSchedule}
+        plan={subscriptionUser?.plan ?? null}
+        yardWateringDaysPerWeek={yard.wateringDaysPerWeek}
+        yardWateringMinutesPerSession={yard.wateringMinutesPerSession}
+        yardMowingDaysPerWeek={yard.mowingDaysPerWeek}
+        yardMowingHeightInches={yard.mowingHeightInches}
       />
     </div>
   );

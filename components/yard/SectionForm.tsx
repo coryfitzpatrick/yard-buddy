@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
+import Link from "next/link";
 import { yardSectionSchema, YardSectionInput, YardSectionFormInput } from "@/lib/validations/yard";
 import { createSectionAction, updateSectionAction } from "@/app/_actions/sections";
 import { GrassTypeSelector } from "./GrassTypeSelector";
@@ -18,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Search } from "lucide-react";
 import { toSqft, toDisplaySize } from "@/lib/size-utils";
 import { ScheduleEditor } from "./ScheduleEditor";
+import { canSetSectionSchedule } from "@/lib/plan/can-set-section-schedule";
 
 interface Props {
   yardId: string;
@@ -29,6 +31,11 @@ interface Props {
   initialData?: Partial<YardSectionFormInput & { id: string; slug: string }>;
   yardMowingSchedule?: string | null;
   yardWateringSchedule?: string | null;
+  plan?: string | null;
+  yardWateringDaysPerWeek?: number | null;
+  yardWateringMinutesPerSession?: number | null;
+  yardMowingDaysPerWeek?: number | null;
+  yardMowingHeightInches?: number | null;
   // Hide the area-type picker and section-name input. Useful when the section
   // represents the whole yard (only section in the yard) and these fields
   // would just confuse the user.
@@ -37,7 +44,7 @@ interface Props {
 
 
 
-export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule, hideSectionIdentity = false }: Props) {
+export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule, plan, yardWateringDaysPerWeek, yardWateringMinutesPerSession, yardMowingDaysPerWeek, yardMowingHeightInches, hideSectionIdentity = false }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const isEdit = !!initialData?.id;
@@ -58,6 +65,10 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         soilTestSource: initialData?.soilTestSource ?? undefined,
         soilTestedAt: initialData?.soilTestedAt as YardSectionFormInput["soilTestedAt"],
         notes: initialData?.notes ?? undefined,
+        wateringDaysPerWeek: initialData?.wateringDaysPerWeek as YardSectionFormInput["wateringDaysPerWeek"],
+        wateringMinutesPerSession: initialData?.wateringMinutesPerSession as YardSectionFormInput["wateringMinutesPerSession"],
+        mowingDaysPerWeek: initialData?.mowingDaysPerWeek as YardSectionFormInput["mowingDaysPerWeek"],
+        mowingHeightInches: initialData?.mowingHeightInches as YardSectionFormInput["mowingHeightInches"],
         mowingSchedule: initialData?.mowingSchedule ?? undefined,
         wateringSchedule: initialData?.wateringSchedule ?? undefined,
         yardSizeSqft: (initialData?.yardSizeSqft ?? (lotSqft && !initialData ? (lotSqft - (buildingSqft ?? 0)) || lotSqft : undefined)) as YardSectionFormInput["yardSizeSqft"],
@@ -304,6 +315,74 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           <Textarea placeholder="Shady areas, problem spots…" {...register("notes")} />
           {errors.notes && <p className="text-sm text-red-500">{errors.notes.message}</p>}
         </div>
+        <div className="space-y-4 border-t border-gray-100 pt-4">
+          <h3 className="text-sm font-semibold text-gray-700">Schedule Overrides</h3>
+          <p className="text-xs text-gray-400">Override the yard-level defaults for this section only.</p>
+          {canSetSectionSchedule(plan ?? null) ? (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label>Watering days / week <span className="text-gray-400 font-normal">(optional)</span></Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={7}
+                  placeholder={yardWateringDaysPerWeek?.toString() ?? ""}
+                  {...register("wateringDaysPerWeek")}
+                />
+                {errors.wateringDaysPerWeek && (
+                  <p className="text-sm text-red-500">{errors.wateringDaysPerWeek.message}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <Label>Watering min. / session <span className="text-gray-400 font-normal">(optional)</span></Label>
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder={yardWateringMinutesPerSession?.toString() ?? ""}
+                  {...register("wateringMinutesPerSession")}
+                />
+                {errors.wateringMinutesPerSession && (
+                  <p className="text-sm text-red-500">{errors.wateringMinutesPerSession.message}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <Label>Mowing days / week <span className="text-gray-400 font-normal">(optional)</span></Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={7}
+                  placeholder={yardMowingDaysPerWeek?.toString() ?? ""}
+                  {...register("mowingDaysPerWeek")}
+                />
+                {errors.mowingDaysPerWeek && (
+                  <p className="text-sm text-red-500">{errors.mowingDaysPerWeek.message}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <Label>Mowing height (in.) <span className="text-gray-400 font-normal">(optional)</span></Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={5}
+                  step={0.5}
+                  placeholder={yardMowingHeightInches?.toString() ?? ""}
+                  {...register("mowingHeightInches")}
+                />
+                {errors.mowingHeightInches && (
+                  <p className="text-sm text-red-500">{errors.mowingHeightInches.message}</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">
+              Watering and mowing schedules are set at the yard level on your current plan.{" "}
+              <Link href={`/yard/${yardSlug ?? yardId}/edit`} className="text-green-600 hover:underline">
+                Edit yard schedule
+              </Link>
+            </p>
+          )}
+        </div>
+
         <div id="schedule" className="space-y-4 border-t border-gray-100 pt-4">
           <h3 className="text-sm font-semibold text-gray-700">Personalized Reminders</h3>
 

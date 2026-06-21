@@ -14,15 +14,37 @@ export default async function EditSectionPage({
   if (!session?.user?.id) redirect("/login");
 
   const { id: yardSlug, sectionId: sectionSlug } = await params;
-  const yard = await db.yard.findFirst({
-    where: { slug: yardSlug, userId: session.user.id },
-    select: { id: true },
-  });
+  const [yard, subscriptionUser] = await Promise.all([
+    db.yard.findFirst({
+      where: { slug: yardSlug, userId: session.user.id },
+      select: { id: true },
+    }),
+    db.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    }),
+  ]);
   if (!yard) notFound();
 
   const section = await db.yardSection.findFirst({
     where: { slug: sectionSlug, yardId: yard.id },
-    include: { yard: { select: { name: true, zipCode: true, lotSqft: true, buildingSqft: true, streetAddress: true, mowingSchedule: true, wateringSchedule: true } } },
+    include: {
+      yard: {
+        select: {
+          name: true,
+          zipCode: true,
+          lotSqft: true,
+          buildingSqft: true,
+          streetAddress: true,
+          mowingSchedule: true,
+          wateringSchedule: true,
+          wateringDaysPerWeek: true,
+          wateringMinutesPerSession: true,
+          mowingDaysPerWeek: true,
+          mowingHeightInches: true,
+        },
+      },
+    },
   });
   if (!section) notFound();
 
@@ -41,6 +63,11 @@ export default async function EditSectionPage({
         streetAddress={section.yard.streetAddress ?? undefined}
         yardMowingSchedule={section.yard.mowingSchedule}
         yardWateringSchedule={section.yard.wateringSchedule}
+        plan={subscriptionUser?.plan ?? null}
+        yardWateringDaysPerWeek={section.yard.wateringDaysPerWeek}
+        yardWateringMinutesPerSession={section.yard.wateringMinutesPerSession}
+        yardMowingDaysPerWeek={section.yard.mowingDaysPerWeek}
+        yardMowingHeightInches={section.yard.mowingHeightInches}
         initialData={{
           id: section.id,
           slug: section.slug,
@@ -57,6 +84,10 @@ export default async function EditSectionPage({
           soilTestedAt: section.soilTestedAt ? section.soilTestedAt.toISOString().slice(0, 10) : undefined,
           soilMoisture: section.soilMoisture as "dry" | "moderate" | "moist" | undefined,
           notes: section.notes ?? undefined,
+          wateringDaysPerWeek: section.wateringDaysPerWeek ?? undefined,
+          wateringMinutesPerSession: section.wateringMinutesPerSession ?? undefined,
+          mowingDaysPerWeek: section.mowingDaysPerWeek ?? undefined,
+          mowingHeightInches: section.mowingHeightInches ?? undefined,
           mowingSchedule: section.mowingSchedule ?? undefined,
           wateringSchedule: section.wateringSchedule ?? undefined,
         }}

@@ -72,6 +72,22 @@ export const yardSectionSchema = z.object({
   ),
   soilMoisture: z.enum(["dry", "moderate", "moist"]).optional(),
   notes: z.string().max(2000).optional(),
+  wateringDaysPerWeek: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().min(1).max(7).optional()
+  ),
+  wateringMinutesPerSession: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().min(1).optional()
+  ),
+  mowingDaysPerWeek: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().int().min(1).max(7).optional()
+  ),
+  mowingHeightInches: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+    z.number().min(1).max(5).optional()
+  ),
   mowingSchedule: z.string().optional(),
   wateringSchedule: z.string().optional(),
 });

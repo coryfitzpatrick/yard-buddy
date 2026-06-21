@@ -17,7 +17,8 @@ export default async function EditYardPage({
   if (!session?.user?.id) redirect("/login");
 
   const { id } = await params;
-  const yard = await db.yard.findFirst({
+  const [yard, subscriptionUser] = await Promise.all([
+    db.yard.findFirst({
     where: { slug: id, userId: session.user.id },
     select: {
       id: true,
@@ -30,6 +31,8 @@ export default async function EditYardPage({
       spreaderModel: true,
       wateringDaysPerWeek: true,
       wateringMinutesPerSession: true,
+      mowingDaysPerWeek: true,
+      mowingHeightInches: true,
       mowingSchedule: true,
       wateringSchedule: true,
       sections: {
@@ -50,12 +53,21 @@ export default async function EditYardPage({
           soilTestedAt: true,
           soilMoisture: true,
           notes: true,
+          wateringDaysPerWeek: true,
+          wateringMinutesPerSession: true,
+          mowingDaysPerWeek: true,
+          mowingHeightInches: true,
           mowingSchedule: true,
           wateringSchedule: true,
         },
       },
     },
-  });
+  }),
+    db.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    }),
+  ]);
   if (!yard) notFound();
 
   // When the yard hasn't been split into sections (still just the auto-created
@@ -104,6 +116,11 @@ export default async function EditYardPage({
             streetAddress={yard.streetAddress ?? undefined}
             yardMowingSchedule={yard.mowingSchedule}
             yardWateringSchedule={yard.wateringSchedule}
+            plan={subscriptionUser?.plan ?? null}
+            yardWateringDaysPerWeek={yard.wateringDaysPerWeek}
+            yardWateringMinutesPerSession={yard.wateringMinutesPerSession}
+            yardMowingDaysPerWeek={yard.mowingDaysPerWeek}
+            yardMowingHeightInches={yard.mowingHeightInches}
             hideSectionIdentity
             initialData={{
               id: onlySection.id,
@@ -121,6 +138,10 @@ export default async function EditYardPage({
               soilTestedAt: onlySection.soilTestedAt ? onlySection.soilTestedAt.toISOString().slice(0, 10) : undefined,
               soilMoisture: onlySection.soilMoisture as "dry" | "moderate" | "moist" | undefined,
               notes: onlySection.notes ?? undefined,
+              wateringDaysPerWeek: onlySection.wateringDaysPerWeek ?? undefined,
+              wateringMinutesPerSession: onlySection.wateringMinutesPerSession ?? undefined,
+              mowingDaysPerWeek: onlySection.mowingDaysPerWeek ?? undefined,
+              mowingHeightInches: onlySection.mowingHeightInches ?? undefined,
               mowingSchedule: onlySection.mowingSchedule ?? undefined,
               wateringSchedule: onlySection.wateringSchedule ?? undefined,
             }}
