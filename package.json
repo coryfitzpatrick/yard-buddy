@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",
+    "@aparajita/capacitor-biometric-auth": "^10.0.0",
     "@auth/prisma-adapter": "^2.11.2",
     "@axiomhq/js": "^1.6.1",
     "@axiomhq/logging": "^0.2.2",
