@@ -9,8 +9,17 @@ import { resend, buildDigestEmail, generateUnsubscribeToken } from "@/lib/email"
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
 import { withAxiom, logger } from "@/lib/observability/logger";
-import { emitCronRun } from "@/lib/observability/events";
+import { emitCronRun, emitPushDelivery } from "@/lib/observability/events";
 import { emitYesterdaysAiSummary } from "@/lib/observability/ai-daily-summary";
+import { sendPushToUser, type PushPayload } from "@/lib/push/send";
+import {
+  shouldPushBestDay,
+  shouldPushWeatherWarning,
+  shouldPushPreEmergent,
+  shouldPushGrub,
+  shouldPushOverseed,
+} from "@/lib/push/triggers";
+import { hashEmail } from "@/lib/observability/redact";
 
 const EMAIL_CONCURRENCY = 10;
 // Each yard's processing is a small read-modify-write sequence on its own
@@ -38,6 +47,39 @@ function isBefore(a: Date, b: Date): boolean {
 
 function sameDay(a: Date, b: Date): boolean {
   return a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10);
+}
+
+// Fire-and-forget push wrapper. Catches all errors so a push failure can never
+// block the cron's other work. sendPushToUser itself prunes failed tokens and
+// logs delivery-level detail; we emit the typed event for kind-aware dashboards.
+async function safePushUser(
+  userId: string,
+  payload: PushPayload,
+  kind: "best_day" | "weather_warning" | "preemergent_window" | "grub_window" | "overseed_window",
+): Promise<void> {
+  try {
+    await sendPushToUser(userId, payload);
+    emitPushDelivery({
+      userIdHash: hashEmail(userId),
+      kind,
+      tokens: 0,
+      success: 1,
+      failed: 0,
+    });
+  } catch (err) {
+    logger.error("push: send threw", {
+      userId,
+      kind,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    emitPushDelivery({
+      userIdHash: hashEmail(userId),
+      kind,
+      tokens: 0,
+      success: 0,
+      failed: 1,
+    });
+  }
 }
 
 async function runDailyTasks(
@@ -177,16 +219,40 @@ async function runDailyTasks(
 
         const newWindow = computeNewWindow(condition as import("@/types").WeatherCondition, weather.forecast, windowDays, today);
 
+        // Track effective scheduledStart so we can evaluate trigger predicates
+        // against the post-update window state rather than the snapshot we read.
+        let effectiveScheduledStart = task.scheduledStart;
+
         if (newWindow) {
           await db.lawnTask.update({
             where: { id: task.id },
             data: { scheduledStart: newWindow.scheduledStart, scheduledEnd: newWindow.scheduledEnd },
           });
+          effectiveScheduledStart = newWindow.scheduledStart;
         } else if (condition === "any" && task.scheduledEnd && isBefore(task.scheduledEnd, today)) {
           await db.lawnTask.update({
             where: { id: task.id },
             data: { scheduledStart: today, scheduledEnd: addDays(today, windowDays - 1) },
           });
+          effectiveScheduledStart = today;
+        }
+
+        // Weather-warning push: tomorrow's scheduled task with a weather concern.
+        if (
+          shouldPushWeatherWarning(
+            { scheduledStart: effectiveScheduledStart, weatherCondition: task.weatherCondition },
+            today,
+          )
+        ) {
+          await safePushUser(
+            yard.userId,
+            {
+              title: "Weather alert for tomorrow",
+              body: `${task.title} is scheduled for tomorrow and weather may affect it.`,
+              data: { yardId: yard.id, taskId: task.id, kind: "weather_warning" },
+            },
+            "weather_warning",
+          );
         }
       }
 
@@ -223,8 +289,22 @@ async function runDailyTasks(
 
     const state = yard.state ?? "";
 
+    // Track whether each window opens this run so we can fire window-opening
+    // pushes after the transactions land. The "fired" flags on the existing
+    // GddRecord are exactly yesterday's applicability state because they
+    // flip false→true the moment the window first opens; comparing
+    // (now-applicable) against (was-fired) yields the first-true transition.
+    const preEmergentApplicableNow =
+      !gddRecord.preEmergentFired && gddRecord.cumulativeGdd >= 50;
+    const grubsApplicableNow =
+      !gddRecord.grubsFired && gddRecord.cumulativeGdd >= 300;
+    const month = today.getUTCMonth();
+    const avgTemp = ((weather.forecast[0]?.high ?? 0) + (weather.forecast[0]?.low ?? 0)) / 2;
+    const overseedApplicableNow =
+      !gddRecord.overseedingFired && month >= 7 && month <= 9 && avgTemp < 65;
+
     // Pre-emergent: cumulative GDD ≥ 50
-    if (!gddRecord.preEmergentFired && gddRecord.cumulativeGdd >= 50) {
+    if (preEmergentApplicableNow) {
       const taskUpdates = yard.sections
         .filter((section) => isPreEmergentApplicable(section.grassType, state))
         .map((section) =>
@@ -244,7 +324,7 @@ async function runDailyTasks(
     }
 
     // Grubs: cumulative GDD ≥ 300
-    if (!gddRecord.grubsFired && gddRecord.cumulativeGdd >= 300) {
+    if (grubsApplicableNow) {
       const taskUpdates = yard.sections
         .filter((section) => isGrubAlertApplicable(section.grassType, state))
         .map((section) =>
@@ -264,9 +344,7 @@ async function runDailyTasks(
     }
 
     // Overseeding: avg temp < 65°F AND month Aug–Oct (0-indexed: 7–9)
-    const month = today.getUTCMonth();
-    const avgTemp = ((weather.forecast[0]?.high ?? 0) + (weather.forecast[0]?.low ?? 0)) / 2;
-    if (!gddRecord.overseedingFired && month >= 7 && month <= 9 && avgTemp < 65) {
+    if (overseedApplicableNow) {
       const taskUpdates = yard.sections
         .filter((section) => isOverseedingApplicable(section.grassType))
         .map((section) =>
@@ -283,6 +361,68 @@ async function runDailyTasks(
         ...taskUpdates,
         db.gddRecord.update({ where: { id: gddRecord.id }, data: { overseedingFired: true } }),
       ]);
+    }
+
+    // GDD-window-opening pushes: fire on the first-true transition only.
+    // Predicates take (todayApplicable, yesterdayApplicable). Yesterday's
+    // applicability is the pre-update "fired" flag — if it was false and the
+    // window opened this run, we emit one push per yard per window type.
+    if (shouldPushPreEmergent(preEmergentApplicableNow, gddRecord.preEmergentFired)) {
+      await safePushUser(
+        yard.userId,
+        {
+          title: "Pre-emergent window open",
+          body: "Soil temps just hit the pre-emergent window for your zone.",
+          data: { yardId: yard.id, kind: "preemergent_window" },
+        },
+        "preemergent_window",
+      );
+    }
+    if (shouldPushGrub(grubsApplicableNow, gddRecord.grubsFired)) {
+      await safePushUser(
+        yard.userId,
+        {
+          title: "Grub treatment window open",
+          body: "Soil temps just hit the grub treatment window for your zone.",
+          data: { yardId: yard.id, kind: "grub_window" },
+        },
+        "grub_window",
+      );
+    }
+    if (shouldPushOverseed(overseedApplicableNow, gddRecord.overseedingFired)) {
+      await safePushUser(
+        yard.userId,
+        {
+          title: "Overseeding window open",
+          body: "Conditions look right to overseed your lawn.",
+          data: { yardId: yard.id, kind: "overseed_window" },
+        },
+        "overseed_window",
+      );
+    }
+
+    // Best-day push: any pending task across this yard whose bestDay is today.
+    // This catches both tasks just stamped by the GDD transitions above and
+    // tasks whose bestDay was set on prior runs and happens to equal today.
+    const bestDayTasks = await db.lawnTask.findMany({
+      where: {
+        status: "pending",
+        bestDay: { not: null },
+        yardSection: { yardId: yard.id },
+      },
+      select: { id: true, title: true, bestDay: true },
+    });
+    for (const task of bestDayTasks) {
+      if (!shouldPushBestDay(task, today)) continue;
+      await safePushUser(
+        yard.userId,
+        {
+          title: "Today is the best day",
+          body: `Today is the recommended day to ${task.title.toLowerCase()}.`,
+          data: { yardId: yard.id, taskId: task.id, kind: "best_day" },
+        },
+        "best_day",
+      );
     }
   });
   progress.yardsProcessed = yards.length;

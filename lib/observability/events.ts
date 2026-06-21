@@ -155,9 +155,14 @@ interface PushDeliveryArgs {
 }
 
 export function emitPushDelivery(args: PushDeliveryArgs): void {
+  // `pushKind` distinguishes the typed push category (best_day, weather_warning…)
+  // from the event envelope's `kind: "push.delivery"`. Spreading args directly
+  // would clobber the envelope kind, which Axiom dashboards group on.
+  const { kind: pushKind, ...rest } = args;
   const payload = {
     kind: "push.delivery",
-    ...args,
+    pushKind,
+    ...rest,
     ...commonFields(),
   };
   if (args.failed > 0 && args.success === 0) {
