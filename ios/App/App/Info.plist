@@ -47,5 +47,13 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Yard Analyzer uses the camera to capture lawn photos for AI analysis.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Yard Analyzer reads from your photo library so you can analyze existing lawn photos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Yard Analyzer saves analyzed lawn reports to your photo library.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Yard Analyzer uses Face ID to unlock your saved session for quick sign-in.</string>
 </dict>
 </plist>
