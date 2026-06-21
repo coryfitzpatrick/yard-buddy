@@ -135,7 +135,7 @@ export const POST = withAxiom(async (req: NextRequest) => {
     const limits = getPlanLimits(subUser);
     const message = limits.canRunAnalysis
       ? `You have used all ${limits.maxAnalysesPerYardPerMonth} analyses for this yard this month. Your limit resets on the 1st of next month.`
-      : "Upgrade your plan to unlock automated lawn analysis.";
+      : "Upgrade your plan to start analyzing your lawn.";
     return NextResponse.json({ error: "analysis_limit_reached", message }, { status: 403 });
   }
 
