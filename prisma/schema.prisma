@@ -97,6 +97,8 @@ model Yard {
   spreaderModel      String?
   wateringDaysPerWeek       Int?
   wateringMinutesPerSession Int?
+  mowingDaysPerWeek         Int?
+  mowingHeightInches        Float?
   mowingSchedule            String?
   wateringSchedule          String?
   weatherRefreshedAt DateTime?
@@ -127,6 +129,10 @@ model YardSection {
   soilTestedAt      DateTime?
   soilMoisture      String?
   notes         String?
+  wateringDaysPerWeek       Int?
+  wateringMinutesPerSession Int?
+  mowingDaysPerWeek         Int?
+  mowingHeightInches        Float?
   currentRoutine    String?
   wateringSchedule  String?
   mowingSchedule    String?
@@ -148,6 +154,16 @@ model LawnAnalysis {
   issues        String[]
   summary       String      @db.Text
   rawResponse   String      @db.Text
+  wateringSchedule                   String?   @db.Text
+  wateringDeviates                   Boolean?
+  wateringSuggestedDaysPerWeek       Int?
+  wateringSuggestedMinutesPerSession Int?
+  wateringRecommendationDismissedAt  DateTime?
+  mowingSchedule                     String?   @db.Text
+  mowingDeviates                     Boolean?
+  mowingSuggestedDaysPerWeek         Int?
+  mowingSuggestedHeightInches        Float?
+  mowingRecommendationDismissedAt    DateTime?
   createdAt     DateTime    @default(now())
   yardSection   YardSection @relation(fields: [yardSectionId], references: [id], onDelete: Cascade)
   tasks         LawnTask[]
