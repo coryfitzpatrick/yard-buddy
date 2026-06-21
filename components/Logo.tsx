@@ -1,8 +1,8 @@
 import Image from "next/image";
 
-const LOGO_SRC = "/ya-logo.webp";
-const LOGO_INTRINSIC_WIDTH = 2690;
-const LOGO_INTRINSIC_HEIGHT = 1749;
+const LOGO_SRC = "/ya-logo-2.webp";
+const LOGO_INTRINSIC_WIDTH = 4470;
+const LOGO_INTRINSIC_HEIGHT = 3030;
 
 interface LogoProps {
   className?: string;
