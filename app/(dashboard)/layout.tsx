@@ -5,6 +5,7 @@ import { DashboardNav } from "@/components/dashboard/DashboardNav";
 import { Footer } from "@/components/Footer";
 import NotInApp from "@/components/NotInApp";
 import PushPermissionPrompt from "@/components/mobile/PushPermissionPrompt";
+import BiometricOptInPrompt from "@/components/mobile/BiometricOptInPrompt";
 import Link from "next/link";
 import { daysUntilTrialEnd } from "@/lib/subscription";
 
@@ -58,6 +59,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </main>
       <Footer />
       <PushPermissionPrompt />
+      <BiometricOptInPrompt userIsAuthed={!!session?.user?.id} />
     </div>
   );
 }
