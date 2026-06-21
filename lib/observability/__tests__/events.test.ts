@@ -6,6 +6,7 @@ import {
   emitRateLimitHit,
   emitAiCall,
   emitAiDailySummary,
+  emitPushDelivery,
   isExpensiveCall,
 } from "@/lib/observability/events";
 import type { RateLimitedRoute } from "@/lib/observability/events";
@@ -186,6 +187,29 @@ describe("emitAiDailySummary", () => {
         totals: { calls: 50, failures: 2, costUsd: 1.23 },
       }),
     );
+  });
+});
+
+describe("emitPushDelivery", () => {
+  it("logs error when all deliveries failed", () => {
+    const errorSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
+    emitPushDelivery({ userIdHash: "abc", kind: "best_day", tokens: 2, success: 0, failed: 2 });
+    expect(errorSpy).toHaveBeenCalledWith("push.delivery", expect.objectContaining({ failed: 2, success: 0 }));
+    errorSpy.mockRestore();
+  });
+
+  it("logs warn on partial failure", () => {
+    const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
+    emitPushDelivery({ userIdHash: "abc", kind: "weather_warning", tokens: 2, success: 1, failed: 1 });
+    expect(warnSpy).toHaveBeenCalledWith("push.delivery", expect.objectContaining({ failed: 1, success: 1 }));
+    warnSpy.mockRestore();
+  });
+
+  it("logs info on full success", () => {
+    const infoSpy = vi.spyOn(logger, "info").mockImplementation(() => {});
+    emitPushDelivery({ userIdHash: "abc", kind: "preemergent_window", tokens: 1, success: 1, failed: 0 });
+    expect(infoSpy).toHaveBeenCalledWith("push.delivery", expect.objectContaining({ failed: 0, success: 1 }));
+    infoSpy.mockRestore();
   });
 });
 

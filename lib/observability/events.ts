@@ -138,3 +138,33 @@ export function emitAiDailySummary(args: AiDailySummary): void {
   const payload = { ...args, kind: "ai.daily_summary", ...commonFields() };
   logger.info("ai.daily_summary", payload);
 }
+
+export type PushKind =
+  | "best_day"
+  | "weather_warning"
+  | "preemergent_window"
+  | "grub_window"
+  | "overseed_window";
+
+interface PushDeliveryArgs {
+  userIdHash: string;
+  kind: PushKind;
+  tokens: number;
+  success: number;
+  failed: number;
+}
+
+export function emitPushDelivery(args: PushDeliveryArgs): void {
+  const payload = {
+    kind: "push.delivery",
+    ...args,
+    ...commonFields(),
+  };
+  if (args.failed > 0 && args.success === 0) {
+    logger.error("push.delivery", payload);
+  } else if (args.failed > 0) {
+    logger.warn("push.delivery", payload);
+  } else {
+    logger.info("push.delivery", payload);
+  }
+}
