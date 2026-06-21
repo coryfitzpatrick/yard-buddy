@@ -10,6 +10,8 @@ import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
 import { TaskList } from "@/components/dashboard/TaskList";
 import { PersonalizedRemindersCard } from "@/components/sections/PersonalizedRemindersCard";
+import { ScheduleRecommendationCard } from "@/components/sections/ScheduleRecommendationCard";
+import { effectiveWatering, effectiveMowing } from "@/lib/schedules/effective-schedule";
 import { format } from "date-fns";
 import { getPlanLimits, getDaysUntilDeletion, canRunAnalysis } from "@/lib/subscription";
 import NotInApp from "@/components/NotInApp";
@@ -68,11 +70,32 @@ export default async function SectionDetailPage({
         select: {
           id: true,
           name: true,
+          wateringDaysPerWeek: true,
+          wateringMinutesPerSession: true,
+          mowingDaysPerWeek: true,
+          mowingHeightInches: true,
         },
       },
       analyses: {
         orderBy: { createdAt: "desc" },
-        select: { id: true, healthScore: true, issues: true, summary: true, createdAt: true, imageUrls: true },
+        select: {
+          id: true,
+          healthScore: true,
+          issues: true,
+          summary: true,
+          createdAt: true,
+          imageUrls: true,
+          wateringSchedule: true,
+          wateringDeviates: true,
+          wateringSuggestedDaysPerWeek: true,
+          wateringSuggestedMinutesPerSession: true,
+          wateringRecommendationDismissedAt: true,
+          mowingSchedule: true,
+          mowingDeviates: true,
+          mowingSuggestedDaysPerWeek: true,
+          mowingSuggestedHeightInches: true,
+          mowingRecommendationDismissedAt: true,
+        },
       },
       tasks: {
         where: {
@@ -351,6 +374,32 @@ export default async function SectionDetailPage({
         mowingSchedule={section.mowingSchedule ?? null}
         wateringSchedule={section.wateringSchedule ?? null}
       />
+
+      {/* Schedule recommendation cards */}
+      <div className="space-y-4 mb-6">
+        {(() => {
+          const wEff = effectiveWatering(section, section.yard, subscriptionUser.plan);
+          const mEff = effectiveMowing(section, section.yard, subscriptionUser.plan);
+          return (
+            <>
+              <ScheduleRecommendationCard
+                kind="watering"
+                sectionId={section.id}
+                latestAnalysis={latestAnalysis}
+                effective={{ daysPerWeek: wEff.daysPerWeek, minutesPerSession: wEff.minutesPerSession, heightInches: null }}
+                plan={subscriptionUser.plan}
+              />
+              <ScheduleRecommendationCard
+                kind="mowing"
+                sectionId={section.id}
+                latestAnalysis={latestAnalysis}
+                effective={{ daysPerWeek: mEff.daysPerWeek, minutesPerSession: null, heightInches: mEff.heightInches }}
+                plan={subscriptionUser.plan}
+              />
+            </>
+          );
+        })()}
+      </div>
 
       {/* Tasks */}
       {(visibleTasks.length > 0 || hiddenTaskCount > 0) && (
