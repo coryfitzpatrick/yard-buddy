@@ -181,28 +181,28 @@ export function emitPushDelivery(args: PushDeliveryArgs): void {
   }
 }
 
-type Plan = string | null;
+type PlanString = string | null;
 
-export function emitWateringRecommended(args: { sectionId: string; deviates: boolean; plan: Plan }) {
+export function emitWateringRecommended(args: { sectionId: string; deviates: boolean; plan: PlanString }): void {
   logger.info("watering.recommended", { ...args, kind: "watering.recommended", ...commonFields() });
 }
 
-export function emitWateringApplied(args: { sectionId: string; plan: Plan; target: "yard" | "section" }) {
+export function emitWateringApplied(args: { sectionId: string; plan: PlanString; target: "yard" | "section" }): void {
   logger.info("watering.applied", { ...args, kind: "watering.applied", ...commonFields() });
 }
 
-export function emitWateringDismissed(args: { sectionId: string }) {
+export function emitWateringDismissed(args: { sectionId: string }): void {
   logger.info("watering.dismissed", { ...args, kind: "watering.dismissed", ...commonFields() });
 }
 
-export function emitMowingRecommended(args: { sectionId: string; deviates: boolean; plan: Plan }) {
+export function emitMowingRecommended(args: { sectionId: string; deviates: boolean; plan: PlanString }): void {
   logger.info("mowing.recommended", { ...args, kind: "mowing.recommended", ...commonFields() });
 }
 
-export function emitMowingApplied(args: { sectionId: string; plan: Plan; target: "yard" | "section" }) {
+export function emitMowingApplied(args: { sectionId: string; plan: PlanString; target: "yard" | "section" }): void {
   logger.info("mowing.applied", { ...args, kind: "mowing.applied", ...commonFields() });
 }
 
-export function emitMowingDismissed(args: { sectionId: string }) {
+export function emitMowingDismissed(args: { sectionId: string }): void {
   logger.info("mowing.dismissed", { ...args, kind: "mowing.dismissed", ...commonFields() });
 }

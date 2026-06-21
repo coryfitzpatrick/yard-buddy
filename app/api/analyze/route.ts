@@ -321,8 +321,12 @@ export const POST = withAxiom(async (req: NextRequest) => {
     });
 
     if (schedule) {
-      emitWateringRecommended({ sectionId: section.id, deviates: schedule.watering.deviates, plan: subUser.plan });
-      emitMowingRecommended({ sectionId: section.id, deviates: schedule.mowing.deviates, plan: subUser.plan });
+      try {
+        emitWateringRecommended({ sectionId: section.id, deviates: schedule.watering.deviates, plan: subUser.plan });
+        emitMowingRecommended({ sectionId: section.id, deviates: schedule.mowing.deviates, plan: subUser.plan });
+      } catch {
+        // Telemetry is best-effort; never fail an analysis on a logger error.
+      }
     }
 
     return NextResponse.json({ analysis, result });
