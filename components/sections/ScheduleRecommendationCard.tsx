@@ -84,7 +84,7 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
 
   // State C - deviating, action buttons
   const formatSecond = (v: number | null) =>
-    kind === "watering" ? `${v ?? "—"} min/session` : `${v ?? "—"} in`;
+    kind === "watering" ? `${v ?? "?"} min/session` : `${v ?? "?"} in`;
   const apply = async () => {
     setBusy(true);
     try {
@@ -109,11 +109,11 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
       <div className="grid grid-cols-2 gap-3 text-sm text-amber-900 mb-4">
         <div>
           <div className="text-xs text-amber-700">Current</div>
-          <div>{currentDays ?? "—"} days/week, {formatSecond(currentSecond)}</div>
+          <div>{currentDays ?? "?"} days/week, {formatSecond(currentSecond)}</div>
         </div>
         <div>
           <div className="text-xs text-amber-700">Suggested</div>
-          <div>{suggestedDays ?? "—"} days/week, {formatSecond(suggestedSecond)}</div>
+          <div>{suggestedDays ?? "?"} days/week, {formatSecond(suggestedSecond)}</div>
         </div>
       </div>
       <div className="flex gap-2">
