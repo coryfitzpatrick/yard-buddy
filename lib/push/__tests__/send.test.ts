@@ -105,4 +105,26 @@ describe("sendPushToUser", () => {
       expect.objectContaining({ where: { id: "dt2" } }),
     );
   });
+
+  it("does not throw when a per-token bookkeeping update fails (uses Promise.allSettled)", async () => {
+    mockFindMany.mockResolvedValue([
+      { id: "dt1", token: "tok1", platform: "ios", failureCount: 0 },
+      { id: "dt2", token: "tok2", platform: "android", failureCount: 0 },
+    ]);
+    mockSendEachForMulticast.mockResolvedValue({
+      successCount: 2,
+      failureCount: 0,
+      responses: [{ success: true }, { success: true }],
+    });
+    // Make the second update fail
+    let callIdx = 0;
+    mockUpdate.mockImplementation(() => {
+      callIdx++;
+      if (callIdx === 2) return Promise.reject(new Error("db write failed"));
+      return Promise.resolve({});
+    });
+
+    // Should not throw
+    await expect(sendPushToUser("u1", { title: "T", body: "B" })).resolves.toBeUndefined();
+  });
 });

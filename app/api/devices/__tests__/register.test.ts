@@ -49,6 +49,7 @@ describe("POST /api/devices/register", () => {
     });
     const res = await POST(req as never, undefined as never);
     expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, id: "dt1" });
     expect(mockUpsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { token: "fcm-token-abc" },
@@ -56,5 +57,16 @@ describe("POST /api/devices/register", () => {
         create: expect.objectContaining({ userId: "u1", token: "fcm-token-abc", platform: "ios" }),
       }),
     );
+  });
+
+  it("returns 400 when token exceeds the max length", async () => {
+    (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
+    const req = new Request("https://example.com/api/devices/register", {
+      method: "POST",
+      body: JSON.stringify({ token: "x".repeat(5000), platform: "ios" }),
+    });
+    const res = await POST(req as never, undefined as never);
+    expect(res.status).toBe(400);
+    expect(mockUpsert).not.toHaveBeenCalled();
   });
 });

@@ -24,3 +24,8 @@ ALTER TABLE "DeviceToken" ADD CONSTRAINT "DeviceToken_userId_fkey" FOREIGN KEY (
 -- no policies. The app accesses this table via Prisma with the postgres role,
 -- which bypasses RLS.
 ALTER TABLE "DeviceToken" ENABLE ROW LEVEL SECURITY;
+
+-- Defense-in-depth: zod enforces this at the API boundary, but the DB-level
+-- CHECK catches any out-of-band insertion (e.g. direct SQL via admin tools).
+ALTER TABLE "DeviceToken" ADD CONSTRAINT "DeviceToken_platform_check"
+  CHECK ("platform" IN ('ios', 'android'));

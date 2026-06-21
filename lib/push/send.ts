@@ -33,7 +33,7 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
     ...(payload.data ? { data: payload.data } : {}),
   });
 
-  await Promise.all(
+  const settled = await Promise.allSettled(
     result.responses.map(async (resp, i) => {
       const dt = tokens[i]!;
       if (resp.success) {
@@ -45,6 +45,9 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
       }
       const next = dt.failureCount + 1;
       if (next >= FAILURE_THRESHOLD) {
+        // deleteMany (not delete) so we no-op if the row was concurrently removed
+        // by an unregister call or a parallel cron run that also tripped the threshold.
+        // Matches the IDOR-safe pattern in app/api/devices/[id]/route.ts.
         await db.deviceToken.deleteMany({ where: { id: dt.id } });
         return;
       }
@@ -54,12 +57,27 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
       });
     }),
   );
+  const bookkeepingErrors = settled.filter((s) => s.status === "rejected");
+  if (bookkeepingErrors.length > 0) {
+    logger.warn("push.send: some bookkeeping writes failed", {
+      userId,
+      count: bookkeepingErrors.length,
+    });
+  }
 
   if (result.failureCount > 0) {
+    const failures = result.responses
+      .map((r, i) =>
+        r.success
+          ? null
+          : { id: tokens[i]!.id, code: (r as { error?: { code?: string } }).error?.code ?? "unknown" },
+      )
+      .filter(Boolean);
     logger.warn("push.send: some deliveries failed", {
       userId,
       success: result.successCount,
       failed: result.failureCount,
+      failures,
     });
   }
 }
