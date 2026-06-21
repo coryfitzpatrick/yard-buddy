@@ -81,7 +81,7 @@ export default async function PricingPage() {
         <Link href={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-2">
           <Logo className="h-6 w-auto" />
           <span className="text-gray-300">|</span>
-          <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
+          <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
         </Link>
         {isLoggedIn
           ? <Link href="/dashboard"><Button variant="ghost" size="sm">Dashboard</Button></Link>

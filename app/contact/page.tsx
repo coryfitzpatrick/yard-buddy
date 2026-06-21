@@ -27,7 +27,7 @@ export default function ContactPage() {
         <Link href="/" className="flex items-center gap-2">
           <Logo className="h-6 w-auto" />
           <span className="text-gray-300">|</span>
-          <span className="text-lg font-bold text-green-700">Yard Analyzer</span>
+          <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
         </Link>
       </nav>
 
