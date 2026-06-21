@@ -19,7 +19,7 @@ Get Yard Analyzer downloadable from the Apple App Store and Google Play Store wi
 - Independent mobile-only features. The mobile app is feature-equivalent to the web app, minus paywall-related surfaces.
 - Web push (PWA-style). Only native iOS/Android push via APNs/FCM.
 - Push delivery as a wholesale replacement for email. Email continues to handle digests, billing, trial reminders, account changes; push handles only time-sensitive task/weather events.
-- Biometric for OAuth-signup users in v1. Equivalent UX via long-lived session cookies; native biometric prompts ship in a follow-up if needed.
+- (none — refresh-token pattern handles OAuth and credentials users equivalently)
 
 ## Decisions made during brainstorming
 
@@ -29,7 +29,7 @@ Get Yard Analyzer downloadable from the Apple App Store and Google Play Store wi
 | 2 | How to handle existing Stripe subscriptions? | **A** — hide all paywall UI in-app. Subscriptions happen on the web only. |
 | 3 | Architectural approach | **Approach 1** — Capacitor wrapping the live `yardanalyzer.com` URL with native plugins. |
 | 4 | Push notification scope | **C** — push for time-sensitive events only ("mow tomorrow before rain," "best GDD day is today," "pre-emergent window opens"). Email continues to handle weekly digests, billing, trial reminders, and account events. |
-| 5 | Biometric login security model | **A** — cache the NextAuth session token in iOS Keychain / Android Keystore. Biometric unlocks the cached token for instant re-login. Server-revokable (a stolen token can be invalidated server-side); does not store the user's password; works equivalently for password and OAuth users. |
+| 5 | Biometric login security model | **A** initially (cache session JWT) → revised to **refresh-token pattern** mid-implementation. Discovery: NextAuth's session cookie is HttpOnly, so `document.cookie = token` cannot set it from JS. Rather than work around with a `/api/auth/biometric-unlock` endpoint that re-issues the SAME session cookie (Option 1), pivoted to a server-issued refresh token stored in Keychain. The refresh token is exchanged via `/api/auth/biometric-exchange` for a fresh session cookie. Per-device revocable, rotates on each use, stronger audit story, aligns with RFC 8252 (OAuth for native apps). |
 
 ## Architecture
 
@@ -243,20 +243,63 @@ Internally: fetch all `DeviceToken` rows for the user, batch-send via `firebase-
 
 ## Biometric login
 
-### Storage model
+### Storage model — refresh-token pattern (NOT the session JWT)
 
 iOS Keychain + Android Keystore, accessed via `@aparajita/capacitor-biometric-auth`. Both are hardware-backed on modern devices (Secure Enclave on iPhone, StrongBox on Pixel). The plugin handles per-platform availability checks, biometric type detection (Face ID vs Touch ID vs Fingerprint vs Iris), and falls back to device passcode if biometrics aren't available.
 
-What's stored: the NextAuth session cookie value, keyed by user email (so multi-account support works). Nothing else.
+**What's stored: a server-issued refresh token, NOT the NextAuth session JWT itself.** The refresh token is opaque to the client (random 256-bit value, base64-encoded) and only useful when presented to the `/api/auth/biometric-exchange` endpoint. The server stores a SHA-256 hash of the token (not the plaintext) keyed by `(userId, deviceId)` in a new `BiometricRefreshToken` Prisma model.
+
+**Why refresh tokens instead of caching the session JWT:**
+- **Per-device revocation:** "lost phone" can wipe that device's refresh token without logging the user out of laptop/tablet.
+- **Exfiltration is single-purpose:** a stolen refresh token only works against our exchange endpoint, which can rate-limit, geofence, and log. A stolen session JWT works against the entire API directly.
+- **Token rotation:** each successful exchange issues a new refresh token + invalidates the old, so the exposure window for any leaked token is one cold launch.
+- **Independent TTL:** refresh token can live 90 days; session JWT (re-issued on exchange) stays at NextAuth's default 30 min lifetime — defense-in-depth.
+- **OAuth 2.0 alignment:** RFC 8252 recommends refresh tokens for native apps. Easier security audit story.
+
+### Data model
+
+```prisma
+model BiometricRefreshToken {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash         String    @unique  // sha256(plaintext)
+  deviceFingerprint String?              // optional: platform + app version + UA hash; informational only
+  createdAt         DateTime  @default(now())
+  lastUsedAt        DateTime  @default(now())
+  revokedAt         DateTime?            // null = active; non-null = revoked, do not honor
+
+  @@index([userId])
+}
+```
+
+Plus `biometricRefreshTokens BiometricRefreshToken[]` back-reference on the `User` model. New migration includes `ALTER TABLE … ENABLE ROW LEVEL SECURITY` per project convention.
+
+### Backend endpoints
+
+- `POST /api/auth/biometric-issue` (authenticated) — generates a fresh 256-bit refresh token, stores `sha256(token)` in DB, returns plaintext to client (only chance to see it). Body: optional `{ deviceFingerprint?: string }`. Response: `{ token, id }`.
+- `POST /api/auth/biometric-exchange` (unauthenticated) — body `{ token: string }`. Looks up the row by `tokenHash = sha256(token)`, rejects if not found, revoked, or last used > 90 days ago. On success: issues a new session JWT via `next-auth/jwt` encode, sets the session cookie with matching attributes (HttpOnly, Secure in prod, SameSite=Lax, correct name `authjs.session-token` / `__Secure-authjs.session-token`), rotates the refresh token (new token replaces old, old row marked revoked), returns the new refresh token. Client overwrites the Keychain entry with the new token.
+- `POST /api/auth/biometric-revoke` (authenticated) — body `{ id?: string }`. With id: revokes that specific row (per-device logout). Without id: revokes all rows for the user (full reset). Called on logout (per-device) and from future Settings → Devices UI (per-device or all).
+
+### Helper module
+
+`lib/auth/biometric-refresh.ts` exports:
+- `generateRefreshToken(): { token: string; hash: string }` — `randomBytes(32).toString("base64url")` + `sha256(token).hex`
+- `hashRefreshToken(token: string): string` — `sha256(token).hex`
+- `validateAndConsume(token: string): Promise<{ userId: string; rowId: string } | null>` — checks DB, returns userId on success (or null if invalid/revoked/expired)
+- `issueSessionCookie(userId: string, response: NextResponse): Promise<void>` — encodes a NextAuth JWT with `userId` claim, sets cookie via `Set-Cookie` header with NextAuth's exact attributes for the current environment
 
 ### Opt-in flow
 
 1. User successfully logs in (password or OAuth) inside the app.
 2. After session is established, a one-time prompt appears: "Sign in faster next time with Face ID?" (system biometric name detected dynamically — "Touch ID," "Fingerprint," etc.).
 3. Two buttons: "Enable" and "Not Now."
-4. If Enable: trigger a single biometric verification to confirm the device has working biometrics; on success, write the session token to Keychain.
-5. Set `Preferences.biometricEnabled = true`.
-6. On Not Now: respect, never re-prompt automatically (re-enable via Settings → Account → "Sign in with Face ID").
+4. If Enable:
+   - App POSTs to `/api/auth/biometric-issue` to get a fresh refresh token.
+   - App stores the token in Keychain via `BiometricAuth.setBiometricCredentials({ server: "yardanalyzer.refresh", username: "session", password: token })`.
+   - Trigger a single biometric verification to confirm the device has working biometrics.
+   - Set `Preferences.biometricEnabled = true`.
+5. On Not Now: respect, never re-prompt automatically (re-enable via Settings → Account → "Sign in with Face ID" — Group 7 work).
 
 ### Cold-launch unlock flow
 
@@ -265,18 +308,36 @@ What's stored: the NextAuth session cookie value, keyed by user email (so multi-
 3. If true:
    - Check if the current NextAuth session is still valid (call `/api/auth/session`).
    - If valid → app is logged in, no prompt.
-   - If invalid/expired → prompt biometric. On success, read session token from Keychain, set the cookie, reload. On failure or cancel → fall through to normal login screen.
+   - If invalid/expired → prompt biometric. On success:
+     - Read refresh token from Keychain.
+     - POST to `/api/auth/biometric-exchange` with the token.
+     - Server validates, rotates the token (returns a new one), sets the session cookie via `Set-Cookie` header (HttpOnly, NextAuth-compatible).
+     - Client overwrites the Keychain entry with the new refresh token returned in the response.
+     - Reload the page; new session cookie is in effect, app is logged in.
+   - On biometric failure or cancel → fall through to normal login screen.
 
 ### Logout behavior
 
-Logout (whether triggered by user action, server-side session revocation, or 401 from any API call) clears the Keychain entry AND `Preferences.biometricEnabled`. Re-enabling requires logging in again and re-opting in.
+Logout (whether triggered by user action, server-side session revocation, or 401 from any API call):
+1. POST to `/api/auth/biometric-revoke` to mark this device's refresh token row `revokedAt = now()` in DB.
+2. Clear the Keychain entry via `BiometricAuth.deleteBiometricCredentials({ server: "yardanalyzer.refresh" })`.
+3. Clear `Preferences.biometricEnabled`.
+4. Call the existing NextAuth `signOut()` to drop the session cookie.
+
+Re-enabling requires logging in again and re-opting in (new refresh token is issued).
 
 ### Edge cases
 
 - **Biometric disabled in OS settings.** Plugin returns "not available." App skips the prompt entirely and uses the normal login flow.
 - **Biometric failed 3 times in a row.** iOS locks biometric for some duration. Plugin returns "lockout." App falls back to manual login.
-- **User changes device biometrics (new finger registered, Face ID reset).** iOS Keychain has an option to invalidate on biometric change; we enable it. Effect: session token gets wiped, user has to re-login + re-opt-in.
-- **OAuth users.** Same flow — the session token is just the NextAuth session cookie, which works the same whether the original auth was password or OAuth.
+- **User changes device biometrics (new finger registered, Face ID reset).** iOS Keychain has an option to invalidate on biometric change; we enable it. Effect: refresh token gets wiped from Keychain, user has to re-login + re-opt-in. The DB row stays but is effectively orphaned until garbage-collected (revoke-all on next login).
+- **OAuth users.** Same flow — biometric stores a refresh token, not a password, so OAuth and credentials users get equivalent UX. The refresh token is independent of how the original session was established.
+- **Stolen device, attacker bypasses lockscreen.** Refresh token is in biometric-protected Keychain; attacker needs the user's face/finger to read it. If they have that, they could just use the unlocked phone normally. No additional risk surface vs. a normal phone-lock bypass.
+- **Refresh token compromised via Keychain exfiltration (hypothetical OS-level malware).** Attacker still has to hit `/api/auth/biometric-exchange` from a network we can monitor. We log exchange attempts; high-volume or geographically-anomalous exchange traffic can trigger alerts. Token rotation means a leaked token is invalidated the moment the legitimate user does a cold-launch unlock.
+
+### Deferred to Group 7: Settings → Devices revocation UI
+
+A list view of all the user's active refresh tokens (one per biometric-opted-in device) with revoke buttons. Out of Group 5 scope; provides the user-facing entry point for per-device revocation that the data model already supports. ~half day of work.
 
 ## Auth flow in the WebView
 
@@ -432,7 +493,8 @@ No automated mobile end-to-end testing in v1 (Detox/Appium overhead not justifie
 - **FCM service account credential leak.** The Firebase service account JSON has push-send authority for all users. Mitigated by storing only on Vercel env vars (never in repo), rotating annually, and scoping the IAM role to FCM-only (no other Firebase services granted).
 - **Stale push tokens accumulating.** Mitigated by `failureCount`-based pruning (3 strikes and the token is deleted) plus periodic batch cleanup in the monthly cost-report cron.
 - **Push notification fatigue.** Per question 4 (C), only 5 trigger categories ship pushes, and each has natural rate limits (best-day fires once per task; weather warning fires once per scheduled task; window-opening events fire once per season transition). Realistic worst-case: ~2-3 pushes per user per week. Add a global per-user "max 1 push per 4 hours" rate limit if real-world data shows higher.
-- **Biometric storage compromise.** Mitigated by storing only the session token (not password). Server-side session revocation is the kill switch. If a user reports loss/theft of their device, they can revoke the session from settings on another device.
+- **Biometric storage compromise.** Mitigated by storing only a server-issued refresh token (not the session JWT, not the password) which is single-purpose (only works against `/api/auth/biometric-exchange`), rotates on every use, and is per-device revocable from the future Settings → Devices UI. A leaked token's effective TTL collapses to one cold-launch unlock by the legitimate user (rotation invalidates the old token). If a device is lost, the user can revoke that device's row from another logged-in session.
+- **Exchange-endpoint abuse.** `/api/auth/biometric-exchange` is unauthenticated by design (it's how you become authenticated). Mitigated by rate-limiting per IP and per token-hash, logging all attempts to Axiom with `userId` (derived from the validated token) so anomalous patterns (high-volume, geo-anomalous) surface as observability alerts.
 
 ## Out of scope (explicit, may be future projects)
 

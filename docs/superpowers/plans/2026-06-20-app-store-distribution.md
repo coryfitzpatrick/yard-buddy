@@ -1529,9 +1529,11 @@ Report: "Group 4 (Push triggers + cron integration) complete. 4 commits. `push.d
 
 ---
 
-## Group 5 — Biometric login
+## Group 5 — Biometric login (refresh-token pattern)
 
-Install the biometric plugin, build the opt-in prompt, build the cold-launch unlock, handle logout cleanup.
+Pivot from the original "cache session JWT" design (option A) to a refresh-token pattern (option 3 per the verification finding). The session cookie is HttpOnly, so JS-side `document.cookie = ...` doesn't work. Instead, server issues a 256-bit refresh token, client caches it in Keychain, biometric unlocks it, server exchanges it for a fresh session cookie via `Set-Cookie`. Per-device revocable, token-rotating, RFC-8252 aligned.
+
+Task expansion vs original plan: 4 tasks → 9 tasks, because the refresh-token model requires a backend (DB model + 3 endpoints + helper module) on top of the client-side biometric flow.
 
 ### Task 5.1: Install biometric plugin
 
@@ -1545,39 +1547,641 @@ Run:
 npm install @aparajita/capacitor-biometric-auth
 ```
 
-- [ ] **Step 2: Sync to native projects**
+- [ ] **Step 2: Skip `npx cap sync`**
 
-Run: `npx cap sync`
-Expected: plugin registers in both iOS and Android native code.
+Task 1.2 (native iOS/Android project generation) was deferred — no `ios/` or `android/` directories exist yet, so `npx cap sync` has nothing to sync. The web-side install of the plugin completes; the native registration happens later when `npx cap add ios|android` runs in a future session.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add package.json package-lock.json ios/ android/
-git commit -m "Install @aparajita/capacitor-biometric-auth plugin"
+git add package.json package-lock.json
+git commit -m "Install @aparajita/capacitor-biometric-auth plugin (web-side)"
 ```
 
-### Task 5.2: Biometric opt-in prompt after first login
+### Task 5.2: Add `BiometricRefreshToken` Prisma model + migration
 
 **Files:**
+- Modify: `prisma/schema.prisma`
+- Create: `prisma/migrations/<timestamp>_add_biometric_refresh_token/migration.sql`
+
+- [ ] **Step 1: Append the model to `prisma/schema.prisma`**
+
+```prisma
+model BiometricRefreshToken {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash         String    @unique   // sha256(plaintext token), hex
+  deviceFingerprint String?              // informational only: platform + app version + UA hash
+  createdAt         DateTime  @default(now())
+  lastUsedAt        DateTime  @default(now())
+  revokedAt         DateTime?            // null = active; non-null = revoked
+
+  @@index([userId])
+}
+```
+
+Add the back-reference inside the `User` model:
+```prisma
+biometricRefreshTokens BiometricRefreshToken[]
+```
+
+- [ ] **Step 2: Generate the migration with `--create-only`** (same prod-DB-safety guardrails as Group 3 Task 3.1)
+
+Run:
+```bash
+npx prisma migrate dev --name add_biometric_refresh_token --create-only
+```
+
+If this fails the same way as Group 3 (DIRECT_URL env empty / Supabase shadow DB), hand-write the migration SQL following the format of `prisma/migrations/20260620194639_add_device_token/migration.sql`. Apply the same RLS lockdown:
+```sql
+ALTER TABLE "BiometricRefreshToken" ENABLE ROW LEVEL SECURITY;
+```
+
+- [ ] **Step 3: Regenerate the Prisma client**
+
+Run: `npx prisma generate`
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add prisma/schema.prisma prisma/migrations/
+git commit -m "Add BiometricRefreshToken Prisma model for biometric login"
+```
+
+### Task 5.3: Add `lib/auth/biometric-refresh.ts` helper module with TDD
+
+**Files:**
+- Create: `lib/auth/biometric-refresh.ts`
+- Create: `lib/auth/__tests__/biometric-refresh.test.ts`
+
+- [ ] **Step 1: Write failing tests**
+
+```ts
+// lib/auth/__tests__/biometric-refresh.test.ts
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+const mockFindUnique = vi.fn();
+const mockUpdate = vi.fn();
+const mockCreate = vi.fn();
+
+vi.mock("@/lib/db", () => ({
+  db: {
+    biometricRefreshToken: {
+      findUnique: (...args: unknown[]) => mockFindUnique(...args),
+      update: (...args: unknown[]) => mockUpdate(...args),
+      create: (...args: unknown[]) => mockCreate(...args),
+    },
+  },
+}));
+
+import {
+  generateRefreshToken,
+  hashRefreshToken,
+  validateAndConsume,
+} from "@/lib/auth/biometric-refresh";
+
+beforeEach(() => {
+  mockFindUnique.mockReset();
+  mockUpdate.mockReset();
+  mockCreate.mockReset();
+});
+
+describe("generateRefreshToken", () => {
+  it("returns a base64url plaintext and its sha256 hex hash", () => {
+    const { token, hash } = generateRefreshToken();
+    expect(token).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(token.length).toBeGreaterThanOrEqual(40); // base64url of 32 bytes
+    expect(hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(hash).toBe(hashRefreshToken(token));
+  });
+
+  it("produces distinct tokens on successive calls", () => {
+    const a = generateRefreshToken();
+    const b = generateRefreshToken();
+    expect(a.token).not.toBe(b.token);
+    expect(a.hash).not.toBe(b.hash);
+  });
+});
+
+describe("hashRefreshToken", () => {
+  it("is deterministic", () => {
+    expect(hashRefreshToken("abc")).toBe(hashRefreshToken("abc"));
+  });
+  it("differs across inputs", () => {
+    expect(hashRefreshToken("a")).not.toBe(hashRefreshToken("b"));
+  });
+});
+
+describe("validateAndConsume", () => {
+  it("returns null when no row matches the hash", async () => {
+    mockFindUnique.mockResolvedValue(null);
+    expect(await validateAndConsume("nonexistent")).toBeNull();
+  });
+
+  it("returns null when row is revoked", async () => {
+    mockFindUnique.mockResolvedValue({
+      id: "r1",
+      userId: "u1",
+      revokedAt: new Date(),
+      lastUsedAt: new Date(),
+    });
+    expect(await validateAndConsume("any")).toBeNull();
+  });
+
+  it("returns null when lastUsedAt is older than 90 days", async () => {
+    const ninetyOneDaysAgo = new Date(Date.now() - 91 * 24 * 60 * 60 * 1000);
+    mockFindUnique.mockResolvedValue({
+      id: "r1",
+      userId: "u1",
+      revokedAt: null,
+      lastUsedAt: ninetyOneDaysAgo,
+    });
+    expect(await validateAndConsume("any")).toBeNull();
+  });
+
+  it("returns userId and rowId on valid token", async () => {
+    mockFindUnique.mockResolvedValue({
+      id: "r1",
+      userId: "u1",
+      revokedAt: null,
+      lastUsedAt: new Date(),
+    });
+    const result = await validateAndConsume("any");
+    expect(result).toEqual({ userId: "u1", rowId: "r1" });
+  });
+});
+```
+
+- [ ] **Step 2: Run test to verify failure**
+
+Run: `npx vitest run lib/auth/__tests__/biometric-refresh.test.ts`
+Expected: FAIL with "Cannot find module".
+
+- [ ] **Step 3: Implement**
+
+```ts
+// lib/auth/biometric-refresh.ts
+import { createHash, randomBytes } from "node:crypto";
+import { db } from "@/lib/db";
+
+const REFRESH_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+
+export function generateRefreshToken(): { token: string; hash: string } {
+  const token = randomBytes(32).toString("base64url");
+  const hash = hashRefreshToken(token);
+  return { token, hash };
+}
+
+export function hashRefreshToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+export async function validateAndConsume(
+  plaintextToken: string,
+): Promise<{ userId: string; rowId: string } | null> {
+  const tokenHash = hashRefreshToken(plaintextToken);
+  const row = await db.biometricRefreshToken.findUnique({
+    where: { tokenHash },
+    select: { id: true, userId: true, revokedAt: true, lastUsedAt: true },
+  });
+  if (!row) return null;
+  if (row.revokedAt) return null;
+  if (Date.now() - row.lastUsedAt.getTime() > REFRESH_TTL_MS) return null;
+  return { userId: row.userId, rowId: row.id };
+}
+```
+
+- [ ] **Step 4: Verify**
+
+Run: `npx vitest run lib/auth/__tests__/biometric-refresh.test.ts`
+Expected: PASS, 7 tests.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add lib/auth/biometric-refresh.ts lib/auth/__tests__/biometric-refresh.test.ts
+git commit -m "Add biometric refresh token helper module"
+```
+
+### Task 5.4: `POST /api/auth/biometric-issue` endpoint with TDD
+
+**Files:**
+- Create: `app/api/auth/biometric-issue/route.ts`
+- Create: `app/api/auth/biometric-issue/__tests__/route.test.ts`
+
+- [ ] **Step 1: Write failing tests**
+
+```ts
+// app/api/auth/biometric-issue/__tests__/route.test.ts
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+const mockCreate = vi.fn();
+vi.mock("@/lib/db", () => ({
+  db: { biometricRefreshToken: { create: (...args: unknown[]) => mockCreate(...args) } },
+}));
+
+vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
+
+import { POST } from "@/app/api/auth/biometric-issue/route";
+import { auth } from "@/lib/auth";
+
+describe("POST /api/auth/biometric-issue", () => {
+  beforeEach(() => {
+    mockCreate.mockReset();
+    (auth as ReturnType<typeof vi.fn>).mockReset();
+  });
+
+  it("returns 401 when unauthenticated", async () => {
+    (auth as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    const req = new Request("https://example.com/api/auth/biometric-issue", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+    const res = await POST(req as never, undefined as never);
+    expect(res.status).toBe(401);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it("creates a row with sha256(token) and returns plaintext token + id", async () => {
+    (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
+    mockCreate.mockImplementation(async ({ data }) => ({ id: "r1", ...data }));
+    const req = new Request("https://example.com/api/auth/biometric-issue", {
+      method: "POST",
+      body: JSON.stringify({ deviceFingerprint: "ios:1.0:abcd" }),
+    });
+    const res = await POST(req as never, undefined as never);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.token).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(body.id).toBe("r1");
+    expect(mockCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        userId: "u1",
+        tokenHash: expect.stringMatching(/^[0-9a-f]{64}$/),
+        deviceFingerprint: "ios:1.0:abcd",
+      }),
+    });
+  });
+
+  it("accepts request without deviceFingerprint", async () => {
+    (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
+    mockCreate.mockImplementation(async ({ data }) => ({ id: "r1", ...data }));
+    const req = new Request("https://example.com/api/auth/biometric-issue", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+    const res = await POST(req as never, undefined as never);
+    expect(res.status).toBe(200);
+  });
+});
+```
+
+- [ ] **Step 2: Run to verify failure**
+
+Run: `npx vitest run app/api/auth/biometric-issue/__tests__/route.test.ts`
+Expected: FAIL.
+
+- [ ] **Step 3: Implement**
+
+```ts
+// app/api/auth/biometric-issue/route.ts
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { generateRefreshToken } from "@/lib/auth/biometric-refresh";
+import { withAxiom, logger } from "@/lib/observability/logger";
+
+const Body = z.object({
+  deviceFingerprint: z.string().max(200).optional(),
+});
+
+export const POST = withAxiom(async (req: Request) => {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const parsed = Body.safeParse(await req.json().catch(() => ({})));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid body", issues: parsed.error.issues }, { status: 400 });
+  }
+
+  const { token, hash } = generateRefreshToken();
+
+  try {
+    const row = await db.biometricRefreshToken.create({
+      data: {
+        userId: session.user.id,
+        tokenHash: hash,
+        deviceFingerprint: parsed.data.deviceFingerprint ?? null,
+      },
+    });
+    return NextResponse.json({ token, id: row.id });
+  } catch (err) {
+    logger.error("biometric-issue: create failed", {
+      userId: session.user.id,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+});
+```
+
+- [ ] **Step 4: Verify**
+
+Run: `npx vitest run app/api/auth/biometric-issue/__tests__/route.test.ts`
+Expected: PASS, 3 tests.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add app/api/auth/biometric-issue/route.ts app/api/auth/biometric-issue/__tests__/route.test.ts
+git commit -m "Add /api/auth/biometric-issue endpoint"
+```
+
+### Task 5.5: `POST /api/auth/biometric-exchange` endpoint with TDD
+
+**Files:**
+- Create: `app/api/auth/biometric-exchange/route.ts`
+- Create: `app/api/auth/biometric-exchange/__tests__/route.test.ts`
+
+- [ ] **Step 1: Write failing tests**
+
+```ts
+// app/api/auth/biometric-exchange/__tests__/route.test.ts
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+const mockValidateAndConsume = vi.fn();
+const mockGenerateRefreshToken = vi.fn();
+vi.mock("@/lib/auth/biometric-refresh", () => ({
+  validateAndConsume: (...args: unknown[]) => mockValidateAndConsume(...args),
+  generateRefreshToken: (...args: unknown[]) => mockGenerateRefreshToken(...args),
+  hashRefreshToken: (token: string) => `hash(${token})`,
+}));
+
+const mockTransaction = vi.fn();
+vi.mock("@/lib/db", () => ({
+  db: {
+    $transaction: (fn: (tx: unknown) => Promise<unknown>) => mockTransaction(fn),
+    biometricRefreshToken: {
+      update: vi.fn(),
+      create: vi.fn(),
+    },
+  },
+}));
+
+const mockEncode = vi.fn();
+vi.mock("next-auth/jwt", () => ({ encode: (...args: unknown[]) => mockEncode(...args) }));
+
+import { POST } from "@/app/api/auth/biometric-exchange/route";
+
+beforeEach(() => {
+  mockValidateAndConsume.mockReset();
+  mockGenerateRefreshToken.mockReset();
+  mockTransaction.mockReset();
+  mockEncode.mockReset();
+  process.env.AUTH_SECRET = "test-secret";
+});
+
+describe("POST /api/auth/biometric-exchange", () => {
+  it("returns 400 on missing token", async () => {
+    const req = new Request("https://example.com/api/auth/biometric-exchange", {
+      method: "POST", body: JSON.stringify({}),
+    });
+    const res = await POST(req as never, undefined as never);
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 401 when token is invalid", async () => {
+    mockValidateAndConsume.mockResolvedValue(null);
+    const req = new Request("https://example.com/api/auth/biometric-exchange", {
+      method: "POST", body: JSON.stringify({ token: "bad" }),
+    });
+    const res = await POST(req as never, undefined as never);
+    expect(res.status).toBe(401);
+  });
+
+  it("on valid token: encodes a session JWT, rotates the refresh token, sets cookie via Set-Cookie", async () => {
+    mockValidateAndConsume.mockResolvedValue({ userId: "u1", rowId: "r-old" });
+    mockGenerateRefreshToken.mockReturnValue({ token: "new-token", hash: "new-hash" });
+    mockEncode.mockResolvedValue("encoded.jwt.value");
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        biometricRefreshToken: {
+          update: vi.fn().mockResolvedValue({}),
+          create: vi.fn().mockResolvedValue({ id: "r-new" }),
+        },
+      };
+      return fn(tx);
+    });
+
+    const req = new Request("https://example.com/api/auth/biometric-exchange", {
+      method: "POST", body: JSON.stringify({ token: "old-token" }),
+    });
+    const res = await POST(req as never, undefined as never);
+
+    expect(res.status).toBe(200);
+    expect(mockEncode).toHaveBeenCalledWith(expect.objectContaining({
+      token: expect.objectContaining({ id: "u1" }),
+      secret: "test-secret",
+    }));
+
+    // Cookie was set
+    const setCookie = res.headers.get("set-cookie");
+    expect(setCookie).toContain("authjs.session-token=encoded.jwt.value");
+    expect(setCookie?.toLowerCase()).toContain("httponly");
+    expect(setCookie?.toLowerCase()).toContain("samesite=lax");
+
+    const body = await res.json();
+    expect(body).toEqual({ ok: true, token: "new-token" });
+  });
+});
+```
+
+- [ ] **Step 2: Run to verify failure**
+
+Run: `npx vitest run app/api/auth/biometric-exchange/__tests__/route.test.ts`
+Expected: FAIL.
+
+- [ ] **Step 3: Implement**
+
+```ts
+// app/api/auth/biometric-exchange/route.ts
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { encode } from "next-auth/jwt";
+import { db } from "@/lib/db";
+import {
+  generateRefreshToken,
+  validateAndConsume,
+} from "@/lib/auth/biometric-refresh";
+import { withAxiom, logger } from "@/lib/observability/logger";
+
+const Body = z.object({
+  token: z.string().min(1).max(200),
+});
+
+const SESSION_MAX_AGE = 30 * 24 * 60 * 60; // 30 days, matches NextAuth default
+const COOKIE_NAME =
+  process.env.NODE_ENV === "production"
+    ? "__Secure-authjs.session-token"
+    : "authjs.session-token";
+
+export const POST = withAxiom(async (req: Request) => {
+  const parsed = Body.safeParse(await req.json().catch(() => ({})));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+  }
+
+  const validated = await validateAndConsume(parsed.data.token);
+  if (!validated) {
+    logger.warn("biometric-exchange: invalid token", {});
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    // Encode a NextAuth-compatible session JWT
+    const sessionJwt = await encode({
+      token: { id: validated.userId, sub: validated.userId },
+      secret: process.env.AUTH_SECRET!,
+      salt: COOKIE_NAME,
+      maxAge: SESSION_MAX_AGE,
+    });
+
+    // Rotate the refresh token in a single transaction
+    const { token: newToken, hash: newHash } = generateRefreshToken();
+    await db.$transaction(async (tx) => {
+      await tx.biometricRefreshToken.update({
+        where: { id: validated.rowId },
+        data: { revokedAt: new Date() },
+      });
+      await tx.biometricRefreshToken.create({
+        data: { userId: validated.userId, tokenHash: newHash },
+      });
+    });
+
+    // Set the session cookie with NextAuth's exact attributes
+    const res = NextResponse.json({ ok: true, token: newToken });
+    res.cookies.set(COOKIE_NAME, sessionJwt, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE,
+    });
+
+    return res;
+  } catch (err) {
+    logger.error("biometric-exchange: server error", {
+      userId: validated.userId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+});
+```
+
+> **Plugin/library note:** `encode` from `next-auth/jwt` is the load-bearing call. NextAuth 5+ requires the `salt` parameter to match the cookie name (this is how it's configured to derive the encryption key). If `encode`'s signature differs from the snippet above in your installed version, check `node_modules/next-auth/jwt/index.d.ts` and adapt.
+
+- [ ] **Step 4: Verify**
+
+Run: `npx vitest run app/api/auth/biometric-exchange/__tests__/route.test.ts`
+Expected: PASS, 3 tests.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add app/api/auth/biometric-exchange/route.ts app/api/auth/biometric-exchange/__tests__/route.test.ts
+git commit -m "Add /api/auth/biometric-exchange endpoint with token rotation"
+```
+
+### Task 5.6: `POST /api/auth/biometric-revoke` endpoint
+
+**Files:**
+- Create: `app/api/auth/biometric-revoke/route.ts`
+
+- [ ] **Step 1: Implement**
+
+```ts
+// app/api/auth/biometric-revoke/route.ts
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { withAxiom, logger } from "@/lib/observability/logger";
+
+const Body = z.object({
+  id: z.string().optional(),  // omit to revoke all rows for the user
+});
+
+export const POST = withAxiom(async (req: Request) => {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const parsed = Body.safeParse(await req.json().catch(() => ({})));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+  }
+
+  try {
+    const where = parsed.data.id
+      ? { id: parsed.data.id, userId: session.user.id }
+      : { userId: session.user.id };
+    const result = await db.biometricRefreshToken.updateMany({
+      where,
+      data: { revokedAt: new Date() },
+    });
+    return NextResponse.json({ ok: true, revoked: result.count });
+  } catch (err) {
+    logger.error("biometric-revoke: failed", {
+      userId: session.user.id,
+      id: parsed.data.id,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+});
+```
+
+> Uses `updateMany` (not `update`) for the same IDOR-safe reason as `app/api/devices/[id]/route.ts`: silently no-ops if the row doesn't exist or belongs to another user.
+
+- [ ] **Step 2: Verify**
+
+Run: `npx tsc --noEmit && npm test`
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add app/api/auth/biometric-revoke/route.ts
+git commit -m "Add /api/auth/biometric-revoke endpoint (per-device or all)"
+```
+
+### Task 5.7: Biometric opt-in prompt (client-side)
+
+**Files:**
+- Create: `lib/biometric/store.ts` (Keychain abstraction — stores refresh tokens, not session JWTs)
 - Create: `components/mobile/BiometricOptInPrompt.tsx`
-- Create: `lib/biometric/store.ts` (Keychain abstraction)
-- Modify: `app/(dashboard)/layout.tsx` (mount the prompt)
+- Modify: `app/(dashboard)/layout.tsx`
 
 - [ ] **Step 1: Implement the Keychain abstraction**
 
 ```ts
 // lib/biometric/store.ts
-// Thin abstraction over @aparajita/capacitor-biometric-auth that hides the
-// per-platform Keychain/Keystore details. All methods are no-ops in SSR or
-// in a browser context; only run on the client inside the Capacitor app.
+// Thin abstraction over @aparajita/capacitor-biometric-auth. Stores a
+// server-issued refresh token (NOT a session JWT) keyed by a server identifier.
+// Methods only run in the Capacitor app context; callers should gate on
+// isMobileAppClient() before invoking.
 
-const SERVER_KEY = "yardanalyzer.session";
+const SERVER_KEY = "yardanalyzer.refresh";
 
 export interface BiometricStore {
   isAvailable(): Promise<boolean>;
-  storeToken(token: string): Promise<void>;
-  unlockToken(): Promise<string | null>;
+  storeRefreshToken(token: string): Promise<void>;
+  unlockRefreshToken(): Promise<string | null>;
   clear(): Promise<void>;
 }
 
@@ -1589,10 +2193,10 @@ export async function getBiometricStore(): Promise<BiometricStore> {
       const r = await BiometricAuth.checkBiometry();
       return r.isAvailable;
     },
-    async storeToken(token: string) {
-      await BiometricAuth.setBiometricCredentials({ server: SERVER_KEY, username: "session", password: token });
+    async storeRefreshToken(token: string) {
+      await BiometricAuth.setBiometricCredentials({ server: SERVER_KEY, username: "refresh", password: token });
     },
-    async unlockToken() {
+    async unlockRefreshToken() {
       try {
         await BiometricAuth.authenticate({
           reason: "Sign in to Yard Analyzer",
@@ -1608,15 +2212,13 @@ export async function getBiometricStore(): Promise<BiometricStore> {
     async clear() {
       try {
         await BiometricAuth.deleteBiometricCredentials({ server: SERVER_KEY });
-      } catch {
-        // no-op if nothing stored
-      }
+      } catch { /* no-op if nothing stored */ }
     },
   };
 }
 ```
 
-> **Plugin API note:** the exact method names (`setBiometricCredentials`, `getBiometricCredentials`) come from `@aparajita/capacitor-biometric-auth`'s docs. If the actual export differs, adjust accordingly — the abstraction shape (the `BiometricStore` interface) stays the same.
+> **Plugin API note:** the exact method names (`setBiometricCredentials`, `getBiometricCredentials`) are from `@aparajita/capacitor-biometric-auth`'s docs. If the actual export differs, adjust accordingly — the abstraction shape stays the same.
 
 - [ ] **Step 2: Implement the opt-in prompt**
 
@@ -1628,11 +2230,11 @@ import { isMobileAppClient } from "@/lib/platform";
 
 const PROMPT_KEY = "biometric_optin_prompted_v1";
 
-export default function BiometricOptInPrompt({ sessionToken }: { sessionToken: string | null }) {
+export default function BiometricOptInPrompt({ userIsAuthed }: { userIsAuthed: boolean }) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (!isMobileAppClient() || !sessionToken) return;
+    if (!isMobileAppClient() || !userIsAuthed) return;
     (async () => {
       const { Preferences } = await import("@capacitor/preferences");
       const { value } = await Preferences.get({ key: PROMPT_KEY });
@@ -1640,22 +2242,50 @@ export default function BiometricOptInPrompt({ sessionToken }: { sessionToken: s
       const { getBiometricStore } = await import("@/lib/biometric/store");
       const store = await getBiometricStore();
       if (!(await store.isAvailable())) {
-        // No biometric hardware/permission; never prompt
         await Preferences.set({ key: PROMPT_KEY, value: "shown" });
         return;
       }
       setShow(true);
     })();
-  }, [sessionToken]);
+  }, [userIsAuthed]);
 
   async function handleEnable() {
-    if (!sessionToken) return;
     const { Preferences } = await import("@capacitor/preferences");
+    const { Capacitor } = await import("@capacitor/core");
+
+    // Build a device fingerprint for the server-side audit trail
+    const fingerprint = `${Capacitor.getPlatform()}:${navigator.userAgent.slice(0, 100)}`;
+
+    // POST to /api/auth/biometric-issue to get a fresh refresh token
+    let issuedToken: string | null = null;
+    try {
+      const res = await fetch("/api/auth/biometric-issue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deviceFingerprint: fingerprint }),
+      });
+      if (res.ok) {
+        const body = await res.json();
+        issuedToken = body.token;
+      }
+    } catch { /* swallowed */ }
+
+    if (!issuedToken) {
+      // Server-side failure; leave PROMPT_KEY unset so we can retry next time
+      console.warn("BiometricOptInPrompt: biometric-issue request failed");
+      setShow(false);
+      return;
+    }
+
     const { getBiometricStore } = await import("@/lib/biometric/store");
     const store = await getBiometricStore();
-    await store.storeToken(sessionToken);
-    await Preferences.set({ key: PROMPT_KEY, value: "shown" });
-    await Preferences.set({ key: "biometric_enabled", value: "true" });
+    try {
+      await store.storeRefreshToken(issuedToken);
+      await Preferences.set({ key: PROMPT_KEY, value: "shown" });
+      await Preferences.set({ key: "biometric_enabled", value: "true" });
+    } catch (err) {
+      console.warn("BiometricOptInPrompt: Keychain write failed", err);
+    }
     setShow(false);
   }
 
@@ -1686,46 +2316,44 @@ export default function BiometricOptInPrompt({ sessionToken }: { sessionToken: s
 }
 ```
 
-- [ ] **Step 3: Pass the session token from the layout into the component**
+- [ ] **Step 3: Mount in dashboard layout**
 
-In `app/(dashboard)/layout.tsx`, fetch the session token server-side and pass as a prop. The exact token name depends on NextAuth setup; usually it's accessible via `auth()` or `cookies()`. Pseudo-code:
-
+In `app/(dashboard)/layout.tsx`:
 ```tsx
 import { auth } from "@/lib/auth";
 import BiometricOptInPrompt from "@/components/mobile/BiometricOptInPrompt";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  const sessionToken = session?.user?.id ? /* read cookie / token */ : null;
   return (
     <>
       {children}
-      <BiometricOptInPrompt sessionToken={sessionToken} />
+      <BiometricOptInPrompt userIsAuthed={!!session?.user?.id} />
     </>
   );
 }
 ```
 
-> **NextAuth specifics:** NextAuth 5's default session token cookie name is `authjs.session-token` (HTTP-only). You'll need to read it via Next.js `cookies()` rather than passing through `auth()`. Verify the exact cookie name by inspecting Network tab in a logged-in session on the deployed app, then read it server-side with `cookies().get(<name>)?.value`.
+Note: no longer passing the session token. The prompt fetches a refresh token from the server on demand.
 
-- [ ] **Step 4: Verify TS + suite**
+- [ ] **Step 4: Verify**
 
 Run: `npx tsc --noEmit && npm test`
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add components/mobile/BiometricOptInPrompt.tsx lib/biometric/store.ts app/\(dashboard\)/layout.tsx
-git commit -m "Add biometric opt-in prompt after first login on mobile"
+git add lib/biometric/store.ts components/mobile/BiometricOptInPrompt.tsx app/\(dashboard\)/layout.tsx
+git commit -m "Add biometric opt-in prompt that fetches and stores a refresh token"
 ```
 
-### Task 5.3: Cold-launch biometric unlock
+### Task 5.8: Cold-launch biometric unlock gate
 
 **Files:**
 - Create: `components/mobile/BiometricUnlockGate.tsx`
-- Modify: `app/layout.tsx` (root layout, so it wraps even pre-auth)
+- Modify: `app/layout.tsx`
 
-- [ ] **Step 1: Implement the unlock gate**
+- [ ] **Step 1: Implement**
 
 ```tsx
 // components/mobile/BiometricUnlockGate.tsx
@@ -1748,26 +2376,48 @@ export default function BiometricUnlockGate({ children }: { children: React.Reac
         setReady(true);
         return;
       }
+
       // Check if the current session is still valid
-      const sessionRes = await fetch("/api/auth/session");
-      if (sessionRes.ok) {
-        const session = await sessionRes.json();
-        if (session?.user) {
-          setReady(true);
-          return;
+      try {
+        const sessionRes = await fetch("/api/auth/session");
+        if (sessionRes.ok) {
+          const session = await sessionRes.json();
+          if (session?.user) {
+            setReady(true);
+            return;
+          }
         }
-      }
-      // Session invalid -- prompt biometric to unlock
+      } catch { /* fall through to biometric */ }
+
+      // Session invalid -- prompt biometric, then exchange the refresh token
       const { getBiometricStore } = await import("@/lib/biometric/store");
       const store = await getBiometricStore();
-      const token = await store.unlockToken();
-      if (token) {
-        // Write the cookie back and reload
-        document.cookie = `authjs.session-token=${token}; path=/; secure; samesite=lax`;
-        window.location.reload();
+      const refreshToken = await store.unlockRefreshToken();
+      if (!refreshToken) {
+        setReady(true);  // user cancelled or biometric failed; fall through to login
         return;
       }
-      // Cancelled or failed -- fall through to normal login
+
+      try {
+        const res = await fetch("/api/auth/biometric-exchange", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: refreshToken }),
+        });
+        if (res.ok) {
+          const body = await res.json();
+          // Server set the session cookie; rotate the stored refresh token
+          await store.storeRefreshToken(body.token);
+          window.location.reload();
+          return;
+        }
+        // Exchange rejected the token (revoked, expired, etc.)
+        console.warn("BiometricUnlockGate: exchange failed", res.status);
+        await store.clear();
+        await Preferences.remove({ key: "biometric_enabled" });
+      } catch (err) {
+        console.warn("BiometricUnlockGate: exchange threw", err);
+      }
       setReady(true);
     })();
   }, []);
@@ -1777,12 +2427,9 @@ export default function BiometricUnlockGate({ children }: { children: React.Reac
 }
 ```
 
-> **Cookie name caveat:** `authjs.session-token` is the NextAuth 5 default. If your config uses a custom name (`session.cookieName`), use that instead. Verify before writing.
-
 - [ ] **Step 2: Wrap the root layout**
 
 In `app/layout.tsx`:
-
 ```tsx
 import BiometricUnlockGate from "@/components/mobile/BiometricUnlockGate";
 // ...
@@ -1791,7 +2438,7 @@ import BiometricUnlockGate from "@/components/mobile/BiometricUnlockGate";
 </body>
 ```
 
-- [ ] **Step 3: Verify TS + suite**
+- [ ] **Step 3: Verify**
 
 Run: `npx tsc --noEmit && npm test`
 
@@ -1799,42 +2446,51 @@ Run: `npx tsc --noEmit && npm test`
 
 ```bash
 git add components/mobile/BiometricUnlockGate.tsx app/layout.tsx
-git commit -m "Add biometric unlock gate at app cold launch"
+git commit -m "Add cold-launch biometric unlock via refresh-token exchange"
 ```
 
-### Task 5.4: Logout cleanup
+### Task 5.9: Logout cleanup
 
 **Files:**
-- Locate the existing logout / sign-out handler (likely in `components/dashboard/DashboardNav.tsx` or a sign-out action under `lib/auth.ts`)
+- Locate the existing logout / sign-out handler
 
-- [ ] **Step 1: Find the logout call site**
+- [ ] **Step 1: Find the call site**
 
 Run:
 ```bash
 grep -rn "signOut\|sign-out\|signout" components/ app/ --include="*.tsx" --include="*.ts" | grep -v __tests__
 ```
 
-- [ ] **Step 2: Wrap or augment with Keychain clear**
+- [ ] **Step 2: Augment the logout handler**
 
-Pattern (adapt to actual call site):
+Add this BEFORE the existing `signOut()` call (so we revoke the refresh token server-side while we still have a valid session):
+
 ```tsx
 async function handleLogout() {
-  // existing logout logic
-  await signOut();
-
-  // NEW: clear biometric storage if running in app
+  // NEW: revoke the refresh token + clear biometric storage if in app
   const { isMobileAppClient } = await import("@/lib/platform");
   if (isMobileAppClient()) {
+    try {
+      await fetch("/api/auth/biometric-revoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),  // empty body = revoke all for this user
+      });
+    } catch { /* best-effort; user might already be offline */ }
+
     const { Preferences } = await import("@capacitor/preferences");
     const { getBiometricStore } = await import("@/lib/biometric/store");
     const store = await getBiometricStore();
     await store.clear();
     await Preferences.remove({ key: "biometric_enabled" });
   }
+
+  // existing logout logic
+  await signOut();
 }
 ```
 
-- [ ] **Step 3: Verify TS + suite**
+- [ ] **Step 3: Verify**
 
 Run: `npx tsc --noEmit && npm test`
 
@@ -1842,12 +2498,12 @@ Run: `npx tsc --noEmit && npm test`
 
 ```bash
 git add <modified files>
-git commit -m "Clear biometric Keychain entry on logout"
+git commit -m "Revoke biometric refresh token + clear Keychain on logout"
 ```
 
 ### **CHECKPOINT 5** — Stop, report to user
 
-Report: "Group 5 (Biometric login) complete. 4 commits. `@aparajita/capacitor-biometric-auth` installed, opt-in prompt after first login, cold-launch unlock gate at root layout, logout cleanup. Browser users unaffected (everything gates on `isMobileAppClient()`). Ready for Group 6 (native plugin configuration)."
+Report: "Group 5 (Biometric login — refresh-token pattern) complete. 9 commits. Backend: `BiometricRefreshToken` model + RLS migration, helper module with TDD, 3 endpoints (issue, exchange with token rotation + HttpOnly cookie set, revoke per-device or all). Client: Keychain abstraction (stores refresh tokens, not JWTs), opt-in prompt that fetches+stores a token, cold-launch unlock gate that exchanges the token for a fresh session cookie, logout cleanup that revokes server-side + clears Keychain. Settings → Devices revocation UI deferred to Group 7. Browser users unaffected. Ready for Group 6 (native plugin configuration)."
 
 ---
 
