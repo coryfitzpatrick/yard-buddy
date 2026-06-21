@@ -193,22 +193,31 @@ describe("emitAiDailySummary", () => {
 describe("emitPushDelivery", () => {
   it("logs error when all deliveries failed", () => {
     const errorSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
-    emitPushDelivery({ userIdHash: "abc", kind: "best_day", tokens: 2, success: 0, failed: 2 });
-    expect(errorSpy).toHaveBeenCalledWith("push.delivery", expect.objectContaining({ failed: 2, success: 0 }));
+    emitPushDelivery({ userIdHash: "abc", pushKind: "best_day", tokens: 2, success: 0, failed: 2 });
+    expect(errorSpy).toHaveBeenCalledWith(
+      "push.delivery",
+      expect.objectContaining({ failed: 2, success: 0, pushKind: "best_day" }),
+    );
     errorSpy.mockRestore();
   });
 
   it("logs warn on partial failure", () => {
     const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    emitPushDelivery({ userIdHash: "abc", kind: "weather_warning", tokens: 2, success: 1, failed: 1 });
-    expect(warnSpy).toHaveBeenCalledWith("push.delivery", expect.objectContaining({ failed: 1, success: 1 }));
+    emitPushDelivery({ userIdHash: "abc", pushKind: "weather_warning", tokens: 2, success: 1, failed: 1 });
+    expect(warnSpy).toHaveBeenCalledWith(
+      "push.delivery",
+      expect.objectContaining({ failed: 1, success: 1, pushKind: "weather_warning" }),
+    );
     warnSpy.mockRestore();
   });
 
   it("logs info on full success", () => {
     const infoSpy = vi.spyOn(logger, "info").mockImplementation(() => {});
-    emitPushDelivery({ userIdHash: "abc", kind: "preemergent_window", tokens: 1, success: 1, failed: 0 });
-    expect(infoSpy).toHaveBeenCalledWith("push.delivery", expect.objectContaining({ failed: 0, success: 1 }));
+    emitPushDelivery({ userIdHash: "abc", pushKind: "preemergent_window", tokens: 1, success: 1, failed: 0 });
+    expect(infoSpy).toHaveBeenCalledWith(
+      "push.delivery",
+      expect.objectContaining({ failed: 0, success: 1, pushKind: "preemergent_window" }),
+    );
     infoSpy.mockRestore();
   });
 });

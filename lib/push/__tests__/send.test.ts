@@ -57,9 +57,13 @@ beforeEach(() => {
 });
 
 describe("sendPushToUser", () => {
-  it("returns early without sending if the user has no device tokens", async () => {
+  it("returns zero counts without sending if the user has no device tokens", async () => {
     mockFindMany.mockResolvedValue([]);
-    await sendPushToUser("u1", { title: "T", body: "B" });
+    await expect(sendPushToUser("u1", { title: "T", body: "B" })).resolves.toEqual({
+      tokens: 0,
+      success: 0,
+      failed: 0,
+    });
     expect(mockSendEachForMulticast).not.toHaveBeenCalled();
   });
 
@@ -73,7 +77,9 @@ describe("sendPushToUser", () => {
       failureCount: 0,
       responses: [{ success: true }, { success: true }],
     });
-    await sendPushToUser("u1", { title: "T", body: "B", data: { yardId: "y1" } });
+    await expect(
+      sendPushToUser("u1", { title: "T", body: "B", data: { yardId: "y1" } }),
+    ).resolves.toEqual({ tokens: 2, success: 2, failed: 0 });
     expect(mockSendEachForMulticast).toHaveBeenCalledWith(
       expect.objectContaining({
         tokens: ["tok1", "tok2"],
@@ -97,7 +103,11 @@ describe("sendPushToUser", () => {
         { success: true },
       ],
     });
-    await sendPushToUser("u1", { title: "T", body: "B" });
+    await expect(sendPushToUser("u1", { title: "T", body: "B" })).resolves.toEqual({
+      tokens: 2,
+      success: 1,
+      failed: 1,
+    });
     // dt1 had failureCount 2, now 3 -> deleted
     expect(mockDeleteMany).toHaveBeenCalledWith({ where: { id: "dt1" } });
     // dt2 succeeded -> lastUsedAt updated
@@ -124,7 +134,11 @@ describe("sendPushToUser", () => {
       return Promise.resolve({});
     });
 
-    // Should not throw
-    await expect(sendPushToUser("u1", { title: "T", body: "B" })).resolves.toBeUndefined();
+    // Return value reflects the FCM-level counts, unaffected by a bookkeeping write throwing.
+    await expect(sendPushToUser("u1", { title: "T", body: "B" })).resolves.toEqual({
+      tokens: 2,
+      success: 2,
+      failed: 0,
+    });
   });
 });

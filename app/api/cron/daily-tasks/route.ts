@@ -9,7 +9,7 @@ import { resend, buildDigestEmail, generateUnsubscribeToken } from "@/lib/email"
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
 import { withAxiom, logger } from "@/lib/observability/logger";
-import { emitCronRun, emitPushDelivery } from "@/lib/observability/events";
+import { emitCronRun, emitPushDelivery, type PushKind } from "@/lib/observability/events";
 import { emitYesterdaysAiSummary } from "@/lib/observability/ai-daily-summary";
 import { sendPushToUser, type PushPayload } from "@/lib/push/send";
 import {
@@ -55,16 +55,20 @@ function sameDay(a: Date, b: Date): boolean {
 async function safePushUser(
   userId: string,
   payload: PushPayload,
-  kind: "best_day" | "weather_warning" | "preemergent_window" | "grub_window" | "overseed_window",
+  kind: PushKind,
 ): Promise<void> {
   try {
-    await sendPushToUser(userId, payload);
+    const result = await sendPushToUser(userId, payload);
+    // I-2: suppress emission when no devices are registered for this user.
+    // Otherwise the cron would emit one info event per yard per trigger per day
+    // for every user without push enabled — pure observability noise.
+    if (result.tokens === 0) return;
     emitPushDelivery({
       userIdHash: hashEmail(userId),
-      kind,
-      tokens: 0,
-      success: 1,
-      failed: 0,
+      pushKind: kind,
+      tokens: result.tokens,
+      success: result.success,
+      failed: result.failed,
     });
   } catch (err) {
     logger.error("push: send threw", {
@@ -74,7 +78,7 @@ async function safePushUser(
     });
     emitPushDelivery({
       userIdHash: hashEmail(userId),
-      kind,
+      pushKind: kind,
       tokens: 0,
       success: 0,
       failed: 1,
@@ -289,22 +293,20 @@ async function runDailyTasks(
 
     const state = yard.state ?? "";
 
-    // Track whether each window opens this run so we can fire window-opening
-    // pushes after the transactions land. The "fired" flags on the existing
-    // GddRecord are exactly yesterday's applicability state because they
-    // flip false→true the moment the window first opens; comparing
-    // (now-applicable) against (was-fired) yields the first-true transition.
-    const preEmergentApplicableNow =
-      !gddRecord.preEmergentFired && gddRecord.cumulativeGdd >= 50;
-    const grubsApplicableNow =
-      !gddRecord.grubsFired && gddRecord.cumulativeGdd >= 300;
+    // Track whether each window qualifies on its own merits (independent of
+    // the "fired" flag) so we can pass both signals to the push predicates
+    // for the first-true transition check. Gating the transaction on
+    // `qualifiesOnMerits && !alreadyFired` keeps us from re-firing each day
+    // the window stays open.
     const month = today.getUTCMonth();
     const avgTemp = ((weather.forecast[0]?.high ?? 0) + (weather.forecast[0]?.low ?? 0)) / 2;
-    const overseedApplicableNow =
-      !gddRecord.overseedingFired && month >= 7 && month <= 9 && avgTemp < 65;
+
+    const preEmergentQualifies = gddRecord.cumulativeGdd >= 50;
+    const grubsQualifies = gddRecord.cumulativeGdd >= 300;
+    const overseedQualifies = month >= 7 && month <= 9 && avgTemp < 65;
 
     // Pre-emergent: cumulative GDD ≥ 50
-    if (preEmergentApplicableNow) {
+    if (preEmergentQualifies && !gddRecord.preEmergentFired) {
       const taskUpdates = yard.sections
         .filter((section) => isPreEmergentApplicable(section.grassType, state))
         .map((section) =>
@@ -324,7 +326,7 @@ async function runDailyTasks(
     }
 
     // Grubs: cumulative GDD ≥ 300
-    if (grubsApplicableNow) {
+    if (grubsQualifies && !gddRecord.grubsFired) {
       const taskUpdates = yard.sections
         .filter((section) => isGrubAlertApplicable(section.grassType, state))
         .map((section) =>
@@ -344,7 +346,7 @@ async function runDailyTasks(
     }
 
     // Overseeding: avg temp < 65°F AND month Aug–Oct (0-indexed: 7–9)
-    if (overseedApplicableNow) {
+    if (overseedQualifies && !gddRecord.overseedingFired) {
       const taskUpdates = yard.sections
         .filter((section) => isOverseedingApplicable(section.grassType))
         .map((section) =>
@@ -364,10 +366,12 @@ async function runDailyTasks(
     }
 
     // GDD-window-opening pushes: fire on the first-true transition only.
-    // Predicates take (todayApplicable, yesterdayApplicable). Yesterday's
-    // applicability is the pre-update "fired" flag — if it was false and the
-    // window opened this run, we emit one push per yard per window type.
-    if (shouldPushPreEmergent(preEmergentApplicableNow, gddRecord.preEmergentFired)) {
+    // Predicates take (qualifiesOnMerits, alreadyFired). The pre-update
+    // "fired" flag is exactly yesterday's window-open state because it flips
+    // false→true the moment the window first opens; combining
+    // (qualifies-today) with (was-fired-yesterday) yields the first-true
+    // transition and ensures we emit one push per yard per window per season.
+    if (shouldPushPreEmergent(preEmergentQualifies, gddRecord.preEmergentFired)) {
       await safePushUser(
         yard.userId,
         {
@@ -378,7 +382,7 @@ async function runDailyTasks(
         "preemergent_window",
       );
     }
-    if (shouldPushGrub(grubsApplicableNow, gddRecord.grubsFired)) {
+    if (shouldPushGrub(grubsQualifies, gddRecord.grubsFired)) {
       await safePushUser(
         yard.userId,
         {
@@ -389,7 +393,7 @@ async function runDailyTasks(
         "grub_window",
       );
     }
-    if (shouldPushOverseed(overseedApplicableNow, gddRecord.overseedingFired)) {
+    if (shouldPushOverseed(overseedQualifies, gddRecord.overseedingFired)) {
       await safePushUser(
         yard.userId,
         {

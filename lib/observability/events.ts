@@ -139,6 +139,12 @@ export function emitAiDailySummary(args: AiDailySummary): void {
   logger.info("ai.daily_summary", payload);
 }
 
+// Note: PushKind is used on two different wires that happen to share vocabulary:
+//   1. `data.kind` in the client-bound FCM payload (drives mobile-side routing,
+//      e.g. which yard/section a deep-link opens to)
+//   2. `fields.pushKind` in this observability event (the dashboard/alert
+//      dimension for filtering push delivery success rate by kind)
+// They're intentionally the same set of literals so a single rename propagates.
 export type PushKind =
   | "best_day"
   | "weather_warning"
@@ -148,7 +154,7 @@ export type PushKind =
 
 interface PushDeliveryArgs {
   userIdHash: string;
-  kind: PushKind;
+  pushKind: PushKind;
   tokens: number;
   success: number;
   failed: number;
@@ -156,13 +162,12 @@ interface PushDeliveryArgs {
 
 export function emitPushDelivery(args: PushDeliveryArgs): void {
   // `pushKind` distinguishes the typed push category (best_day, weather_warning…)
-  // from the event envelope's `kind: "push.delivery"`. Spreading args directly
-  // would clobber the envelope kind, which Axiom dashboards group on.
-  const { kind: pushKind, ...rest } = args;
+  // from the event envelope's `kind: "push.delivery"`. The arg is already
+  // named `pushKind` so the envelope `kind` field stays unambiguous for the
+  // Axiom dashboards that group on it.
   const payload = {
     kind: "push.delivery",
-    pushKind,
-    ...rest,
+    ...args,
     ...commonFields(),
   };
   if (args.failed > 0 && args.success === 0) {

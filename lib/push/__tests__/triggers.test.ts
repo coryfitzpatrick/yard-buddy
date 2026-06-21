@@ -25,7 +25,7 @@ describe("shouldPushWeatherWarning", () => {
   it("returns true when a scheduled task tomorrow has a weather concern", () => {
     const today = new Date("2026-06-20T00:00:00Z");
     expect(shouldPushWeatherWarning(
-      { scheduledStart: new Date("2026-06-21T00:00:00Z"), weatherCondition: "heavy_rain" },
+      { scheduledStart: new Date("2026-06-21T00:00:00Z"), weatherCondition: "no_rain_48h" },
       today,
     )).toBe(true);
   });
@@ -33,6 +33,13 @@ describe("shouldPushWeatherWarning", () => {
     const today = new Date("2026-06-20T00:00:00Z");
     expect(shouldPushWeatherWarning(
       { scheduledStart: new Date("2026-06-21T00:00:00Z"), weatherCondition: null },
+      today,
+    )).toBe(false);
+  });
+  it("returns false when weatherCondition is 'any' (the no-sensitivity sentinel)", () => {
+    const today = new Date("2026-06-20T00:00:00Z");
+    expect(shouldPushWeatherWarning(
+      { scheduledStart: new Date("2026-06-21T00:00:00Z"), weatherCondition: "any" },
       today,
     )).toBe(false);
   });

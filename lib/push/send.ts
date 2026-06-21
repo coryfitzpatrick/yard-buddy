@@ -19,12 +19,21 @@ export interface PushPayload {
   data?: Record<string, string>;
 }
 
-export async function sendPushToUser(userId: string, payload: PushPayload): Promise<void> {
+export interface PushSendResult {
+  tokens: number;
+  success: number;
+  failed: number;
+}
+
+export async function sendPushToUser(
+  userId: string,
+  payload: PushPayload,
+): Promise<PushSendResult> {
   const tokens = await db.deviceToken.findMany({
     where: { userId },
     select: { id: true, token: true, platform: true, failureCount: true },
   });
-  if (tokens.length === 0) return;
+  if (tokens.length === 0) return { tokens: 0, success: 0, failed: 0 };
 
   const messaging = getMessaging(getApp());
   const result = await messaging.sendEachForMulticast({
@@ -80,4 +89,10 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
       failures,
     });
   }
+
+  return {
+    tokens: tokens.length,
+    success: result.successCount,
+    failed: result.failureCount,
+  };
 }

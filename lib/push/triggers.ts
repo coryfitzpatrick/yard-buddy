@@ -19,22 +19,30 @@ export function shouldPushWeatherWarning(
   task: { scheduledStart: Date | null; weatherCondition: string | null },
   today: Date,
 ): boolean {
-  if (!task.scheduledStart || !task.weatherCondition) return false;
+  // "any" is the no-sensitivity sentinel (see WeatherCondition in types/index.ts):
+  // a task with weatherCondition === "any" has no weather concern by definition,
+  // so firing a weather warning for it would be a category error.
+  if (!task.scheduledStart || !task.weatherCondition || task.weatherCondition === "any") return false;
   const tomorrow = new Date(today);
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
   return sameUtcDate(task.scheduledStart, tomorrow);
 }
 
-// First-true-transition predicates: today's value is true, yesterday's was false.
-// Caller passes both values; this keeps the predicate pure for testing.
-export function shouldPushPreEmergent(todayApplicable: boolean, yesterdayApplicable: boolean): boolean {
-  return todayApplicable && !yesterdayApplicable;
+// First-true-transition predicates for GDD-window pushes:
+// `qualifiesOnMerits` = does today's data meet the threshold (e.g. cumulative GDD ≥ 50)?
+// `alreadyFired` = was the window already opened on a prior run (the "fired" flag)?
+// Together they identify the first day the window opens, and only that day, so
+// we fire one push per yard per window per season rather than every day the
+// window stays open. Keeping both inputs explicit means the cron's bookkeeping
+// is visible at the call site instead of pre-baked into a single boolean.
+export function shouldPushPreEmergent(qualifiesOnMerits: boolean, alreadyFired: boolean): boolean {
+  return qualifiesOnMerits && !alreadyFired;
 }
 
-export function shouldPushGrub(todayApplicable: boolean, yesterdayApplicable: boolean): boolean {
-  return todayApplicable && !yesterdayApplicable;
+export function shouldPushGrub(qualifiesOnMerits: boolean, alreadyFired: boolean): boolean {
+  return qualifiesOnMerits && !alreadyFired;
 }
 
-export function shouldPushOverseed(todayApplicable: boolean, yesterdayApplicable: boolean): boolean {
-  return todayApplicable && !yesterdayApplicable;
+export function shouldPushOverseed(qualifiesOnMerits: boolean, alreadyFired: boolean): boolean {
+  return qualifiesOnMerits && !alreadyFired;
 }
