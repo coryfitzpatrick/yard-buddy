@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
 import { Footer } from "@/components/Footer";
 import NotInApp from "@/components/NotInApp";
+import PushPermissionPrompt from "@/components/mobile/PushPermissionPrompt";
 import Link from "next/link";
 import { daysUntilTrialEnd } from "@/lib/subscription";
 
@@ -56,6 +57,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {children}
       </main>
       <Footer />
+      <PushPermissionPrompt />
     </div>
   );
 }
