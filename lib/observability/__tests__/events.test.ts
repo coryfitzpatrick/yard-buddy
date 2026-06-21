@@ -8,6 +8,12 @@ import {
   emitAiDailySummary,
   emitPushDelivery,
   isExpensiveCall,
+  emitWateringRecommended,
+  emitWateringApplied,
+  emitWateringDismissed,
+  emitMowingRecommended,
+  emitMowingApplied,
+  emitMowingDismissed,
 } from "@/lib/observability/events";
 import type { RateLimitedRoute } from "@/lib/observability/events";
 
@@ -284,5 +290,55 @@ describe("common fields on every event", () => {
         version: expect.any(String),
       }),
     );
+  });
+});
+
+describe("schedule recommendation emitters", () => {
+  it("emits watering.recommended with payload", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitWateringRecommended({ sectionId: "sec_1", deviates: true, plan: "home_plus" });
+    expect(spy).toHaveBeenCalledWith(
+      "watering.recommended",
+      expect.objectContaining({ kind: "watering.recommended", sectionId: "sec_1", deviates: true, plan: "home_plus" }),
+    );
+    spy.mockRestore();
+  });
+
+  it("emits watering.applied with target", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitWateringApplied({ sectionId: "sec_1", plan: "home_basic", target: "yard" });
+    expect(spy).toHaveBeenCalledWith(
+      "watering.applied",
+      expect.objectContaining({ kind: "watering.applied", target: "yard" }),
+    );
+    spy.mockRestore();
+  });
+
+  it("emits watering.dismissed", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitWateringDismissed({ sectionId: "sec_1" });
+    expect(spy).toHaveBeenCalledWith("watering.dismissed", expect.objectContaining({ kind: "watering.dismissed", sectionId: "sec_1" }));
+    spy.mockRestore();
+  });
+
+  it("emits mowing.recommended", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitMowingRecommended({ sectionId: "sec_1", deviates: false, plan: "professional" });
+    expect(spy).toHaveBeenCalledWith("mowing.recommended", expect.objectContaining({ kind: "mowing.recommended", deviates: false }));
+    spy.mockRestore();
+  });
+
+  it("emits mowing.applied with target", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitMowingApplied({ sectionId: "sec_1", plan: "home_plus", target: "section" });
+    expect(spy).toHaveBeenCalledWith("mowing.applied", expect.objectContaining({ target: "section" }));
+    spy.mockRestore();
+  });
+
+  it("emits mowing.dismissed", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitMowingDismissed({ sectionId: "sec_1" });
+    expect(spy).toHaveBeenCalledWith("mowing.dismissed", expect.objectContaining({ kind: "mowing.dismissed" }));
+    spy.mockRestore();
   });
 });

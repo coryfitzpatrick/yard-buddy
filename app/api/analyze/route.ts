@@ -9,6 +9,7 @@ import { canRunAnalysis, getPlanLimits } from "@/lib/subscription";
 import { isOwnedLawnPhotoUrl } from "@/lib/storage-url";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withAxiom, logger } from "@/lib/observability/logger";
+import { emitWateringRecommended, emitMowingRecommended } from "@/lib/observability/events";
 
 export const maxDuration = 60;
 
@@ -318,6 +319,11 @@ export const POST = withAxiom(async (req: NextRequest) => {
       },
       include: { tasks: true },
     });
+
+    if (schedule) {
+      emitWateringRecommended({ sectionId: section.id, deviates: schedule.watering.deviates, plan: subUser.plan });
+      emitMowingRecommended({ sectionId: section.id, deviates: schedule.mowing.deviates, plan: subUser.plan });
+    }
 
     return NextResponse.json({ analysis, result });
   } catch (err) {

@@ -180,3 +180,29 @@ export function emitPushDelivery(args: PushDeliveryArgs): void {
     logger.info("push.delivery", payload);
   }
 }
+
+type Plan = string | null;
+
+export function emitWateringRecommended(args: { sectionId: string; deviates: boolean; plan: Plan }) {
+  logger.info("watering.recommended", { ...args, kind: "watering.recommended", ...commonFields() });
+}
+
+export function emitWateringApplied(args: { sectionId: string; plan: Plan; target: "yard" | "section" }) {
+  logger.info("watering.applied", { ...args, kind: "watering.applied", ...commonFields() });
+}
+
+export function emitWateringDismissed(args: { sectionId: string }) {
+  logger.info("watering.dismissed", { ...args, kind: "watering.dismissed", ...commonFields() });
+}
+
+export function emitMowingRecommended(args: { sectionId: string; deviates: boolean; plan: Plan }) {
+  logger.info("mowing.recommended", { ...args, kind: "mowing.recommended", ...commonFields() });
+}
+
+export function emitMowingApplied(args: { sectionId: string; plan: Plan; target: "yard" | "section" }) {
+  logger.info("mowing.applied", { ...args, kind: "mowing.applied", ...commonFields() });
+}
+
+export function emitMowingDismissed(args: { sectionId: string }) {
+  logger.info("mowing.dismissed", { ...args, kind: "mowing.dismissed", ...commonFields() });
+}
