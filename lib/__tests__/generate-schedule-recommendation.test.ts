@@ -21,7 +21,7 @@ beforeEach(() => {
 
 describe("generateScheduleRecommendation", () => {
   const opts = { grassType: "bermuda", zipCode: "30301" } as const;
-  const ctx = { userId: "u_1", route: "/api/analyze", feature: "watering" } as const;
+  const ctx = { userId: "u_1", feature: "schedule" } as const;
 
   it("parses a valid full JSON response", async () => {
     vi.mocked(callClaude).mockResolvedValue(claudeReturning(JSON.stringify({

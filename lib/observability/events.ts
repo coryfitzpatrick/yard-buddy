@@ -21,6 +21,7 @@ export type AiFeature =
   | "identify-grass"
   | "recommendations"
   | "watering"
+  | "schedule"
   | "critique"
   | "overdue-assessor";
 

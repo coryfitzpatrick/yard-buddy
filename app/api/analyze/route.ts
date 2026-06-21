@@ -222,12 +222,18 @@ export const POST = withAxiom(async (req: NextRequest) => {
           mowingHeightInches: mEff.heightInches,
           weatherSummary,
         },
-        { userId: session.user.id, feature: "watering" },
+        { userId: session.user.id, feature: "schedule" },
       );
     } catch (err) {
       // Schedule call is best-effort. If it fails we still save the analysis with
       // schedule fields null, and the section page renders a passive empty state.
-      logger.warn("analyze: schedule call failed", { err: err instanceof Error ? err.message : String(err) });
+      logger.warn("analyze: schedule call failed", {
+        err: err instanceof Error ? err.message : String(err),
+        userId: session.user.id,
+        sectionId: section.id,
+        yardId: section.yardId,
+        grassType: section.grassType,
+      });
     }
 
     // Deduplicate against existing pending tasks in this yard
