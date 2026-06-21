@@ -32,6 +32,8 @@ export default function HomePage() {
         </div>
       </nav>
       <div className="max-w-4xl mx-auto px-6 pt-20 pb-10 text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/ya-logo.webp" alt="Yard Analyzer" className="h-40 w-auto mx-auto mb-6" />
         <h1 className="text-5xl font-bold text-gray-900 mb-4 leading-tight">
           Your lawn expert,<br />
           <span className="text-green-600">always on call.</span>
