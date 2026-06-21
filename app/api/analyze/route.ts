@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { analyzeImages, validateLawnImages } from "@/lib/claude";
+import { analyzeImages, validateLawnImages, generateScheduleRecommendation } from "@/lib/claude";
+import { effectiveWatering, effectiveMowing } from "@/lib/schedules/effective-schedule";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
 import { deduplicateRecommendations } from "@/lib/analysis-utils";
 import { canRunAnalysis, getPlanLimits } from "@/lib/subscription";
@@ -115,7 +116,7 @@ export const POST = withAxiom(async (req: NextRequest) => {
   // Verify section ownership before any rate-limit queries (prevents BOLA)
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { userId: session.user.id } },
-    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true } } },
+    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true, wateringDaysPerWeek: true, wateringMinutesPerSession: true, mowingDaysPerWeek: true, mowingHeightInches: true } } },
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -200,6 +201,35 @@ export const POST = withAxiom(async (req: NextRequest) => {
 
     result.recommendations = deduplicateRecommendations(result.recommendations);
 
+    // Schedule recommendation — best-effort: failure leaves schedule fields null.
+    const wEff = effectiveWatering(section, section.yard, subUser.plan);
+    const mEff = effectiveMowing(section, section.yard, subUser.plan);
+
+    let schedule: Awaited<ReturnType<typeof generateScheduleRecommendation>> | null = null;
+    try {
+      schedule = await generateScheduleRecommendation(
+        {
+          grassType: section.grassType,
+          areaType: section.areaType,
+          yardSizeSqft: section.yardSizeSqft,
+          soilPh: section.soilPh,
+          soilMoisture: section.soilMoisture,
+          notes: section.notes,
+          zipCode: section.yard.zipCode,
+          wateringDaysPerWeek: wEff.daysPerWeek,
+          wateringMinutesPerSession: wEff.minutesPerSession,
+          mowingDaysPerWeek: mEff.daysPerWeek,
+          mowingHeightInches: mEff.heightInches,
+          weatherSummary,
+        },
+        { userId: session.user.id, feature: "watering" },
+      );
+    } catch (err) {
+      // Schedule call is best-effort. If it fails we still save the analysis with
+      // schedule fields null, and the section page renders a passive empty state.
+      logger.warn("analyze: schedule call failed", { err: err instanceof Error ? err.message : String(err) });
+    }
+
     // Deduplicate against existing pending tasks in this yard
     const existingYardTasks = await db.lawnTask.findMany({
       where: {
@@ -250,6 +280,15 @@ export const POST = withAxiom(async (req: NextRequest) => {
         issues: result.issues,
         summary: result.summary,
         rawResponse: JSON.stringify(result),
+        // schedule fields — null when schedule call failed or returned malformed JSON
+        wateringSchedule: schedule?.watering.schedule ?? null,
+        wateringDeviates: schedule?.watering.deviates ?? null,
+        wateringSuggestedDaysPerWeek: schedule?.watering.suggestedDaysPerWeek ?? null,
+        wateringSuggestedMinutesPerSession: schedule?.watering.suggestedMinutesPerSession ?? null,
+        mowingSchedule: schedule?.mowing.schedule ?? null,
+        mowingDeviates: schedule?.mowing.deviates ?? null,
+        mowingSuggestedDaysPerWeek: schedule?.mowing.suggestedDaysPerWeek ?? null,
+        mowingSuggestedHeightInches: schedule?.mowing.suggestedHeightInches ?? null,
         tasks: {
           create: recsToCreate.map((r) => ({
             yardSectionId: sectionId,
