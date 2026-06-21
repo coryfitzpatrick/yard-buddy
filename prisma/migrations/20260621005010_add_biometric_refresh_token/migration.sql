@@ -5,7 +5,6 @@ CREATE TABLE "BiometricRefreshToken" (
     "tokenHash" TEXT NOT NULL,
     "deviceFingerprint" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "lastUsedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "revokedAt" TIMESTAMP(3),
 
     CONSTRAINT "BiometricRefreshToken_pkey" PRIMARY KEY ("id")

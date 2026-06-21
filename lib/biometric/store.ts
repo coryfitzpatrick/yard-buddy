@@ -21,9 +21,12 @@
 // isMobileAppClient() before invoking.
 
 const SERVER_KEY = "yardanalyzer.biometric.refresh";
-const USERNAME_SENTINEL = "refresh"; // Capgo stores {username,password}; we
-                                     // only need one secret, so the token
-                                     // goes in `password` under a fixed name.
+// Capgo's setCredentials takes a (server, username) tuple; we only ever store one
+// secret per app, so the username is a fixed sentinel. If we ever need to store
+// a second secret (e.g., a separate device-attestation token), bump SERVER_KEY
+// to a new namespace rather than reusing this username slot -- existing installs
+// would have a stale row under the old name that needs migration logic.
+const USERNAME_SENTINEL = "refresh";
 
 export interface BiometricStore {
   isAvailable(): Promise<boolean>;

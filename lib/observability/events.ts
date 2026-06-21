@@ -34,7 +34,8 @@ export type RateLimitedRoute =
   | "/api/lookup-yard-size"
   | "/api/auth/register"
   | "/api/auth/forgot-password"
-  | "/api/auth/reset-password";
+  | "/api/auth/reset-password"
+  | "/api/auth/biometric-exchange";
 
 // `cron.run` events use a structured `error` field ({ message, code?, stack? })
 // because failure detail is part of the event schema. Free-form `logger.error`

@@ -4,8 +4,9 @@ import { encode } from "next-auth/jwt";
 import { db } from "@/lib/db";
 import {
   generateRefreshToken,
-  validateAndConsume,
+  validateRefreshToken,
 } from "@/lib/auth/biometric-refresh";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withAxiom, logger } from "@/lib/observability/logger";
 
 const Body = z.object({
@@ -19,12 +20,27 @@ const COOKIE_NAME =
     : "authjs.session-token";
 
 export const POST = withAxiom(async (req: Request) => {
+  // Rate-limit before body parsing so floods cost as little as possible. This
+  // is the only unauthenticated endpoint in Group 5 that gates session
+  // issuance; 10/min per IP allows legitimate retries (registration listener
+  // timeout, transient errors) while making brute-force/DoS impractical.
+  const ip = getClientIp(req);
+  const { limited } = await checkRateLimit(
+    `biometric-exchange:${ip}`,
+    10,
+    60 * 1000,
+    { route: "/api/auth/biometric-exchange", ip, userId: null },
+  );
+  if (limited) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const parsed = Body.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
 
-  const validated = await validateAndConsume(parsed.data.token);
+  const validated = await validateRefreshToken(parsed.data.token);
   if (!validated) {
     logger.warn("biometric-exchange: invalid token", {});
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

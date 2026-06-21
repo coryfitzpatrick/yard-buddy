@@ -273,7 +273,6 @@ model BiometricRefreshToken {
   tokenHash         String    @unique   // sha256(plaintext token), hex
   deviceFingerprint String?              // informational only: platform + app version + UA hash
   createdAt         DateTime  @default(now())
-  lastUsedAt        DateTime  @default(now())
   revokedAt         DateTime?            // null = active; non-null = revoked
 
   @@index([userId])
