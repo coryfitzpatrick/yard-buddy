@@ -683,7 +683,7 @@ export async function generateScheduleRecommendation(
       "You are an expert lawn care agronomist. Given lawn section details, provide concise watering and mowing schedule recommendations. Return valid JSON only — no markdown, no text outside the JSON object.",
     messages: [{ role: "user", content: buildSchedulePrompt(opts) }],
   }, ctx);
-  const text = msg.content[0].type === "text" ? msg.content[0].text.trim() : "";
+  const text = msg.content[0]?.type === "text" ? msg.content[0].text.trim() : "";
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);

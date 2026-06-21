@@ -38,10 +38,16 @@ describe("buildSchedulePrompt", () => {
     expect(prompt).toMatch(/recommend a watering schedule from scratch/i);
   });
 
+  it("falls back to from-scratch language when mowing schedule is unset", () => {
+    const prompt = buildSchedulePrompt({ grassType: "bermuda", zipCode: "30301" });
+    expect(prompt).toMatch(/recommend a mowing schedule from scratch/i);
+  });
+
   it("declares the strict JSON response shape", () => {
     const prompt = buildSchedulePrompt({ grassType: "bermuda", zipCode: "30301" });
     expect(prompt).toContain('"watering"');
     expect(prompt).toContain('"mowing"');
+    expect(prompt).toContain('"schedule"');
     expect(prompt).toContain('"deviates"');
     expect(prompt).toContain('"suggestedDaysPerWeek"');
     expect(prompt).toContain('"suggestedMinutesPerSession"');
