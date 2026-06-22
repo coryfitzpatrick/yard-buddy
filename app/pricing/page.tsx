@@ -103,6 +103,8 @@ export default async function PricingPage() {
           <p className="text-lg text-gray-500">
             {isActivePaid
               ? "Upgrade, downgrade, or switch billing period anytime."
+              : hasEverPaid
+              ? "Welcome back. Pick a plan to resume."
               : "Try free for 21 days, then pick the plan that fits."}
           </p>
         </div>
@@ -264,7 +266,7 @@ export default async function PricingPage() {
         </div>
 
         <div className="mt-12 text-center text-sm text-gray-400 space-y-1">
-          <p>No credit card required to start your free trial.</p>
+          {!hasEverPaid && <p>No credit card required to start your free trial.</p>}
           <p>Cancel or pause anytime from your settings. Your data is retained for 30 days after cancellation.</p>
           <p className="mt-2">Questions? <a href="mailto:contact@yardanalyzer.com" className="underline text-green-600">contact@yardanalyzer.com</a></p>
         </div>
