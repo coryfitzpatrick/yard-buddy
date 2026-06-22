@@ -122,9 +122,10 @@ export default async function PricingPage() {
                 <p className="font-semibold text-gray-900 text-lg">Free Trial</p>
                 <div className="mt-2">
                   <span className="text-3xl font-bold text-gray-900">$0</span>
-                  <span className="text-gray-400 text-sm"> for 14 days</span>
+                  <span className="text-gray-400 text-sm"> for 21 days</span>
                 </div>
                 <p className="text-xs text-gray-400 font-medium mt-0.5">No credit card required</p>
+                <p className="text-xs text-emerald-700 font-medium mt-1">+7 bonus days when you set your schedule and complete a task</p>
               </div>
 
               <ul className="space-y-2 mb-6 flex-1 text-sm text-gray-600">
