@@ -37,6 +37,23 @@ model User {
   stripeSubscriptionId String?   @unique
   currentPeriodEnd     DateTime?
   pausedUntil          DateTime?
+
+  // Trial engagement extension — set when user completes the +7 day bonus criteria
+  trialEngagementBonusGrantedAt DateTime?
+
+  // Trial nudge idempotency flags
+  day5NudgeSentAt   DateTime?
+  day10NudgeSentAt  DateTime?
+  day14SecondAnalysisPromptSentAt DateTime?
+
+  // Grace period warning idempotency flags
+  graceDay14EmailSentAt DateTime?
+  graceDay7EmailSentAt  DateTime?
+  graceDay2EmailSentAt  DateTime?
+  gracePush7SentAt      DateTime?
+  gracePush1SentAt      DateTime?
+  trialEndedPushSentAt  DateTime?
+
   cardExpiryWarningSentAt DateTime?
   lastPaymentFailedInvoiceId String?
   termsAcceptedAt      DateTime?
