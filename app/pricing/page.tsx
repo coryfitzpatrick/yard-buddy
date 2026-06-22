@@ -14,8 +14,9 @@ const PLANS = [
   {
     name: "Home Basic",
     key: "home_basic",
-    monthly: 7.99,
-    annual: 79,
+    monthly: 5.99,
+    annual: 59,
+    annualSavings: "Save 2 months",
     highlight: false,
     yards: "1 yard",
     analyses: "8 analyses per month",
@@ -29,8 +30,9 @@ const PLANS = [
   {
     name: "Home Plus",
     key: "home_plus",
-    monthly: 14.99,
-    annual: 139,
+    monthly: 12.99,
+    annual: 129,
+    annualSavings: "Save 2 months",
     highlight: true,
     yards: "Up to 3 yards",
     analyses: "8 analyses per yard per month",
@@ -45,6 +47,7 @@ const PLANS = [
     key: "professional",
     monthly: 24.99,
     annual: 229,
+    annualSavings: "Save almost 3 months",
     highlight: false,
     yards: "Up to 10 yards",
     analyses: "8 analyses per yard per month",
@@ -186,7 +189,7 @@ export default async function PricingPage() {
                   <span className="text-gray-400 text-sm"> per month</span>
                 </div>
                 <p className="text-xs text-green-600 font-medium mt-0.5">
-                  ${plan.annual} per year. Save 2 months.
+                  ${plan.annual} per year. {plan.annualSavings}.
                 </p>
               </div>
 
