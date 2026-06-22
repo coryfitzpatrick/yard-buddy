@@ -209,4 +209,81 @@ describe("POST /api/sections/[sectionId]/mowing/apply", () => {
     expect(txYardUpdate).not.toHaveBeenCalled();
     expect(emitMowingApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_plus", target: "section" });
   });
+
+  it("200 with days+time in body: writes mowingDays and mowingTime alongside heightInches", async () => {
+    (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
+    mockYardSectionFindUnique.mockResolvedValue({
+      id: "s1",
+      yardId: "y1",
+      yard: { user: { id: "u1", plan: "home_basic" } },
+    });
+    mockLawnAnalysisFindFirst.mockResolvedValue({
+      id: "a1",
+      mowingSuggestedHeightInches: 3.0,
+    });
+
+    const txYardUpdate = vi.fn().mockResolvedValue({});
+    const txYardSectionUpdate = vi.fn().mockResolvedValue({});
+    const txLawnAnalysisUpdate = vi.fn().mockResolvedValue({});
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        yard: { update: txYardUpdate },
+        yardSection: { update: txYardSectionUpdate },
+        lawnAnalysis: { update: txLawnAnalysisUpdate },
+      };
+      return fn(tx);
+    });
+
+    const req = new Request("https://example.com/api/sections/s1/mowing/apply", {
+      method: "POST",
+      body: JSON.stringify({ days: ["Mon", "Wed", "Fri"], time: "10:00" }),
+    });
+    const res = await POST(req as never, makeParams("s1") as never);
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual({ target: "yard", heightInches: 3.0, days: ["Mon", "Wed", "Fri"], time: "10:00" });
+
+    expect(txYardUpdate).toHaveBeenCalledWith({
+      where: { id: "y1" },
+      data: { mowingHeightInches: 3.0, mowingDays: ["Mon", "Wed", "Fri"], mowingTime: "10:00" },
+    });
+  });
+
+  it("200 empty body still works (no days/time written)", async () => {
+    (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
+    mockYardSectionFindUnique.mockResolvedValue({
+      id: "s1",
+      yardId: "y1",
+      yard: { user: { id: "u1", plan: "home_basic" } },
+    });
+    mockLawnAnalysisFindFirst.mockResolvedValue({
+      id: "a1",
+      mowingSuggestedHeightInches: 3.0,
+    });
+
+    const txYardUpdate = vi.fn().mockResolvedValue({});
+    const txYardSectionUpdate = vi.fn().mockResolvedValue({});
+    const txLawnAnalysisUpdate = vi.fn().mockResolvedValue({});
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        yard: { update: txYardUpdate },
+        yardSection: { update: txYardSectionUpdate },
+        lawnAnalysis: { update: txLawnAnalysisUpdate },
+      };
+      return fn(tx);
+    });
+
+    const req = new Request("https://example.com/api/sections/s1/mowing/apply", { method: "POST" });
+    const res = await POST(req as never, makeParams("s1") as never);
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual({ target: "yard", heightInches: 3.0 });
+
+    expect(txYardUpdate).toHaveBeenCalledWith({
+      where: { id: "y1" },
+      data: { mowingHeightInches: 3.0 },
+    });
+  });
 });

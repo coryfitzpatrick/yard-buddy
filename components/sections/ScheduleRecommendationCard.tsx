@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { distributeWateringDays, distributeMowingDays } from "@/lib/schedules/distribute-days";
 
 type Kind = "watering" | "mowing";
 
@@ -67,10 +68,55 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
 
   // State B - no deviation (or recomputed away)
   if (!stillDeviates) {
+    const hasNoSchedule = effective.days.length === 0;
+    const hasSuggestion = suggestedDays != null;
+    const showSetupCta = hasNoSchedule && hasSuggestion;
+
+    const setUp = async () => {
+      if (!suggestedDays) return;
+      setBusy(true);
+      setError(null);
+      try {
+        const days = kind === "watering"
+          ? distributeWateringDays(suggestedDays)
+          : distributeMowingDays(suggestedDays);
+        const time = kind === "watering" ? "07:00" : "10:00";
+        const res = await fetch(`/api/sections/${sectionId}/${kind}/apply`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ days, time }),
+        });
+        if (res.ok) router.refresh();
+        else if (res.status === 400) setError("Couldn't set up. Try again.");
+        else if (res.status === 404) setError("Section or analysis not found.");
+        else setError("Something went wrong. Try again.");
+      } catch {
+        setError("Network error.");
+      } finally {
+        setBusy(false);
+      }
+    };
+
     return (
       <div className="rounded-2xl border border-gray-200 p-5 bg-white">
         <h3 className="font-semibold mb-1">{kind === "watering" ? "Watering" : "Mowing"}</h3>
         {schedule && <p className="text-sm text-gray-700">{schedule}</p>}
+        {showSetupCta && (
+          <div className="mt-3">
+            <p className="text-sm text-gray-500 mb-2">
+              You haven&apos;t set up a {kind} schedule yet.
+            </p>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={setUp}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+            >
+              {busy ? "Saving..." : `Set up ${kind}`}
+            </button>
+            {error && <p role="alert" className="text-sm text-red-700 mt-2">{error}</p>}
+          </div>
+        )}
       </div>
     );
   }

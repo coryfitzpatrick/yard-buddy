@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { applyTargetForPlan } from "@/lib/schedules/apply-handler";
 import { withAxiom, logger } from "@/lib/observability/logger";
 import { emitMowingApplied } from "@/lib/observability/events";
 
-export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Promise<{ sectionId: string }> }) => {
+const optionalBody = z.object({
+  days: z.array(z.enum(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])).optional(),
+  time: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+}).partial();
+
+export const POST = withAxiom(async (req: NextRequest, { params }: { params: Promise<{ sectionId: string }> }) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -30,17 +36,32 @@ export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Pr
     return NextResponse.json({ error: "No structured suggestion available" }, { status: 400 });
   }
 
+  let extra: { days?: string[]; time?: string | null } = {};
+  try {
+    const json = await req.json();
+    const parsed = optionalBody.safeParse(json);
+    if (parsed.success) extra = parsed.data;
+  } catch {
+    // empty body or non-JSON: fall through with extra={}
+  }
+
   const target = applyTargetForPlan(section.yard.user.plan);
   await db.$transaction(async (tx) => {
+    const data: { mowingHeightInches: number; mowingDays?: string[]; mowingTime?: string | null } = {
+      mowingHeightInches: height,
+    };
+    if (extra.days !== undefined) data.mowingDays = extra.days;
+    if (extra.time !== undefined) data.mowingTime = extra.time;
+
     if (target === "yard") {
       await tx.yard.update({
         where: { id: section.yardId },
-        data: { mowingHeightInches: height },
+        data,
       });
     } else {
       await tx.yardSection.update({
         where: { id: sectionId },
-        data: { mowingHeightInches: height },
+        data,
       });
     }
     await tx.lawnAnalysis.update({
@@ -52,5 +73,10 @@ export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Pr
   emitMowingApplied({ sectionId, plan: section.yard.user.plan, target });
   logger.info("mowing applied", { sectionId, target });
 
-  return NextResponse.json({ target, heightInches: height });
+  return NextResponse.json({
+    target,
+    heightInches: height,
+    ...(extra.days !== undefined && { days: extra.days }),
+    ...(extra.time !== undefined && { time: extra.time }),
+  });
 });
