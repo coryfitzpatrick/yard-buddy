@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Pencil } from "lucide-react";
 import { YardDetailInteractive } from "@/components/yard/YardDetailInteractive";
+import { YardAnalysisTimeline } from "@/components/yard/YardAnalysisTimeline";
 import { getPlanLimits, getDaysUntilDeletion } from "@/lib/subscription";
 import NotInApp from "@/components/NotInApp";
 
@@ -38,8 +39,14 @@ export default async function YardDetailPage({
         include: {
           analyses: {
             orderBy: { createdAt: "desc" },
-            take: 1,
-            select: { healthScore: true },
+            select: {
+              id: true,
+              healthScore: true,
+              summary: true,
+              issues: true,
+              imageUrls: true,
+              createdAt: true,
+            },
           },
           tasks: {
             where: { status: { not: "skipped" } },
@@ -137,6 +144,14 @@ export default async function YardDetailPage({
           </Button>
         </Link>
       </div>
+
+      {yard.sections.length === 1 && (
+        <YardAnalysisTimeline
+          analyses={yard.sections[0]!.analyses}
+          photoHistoryHref={`/yard/${id}/sections/${yard.sections[0]!.slug}/photos`}
+          totalPhotoCount={yard.sections[0]!.analyses.reduce((sum, a) => sum + a.imageUrls.length, 0)}
+        />
+      )}
 
       <YardDetailInteractive
         yardId={id}
