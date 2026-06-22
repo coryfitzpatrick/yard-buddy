@@ -69,7 +69,7 @@ export const PLAN_LABELS: Record<string, string> = {
   admin:        "Admin",
 };
 
-function isEffectivelyExpired(user: SubscriptionUser): boolean {
+export function isEffectivelyExpired(user: SubscriptionUser): boolean {
   if (user.planStatus === "expired" || user.planStatus === "canceled") return true;
   if (
     (user.planStatus === "trialing" || user.plan === "trial") &&

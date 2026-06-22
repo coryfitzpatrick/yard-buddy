@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { applyTargetForPlan } from "@/lib/schedules/apply-handler";
 import { withAxiom, logger } from "@/lib/observability/logger";
 import { emitWateringApplied } from "@/lib/observability/events";
-import { triggerEngagementBonusCheck } from "@/lib/subscription";
+import { isEffectivelyExpired, triggerEngagementBonusCheck } from "@/lib/subscription";
 
 const optionalBody = z.object({
   days: z.array(z.enum(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])).optional(),
@@ -20,10 +20,13 @@ export const POST = withAxiom(async (req: NextRequest, { params }: { params: Pro
 
   const section = await db.yardSection.findUnique({
     where: { id: sectionId },
-    include: { yard: { include: { user: { select: { id: true, plan: true } } } } },
+    include: { yard: { include: { user: { select: { id: true, plan: true, planStatus: true, trialEndsAt: true } } } } },
   });
   if (!section || section.yard.user.id !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  if (isEffectivelyExpired(section.yard.user)) {
+    return NextResponse.json({ error: "Trial expired" }, { status: 403 });
   }
 
   const latest = await db.lawnAnalysis.findFirst({
