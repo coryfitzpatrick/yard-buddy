@@ -25,9 +25,8 @@ export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Pr
   });
   if (!latest) return NextResponse.json({ error: "No analysis to apply" }, { status: 404 });
 
-  const days = latest.wateringSuggestedDaysPerWeek;
   const mins = latest.wateringSuggestedMinutesPerSession;
-  if (days == null || mins == null) {
+  if (mins == null) {
     return NextResponse.json({ error: "No structured suggestion available" }, { status: 400 });
   }
 
@@ -36,12 +35,12 @@ export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Pr
     if (target === "yard") {
       await tx.yard.update({
         where: { id: section.yardId },
-        data: { wateringDaysPerWeek: days, wateringMinutesPerSession: mins },
+        data: { wateringMinutesPerSession: mins },
       });
     } else {
       await tx.yardSection.update({
         where: { id: sectionId },
-        data: { wateringDaysPerWeek: days, wateringMinutesPerSession: mins },
+        data: { wateringMinutesPerSession: mins },
       });
     }
     await tx.lawnAnalysis.update({
@@ -53,5 +52,5 @@ export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Pr
   emitWateringApplied({ sectionId, plan: section.yard.user.plan, target });
   logger.info("watering applied", { sectionId, target });
 
-  return NextResponse.json({ target, daysPerWeek: days, minutesPerSession: mins });
+  return NextResponse.json({ target, minutesPerSession: mins });
 });

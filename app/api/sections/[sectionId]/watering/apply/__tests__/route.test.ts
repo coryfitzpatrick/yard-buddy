@@ -81,7 +81,25 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
     expect(res.status).toBe(404);
   });
 
-  it("returns 400 when wateringSuggestedDaysPerWeek is null", async () => {
+  it("returns 400 when wateringSuggestedMinutesPerSession is null", async () => {
+    (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
+    mockYardSectionFindUnique.mockResolvedValue({
+      id: "s1",
+      yardId: "y1",
+      yard: { user: { id: "u1", plan: "home_basic" } },
+    });
+    mockLawnAnalysisFindFirst.mockResolvedValue({
+      id: "a1",
+      wateringSuggestedMinutesPerSession: null,
+    });
+    const req = new Request("https://example.com/api/sections/s1/watering/apply", { method: "POST" });
+    const res = await POST(req as never, makeParams("s1") as never);
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/no structured suggestion/i);
+  });
+
+  it("succeeds even when wateringSuggestedDaysPerWeek is null (only minutes is required)", async () => {
     (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
     mockYardSectionFindUnique.mockResolvedValue({
       id: "s1",
@@ -93,14 +111,25 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
       wateringSuggestedDaysPerWeek: null,
       wateringSuggestedMinutesPerSession: 20,
     });
+
+    const txYardUpdate = vi.fn().mockResolvedValue({});
+    const txYardSectionUpdate = vi.fn().mockResolvedValue({});
+    const txLawnAnalysisUpdate = vi.fn().mockResolvedValue({});
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        yard: { update: txYardUpdate },
+        yardSection: { update: txYardSectionUpdate },
+        lawnAnalysis: { update: txLawnAnalysisUpdate },
+      };
+      return fn(tx);
+    });
+
     const req = new Request("https://example.com/api/sections/s1/watering/apply", { method: "POST" });
     const res = await POST(req as never, makeParams("s1") as never);
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error).toMatch(/no structured suggestion/i);
+    expect(res.status).toBe(200);
   });
 
-  it("returns 400 when wateringSuggestedMinutesPerSession is null", async () => {
+  it("200 Basic user: writes only wateringMinutesPerSession to tx.yard.update; clears dismissedAt; emits", async () => {
     (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
     mockYardSectionFindUnique.mockResolvedValue({
       id: "s1",
@@ -109,24 +138,6 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
     });
     mockLawnAnalysisFindFirst.mockResolvedValue({
       id: "a1",
-      wateringSuggestedDaysPerWeek: 3,
-      wateringSuggestedMinutesPerSession: null,
-    });
-    const req = new Request("https://example.com/api/sections/s1/watering/apply", { method: "POST" });
-    const res = await POST(req as never, makeParams("s1") as never);
-    expect(res.status).toBe(400);
-  });
-
-  it("200 Basic user (home_basic): writes to tx.yard.update, clears dismissedAt on analysis, emits with target=yard", async () => {
-    (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
-    mockYardSectionFindUnique.mockResolvedValue({
-      id: "s1",
-      yardId: "y1",
-      yard: { user: { id: "u1", plan: "home_basic" } },
-    });
-    mockLawnAnalysisFindFirst.mockResolvedValue({
-      id: "a1",
-      wateringSuggestedDaysPerWeek: 3,
       wateringSuggestedMinutesPerSession: 20,
     });
 
@@ -147,11 +158,11 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ target: "yard", daysPerWeek: 3, minutesPerSession: 20 });
+    expect(body).toEqual({ target: "yard", minutesPerSession: 20 });
 
     expect(txYardUpdate).toHaveBeenCalledWith({
       where: { id: "y1" },
-      data: { wateringDaysPerWeek: 3, wateringMinutesPerSession: 20 },
+      data: { wateringMinutesPerSession: 20 },
     });
     expect(txYardSectionUpdate).not.toHaveBeenCalled();
     expect(txLawnAnalysisUpdate).toHaveBeenCalledWith({
@@ -161,7 +172,7 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
     expect(emitWateringApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "yard" });
   });
 
-  it("200 Plus user (home_plus): writes to tx.yardSection.update, emits with target=section", async () => {
+  it("200 Plus user: writes only wateringMinutesPerSession to tx.yardSection.update; emits with target=section", async () => {
     (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
     mockYardSectionFindUnique.mockResolvedValue({
       id: "s1",
@@ -170,7 +181,6 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
     });
     mockLawnAnalysisFindFirst.mockResolvedValue({
       id: "a1",
-      wateringSuggestedDaysPerWeek: 4,
       wateringSuggestedMinutesPerSession: 15,
     });
 
@@ -191,17 +201,13 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ target: "section", daysPerWeek: 4, minutesPerSession: 15 });
+    expect(body).toEqual({ target: "section", minutesPerSession: 15 });
 
     expect(txYardSectionUpdate).toHaveBeenCalledWith({
       where: { id: "s1" },
-      data: { wateringDaysPerWeek: 4, wateringMinutesPerSession: 15 },
+      data: { wateringMinutesPerSession: 15 },
     });
     expect(txYardUpdate).not.toHaveBeenCalled();
-    expect(txLawnAnalysisUpdate).toHaveBeenCalledWith({
-      where: { id: "a1" },
-      data: { wateringRecommendationDismissedAt: null },
-    });
     expect(emitWateringApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_plus", target: "section" });
   });
 });

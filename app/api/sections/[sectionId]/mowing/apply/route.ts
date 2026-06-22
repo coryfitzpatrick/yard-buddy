@@ -25,9 +25,8 @@ export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Pr
   });
   if (!latest) return NextResponse.json({ error: "No analysis to apply" }, { status: 404 });
 
-  const days = latest.mowingSuggestedDaysPerWeek;
   const height = latest.mowingSuggestedHeightInches;
-  if (days == null || height == null) {
+  if (height == null) {
     return NextResponse.json({ error: "No structured suggestion available" }, { status: 400 });
   }
 
@@ -36,12 +35,12 @@ export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Pr
     if (target === "yard") {
       await tx.yard.update({
         where: { id: section.yardId },
-        data: { mowingDaysPerWeek: days, mowingHeightInches: height },
+        data: { mowingHeightInches: height },
       });
     } else {
       await tx.yardSection.update({
         where: { id: sectionId },
-        data: { mowingDaysPerWeek: days, mowingHeightInches: height },
+        data: { mowingHeightInches: height },
       });
     }
     await tx.lawnAnalysis.update({
@@ -53,5 +52,5 @@ export const POST = withAxiom(async (_req: NextRequest, { params }: { params: Pr
   emitMowingApplied({ sectionId, plan: section.yard.user.plan, target });
   logger.info("mowing applied", { sectionId, target });
 
-  return NextResponse.json({ target, daysPerWeek: days, heightInches: height });
+  return NextResponse.json({ target, heightInches: height });
 });
