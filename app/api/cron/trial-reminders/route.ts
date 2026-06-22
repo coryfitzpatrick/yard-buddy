@@ -199,6 +199,32 @@ export const GET = withAxiom(async (req: NextRequest) => {
       } catch { /* push failure non-fatal */ }
     });
 
+    // Day-0 trial-end push notification: catches users on the wall day.
+    const expiringToday = await db.user.findMany({
+      where: {
+        planStatus: "trialing",
+        trialEndedPushSentAt: null,
+        trialEndsAt: { gte: today, lt: addDays(today, 1) },
+      },
+      select: { id: true },
+    });
+    await mapWithConcurrency(expiringToday, EMAIL_CONCURRENCY, async (user) => {
+      // Claim-first idempotency.
+      const claim = await db.user.updateMany({
+        where: { id: user.id, trialEndedPushSentAt: null },
+        data: { trialEndedPushSentAt: new Date() },
+      });
+      if (claim.count === 0) return;
+
+      try {
+        await sendPushToUser(user.id, {
+          title: "Your free trial ended",
+          body: "Upgrade to keep your schedule and reminders running.",
+          data: { kind: "trial_ended" },
+        });
+      } catch { /* non-fatal */ }
+    });
+
     for (const daysLeft of reminderDays) {
       const targetDate = addDays(today, daysLeft);
 
