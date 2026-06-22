@@ -124,6 +124,7 @@ model Yard {
   wateringTime              String?
   mowingDays                String[]   @default([])
   mowingTime                String?
+  archivedAt DateTime?
   weatherRefreshedAt DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
@@ -133,6 +134,7 @@ model Yard {
 
   @@unique([userId, slug])
   @@index([userId])
+  @@index([userId, archivedAt])
 }
 
 model YardSection {
