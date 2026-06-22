@@ -48,6 +48,24 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
   const [selectedSectionId, setSelectedSectionId] = useState(initialSectionId);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [analyzeMeta, setAnalyzeMeta] = useState<{
+    sectionId: string;
+    plan: string | null;
+    effective: {
+      wateringDays: string[];
+      wateringTime: string | null;
+      wateringMinutesPerSession: number | null;
+      mowingDays: string[];
+      mowingTime: string | null;
+      mowingHeightInches: number | null;
+    };
+    latestAnalysis: {
+      wateringSuggestedDaysPerWeek: number | null;
+      wateringSuggestedMinutesPerSession: number | null;
+      mowingSuggestedDaysPerWeek: number | null;
+      mowingSuggestedHeightInches: number | null;
+    };
+  } | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [analysisLimitReached, setAnalysisLimitReached] = useState(false);
   const [invalidPhotos, setInvalidPhotos] = useState(false);
@@ -79,6 +97,7 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
     const yard = yards.find((y) => y.id === yardId);
     setSelectedSectionId(yard?.sections.length === 1 ? yard.sections[0].id : "");
     setResult(null);
+    setAnalyzeMeta(null);
     setAnalysisError(null);
     setAnalysisLimitReached(false);
     setInvalidPhotos(false);
@@ -91,6 +110,7 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
     abortRef.current = controller;
     setAnalyzing(true);
     setResult(null);
+    setAnalyzeMeta(null);
     setAnalysisError(null);
     setAnalysisLimitReached(false);
     // Persist any pending soil edits first so the analyze route sees the new
@@ -119,6 +139,17 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
       }
       const data = await res.json();
       setResult(data.result);
+      setAnalyzeMeta({
+        sectionId: selectedSectionId!,
+        plan: data.plan ?? null,
+        effective: data.effective,
+        latestAnalysis: {
+          wateringSuggestedDaysPerWeek: data.analysis.wateringSuggestedDaysPerWeek,
+          wateringSuggestedMinutesPerSession: data.analysis.wateringSuggestedMinutesPerSession,
+          mowingSuggestedDaysPerWeek: data.analysis.mowingSuggestedDaysPerWeek,
+          mowingSuggestedHeightInches: data.analysis.mowingSuggestedHeightInches,
+        },
+      });
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
       setAnalysisError("Network error. Please check your connection.");
@@ -206,7 +237,7 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => { setSelectedSectionId(s.id); setResult(null); setAnalysisError(null); setAnalysisLimitReached(false); setInvalidPhotos(false); }}
+                      onClick={() => { setSelectedSectionId(s.id); setResult(null); setAnalyzeMeta(null); setAnalysisError(null); setAnalysisLimitReached(false); setInvalidPhotos(false); }}
                       className={cn(
                         "flex flex-col items-start rounded-lg border-2 px-3 py-2.5 text-left transition-all",
                         sel ? "border-green-600 bg-green-50" : "border-gray-200 bg-white hover:border-green-400"
@@ -312,7 +343,13 @@ export function AnalyzeClient({ yards, initialYardId, initialSectionId }: Props)
                   <ArrowRight className="w-4 h-4 mr-2" /> View Full Plan &amp; Tasks
                 </Button>
               </Link>
-              <AnalysisResults result={result} />
+              <AnalysisResults
+                result={result}
+                sectionId={analyzeMeta?.sectionId}
+                plan={analyzeMeta?.plan}
+                effective={analyzeMeta?.effective}
+                latestAnalysis={analyzeMeta?.latestAnalysis}
+              />
             </div>
           )}
         </>

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AlertTriangle, CheckCircle, Clock, ShoppingCart } from "lucide-react";
+import { PersonalizedScheduleCard } from "@/components/analysis/PersonalizedScheduleCard";
 
 const RETAILERS = [
   { label: "Amazon",     url: (q: string) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}` },
@@ -73,7 +74,27 @@ const ISSUE_LABEL: Record<string, string> = {
   healthy: "Healthy",
 };
 
-export function AnalysisResults({ result }: { result: AnalysisResult }) {
+interface Props {
+  result: AnalysisResult;
+  sectionId?: string;
+  plan?: string | null;
+  effective?: {
+    wateringDays: string[];
+    wateringTime: string | null;
+    wateringMinutesPerSession: number | null;
+    mowingDays: string[];
+    mowingTime: string | null;
+    mowingHeightInches: number | null;
+  };
+  latestAnalysis?: {
+    wateringSuggestedDaysPerWeek: number | null;
+    wateringSuggestedMinutesPerSession: number | null;
+    mowingSuggestedDaysPerWeek: number | null;
+    mowingSuggestedHeightInches: number | null;
+  };
+}
+
+export function AnalysisResults({ result, sectionId, plan, effective, latestAnalysis }: Props) {
   const scoreColor = result.healthScore >= 70 ? "text-green-600" : result.healthScore >= 40 ? "text-yellow-600" : "text-red-600";
 
   return (
@@ -132,6 +153,15 @@ export function AnalysisResults({ result }: { result: AnalysisResult }) {
           ))}
         </div>
       </div>
+
+      {sectionId && plan !== undefined && effective && latestAnalysis && (
+        <PersonalizedScheduleCard
+          sectionId={sectionId}
+          plan={plan}
+          effective={effective}
+          latestAnalysis={latestAnalysis}
+        />
+      )}
     </div>
   );
 }
