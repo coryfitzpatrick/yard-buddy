@@ -207,34 +207,40 @@ export const POST = withAxiom(async (req: NextRequest) => {
     const mEff = effectiveMowing(section, section.yard, subUser.plan);
 
     let schedule: Awaited<ReturnType<typeof generateScheduleRecommendation>> | null = null;
-    try {
-      schedule = await generateScheduleRecommendation(
-        {
-          grassType: section.grassType,
-          areaType: section.areaType,
-          yardSizeSqft: section.yardSizeSqft,
-          soilPh: section.soilPh,
-          soilMoisture: section.soilMoisture,
-          notes: section.notes,
-          zipCode: section.yard.zipCode,
-          wateringDaysPerWeek: wEff.days.length > 0 ? wEff.days.length : null,
-          wateringMinutesPerSession: wEff.minutesPerSession,
-          mowingDaysPerWeek: mEff.days.length > 0 ? mEff.days.length : null,
-          mowingHeightInches: mEff.heightInches,
-          weatherSummary,
-        },
-        { userId: session.user.id, feature: "schedule" },
-      );
-    } catch (err) {
-      // Schedule call is best-effort. If it fails we still save the analysis with
-      // schedule fields null, and the section page renders a passive empty state.
-      logger.warn("analyze: schedule call failed", {
-        err: err instanceof Error ? err.message : String(err),
-        userId: session.user.id,
-        sectionId: section.id,
-        yardId: section.yardId,
-        grassType: section.grassType,
-      });
+    const scheduleOpts = {
+      grassType: section.grassType,
+      areaType: section.areaType,
+      yardSizeSqft: section.yardSizeSqft,
+      soilPh: section.soilPh,
+      soilMoisture: section.soilMoisture,
+      notes: section.notes,
+      zipCode: section.yard.zipCode,
+      wateringDaysPerWeek: wEff.days.length > 0 ? wEff.days.length : null,
+      wateringMinutesPerSession: wEff.minutesPerSession,
+      mowingDaysPerWeek: mEff.days.length > 0 ? mEff.days.length : null,
+      mowingHeightInches: mEff.heightInches,
+      weatherSummary,
+    };
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        schedule = await generateScheduleRecommendation(
+          scheduleOpts,
+          { userId: session.user.id, feature: "schedule" },
+        );
+        break;
+      } catch (err) {
+        if (attempt === 1) {
+          logger.warn("analyze: schedule call failed after retry", {
+            err: err instanceof Error ? err.message : String(err),
+            userId: session.user.id,
+            sectionId: section.id,
+            yardId: section.yardId,
+            grassType: section.grassType,
+          });
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+      }
     }
 
     // Deduplicate against existing pending tasks in this yard
@@ -329,7 +335,19 @@ export const POST = withAxiom(async (req: NextRequest) => {
       }
     }
 
-    return NextResponse.json({ analysis, result });
+    return NextResponse.json({
+      analysis,
+      result,
+      plan: subUser.plan,
+      effective: {
+        wateringDays: wEff.days,
+        wateringTime: wEff.time,
+        wateringMinutesPerSession: wEff.minutesPerSession,
+        mowingDays: mEff.days,
+        mowingTime: mEff.time,
+        mowingHeightInches: mEff.heightInches,
+      },
+    });
   } catch (err) {
     logger.error("Analysis failed", {
       err: err instanceof Error ? err.message : String(err),
