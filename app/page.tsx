@@ -22,7 +22,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <Logo className="h-6 w-auto" />
             <span className="text-gray-300">|</span>
-            <span className="text-xl font-bold text-green-700">Yard Analyzer</span>
+            <span className="text-[26px] leading-none font-bold text-green-700">Yard Analyzer</span>
           </div>
           <div className="flex gap-2">
             <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
