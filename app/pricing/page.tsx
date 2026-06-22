@@ -98,7 +98,7 @@ export default async function PricingPage() {
           <p className="text-lg text-gray-500">
             {isActivePaid
               ? "Upgrade, downgrade, or switch billing period anytime."
-              : "Try free for 14 days, then pick the plan that fits."}
+              : "Try free for 21 days, then pick the plan that fits."}
           </p>
         </div>
 
