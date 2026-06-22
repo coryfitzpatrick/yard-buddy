@@ -18,7 +18,12 @@ import {
   shouldPushPreEmergent,
   shouldPushGrub,
   shouldPushOverseed,
+  shouldPushWateringReminder,
+  shouldPushMowingReminder,
+  shouldPushWateringWeatherWarning,
+  shouldPushMowingWeatherWarning,
 } from "@/lib/push/triggers";
+import { effectiveWatering, effectiveMowing } from "@/lib/schedules/effective-schedule";
 import { hashEmail } from "@/lib/observability/redact";
 
 const EMAIL_CONCURRENCY = 10;
@@ -103,6 +108,7 @@ async function runDailyTasks(
           id: true,
           email: true,
           name: true,
+          plan: true,
           notificationsEnabled: true,
           reminderNotificationsEnabled: true,
           reminderDaysBefore: true,
@@ -110,6 +116,12 @@ async function runDailyTasks(
           notifyDaysAhead: true,
           gddNotificationsEnabled: true,
           gddBestDayReminderDays: true,
+          emailNotificationsEnabled: true,
+          pushNotificationsEnabled: true,
+          taskPushEnabled: true,
+          schedulePushEnabled: true,
+          weatherEmailEnabled: true,
+          weatherPushEnabled: true,
         },
       },
       sections: {
@@ -134,13 +146,12 @@ async function runDailyTasks(
   // (yard-level or section-level). May overlap with task users — deduplicated later.
   const reminderUsers = await db.user.findMany({
     where: {
-      reminderNotificationsEnabled: true,
       yards: {
         some: {
           OR: [
-            { mowingSchedule: { not: null } },
-            { wateringSchedule: { not: null } },
-            { sections: { some: { OR: [{ mowingSchedule: { not: null } }, { wateringSchedule: { not: null } }] } } },
+            { wateringDays: { isEmpty: false } },
+            { mowingDays: { isEmpty: false } },
+            { sections: { some: { OR: [{ wateringDays: { isEmpty: false } }, { mowingDays: { isEmpty: false } }] } } },
           ],
         },
       },
@@ -149,28 +160,44 @@ async function runDailyTasks(
       id: true,
       email: true,
       name: true,
+      plan: true,
       notificationsEnabled: true,
       reminderNotificationsEnabled: true,
       reminderDaysBefore: true,
       lastNotifiedAt: true,
       notifyDaysAhead: true,
+      emailNotificationsEnabled: true,
+      pushNotificationsEnabled: true,
+      taskPushEnabled: true,
+      schedulePushEnabled: true,
+      weatherEmailEnabled: true,
+      weatherPushEnabled: true,
       yards: {
         where: {
           OR: [
-            { mowingSchedule: { not: null } },
-            { wateringSchedule: { not: null } },
-            { sections: { some: { OR: [{ mowingSchedule: { not: null } }, { wateringSchedule: { not: null } }] } } },
+            { wateringDays: { isEmpty: false } },
+            { mowingDays: { isEmpty: false } },
+            { sections: { some: { OR: [{ wateringDays: { isEmpty: false } }, { mowingDays: { isEmpty: false } }] } } },
           ],
         },
         select: {
           name: true,
-          mowingSchedule: true,
-          wateringSchedule: true,
+          zipCode: true,
+          wateringDays: true,
+          wateringTime: true,
+          wateringMinutesPerSession: true,
+          mowingDays: true,
+          mowingTime: true,
+          mowingHeightInches: true,
           sections: {
             select: {
               name: true,
-              mowingSchedule: true,
-              wateringSchedule: true,
+              wateringDays: true,
+              wateringTime: true,
+              wateringMinutesPerSession: true,
+              mowingDays: true,
+              mowingTime: true,
+              mowingHeightInches: true,
             },
           },
         },
@@ -529,31 +556,115 @@ async function runDailyTasks(
         }));
     }
 
-    // Collect reminder content
+    // Collect reminder content using structured schedule fields
     let scheduledReminders: Awaited<ReturnType<typeof getTodayReminders>> = [];
 
+    // Build the effective-schedule sections array (used for both email reminders and push)
+    const sections = reminderUser
+      ? reminderUser.yards.flatMap((y) =>
+          y.sections.map((s) => ({
+            name: s.name,
+            yardName: y.name,
+            effectiveWatering: effectiveWatering(s, y, reminderUser.plan ?? null),
+            effectiveMowing: effectiveMowing(s, y, reminderUser.plan ?? null),
+          }))
+        )
+      : [];
+
     if (user.reminderNotificationsEnabled && reminderUser) {
-      const sections = reminderUser.yards.flatMap((y) =>
-        y.sections.map((s) => ({
-          name: s.name,
-          yardName: y.name,
-          mowingSchedule: s.mowingSchedule,
-          wateringSchedule: s.wateringSchedule,
-          yardMowingSchedule: y.mowingSchedule,
-          yardWateringSchedule: y.wateringSchedule,
-        }))
-      );
       scheduledReminders = getTodayReminders(sections, today, user.reminderDaysBefore);
     }
 
-    if (overdueTasks.length === 0 && upcomingTasks.length === 0 && scheduledReminders.length === 0) return;
+    // Push: schedule reminders (watering + mowing today)
+    const todayDayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][today.getUTCDay()];
+
+    if (reminderUser && user.pushNotificationsEnabled && user.schedulePushEnabled) {
+      for (const section of sections) {
+        const wateringToday = section.effectiveWatering.days.includes(todayDayName);
+        const mowingToday = section.effectiveMowing.days.includes(todayDayName);
+
+        if (shouldPushWateringReminder({ effective: section.effectiveWatering, todayIsScheduled: wateringToday })) {
+          await safePushUser(
+            userId,
+            {
+              title: "Watering reminder",
+              body: `${section.yardName}: water for ${section.effectiveWatering.minutesPerSession} minutes today.`,
+            },
+            "schedule_reminder",
+          );
+          // TODO: Task 16 emit watering.reminder.pushed
+        }
+        if (shouldPushMowingReminder({ effective: section.effectiveMowing, todayIsScheduled: mowingToday })) {
+          await safePushUser(
+            userId,
+            {
+              title: "Mowing reminder",
+              body: `${section.yardName}: mow today at ${section.effectiveMowing.heightInches} inches.`,
+            },
+            "schedule_reminder",
+          );
+          // TODO: Task 16 emit mowing.reminder.pushed
+        }
+      }
+    }
+
+    // Push: weather warnings for scheduled watering/mowing days
+    if (reminderUser && user.pushNotificationsEnabled && user.weatherPushEnabled) {
+      for (const section of sections) {
+        const yard = reminderUser.yards.find((y) => y.name === section.yardName);
+        const wx = yard ? weatherByZip.get(yard.zipCode) : null;
+        // Map precipitationChance (0–100 percentage) to 0–1 fraction for the trigger predicate.
+        // rainfallInches is not available from the current weather API; default to 0.
+        const todayForecast = wx
+          ? { chanceOfRain: (wx.precipitationChance ?? 0) / 100, rainfallInches: 0 }
+          : null;
+        const wateringToday = section.effectiveWatering.days.includes(todayDayName);
+        const mowingToday = section.effectiveMowing.days.includes(todayDayName);
+
+        if (shouldPushWateringWeatherWarning({ todayIsScheduled: wateringToday, todayForecast })) {
+          await safePushUser(
+            userId,
+            {
+              title: "Rain expected today",
+              body: `${section.yardName}: rain is forecast on your watering day.`,
+            },
+            "weather_warning",
+          );
+          // TODO: Task 16 emit watering.weather.alerted
+        }
+        if (shouldPushMowingWeatherWarning({ todayIsScheduled: mowingToday, todayForecast })) {
+          await safePushUser(
+            userId,
+            {
+              title: "Wet grass forecast",
+              body: `${section.yardName}: rain is forecast on your mowing day.`,
+            },
+            "weather_warning",
+          );
+          // TODO: Task 16 emit mowing.weather.alerted
+        }
+      }
+    }
+
+    // Gate email digest on the master email toggle
+    const hasTaskContent = overdueTasks.length > 0 || upcomingTasks.length > 0;
+    const hasReminderContent = scheduledReminders.length > 0;
+    const emailEnabled = user.emailNotificationsEnabled ?? true;
+    const taskEmailEnabled = user.notificationsEnabled;
+    const reminderEmailEnabled = user.reminderNotificationsEnabled;
+
+    const shouldSendEmail =
+      emailEnabled &&
+      ((hasTaskContent && taskEmailEnabled) || (hasReminderContent && reminderEmailEnabled));
+
+    if (!shouldSendEmail) return;
 
     const unsubToken = generateUnsubscribeToken(userId);
     const { subject, html } = buildDigestEmail({
       userName: user.name?.split(" ")[0] ?? "there",
-      overdueTasks,
-      upcomingTasks,
-      scheduledReminders,
+      overdueTasks: taskEmailEnabled ? overdueTasks : [],
+      upcomingTasks: taskEmailEnabled ? upcomingTasks : [],
+      scheduledReminders: reminderEmailEnabled ? scheduledReminders : [],
       dashboardUrl: `${baseUrl}/dashboard`,
       unsubscribeUrl: `${baseUrl}/api/notifications/unsubscribe?token=${unsubToken}`,
     });

@@ -152,7 +152,8 @@ export type PushKind =
   | "weather_warning"
   | "preemergent_window"
   | "grub_window"
-  | "overseed_window";
+  | "overseed_window"
+  | "schedule_reminder";
 
 interface PushDeliveryArgs {
   userIdHash: string;
