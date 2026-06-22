@@ -13,6 +13,7 @@ export type CronRoute =
   | "daily-tasks"
   | "trial-reminders"
   | "account-deletion"
+  | "account-deletion-warnings"
   | "card-expiry"
   | "monthly-cost-report";
 

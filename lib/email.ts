@@ -324,6 +324,38 @@ export function buildSecondAnalysisPromptEmail(opts: {
   return { subject, html };
 }
 
+export function buildGracePeriodWarningEmail(opts: {
+  userName: string;
+  daysUntilDeletion: number;
+  pricingUrl: string;
+}): { subject: string; html: string } {
+  const { userName, daysUntilDeletion, pricingUrl } = opts;
+  const subject =
+    daysUntilDeletion <= 2
+      ? `Your yard data deletes in ${daysUntilDeletion} day${daysUntilDeletion === 1 ? "" : "s"}`
+      : daysUntilDeletion <= 7
+      ? "Last week to save your yard data"
+      : `${daysUntilDeletion} days until your yard data is permanently deleted`;
+  const html = `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">
+    Your free trial ended, and your yard data will be permanently deleted in
+    <strong>${daysUntilDeletion} day${daysUntilDeletion === 1 ? "" : "s"}</strong>.
+    Upgrade now to keep your schedule, analyses, and recommendations.
+  </p>
+  <p style="margin:24px 0;">
+    <a href="${pricingUrl}" style="background:#16a34a;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600;">
+      Upgrade to keep my data
+    </a>
+  </p>
+</body>
+</html>`;
+  return { subject, html };
+}
+
 export function buildPasswordResetEmail(opts: {
   userName: string;
   resetUrl: string;

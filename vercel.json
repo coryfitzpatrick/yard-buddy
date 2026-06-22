@@ -17,6 +17,10 @@
       "schedule": "15 8 * * *"
     },
     {
+      "path": "/api/cron/account-deletion-warnings",
+      "schedule": "20 8 * * *"
+    },
+    {
       "path": "/api/cron/monthly-cost-report",
       "schedule": "0 8 1 * *"
     }
