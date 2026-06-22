@@ -58,6 +58,16 @@ export default async function SettingsPage({
 
   const linkedToGoogle = user.accounts.some((a) => a.provider === "google");
 
+  const yards = await db.yard.findMany({
+    where: { userId: session.user.id, archivedAt: null },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, name: true },
+  });
+
+  const archivedCount = await db.yard.count({
+    where: { userId: session.user.id, archivedAt: { not: null } },
+  });
+
   const subUser = {
     plan: user.plan,
     planStatus: user.planStatus,
@@ -140,6 +150,8 @@ export default async function SettingsPage({
               canPauseSubscription={canPauseSubscription}
               currentPlan={user.plan}
               currentPeriod={currentPeriod}
+              yards={yards}
+              archivedCount={archivedCount}
             />
           </div>
         )}

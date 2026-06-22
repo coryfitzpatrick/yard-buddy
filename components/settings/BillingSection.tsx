@@ -9,8 +9,12 @@
 import Link from "next/link";
 import { CreditCard, PauseCircle, PlayCircle, XCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import NotInApp from "@/components/NotInApp";
+import { DowngradeModal } from "@/components/settings/DowngradeModal";
+import { DeleteArchivedModal } from "@/components/settings/DeleteArchivedModal";
+import { getPlanLimits, PLAN_LABELS } from "@/lib/subscription";
 
 interface PaymentMethod {
   brand: string;
@@ -33,6 +37,8 @@ interface Props {
   canPauseSubscription: boolean;
   currentPlan: string;
   currentPeriod: "monthly" | "annual";
+  yards: { id: string; name: string }[];
+  archivedCount: number;
 }
 
 type Dialog = "pause" | "cancel" | null;
@@ -75,6 +81,8 @@ export function BillingSection({
   canPauseSubscription,
   currentPlan,
   currentPeriod,
+  yards,
+  archivedCount,
 }: Props) {
   const [busy, setBusy] = useState(false);
   const [pauseMonths, setPauseMonths] = useState(3);
@@ -82,6 +90,17 @@ export function BillingSection({
   const [changePlanKey, setChangePlanKey] = useState<string | null>(null);
   const [changePeriod, setChangePeriod] = useState<"monthly" | "annual">(currentPeriod);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [downgradeTarget, setDowngradeTarget] = useState<string | null>(null);
+  const [showDeleteArchived, setShowDeleteArchived] = useState(false);
+
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const action = searchParams.get("action");
+    const target = searchParams.get("to");
+    if (action === "downgrade" && target) {
+      setDowngradeTarget(target);
+    }
+  }, [searchParams]);
 
   const isPaused = planStatus === "paused";
   const isTrial = planStatus === "trialing" || plan === "trial";
@@ -133,6 +152,18 @@ export function BillingSection({
 
   async function handleChangePlan() {
     if (!changePlanKey) return;
+    const targetLimits = getPlanLimits({ plan: changePlanKey, planStatus, trialEndsAt: null });
+    const currentLimits = getPlanLimits({ plan, planStatus, trialEndsAt: null });
+    if (
+      targetLimits.maxYards > 0 &&
+      currentLimits.maxYards > 0 &&
+      targetLimits.maxYards < currentLimits.maxYards
+    ) {
+      setDowngradeTarget(changePlanKey);
+      setChangePlanKey(null);
+      return;
+    }
+
     setBusy(true);
     setActionError(null);
     const res = await fetch("/api/stripe/change-plan", {
@@ -201,6 +232,23 @@ export function BillingSection({
           )}
         </div>
       </div>
+
+      {archivedCount > 0 && (
+        <div className="border-t border-gray-100 pt-4">
+          <p className="text-sm text-gray-700">
+            <span className="font-semibold">{archivedCount} yard{archivedCount === 1 ? "" : "s"} archived</span> from a previous plan.{" "}
+            <span className="text-gray-500">Upgrade to restore, or </span>
+            <button
+              type="button"
+              className="text-red-700 underline hover:text-red-800"
+              onClick={() => setShowDeleteArchived(true)}
+            >
+              delete permanently
+            </button>
+            .
+          </p>
+        </div>
+      )}
 
       {/* Payment method — any customer who has ever billed (active or canceled) */}
       {hasStripeCustomer && (
@@ -460,6 +508,31 @@ export function BillingSection({
             </Link>
           </div>
         </NotInApp>
+      )}
+
+      {downgradeTarget && (
+        <DowngradeModal
+          targetPlan={downgradeTarget}
+          targetPlanLabel={PLAN_LABELS[downgradeTarget] ?? downgradeTarget}
+          newMaxYards={getPlanLimits({ plan: downgradeTarget, planStatus, trialEndsAt: null }).maxYards}
+          yards={yards}
+          currentPeriod={changePeriod}
+          onClose={() => setDowngradeTarget(null)}
+          onSuccess={() => {
+            setDowngradeTarget(null);
+            window.location.reload();
+          }}
+        />
+      )}
+      {showDeleteArchived && (
+        <DeleteArchivedModal
+          archivedCount={archivedCount}
+          onClose={() => setShowDeleteArchived(false)}
+          onSuccess={() => {
+            setShowDeleteArchived(false);
+            window.location.reload();
+          }}
+        />
       )}
     </div>
   );
