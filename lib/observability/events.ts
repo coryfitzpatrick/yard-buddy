@@ -207,3 +207,16 @@ export function emitMowingApplied(args: { sectionId: string; plan: PlanString; t
 export function emitMowingDismissed(args: { sectionId: string }): void {
   logger.info("mowing.dismissed", { ...args, kind: "mowing.dismissed", ...commonFields() });
 }
+
+export function emitWateringReminderPushed(args: { sectionId: string; userId: string }): void {
+  logger.info("watering.reminder.pushed", { ...args, kind: "watering.reminder.pushed", ...commonFields() });
+}
+export function emitMowingReminderPushed(args: { sectionId: string; userId: string }): void {
+  logger.info("mowing.reminder.pushed", { ...args, kind: "mowing.reminder.pushed", ...commonFields() });
+}
+export function emitWateringWeatherAlerted(args: { sectionId: string; userId: string; reason: string }): void {
+  logger.info("watering.weather.alerted", { ...args, kind: "watering.weather.alerted", ...commonFields() });
+}
+export function emitMowingWeatherAlerted(args: { sectionId: string; userId: string; reason: string }): void {
+  logger.info("mowing.weather.alerted", { ...args, kind: "mowing.weather.alerted", ...commonFields() });
+}

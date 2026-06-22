@@ -10,7 +10,15 @@ import { buildWeatherAlerts, type WeatherAlert } from "@/lib/email/weather-alert
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
 import { withAxiom, logger } from "@/lib/observability/logger";
-import { emitCronRun, emitPushDelivery, type PushKind } from "@/lib/observability/events";
+import {
+  emitCronRun,
+  emitPushDelivery,
+  emitWateringReminderPushed,
+  emitMowingReminderPushed,
+  emitWateringWeatherAlerted,
+  emitMowingWeatherAlerted,
+  type PushKind,
+} from "@/lib/observability/events";
 import { emitYesterdaysAiSummary } from "@/lib/observability/ai-daily-summary";
 import { sendPushToUser, type PushPayload } from "@/lib/push/send";
 import {
@@ -192,6 +200,7 @@ async function runDailyTasks(
           mowingHeightInches: true,
           sections: {
             select: {
+              id: true,
               name: true,
               wateringDays: true,
               wateringTime: true,
@@ -564,6 +573,7 @@ async function runDailyTasks(
     const sections = reminderUser
       ? reminderUser.yards.flatMap((y) =>
           y.sections.map((s) => ({
+            id: s.id,
             name: s.name,
             yardName: y.name,
             effectiveWatering: effectiveWatering(s, y, reminderUser.plan ?? null),
@@ -593,7 +603,11 @@ async function runDailyTasks(
             },
             "schedule_reminder",
           );
-          // TODO: Task 16 emit watering.reminder.pushed
+          try {
+            emitWateringReminderPushed({ sectionId: section.id, userId });
+          } catch {
+            // Telemetry is best-effort.
+          }
         }
         if (shouldPushMowingReminder({ effective: section.effectiveMowing, todayIsScheduled: mowingToday })) {
           await safePushUser(
@@ -604,7 +618,11 @@ async function runDailyTasks(
             },
             "schedule_reminder",
           );
-          // TODO: Task 16 emit mowing.reminder.pushed
+          try {
+            emitMowingReminderPushed({ sectionId: section.id, userId });
+          } catch {
+            // Telemetry is best-effort.
+          }
         }
       }
     }
@@ -631,7 +649,11 @@ async function runDailyTasks(
             },
             "weather_warning",
           );
-          // TODO: Task 16 emit watering.weather.alerted
+          try {
+            emitWateringWeatherAlerted({ sectionId: section.id, userId, reason: "rain_forecast" });
+          } catch {
+            // Telemetry is best-effort.
+          }
         }
         if (shouldPushMowingWeatherWarning({ todayIsScheduled: mowingToday, todayForecast })) {
           await safePushUser(
@@ -642,7 +664,11 @@ async function runDailyTasks(
             },
             "weather_warning",
           );
-          // TODO: Task 16 emit mowing.weather.alerted
+          try {
+            emitMowingWeatherAlerted({ sectionId: section.id, userId, reason: "rain_forecast" });
+          } catch {
+            // Telemetry is best-effort.
+          }
         }
       }
     }

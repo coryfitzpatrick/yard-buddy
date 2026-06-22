@@ -14,6 +14,10 @@ import {
   emitMowingRecommended,
   emitMowingApplied,
   emitMowingDismissed,
+  emitWateringReminderPushed,
+  emitMowingReminderPushed,
+  emitWateringWeatherAlerted,
+  emitMowingWeatherAlerted,
 } from "@/lib/observability/events";
 import type { RateLimitedRoute } from "@/lib/observability/events";
 
@@ -339,6 +343,33 @@ describe("schedule recommendation emitters", () => {
     const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
     emitMowingDismissed({ sectionId: "sec_1" });
     expect(spy).toHaveBeenCalledWith("mowing.dismissed", expect.objectContaining({ kind: "mowing.dismissed" }));
+    spy.mockRestore();
+  });
+});
+
+describe("schedule push event emitters", () => {
+  it("emits watering.reminder.pushed", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitWateringReminderPushed({ sectionId: "sec_1", userId: "u_1" });
+    expect(spy).toHaveBeenCalledWith("watering.reminder.pushed", expect.objectContaining({ kind: "watering.reminder.pushed", sectionId: "sec_1", userId: "u_1" }));
+    spy.mockRestore();
+  });
+  it("emits mowing.reminder.pushed", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitMowingReminderPushed({ sectionId: "sec_1", userId: "u_1" });
+    expect(spy).toHaveBeenCalledWith("mowing.reminder.pushed", expect.objectContaining({ kind: "mowing.reminder.pushed" }));
+    spy.mockRestore();
+  });
+  it("emits watering.weather.alerted with reason", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitWateringWeatherAlerted({ sectionId: "sec_1", userId: "u_1", reason: "rain_forecast" });
+    expect(spy).toHaveBeenCalledWith("watering.weather.alerted", expect.objectContaining({ reason: "rain_forecast" }));
+    spy.mockRestore();
+  });
+  it("emits mowing.weather.alerted with reason", () => {
+    const spy = vi.spyOn(logger, "info").mockImplementation(() => undefined as never);
+    emitMowingWeatherAlerted({ sectionId: "sec_1", userId: "u_1", reason: "rain_forecast" });
+    expect(spy).toHaveBeenCalledWith("mowing.weather.alerted", expect.objectContaining({ kind: "mowing.weather.alerted" }));
     spy.mockRestore();
   });
 });
