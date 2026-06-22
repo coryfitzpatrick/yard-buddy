@@ -55,6 +55,16 @@ export const GET = withAxiom(async (req: NextRequest) => {
       if (!user.email) return;
       const hasSchedule = await userHasAnySchedule(user.id);
       if (hasSchedule) return; // condition cleared — nudge not needed.
+
+      // Claim the nudge slot before sending. If another worker beat us (or this
+      // is a retry), count will be 0 and we skip. This prevents double-send when
+      // the cron is retried mid-batch.
+      const claim = await db.user.updateMany({
+        where: { id: user.id, day5NudgeSentAt: null },
+        data: { day5NudgeSentAt: new Date() },
+      });
+      if (claim.count === 0) return;
+
       const { subject, html } = buildDay5ScheduleNudgeEmail({
         userName: user.name?.split(" ")[0] ?? "there",
         scheduleSetupUrl: `${baseUrl}/dashboard`,
@@ -83,10 +93,6 @@ export const GET = withAxiom(async (req: NextRequest) => {
       } catch {
         /* push failure non-fatal */
       }
-      await db.user.update({
-        where: { id: user.id },
-        data: { day5NudgeSentAt: new Date() },
-      });
     });
 
     for (const daysLeft of reminderDays) {
