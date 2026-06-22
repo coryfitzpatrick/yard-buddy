@@ -4,6 +4,7 @@ import { stripe, planFromPriceId } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { resend, buildPaymentFailedEmail } from "@/lib/email";
 import { withAxiom, logger } from "@/lib/observability/logger";
+import { getPlanLimits } from "@/lib/subscription";
 
 async function updateUserFromSubscription(sub: Stripe.Subscription) {
   // Look up user by our stored customerId — never trust payload userId directly
@@ -51,6 +52,29 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
       pausedUntil,
     },
   });
+
+  // Auto-restore most recently archived yards if the new plan increases the limit.
+  const newLimits = getPlanLimits({ plan, planStatus, trialEndsAt: null });
+  if (newLimits.maxYards !== -1 && newLimits.maxYards > 0) {
+    const activeCount = await db.yard.count({
+      where: { userId: user.id, archivedAt: null },
+    });
+    const restoreCount = newLimits.maxYards - activeCount;
+    if (restoreCount > 0) {
+      const archived = await db.yard.findMany({
+        where: { userId: user.id, archivedAt: { not: null } },
+        orderBy: { archivedAt: "desc" },
+        take: restoreCount,
+        select: { id: true },
+      });
+      if (archived.length > 0) {
+        await db.yard.updateMany({
+          where: { id: { in: archived.map((y) => y.id) } },
+          data: { archivedAt: null },
+        });
+      }
+    }
+  }
 }
 
 export const POST = withAxiom(async (req: NextRequest) => {
