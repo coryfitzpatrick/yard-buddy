@@ -1,6 +1,4 @@
-import { after } from "next/server";
 import { db } from "@/lib/db";
-import { logger } from "@/lib/observability/logger";
 import { DAY_MS, TRIAL_ENGAGEMENT_BONUS_DAYS, TRIAL_GRACE_DAYS } from "@/lib/time";
 
 // "admin" is a hidden, unlimited plan — not exposed on the pricing page or in
@@ -202,20 +200,3 @@ export async function grantEngagementBonusIfEligible(userId: string): Promise<Gr
   return { granted: true, newTrialEndsAt };
 }
 
-/**
- * Trigger an engagement bonus check after the response is sent. Wraps the
- * grant in next/server's `after()` so the work survives serverless lifecycle
- * — a plain fire-and-forget Promise can be cut off mid-flight on Vercel.
- */
-export function triggerEngagementBonusCheck(userId: string): void {
-  after(async () => {
-    try {
-      await grantEngagementBonusIfEligible(userId);
-    } catch (err) {
-      logger.warn("engagement-bonus: grant check failed", {
-        userId,
-        err: err instanceof Error ? err.message : String(err),
-      });
-    }
-  });
-}

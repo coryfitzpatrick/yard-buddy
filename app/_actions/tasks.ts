@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { triggerEngagementBonusCheck } from "@/lib/subscription";
+import { triggerEngagementBonusCheck } from "@/lib/engagement-trigger";
 
 const statusSchema = z.enum(["pending", "completed", "skipped"]);
 

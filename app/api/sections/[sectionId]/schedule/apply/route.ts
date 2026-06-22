@@ -5,7 +5,8 @@ import { db } from "@/lib/db";
 import { canSetSectionSchedule } from "@/lib/plan/can-set-section-schedule";
 import { withAxiom, logger } from "@/lib/observability/logger";
 import { emitWateringApplied, emitMowingApplied } from "@/lib/observability/events";
-import { isEffectivelyExpired, triggerEngagementBonusCheck } from "@/lib/subscription";
+import { isEffectivelyExpired } from "@/lib/subscription";
+import { triggerEngagementBonusCheck } from "@/lib/engagement-trigger";
 
 const DAY = z.enum(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
 const TIME = z.string().regex(/^\d{2}:\d{2}$/).nullable();
