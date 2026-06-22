@@ -175,12 +175,13 @@ export async function grantEngagementBonusIfEligible(userId: string): Promise<Gr
   const newTrialEndsAt = new Date(
     (user.trialEndsAt?.getTime() ?? Date.now()) + TRIAL_ENGAGEMENT_BONUS_DAYS * DAY_MS,
   );
-  await db.user.update({
-    where: { id: userId },
+  const updated = await db.user.updateMany({
+    where: { id: userId, trialEngagementBonusGrantedAt: null },
     data: {
       trialEndsAt: newTrialEndsAt,
       trialEngagementBonusGrantedAt: new Date(),
     },
   });
+  if (updated.count === 0) return { granted: false, reason: "already_granted" };
   return { granted: true, newTrialEndsAt };
 }
