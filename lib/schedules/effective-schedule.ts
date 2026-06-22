@@ -1,12 +1,14 @@
 import { canSetSectionSchedule } from "@/lib/plan/can-set-section-schedule";
 
 type WateringSource = {
-  wateringDaysPerWeek: number | null;
+  wateringDays: string[];
+  wateringTime: string | null;
   wateringMinutesPerSession: number | null;
 };
 
 type MowingSource = {
-  mowingDaysPerWeek: number | null;
+  mowingDays: string[];
+  mowingTime: string | null;
   mowingHeightInches: number | null;
 };
 
@@ -16,10 +18,10 @@ export function effectiveWatering(
   plan: string | null,
 ) {
   const canOverride = canSetSectionSchedule(plan);
-  return {
-    daysPerWeek: (canOverride ? section.wateringDaysPerWeek : null) ?? yard.wateringDaysPerWeek ?? null,
-    minutesPerSession: (canOverride ? section.wateringMinutesPerSession : null) ?? yard.wateringMinutesPerSession ?? null,
-  };
+  const days = canOverride && section.wateringDays.length > 0 ? section.wateringDays : yard.wateringDays;
+  const time = (canOverride ? section.wateringTime : null) ?? yard.wateringTime ?? null;
+  const minutesPerSession = (canOverride ? section.wateringMinutesPerSession : null) ?? yard.wateringMinutesPerSession ?? null;
+  return { days, time, minutesPerSession };
 }
 
 export function effectiveMowing(
@@ -28,8 +30,8 @@ export function effectiveMowing(
   plan: string | null,
 ) {
   const canOverride = canSetSectionSchedule(plan);
-  return {
-    daysPerWeek: (canOverride ? section.mowingDaysPerWeek : null) ?? yard.mowingDaysPerWeek ?? null,
-    heightInches: (canOverride ? section.mowingHeightInches : null) ?? yard.mowingHeightInches ?? null,
-  };
+  const days = canOverride && section.mowingDays.length > 0 ? section.mowingDays : yard.mowingDays;
+  const time = (canOverride ? section.mowingTime : null) ?? yard.mowingTime ?? null;
+  const heightInches = (canOverride ? section.mowingHeightInches : null) ?? yard.mowingHeightInches ?? null;
+  return { days, time, heightInches };
 }
