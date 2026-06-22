@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { triggerEngagementBonusCheck } from "@/lib/subscription";
 
 const statusSchema = z.enum(["pending", "completed", "skipped"]);
 
@@ -27,6 +28,10 @@ export async function updateTaskStatusAction(id: string, status: "pending" | "co
       completedAt: parsed.data === "completed" ? new Date() : null,
     },
   });
+
+  if (parsed.data === "completed") {
+    triggerEngagementBonusCheck(session.user.id);
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
