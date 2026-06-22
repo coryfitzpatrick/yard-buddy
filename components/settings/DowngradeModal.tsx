@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface Yard {
@@ -30,6 +30,16 @@ export function DowngradeModal({
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    dialogRef.current?.focus();
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   const archiveCount = yards.length - newMaxYards;
   const isValid = selectedKeep.size === newMaxYards && confirmation === "DOWNGRADE";
@@ -67,8 +77,15 @@ export function DowngradeModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl max-w-lg w-full mx-4 p-6 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="downgrade-modal-title"
+        tabIndex={-1}
+        className="bg-white rounded-2xl max-w-lg w-full mx-4 p-6 max-h-[90vh] overflow-y-auto outline-none"
+      >
+        <h2 id="downgrade-modal-title" className="text-lg font-semibold text-gray-900 mb-1">
           Downgrading to {targetPlanLabel}
         </h2>
         <p className="text-sm text-gray-600 mb-4">
@@ -102,10 +119,11 @@ export function DowngradeModal({
           Archived yards stop sending reminders and don&apos;t count toward your plan. Your data is kept and restored if you upgrade. Your card will be credited for unused time on your current plan.
         </div>
 
-        <label className="block text-sm font-medium text-gray-900 mb-1">
+        <label htmlFor="downgrade-confirmation" className="block text-sm font-medium text-gray-900 mb-1">
           Type DOWNGRADE to confirm
         </label>
         <input
+          id="downgrade-confirmation"
           type="text"
           value={confirmation}
           onChange={(e) => setConfirmation(e.target.value)}
