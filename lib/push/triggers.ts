@@ -46,3 +46,29 @@ export function shouldPushGrub(qualifiesOnMerits: boolean, alreadyFired: boolean
 export function shouldPushOverseed(qualifiesOnMerits: boolean, alreadyFired: boolean): boolean {
   return qualifiesOnMerits && !alreadyFired;
 }
+
+export function shouldPushWateringReminder(
+  { effective, todayIsScheduled }: { effective: { days: string[]; time: string | null }; todayIsScheduled: boolean },
+): boolean {
+  return todayIsScheduled && effective.days.length > 0 && !!effective.time;
+}
+
+export function shouldPushMowingReminder(
+  { effective, todayIsScheduled }: { effective: { days: string[]; time: string | null }; todayIsScheduled: boolean },
+): boolean {
+  return todayIsScheduled && effective.days.length > 0 && !!effective.time;
+}
+
+export function shouldPushWateringWeatherWarning(
+  { todayIsScheduled, todayForecast }: { todayIsScheduled: boolean; todayForecast: { chanceOfRain: number; rainfallInches: number } | null },
+): boolean {
+  if (!todayIsScheduled || !todayForecast) return false;
+  return todayForecast.chanceOfRain >= 0.5 || todayForecast.rainfallInches >= 0.25;
+}
+
+export function shouldPushMowingWeatherWarning(
+  { todayIsScheduled, todayForecast }: { todayIsScheduled: boolean; todayForecast: { chanceOfRain: number; rainfallInches: number } | null },
+): boolean {
+  if (!todayIsScheduled || !todayForecast) return false;
+  return todayForecast.chanceOfRain >= 0.5 || todayForecast.rainfallInches >= 0.10;
+}
