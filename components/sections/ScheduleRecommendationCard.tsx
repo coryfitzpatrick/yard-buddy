@@ -21,7 +21,8 @@ type AnalysisShape = {
 };
 
 type Effective = {
-  daysPerWeek: number | null;
+  days: string[];
+  time: string | null;
   minutesPerSession: number | null;
   heightInches: number | null;
 };
@@ -57,11 +58,12 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
   const suggestedDays = kind === "watering" ? latestAnalysis.wateringSuggestedDaysPerWeek : latestAnalysis.mowingSuggestedDaysPerWeek;
   const suggestedSecond = kind === "watering" ? latestAnalysis.wateringSuggestedMinutesPerSession : latestAnalysis.mowingSuggestedHeightInches;
   const dismissedAt = kind === "watering" ? latestAnalysis.wateringRecommendationDismissedAt : latestAnalysis.mowingRecommendationDismissedAt;
-  const currentDays = effective.daysPerWeek;
+  const currentDayCount = effective.days.length;
   const currentSecond = kind === "watering" ? effective.minutesPerSession : effective.heightInches;
 
   const stillDeviates = deviates === true
-    && (suggestedDays !== currentDays || suggestedSecond !== currentSecond);
+    && ((suggestedDays != null && currentDayCount > 0 && suggestedDays !== currentDayCount)
+        || (suggestedSecond != null && currentSecond != null && suggestedSecond !== currentSecond));
 
   // State B - no deviation (or recomputed away)
   if (!stillDeviates) {
@@ -136,11 +138,20 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
       <div className="grid grid-cols-2 gap-3 text-sm text-amber-900 mb-4">
         <div>
           <div className="text-xs text-amber-700">Current</div>
-          <div>{currentDays ?? "?"} days/week, {formatSecond(currentSecond)}</div>
+          <div>
+            {effective.days.length > 0
+              ? `${effective.days.length} days/week (${effective.days.join(", ")})`
+              : "No schedule set"}
+            {currentSecond != null && `, ${formatSecond(currentSecond)}`}
+            {effective.time && `, ${effective.time}`}
+          </div>
         </div>
         <div>
           <div className="text-xs text-amber-700">Suggested</div>
-          <div>{suggestedDays ?? "?"} days/week, {formatSecond(suggestedSecond)}</div>
+          <div>
+            {suggestedDays ?? "?"} days/week
+            {suggestedSecond != null && `, ${formatSecond(suggestedSecond)}`}
+          </div>
         </div>
       </div>
       <div className="flex gap-2">

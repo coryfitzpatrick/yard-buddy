@@ -24,7 +24,7 @@ const baseAnalysis = {
   mowingRecommendationDismissedAt: null,
 };
 
-const baseEffective = { daysPerWeek: 3, minutesPerSession: 20, heightInches: null };
+const baseEffective = { days: ["Mon","Wed","Fri"], time: "07:00", minutesPerSession: 20, heightInches: null };
 
 describe("ScheduleRecommendationCard - watering", () => {
   it("state A: shows empty state when no analysis", () => {
@@ -54,9 +54,15 @@ describe("ScheduleRecommendationCard - watering", () => {
   it("collapses state D to B when effective schedule matches saved suggestion", () => {
     // User manually edited yard to match the suggestion; even though dismissed, stillDeviates is false.
     const dev = { ...baseAnalysis, wateringDeviates: true, wateringSuggestedDaysPerWeek: 3, wateringSuggestedMinutesPerSession: 15, wateringRecommendationDismissedAt: new Date() };
-    const matching = { daysPerWeek: 3, minutesPerSession: 15, heightInches: null };
+    const matching = { days: ["Mon","Wed","Fri"], time: "07:00", minutesPerSession: 15, heightInches: null };
     render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={dev} effective={matching} plan="home_basic" />);
     expect(screen.queryByText(/schedule override/i)).not.toBeInTheDocument();
+  });
+
+  it("shows the user's days array in the Current display", () => {
+    const dev = { ...baseAnalysis, wateringDeviates: true, wateringSuggestedDaysPerWeek: 2, wateringSuggestedMinutesPerSession: 20 };
+    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={dev} effective={baseEffective} plan="home_basic" />);
+    expect(screen.getByText(/3 days\/week \(Mon, Wed, Fri\)/)).toBeInTheDocument();
   });
 });
 
@@ -70,7 +76,8 @@ describe("ScheduleRecommendationCard - mowing", () => {
   };
 
   it("renders mowing-specific state C with height in inches", () => {
-    const effective = { daysPerWeek: 1, minutesPerSession: null, heightInches: 2.5 };
+    // height mismatch (2.5 != 3.0) drives the deviation
+    const effective = { days: ["Sat"], time: "08:00", minutesPerSession: null, heightInches: 2.5 };
     render(<ScheduleRecommendationCard kind="mowing" sectionId="sec_1" latestAnalysis={mowingAnalysis} effective={effective} plan="home_basic" />);
     expect(screen.getByRole("button", { name: /apply/i })).toBeInTheDocument();
     expect(screen.getAllByText(/3 in/).length).toBeGreaterThan(0);
