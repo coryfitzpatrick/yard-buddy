@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { computeEngagementStatus } from "@/lib/subscription";
+import { db } from "@/lib/db";
+import { grantEngagementBonusIfEligible } from "@/lib/subscription";
 
 describe("computeEngagementStatus", () => {
   const baseUser = {
@@ -37,5 +39,31 @@ describe("computeEngagementStatus", () => {
     const r = computeEngagementStatus(u, { anyScheduleSet: true, anyTaskCompleted: true });
     expect(r.bonusEarned).toBe(false);
     expect(r.bonusAlreadyGranted).toBe(true);
+  });
+});
+
+describe("grantEngagementBonusIfEligible", () => {
+  it("is idempotent — returns granted=false when already granted", async () => {
+    // This is a unit-level expectation. The full DB integration is covered by
+    // higher-level tests on the write endpoints. We assert the helper's
+    // observable behavior with a stubbed user lookup.
+    const userId = "stub-user-id";
+    const fakeUser = {
+      id: userId,
+      plan: "trial",
+      planStatus: "trialing",
+      trialEndsAt: new Date(),
+      trialEngagementBonusGrantedAt: new Date(),
+    };
+    // Stub Prisma findUnique to return the already-granted user.
+    const orig = db.user.findUnique;
+    db.user.findUnique = (async () => fakeUser) as typeof db.user.findUnique;
+    try {
+      const result = await grantEngagementBonusIfEligible(userId);
+      expect(result.granted).toBe(false);
+      expect(result.reason).toBe("already_granted");
+    } finally {
+      db.user.findUnique = orig;
+    }
   });
 });

@@ -1,4 +1,5 @@
-import { DAY_MS, TRIAL_GRACE_DAYS } from "@/lib/time";
+import { db } from "@/lib/db";
+import { DAY_MS, TRIAL_ENGAGEMENT_BONUS_DAYS, TRIAL_GRACE_DAYS } from "@/lib/time";
 
 // "admin" is a hidden, unlimited plan — not exposed on the pricing page or in
 // Stripe checkout. Assigned manually via scripts/grant-pro.ts for demo accounts
@@ -118,4 +119,68 @@ export function getDaysUntilDeletion(user: SubscriptionUser): number | null {
 export function daysUntilTrialEnd(trialEndsAt: Date | null | undefined): number | null {
   if (!trialEndsAt) return null;
   return Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / DAY_MS));
+}
+
+export async function userHasAnySchedule(userId: string): Promise<boolean> {
+  const result = await db.yard.findFirst({
+    where: {
+      userId,
+      OR: [
+        { wateringDays: { isEmpty: false } },
+        { mowingDays: { isEmpty: false } },
+        { sections: { some: { OR: [{ wateringDays: { isEmpty: false } }, { mowingDays: { isEmpty: false } }] } } },
+      ],
+    },
+    select: { id: true },
+  });
+  return result != null;
+}
+
+export async function userHasAnyCompletedTask(userId: string): Promise<boolean> {
+  const result = await db.lawnTask.findFirst({
+    where: {
+      completedAt: { not: null },
+      yardSection: { yard: { userId } },
+    },
+    select: { id: true },
+  });
+  return result != null;
+}
+
+export type GrantResult =
+  | { granted: true; newTrialEndsAt: Date }
+  | { granted: false; reason: "already_granted" | "not_trialing" | "not_eligible" | "user_not_found" };
+
+export async function grantEngagementBonusIfEligible(userId: string): Promise<GrantResult> {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      plan: true,
+      planStatus: true,
+      trialEndsAt: true,
+      trialEngagementBonusGrantedAt: true,
+    },
+  });
+  if (!user) return { granted: false, reason: "user_not_found" };
+  if (user.trialEngagementBonusGrantedAt) return { granted: false, reason: "already_granted" };
+  const isTrial = user.planStatus === "trialing" || user.plan === "trial";
+  if (!isTrial) return { granted: false, reason: "not_trialing" };
+
+  const [scheduleSet, taskCompleted] = await Promise.all([
+    userHasAnySchedule(userId),
+    userHasAnyCompletedTask(userId),
+  ]);
+  if (!scheduleSet || !taskCompleted) return { granted: false, reason: "not_eligible" };
+
+  const newTrialEndsAt = new Date(
+    (user.trialEndsAt?.getTime() ?? Date.now()) + TRIAL_ENGAGEMENT_BONUS_DAYS * DAY_MS,
+  );
+  await db.user.update({
+    where: { id: userId },
+    data: {
+      trialEndsAt: newTrialEndsAt,
+      trialEngagementBonusGrantedAt: new Date(),
+    },
+  });
+  return { granted: true, newTrialEndsAt };
 }
