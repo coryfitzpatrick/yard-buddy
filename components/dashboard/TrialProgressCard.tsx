@@ -38,7 +38,7 @@ export function TrialProgressCard({
             🎉 You earned 7 more trial days
           </p>
           <p className="text-xs text-green-700 mt-0.5">
-            Trial now ends {formatDate(trialEndsAt)}.
+            {trialEndsAt ? <>Trial now ends {formatDate(trialEndsAt)}.</> : "Trial extended by 7 days."}
           </p>
         </div>
       </NotInApp>
@@ -58,9 +58,10 @@ export function TrialProgressCard({
         <ul className="space-y-1.5 text-sm">
           <li className="flex items-start gap-2">
             {scheduleSet
-              ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              : <Circle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />}
+              ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden="true" />
+              : <Circle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />}
             <span className={scheduleSet ? "text-emerald-900" : "text-emerald-800"}>
+              <span className="sr-only">{scheduleSet ? "Completed: " : "Not completed: "}</span>
               {scheduleSet
                 ? "Schedule set"
                 : "Set a watering or mowing schedule"}
@@ -68,9 +69,10 @@ export function TrialProgressCard({
           </li>
           <li className="flex items-start gap-2">
             {taskCompleted
-              ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              : <Circle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />}
+              ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden="true" />
+              : <Circle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />}
             <span className={taskCompleted ? "text-emerald-900" : "text-emerald-800"}>
+              <span className="sr-only">{taskCompleted ? "Completed: " : "Not completed: "}</span>
               {taskCompleted
                 ? "Task completed"
                 : "Complete a task, mark any task done from your yard tasks list"}
