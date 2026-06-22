@@ -126,5 +126,38 @@ export const POST = withAxiom(async (req: NextRequest) => {
     return NextResponse.json({ error: "Plan updated in Stripe but our records failed. Refresh to retry." }, { status: 500 });
   }
 
+  // Auto-restore most recently archived yards if this is an upgrade. Mirrors
+  // the webhook auto-restore. The webhook's idempotency guard short-circuits
+  // when change-plan has already written the new plan to the DB, so this
+  // path needs its own restore.
+  const currentPlanLimits = getPlanLimits({
+    plan: user.plan,
+    planStatus: user.planStatus,
+    trialEndsAt: null,
+  });
+  const isUpgrade = newLimits.maxYards > 0
+    && currentPlanLimits.maxYards > 0
+    && newLimits.maxYards > currentPlanLimits.maxYards;
+  if (isUpgrade) {
+    const postChangeActiveCount = await db.yard.count({
+      where: { userId: session.user.id, archivedAt: null },
+    });
+    const restoreCount = newLimits.maxYards - postChangeActiveCount;
+    if (restoreCount > 0) {
+      const archived = await db.yard.findMany({
+        where: { userId: session.user.id, archivedAt: { not: null } },
+        orderBy: { archivedAt: "desc" },
+        take: restoreCount,
+        select: { id: true },
+      });
+      if (archived.length > 0) {
+        await db.yard.updateMany({
+          where: { id: { in: archived.map((y) => y.id) } },
+          data: { archivedAt: null },
+        });
+      }
+    }
+  }
+
   return NextResponse.json({ ok: true });
 });
