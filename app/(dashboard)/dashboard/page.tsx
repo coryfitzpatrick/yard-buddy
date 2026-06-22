@@ -89,6 +89,8 @@ export default async function DashboardPage() {
   const daysUntilDeletion = user ? getDaysUntilDeletion(user) : null;
   const tasks = limits.maxVisibleTasks === -1 ? allTasks : allTasks.slice(0, limits.maxVisibleTasks);
   const hiddenTaskCount = limits.maxVisibleTasks === -1 ? 0 : Math.max(0, allTasks.length - limits.maxVisibleTasks);
+  const startIndex = limits.maxVisibleTasks === -1 ? 0 : limits.maxVisibleTasks;
+  const hiddenTaskTitles = allTasks.slice(startIndex, startIndex + 3).map((t) => t.title);
 
   const yardSummaries = yards.map((yard: (typeof yards)[number]) => ({
     id: yard.id,
@@ -177,6 +179,7 @@ export default async function DashboardPage() {
         weatherRefreshedAt={weatherRefreshedAt}
         initialWeatherCollapsed={user?.weatherWidgetCollapsed ?? false}
         hiddenTaskCount={hiddenTaskCount}
+        hiddenTaskTitles={hiddenTaskTitles}
       />
     </div>
   );

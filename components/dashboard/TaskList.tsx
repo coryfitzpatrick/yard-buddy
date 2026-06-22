@@ -250,10 +250,12 @@ export function TaskList({
   tasks: initial,
   multiYard = false,
   hiddenTaskCount,
+  hiddenTaskTitles,
 }: {
   tasks: Task[];
   multiYard?: boolean;
   hiddenTaskCount?: number;
+  hiddenTaskTitles?: string[];
 }) {
   const [tasks, setTasks] = useState(initial);
   // useState(false) intentional: in-app users never see the Upgrade copy
@@ -422,7 +424,7 @@ export function TaskList({
               : <>{hiddenTaskCount} more recommendation{hiddenTaskCount !== 1 ? "s" : ""}. Upgrade to see them.</>}
           </p>
           {Array.from({ length: Math.min(hiddenTaskCount!, 3) }).map((_, i) => (
-            <LockedTaskCard key={i} />
+            <LockedTaskCard key={i} title={hiddenTaskTitles?.[i]} />
           ))}
         </div>
       )}
