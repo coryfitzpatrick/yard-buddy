@@ -39,6 +39,7 @@ export default async function YardDetailPage({
         include: {
           analyses: {
             orderBy: { createdAt: "desc" },
+            take: 50,
             select: {
               id: true,
               healthScore: true,
