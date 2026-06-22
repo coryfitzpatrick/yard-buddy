@@ -68,8 +68,11 @@ export default async function YardPage() {
 
   const canAdd = user ? canCreateYard(user, yards.length) : false;
   const planLimits = user ? getPlanLimits(user) : null;
+  const isTrial = user?.planStatus === "trialing" || user?.plan === "trial";
   const limitCopy = planLimits && planLimits.maxYards > 0
-    ? `Track up to ${planLimits.maxYards === 1 ? "1 yard on the free trial" : `${planLimits.maxYards} yards on your current plan`}.`
+    ? isTrial
+      ? "Track up to 1 yard on the free trial."
+      : `Track up to ${planLimits.maxYards} yard${planLimits.maxYards === 1 ? "" : "s"} on your current plan.`
     : "";
 
   return (
