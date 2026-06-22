@@ -6,6 +6,7 @@ const BASE_OPTS = {
   overdueTasks: [],
   upcomingTasks: [],
   scheduledReminders: [],
+  weatherAlerts: [],
   dashboardUrl: "https://example.com/dashboard",
   unsubscribeUrl: "https://example.com/unsub",
 };
@@ -15,7 +16,7 @@ describe("buildDigestEmail with scheduledReminders", () => {
     const { html } = buildDigestEmail({
       ...BASE_OPTS,
       scheduledReminders: [
-        { sectionName: "Front Yard", yardName: "Home", mowing: { time: "10:00", inches: "3.5" }, watering: null },
+        { sectionName: "Front Yard", yardName: "Home", mowing: { time: "10:00", inches: 3.5 }, watering: null },
       ],
     });
     expect(html).toContain("Today&#x27;s Schedule");
@@ -28,7 +29,7 @@ describe("buildDigestEmail with scheduledReminders", () => {
     const { html } = buildDigestEmail({
       ...BASE_OPTS,
       scheduledReminders: [
-        { sectionName: "Back Yard", yardName: "Home", mowing: null, watering: { time: "07:00", minutes: "20" } },
+        { sectionName: "Back Yard", yardName: "Home", mowing: null, watering: { time: "07:00", minutes: 20 } },
       ],
     });
     expect(html).toContain("Water");
@@ -44,7 +45,7 @@ describe("buildDigestEmail with scheduledReminders", () => {
     const { subject } = buildDigestEmail({
       ...BASE_OPTS,
       scheduledReminders: [
-        { sectionName: "Front", yardName: "Home", mowing: { time: "09:00", inches: "3" }, watering: null },
+        { sectionName: "Front", yardName: "Home", mowing: { time: "09:00", inches: 3 }, watering: null },
       ],
     });
     expect(subject).toContain("reminder");
@@ -81,5 +82,26 @@ describe("buildDigestEmail with scheduledReminders", () => {
       ],
     });
     expect(html).not.toContain("Best day:");
+  });
+});
+
+describe("buildDigestEmail with weatherAlerts", () => {
+  it("omits weather alerts section when no alerts", () => {
+    const { html } = buildDigestEmail({ ...BASE_OPTS, weatherAlerts: [] });
+    expect(html).not.toContain("Weather alerts");
+  });
+
+  it("renders weather alerts section when alerts are present", () => {
+    const { html } = buildDigestEmail({
+      ...BASE_OPTS,
+      weatherAlerts: [
+        { yardName: "Home", date: "Wednesday, June 24", kind: "watering", reason: "Rain expected (70%)" },
+      ],
+    });
+    expect(html).toContain("Weather alerts");
+    expect(html).toContain("Home");
+    expect(html).toContain("watering");
+    expect(html).toContain("Wednesday, June 24");
+    expect(html).toContain("Rain expected (70%)");
   });
 });

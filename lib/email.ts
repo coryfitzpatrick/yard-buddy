@@ -3,6 +3,7 @@ import crypto from "crypto";
 import type { ScheduledReminder } from "@/lib/cron/reminder-scheduler";
 import type { CostReport, UserCostRow } from "@/lib/cost-report";
 import { DAY_MS } from "@/lib/time";
+import type { WeatherAlert } from "@/lib/email/weather-alerts";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -106,10 +107,11 @@ export function buildDigestEmail(opts: {
   overdueTasks: DigestTask[];
   upcomingTasks: DigestTask[];
   scheduledReminders: ScheduledReminder[];
+  weatherAlerts?: WeatherAlert[];
   dashboardUrl: string;
   unsubscribeUrl: string;
 }): { subject: string; html: string } {
-  const { userName, overdueTasks, upcomingTasks, scheduledReminders, dashboardUrl, unsubscribeUrl } = opts;
+  const { userName, overdueTasks, upcomingTasks, scheduledReminders, weatherAlerts = [], dashboardUrl, unsubscribeUrl } = opts;
 
   const subject =
     overdueTasks.length > 0
@@ -164,12 +166,12 @@ export function buildDigestEmail(opts: {
           const lines: string[] = [];
           if (r.mowing) {
             const timeStr = r.mowing.time ? ` at ${escapeHtml(formatDisplayTime(r.mowing.time))}` : "";
-            const heightStr = r.mowing.inches ? ` &middot; ${escapeHtml(r.mowing.inches)} in` : "";
+            const heightStr = r.mowing.inches != null ? ` &middot; ${r.mowing.inches} in` : "";
             lines.push(`<div style="color:#374151;font-size:14px;">&#x2702;&#xFE0F; Mow${timeStr}${heightStr}</div>`);
           }
           if (r.watering) {
             const timeStr = r.watering.time ? ` at ${escapeHtml(formatDisplayTime(r.watering.time))}` : "";
-            const minStr = r.watering.minutes ? ` &middot; ${escapeHtml(r.watering.minutes)} min` : "";
+            const minStr = r.watering.minutes != null ? ` &middot; ${r.watering.minutes} min` : "";
             lines.push(`<div style="color:#374151;font-size:14px;">&#x1F4A7; Water${timeStr}${minStr}</div>`);
           }
           return `<div style="border:1px solid #bae6fd;border-radius:8px;padding:12px 16px;margin-bottom:8px;background:#f0f9ff;">
@@ -178,6 +180,14 @@ export function buildDigestEmail(opts: {
           </div>`;
         })
         .join("")}`
+      : "";
+
+  const weatherAlertsHtml =
+    weatherAlerts.length > 0
+      ? `<h2 style="color:#92400e;font-size:16px;margin:24px 0 8px;">Weather alerts</h2>
+<ul style="padding-left:18px;">
+${weatherAlerts.map((a) => `<li>${escapeHtml(a.yardName)}, ${escapeHtml(a.kind)} on ${escapeHtml(a.date)}: ${escapeHtml(a.reason)}</li>`).join("")}
+</ul>`
       : "";
 
   const html = `<!DOCTYPE html>
@@ -189,6 +199,7 @@ export function buildDigestEmail(opts: {
   ${overdueHtml}
   ${upcomingHtml}
   ${remindersHtml}
+  ${weatherAlertsHtml}
   <div style="text-align:center;margin:32px 0;">
     <a href="${dashboardUrl}" style="background:#16a34a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">View My Tasks</a>
   </div>

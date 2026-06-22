@@ -6,6 +6,7 @@ import { computeNewWindow } from "@/lib/cron/weather-scheduler";
 import { assessOverdueTasks } from "@/lib/cron/overdue-assessor";
 import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
 import { resend, buildDigestEmail, generateUnsubscribeToken } from "@/lib/email";
+import { buildWeatherAlerts, type WeatherAlert } from "@/lib/email/weather-alerts";
 import { computeDailyGdd, isPreEmergentApplicable, isGrubAlertApplicable, isOverseedingApplicable } from "@/lib/gdd-utils";
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
 import { withAxiom, logger } from "@/lib/observability/logger";
@@ -646,6 +647,29 @@ async function runDailyTasks(
       }
     }
 
+    // Compute weather alerts for the next 5 days (email only)
+    let weatherAlerts: WeatherAlert[] = [];
+    if (reminderUser && user.weatherEmailEnabled) {
+      const forecastByZip = new Map<string, Array<{ date: Date; chanceOfRain: number; rainfallInches: number }>>();
+      for (const [zip, wx] of weatherByZip.entries()) {
+        if (!wx?.forecast) continue;
+        forecastByZip.set(zip, wx.forecast.map((d) => ({
+          date: new Date(d.date),
+          chanceOfRain: (d.precipChance ?? 0) / 100,
+          rainfallInches: 0, // Not available from the weather API; default to 0 (same as Task 13).
+        })));
+      }
+      const sectionsForAlerts = reminderUser.yards.flatMap((y) =>
+        y.sections.map((s) => ({
+          yardName: y.name,
+          yardZip: y.zipCode,
+          effectiveWatering: effectiveWatering(s, y, reminderUser.plan ?? null),
+          effectiveMowing: effectiveMowing(s, y, reminderUser.plan ?? null),
+        }))
+      );
+      weatherAlerts = buildWeatherAlerts({ sections: sectionsForAlerts, forecastByZip, today });
+    }
+
     // Gate email digest on the master email toggle
     const hasTaskContent = overdueTasks.length > 0 || upcomingTasks.length > 0;
     const hasReminderContent = scheduledReminders.length > 0;
@@ -665,6 +689,7 @@ async function runDailyTasks(
       overdueTasks: taskEmailEnabled ? overdueTasks : [],
       upcomingTasks: taskEmailEnabled ? upcomingTasks : [],
       scheduledReminders: reminderEmailEnabled ? scheduledReminders : [],
+      weatherAlerts,
       dashboardUrl: `${baseUrl}/dashboard`,
       unsubscribeUrl: `${baseUrl}/api/notifications/unsubscribe?token=${unsubToken}`,
     });
