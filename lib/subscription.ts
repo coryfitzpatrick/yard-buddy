@@ -19,7 +19,35 @@ export type SubscriptionUser = {
   trialEndsAt: Date | null;
   currentPeriodEnd?: Date | null;
   pausedUntil?: Date | null;
+  trialEngagementBonusGrantedAt?: Date | null;
 };
+
+export interface EngagementSignals {
+  anyScheduleSet: boolean;
+  anyTaskCompleted: boolean;
+}
+
+export interface EngagementStatus {
+  scheduleSet: boolean;
+  taskCompleted: boolean;
+  bonusEarned: boolean;          // both criteria met AND bonus not yet granted
+  bonusAlreadyGranted: boolean;
+}
+
+export function computeEngagementStatus(
+  user: SubscriptionUser,
+  signals: EngagementSignals,
+): EngagementStatus {
+  const bonusAlreadyGranted = user.trialEngagementBonusGrantedAt != null;
+  const scheduleSet = signals.anyScheduleSet;
+  const taskCompleted = signals.anyTaskCompleted;
+  return {
+    scheduleSet,
+    taskCompleted,
+    bonusAlreadyGranted,
+    bonusEarned: scheduleSet && taskCompleted && !bonusAlreadyGranted,
+  };
+}
 
 const LIMITS: Record<string, PlanLimits> = {
   trial:        { maxYards: 1,  maxAnalysesPerYardPerMonth: 2,  maxVisibleTasks: 1,  canRunAnalysis: true  },
