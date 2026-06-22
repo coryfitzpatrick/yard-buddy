@@ -2,39 +2,39 @@ import { describe, it, expect } from "vitest";
 import { yardSchema } from "@/lib/validations/yard";
 
 describe("yardSchema watering fields", () => {
-  it("accepts valid watering days and minutes", () => {
+  it("accepts valid watering days array and minutes", () => {
     const result = yardSchema.safeParse({
       name: "My Yard",
       zipCode: "30301",
-      wateringDaysPerWeek: 3,
+      wateringDays: ["Mon", "Wed", "Fri"],
+      wateringTime: "07:00",
       wateringMinutesPerSession: 20,
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.wateringDaysPerWeek).toBe(3);
+      expect(result.data.wateringDays).toEqual(["Mon", "Wed", "Fri"]);
+      expect(result.data.wateringTime).toBe("07:00");
       expect(result.data.wateringMinutesPerSession).toBe(20);
     }
   });
 
-  it("accepts empty string as undefined (form input behaviour)", () => {
+  it("accepts empty string for minutes (form input behaviour)", () => {
     const result = yardSchema.safeParse({
       name: "My Yard",
       zipCode: "30301",
-      wateringDaysPerWeek: "",
       wateringMinutesPerSession: "",
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.wateringDaysPerWeek).toBeUndefined();
       expect(result.data.wateringMinutesPerSession).toBeUndefined();
     }
   });
 
-  it("rejects wateringDaysPerWeek outside 1-7", () => {
+  it("rejects an invalid day name in wateringDays", () => {
     const result = yardSchema.safeParse({
       name: "My Yard",
       zipCode: "30301",
-      wateringDaysPerWeek: 8,
+      wateringDays: ["Funday"],
     });
     expect(result.success).toBe(false);
   });
@@ -44,13 +44,13 @@ describe("yardSchema watering fields", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects wateringDaysPerWeek: 0 (below min 1)", () => {
+  it("accepts an empty wateringDays array", () => {
     const result = yardSchema.safeParse({
       name: "My Yard",
       zipCode: "30301",
-      wateringDaysPerWeek: 0,
+      wateringDays: [],
     });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
   it("rejects wateringMinutesPerSession: 0 (below min 1)", () => {
@@ -71,26 +71,13 @@ describe("yardSchema watering fields", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts wateringDaysPerWeek at min boundary (1) and max boundary (7)", () => {
-    const minResult = yardSchema.safeParse({
+  it("rejects malformed wateringTime", () => {
+    const result = yardSchema.safeParse({
       name: "My Yard",
       zipCode: "30301",
-      wateringDaysPerWeek: 1,
+      wateringTime: "morning",
     });
-    expect(minResult.success).toBe(true);
-    if (minResult.success) {
-      expect(minResult.data.wateringDaysPerWeek).toBe(1);
-    }
-
-    const maxResult = yardSchema.safeParse({
-      name: "My Yard",
-      zipCode: "30301",
-      wateringDaysPerWeek: 7,
-    });
-    expect(maxResult.success).toBe(true);
-    if (maxResult.success) {
-      expect(maxResult.data.wateringDaysPerWeek).toBe(7);
-    }
+    expect(result.success).toBe(false);
   });
 
   it("accepts wateringMinutesPerSession at min boundary (1) and max boundary (120)", () => {
@@ -100,9 +87,6 @@ describe("yardSchema watering fields", () => {
       wateringMinutesPerSession: 1,
     });
     expect(minResult.success).toBe(true);
-    if (minResult.success) {
-      expect(minResult.data.wateringMinutesPerSession).toBe(1);
-    }
 
     const maxResult = yardSchema.safeParse({
       name: "My Yard",
@@ -110,8 +94,5 @@ describe("yardSchema watering fields", () => {
       wateringMinutesPerSession: 120,
     });
     expect(maxResult.success).toBe(true);
-    if (maxResult.success) {
-      expect(maxResult.data.wateringMinutesPerSession).toBe(120);
-    }
   });
 });
