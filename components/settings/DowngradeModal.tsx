@@ -89,7 +89,7 @@ export function DowngradeModal({
           Downgrading to {targetPlanLabel}
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          You&apos;ll have {newMaxYards} yard{newMaxYards === 1 ? "" : "s"}. The {archiveCount} yard{archiveCount === 1 ? "" : "s"} you don&apos;t pick will be archived.
+          You&apos;ll have {newMaxYards} yard{newMaxYards === 1 ? "" : "s"}. The {archiveCount} yard{archiveCount === 1 ? "" : "s"}{" "}you don&apos;t pick will be archived.
         </p>
 
         <p className="text-sm font-medium text-gray-900 mb-2">

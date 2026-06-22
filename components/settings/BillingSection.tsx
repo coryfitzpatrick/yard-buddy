@@ -155,12 +155,9 @@ export function BillingSection({
   async function handleChangePlan() {
     if (!changePlanKey) return;
     const targetLimits = getPlanLimits({ plan: changePlanKey, planStatus, trialEndsAt: null });
-    const currentLimits = getPlanLimits({ plan, planStatus, trialEndsAt: null });
-    if (
-      targetLimits.maxYards > 0 &&
-      currentLimits.maxYards > 0 &&
-      targetLimits.maxYards < currentLimits.maxYards
-    ) {
+    // Only open the picker modal when the user is actually over the new plan's
+    // yard limit. A downgrade that fits inside the new plan can switch directly.
+    if (targetLimits.maxYards > 0 && yards.length > targetLimits.maxYards) {
       setDowngradeTarget(changePlanKey);
       setChangePlanKey(null);
       return;
@@ -297,6 +294,13 @@ export function BillingSection({
             const selectedPlan = CHANGE_PLANS.find((p) => p.key === changePlanKey);
             const billedAmount = changePeriod === "monthly" ? selectedPlan?.monthly : selectedPlan?.annual;
             const billedSuffix = changePeriod === "monthly" ? "per month" : "per year";
+            const TIER_RANK: Record<string, number> = { trial: 0, home_basic: 1, home_plus: 2, professional: 3 };
+            const targetRank = TIER_RANK[changePlanKey] ?? 0;
+            const currentRank = TIER_RANK[currentPlan] ?? 0;
+            const isDowngradeChange = targetRank < currentRank;
+            const isUpgradeChange = targetRank > currentRank;
+            const confirmLabel = isDowngradeChange ? "Downgrade" : isUpgradeChange ? "Upgrade" : "Confirm switch";
+            const busyLabel = isDowngradeChange ? "Downgrading…" : isUpgradeChange ? "Upgrading…" : "Switching…";
             return (
             <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 space-y-3">
               <p className="text-sm font-medium text-gray-800">
@@ -339,7 +343,7 @@ export function BillingSection({
                   disabled={busy || changePlanKey === currentPlan}
                   className="bg-green-600 hover:bg-green-700"
                 >
-                  {busy ? "Switching…" : "Confirm switch"}
+                  {busy ? busyLabel : confirmLabel}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => setChangePlanKey(null)}>
                   Never mind
