@@ -150,14 +150,16 @@ export const GET = withAxiom(async (req: NextRequest) => {
       } catch { /* push failure non-fatal */ }
     });
 
-    // Day-14 prompt: nudge a second analysis for the "progress" aha.
-    const day14TargetDaysLeft = TRIAL_DAYS - 14; // 7
-    const day14Target = addDays(today, day14TargetDaysLeft);
+    // Day-14 prompt: nudge a second analysis for the "progress" aha. Uses
+    // createdAt-relative timing (not trialEndsAt) so users who earned the +7
+    // engagement bonus still get the prompt at day 14, not day 21.
+    const day14CreatedStart = addDays(today, -14);
+    const day14CreatedEnd = addDays(today, -13);
     const day14Users = await db.user.findMany({
       where: {
         planStatus: "trialing",
         day14SecondAnalysisPromptSentAt: null,
-        trialEndsAt: { gte: day14Target, lt: addDays(day14Target, 1) },
+        createdAt: { gte: day14CreatedStart, lt: day14CreatedEnd },
       },
       select: { id: true, email: true, name: true },
     });
