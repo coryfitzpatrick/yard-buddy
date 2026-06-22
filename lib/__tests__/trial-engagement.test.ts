@@ -57,11 +57,13 @@ describe("grantEngagementBonusIfEligible", () => {
     };
     // Stub Prisma findUnique to return the already-granted user.
     const orig = db.user.findUnique;
-    db.user.findUnique = (async () => fakeUser) as typeof db.user.findUnique;
+    db.user.findUnique = (async () => fakeUser) as unknown as typeof db.user.findUnique;
     try {
       const result = await grantEngagementBonusIfEligible(userId);
       expect(result.granted).toBe(false);
-      expect(result.reason).toBe("already_granted");
+      if (!result.granted) {
+        expect(result.reason).toBe("already_granted");
+      }
     } finally {
       db.user.findUnique = orig;
     }
