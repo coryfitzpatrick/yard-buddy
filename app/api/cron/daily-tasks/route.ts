@@ -174,6 +174,7 @@ async function runDailyTasks(
         {
           yards: {
             some: {
+              archivedAt: null,
               OR: [
                 { wateringDays: { isEmpty: false } },
                 { mowingDays: { isEmpty: false } },
@@ -202,6 +203,7 @@ async function runDailyTasks(
       weatherPushEnabled: true,
       yards: {
         where: {
+          archivedAt: null,
           OR: [
             { wateringDays: { isEmpty: false } },
             { mowingDays: { isEmpty: false } },

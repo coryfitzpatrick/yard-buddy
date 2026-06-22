@@ -28,7 +28,7 @@ export default async function YardPage() {
   if (!session?.user?.id) redirect("/login");
 
   const yards = await db.yard.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, archivedAt: null },
     orderBy: { createdAt: "asc" },
     select: {
       id: true,

@@ -12,7 +12,7 @@ export default async function AnalyzePage({
   if (!session?.user?.id) redirect("/login");
 
   const raw = await db.yard.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, archivedAt: null },
     orderBy: { createdAt: "asc" },
     include: {
       sections: {

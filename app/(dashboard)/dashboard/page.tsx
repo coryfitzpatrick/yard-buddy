@@ -36,7 +36,7 @@ export default async function DashboardPage() {
     : null;
 
   const yards = await db.yard.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, archivedAt: null },
     orderBy: { createdAt: "asc" },
     include: {
       sections: {

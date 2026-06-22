@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { yardSchema } from "@/lib/validations/yard";
-import { canCreateYard, getPlanLimits } from "@/lib/subscription";
+import { canCreateYard, getActiveYardCount, getPlanLimits } from "@/lib/subscription";
 import { uniqueSlug } from "@/lib/slug";
 import { withAxiom } from "@/lib/observability/logger";
 
@@ -41,7 +41,7 @@ export const POST = withAxiom(async (req: Request) => {
     where: { id: session.user.id },
     select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true, pausedUntil: true },
   });
-  const yardCount = await db.yard.count({ where: { userId: session.user.id } });
+  const yardCount = await getActiveYardCount(session.user.id);
 
   if (!canCreateYard(subUser, yardCount)) {
     const limits = getPlanLimits(subUser);
