@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { canSetSectionSchedule } from "@/lib/plan/can-set-section-schedule";
 import { withAxiom, logger } from "@/lib/observability/logger";
 import { emitWateringApplied, emitMowingApplied } from "@/lib/observability/events";
-import { grantEngagementBonusIfEligible } from "@/lib/subscription";
+import { triggerEngagementBonusCheck } from "@/lib/subscription";
 
 const DAY = z.enum(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
 const TIME = z.string().regex(/^\d{2}:\d{2}$/).nullable();
@@ -81,14 +81,7 @@ export const POST = withAxiom(async (req: NextRequest, { params }: { params: Pro
   emitMowingApplied({ sectionId, plan: section.yard.user.plan, target });
   logger.info("schedule applied", { sectionId, target });
 
-  // Fire-and-forget engagement bonus check. Failure here must not break the
-  // write path the user is waiting on; log only.
-  grantEngagementBonusIfEligible(session.user.id).catch((err) => {
-    logger.warn("engagement-bonus: grant check failed", {
-      userId: session.user.id,
-      err: err instanceof Error ? err.message : String(err),
-    });
-  });
+  triggerEngagementBonusCheck(session.user.id);
 
   return NextResponse.json({ target, watering, mowing });
 });
