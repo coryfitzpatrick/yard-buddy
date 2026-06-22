@@ -26,7 +26,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
   const sectionParam = params.section ?? "";
 
   const yards = await db.yard.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, archivedAt: null },
     select: { id: true, slug: true, name: true, sections: { select: { id: true, slug: true, name: true } } },
     orderBy: { name: "asc" },
   });
@@ -53,9 +53,9 @@ export default async function CalendarPage({ searchParams }: PageProps) {
   const tasks = await db.lawnTask.findMany({
     where: {
       yardSection: {
-        yard: { userId: session.user.id },
+        yard: { userId: session.user.id, archivedAt: null },
         ...(sectionParam ? { slug: sectionParam } : {}),
-        ...(yardParam ? { yard: { slug: yardParam } } : {}),
+        ...(yardParam ? { yard: { slug: yardParam, archivedAt: null } } : {}),
       },
       scheduledStart: { lte: gridEnd },
       scheduledEnd: { gte: gridStart },

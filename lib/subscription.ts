@@ -140,6 +140,7 @@ export async function userHasAnySchedule(userId: string): Promise<boolean> {
   const result = await db.yard.findFirst({
     where: {
       userId,
+      archivedAt: null,
       OR: [
         { wateringDays: { isEmpty: false } },
         { mowingDays: { isEmpty: false } },
@@ -155,7 +156,7 @@ export async function userHasAnyCompletedTask(userId: string): Promise<boolean> 
   const result = await db.lawnTask.findFirst({
     where: {
       completedAt: { not: null },
-      yardSection: { yard: { userId } },
+      yardSection: { yard: { userId, archivedAt: null } },
     },
     select: { id: true },
   });
