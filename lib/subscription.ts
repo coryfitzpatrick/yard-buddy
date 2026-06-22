@@ -98,6 +98,19 @@ export function canCreateYard(user: SubscriptionUser, currentYardCount: number):
   return currentYardCount < limits.maxYards;
 }
 
+export function hasEverPaid(user: { stripeCustomerId?: string | null }): boolean {
+  return user.stripeCustomerId != null;
+}
+
+export function eligiblePlansForUser(user: { stripeCustomerId?: string | null }): Plan[] {
+  const paidPlans: Plan[] = ["home_basic", "home_plus", "professional"];
+  return hasEverPaid(user) ? paidPlans : ["trial", ...paidPlans];
+}
+
+export async function getActiveYardCount(userId: string): Promise<number> {
+  return db.yard.count({ where: { userId, archivedAt: null } });
+}
+
 export function canPause(user: SubscriptionUser): boolean {
   if (user.planStatus !== "active") return false;
   if (user.plan === "trial") return false;
