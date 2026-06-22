@@ -12,24 +12,24 @@ export const yardSchema = z.object({
   streetAddress: z.string().optional(),
   lotSqft: z.number().int().positive().optional(),
   buildingSqft: z.number().int().positive().optional(),
-  wateringDaysPerWeek: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().min(1).max(7).optional()
-  ),
   wateringMinutesPerSession: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().int().min(1).max(120).optional()
-  ),
-  mowingDaysPerWeek: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().min(1).max(7).optional()
   ),
   mowingHeightInches: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().min(1).max(5).optional()
   ),
-  mowingSchedule: z.string().optional(),
-  wateringSchedule: z.string().optional(),
+  wateringDays: z.array(z.enum(["Sun","Mon","Tue","Wed","Thu","Fri","Sat"])).optional(),
+  wateringTime: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : v),
+    z.string().regex(/^\d{2}:\d{2}$/).optional()
+  ),
+  mowingDays: z.array(z.enum(["Sun","Mon","Tue","Wed","Thu","Fri","Sat"])).optional(),
+  mowingTime: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : v),
+    z.string().regex(/^\d{2}:\d{2}$/).optional()
+  ),
 });
 
 export type YardInput = z.infer<typeof yardSchema>;
@@ -72,24 +72,24 @@ export const yardSectionSchema = z.object({
   ),
   soilMoisture: z.enum(["dry", "moderate", "moist"]).optional(),
   notes: z.string().max(2000).optional(),
-  wateringDaysPerWeek: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().min(1).max(7).optional()
-  ),
   wateringMinutesPerSession: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().int().min(1).optional()
-  ),
-  mowingDaysPerWeek: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().min(1).max(7).optional()
   ),
   mowingHeightInches: z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     z.number().min(1).max(5).optional()
   ),
-  mowingSchedule: z.string().optional(),
-  wateringSchedule: z.string().optional(),
+  wateringDays: z.array(z.enum(["Sun","Mon","Tue","Wed","Thu","Fri","Sat"])).optional(),
+  wateringTime: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : v),
+    z.string().regex(/^\d{2}:\d{2}$/).optional()
+  ),
+  mowingDays: z.array(z.enum(["Sun","Mon","Tue","Wed","Thu","Fri","Sat"])).optional(),
+  mowingTime: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : v),
+    z.string().regex(/^\d{2}:\d{2}$/).optional()
+  ),
 });
 
 export type YardSectionInput = z.infer<typeof yardSectionSchema>;
