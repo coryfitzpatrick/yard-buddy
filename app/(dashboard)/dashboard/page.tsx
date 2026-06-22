@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { DashboardInteractiveSection } from "@/components/dashboard/DashboardInteractiveSection";
 import { Greeting } from "@/components/dashboard/Greeting";
 import NotInApp from "@/components/NotInApp";
-import { getPlanLimits, getDaysUntilDeletion } from "@/lib/subscription";
+import { computeEngagementStatus, userHasAnySchedule, userHasAnyCompletedTask, getPlanLimits, getDaysUntilDeletion } from "@/lib/subscription";
+import { TrialProgressCard } from "@/components/dashboard/TrialProgressCard";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -19,6 +20,7 @@ export default async function DashboardPage() {
       trialEndsAt: true,
       currentPeriodEnd: true,
       pausedUntil: true,
+      trialEngagementBonusGrantedAt: true,
     },
   });
 
@@ -109,9 +111,42 @@ export default async function DashboardPage() {
     }))
   );
 
+  const isTrial = user?.planStatus === "trialing" || user?.plan === "trial";
+  let engagement = null as null | {
+    scheduleSet: boolean;
+    taskCompleted: boolean;
+    bonusAlreadyGranted: boolean;
+    bonusGrantedAt: Date | null;
+    trialEndsAt: Date | null;
+  };
+  if (isTrial && user) {
+    const [anyScheduleSet, anyTaskCompleted] = await Promise.all([
+      userHasAnySchedule(session.user.id),
+      userHasAnyCompletedTask(session.user.id),
+    ]);
+    const status = computeEngagementStatus(user, { anyScheduleSet, anyTaskCompleted });
+    engagement = {
+      scheduleSet: status.scheduleSet,
+      taskCompleted: status.taskCompleted,
+      bonusAlreadyGranted: status.bonusAlreadyGranted,
+      bonusGrantedAt: user.trialEngagementBonusGrantedAt,
+      trialEndsAt: user.trialEndsAt,
+    };
+  }
+
   return (
     <div className="px-4 py-6 pb-20 sm:pb-6 space-y-6">
       <Greeting name={session.user.name?.split(" ")[0] ?? "there"} />
+
+      {engagement && (
+        <TrialProgressCard
+          scheduleSet={engagement.scheduleSet}
+          taskCompleted={engagement.taskCompleted}
+          bonusAlreadyGranted={engagement.bonusAlreadyGranted}
+          bonusGrantedAt={engagement.bonusGrantedAt}
+          trialEndsAt={engagement.trialEndsAt}
+        />
+      )}
 
       {daysUntilDeletion !== null && (
         <NotInApp>
