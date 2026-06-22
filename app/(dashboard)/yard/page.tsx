@@ -3,8 +3,9 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowRight, Pencil } from "lucide-react";
+import { Plus, ArrowRight, Pencil, Lock } from "lucide-react";
 import { YardDeleteButton } from "@/components/yard/YardDeleteButton";
+import { canCreateYard, getPlanLimits } from "@/lib/subscription";
 
 function formatScheduleSummary(
   days: string[],
@@ -54,15 +55,40 @@ export default async function YardPage() {
     },
   });
 
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      plan: true,
+      planStatus: true,
+      trialEndsAt: true,
+      currentPeriodEnd: true,
+      pausedUntil: true,
+    },
+  });
+
+  const canAdd = user ? canCreateYard(user, yards.length) : false;
+  const planLimits = user ? getPlanLimits(user) : null;
+  const limitCopy = planLimits && planLimits.maxYards > 0
+    ? `Track up to ${planLimits.maxYards === 1 ? "1 yard on the free trial" : `${planLimits.maxYards} yards on your current plan`}.`
+    : "";
+
   return (
     <div className="px-4 py-8 pb-20 sm:pb-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">My Yards</h1>
-        <Link href="/yard/setup">
-          <Button className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4" />Add Yard
-          </Button>
-        </Link>
+        {canAdd ? (
+          <Link href="/yard/setup">
+            <Button className="bg-green-600 hover:bg-green-700">
+              <Plus className="w-4 h-4" />Add Yard
+            </Button>
+          </Link>
+        ) : (
+          <Link href="/pricing" title={limitCopy}>
+            <Button variant="outline" className="text-gray-500">
+              <Lock className="w-4 h-4 mr-1" />Add Yard (upgrade)
+            </Button>
+          </Link>
+        )}
       </div>
 
       {yards.length === 0 ? (
@@ -153,6 +179,15 @@ export default async function YardPage() {
               )}
             </div>
           );})}
+          {!canAdd && (
+            <Link
+              href="/pricing"
+              className="block rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-500 hover:border-green-400 hover:text-green-700 transition-colors"
+            >
+              <Lock className="w-4 h-4 inline-block mr-1.5 align-text-bottom" />
+              {limitCopy} Upgrade to track more.
+            </Link>
+          )}
         </div>
       )}
     </div>
