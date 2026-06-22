@@ -9,12 +9,17 @@ export const POST = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const { plan, period, archiveYardIds } = body as {
-    plan?: string;
-    period?: string;
-    archiveYardIds?: string[];
-  };
+  let body: { plan?: string; period?: string; archiveYardIds?: string[] };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { plan, period, archiveYardIds } = body;
+
+  if (archiveYardIds !== undefined && (!Array.isArray(archiveYardIds) || !archiveYardIds.every((id) => typeof id === "string"))) {
+    return NextResponse.json({ error: "archiveYardIds must be a string array" }, { status: 400 });
+  }
 
   if (plan === "trial") {
     return NextResponse.json({ error: "Cannot switch to trial" }, { status: 400 });
@@ -98,17 +103,28 @@ export const POST = withAxiom(async (req: NextRequest) => {
     return NextResponse.json({ error: "Couldn't process the plan change. Check your payment method and try again." }, { status: 402 });
   }
 
-  await db.$transaction([
-    ...(overLimit && archiveYardIds
-      ? [
-          db.yard.updateMany({
-            where: { id: { in: archiveYardIds }, userId: session.user.id },
-            data: { archivedAt: new Date() },
-          }),
-        ]
-      : []),
-    db.user.update({ where: { id: session.user.id }, data: { plan } }),
-  ]);
+  try {
+    await db.$transaction([
+      ...(overLimit && archiveYardIds
+        ? [
+            db.yard.updateMany({
+              where: { id: { in: archiveYardIds }, userId: session.user.id },
+              data: { archivedAt: new Date() },
+            }),
+          ]
+        : []),
+      db.user.update({ where: { id: session.user.id }, data: { plan } }),
+    ]);
+  } catch (err) {
+    logger.error("change-plan: prisma transaction failed after stripe succeeded", {
+      userId: session.user.id,
+      plan,
+      overLimit,
+      archiveYardIdsCount: archiveYardIds?.length ?? 0,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    return NextResponse.json({ error: "Plan updated in Stripe but our records failed. Refresh to retry." }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 });
