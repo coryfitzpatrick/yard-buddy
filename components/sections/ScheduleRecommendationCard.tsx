@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Lock } from "lucide-react";
 import { distributeWateringDays, distributeMowingDays } from "@/lib/schedules/distribute-days";
 
 type Kind = "watering" | "mowing";
@@ -209,8 +210,18 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
         </button>
       </div>
       {error && <p role="alert" className="text-sm text-red-700 mt-2">{error}</p>}
-      {plan === "home_basic" && (
-        <p className="text-xs text-amber-700 mt-3">Applies to your whole yard. Upgrade to Home Plus to override per section.</p>
+      {(plan === "trial" || plan === "home_basic") && (
+        <Link
+          href="/pricing"
+          className="mt-4 flex items-center gap-3 rounded-lg border border-dashed border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 hover:border-emerald-400 hover:bg-emerald-100 transition-colors"
+        >
+          <Lock className="w-4 h-4 shrink-0 text-emerald-600" />
+          <span className="flex-1">
+            <span className="font-semibold">Override per section</span>{" "}
+            <span className="text-emerald-700">with Home Plus</span>
+          </span>
+          <span className="text-xs text-emerald-700 underline">Upgrade</span>
+        </Link>
       )}
     </div>
   );

@@ -39,7 +39,7 @@ describe("PersonalizedScheduleCard - picker mode", () => {
     expect(screen.getByRole("button", { name: /skip for now/i })).toBeInTheDocument();
   });
 
-  it("hides apply-to-yard checkbox for home_basic", () => {
+  it("shows locked per-section teaser for home_basic", () => {
     render(
       <PersonalizedScheduleCard
         sectionId="sec_1"
@@ -49,6 +49,20 @@ describe("PersonalizedScheduleCard - picker mode", () => {
       />,
     );
     expect(screen.queryByLabelText(/apply to whole yard/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/save just for this section/i)).toBeInTheDocument();
+  });
+
+  it("shows locked per-section teaser for trial", () => {
+    render(
+      <PersonalizedScheduleCard
+        sectionId="sec_1"
+        plan="trial"
+        latestAnalysis={baseAnalysis}
+        effective={emptyEffective}
+      />,
+    );
+    expect(screen.queryByLabelText(/apply to whole yard/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/save just for this section/i)).toBeInTheDocument();
   });
 
   it("shows apply-to-yard checkbox for home_plus", () => {
