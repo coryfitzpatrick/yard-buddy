@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyCronAuth } from "@/lib/cron/auth";
-import { resend, buildTrialReminderEmail, buildDay5ScheduleNudgeEmail } from "@/lib/email";
-import { userHasAnySchedule } from "@/lib/subscription";
+import { resend, buildTrialReminderEmail, buildDay5ScheduleNudgeEmail, buildDay10TaskNudgeEmail } from "@/lib/email";
+import { userHasAnySchedule, userHasAnyCompletedTask } from "@/lib/subscription";
 import { TRIAL_DAYS } from "@/lib/time";
 import { sendPushToUser } from "@/lib/push/send";
 import { mapWithConcurrency } from "@/lib/cron/concurrency";
@@ -93,6 +93,61 @@ export const GET = withAxiom(async (req: NextRequest) => {
       } catch {
         /* push failure non-fatal */
       }
+    });
+
+    // Day-10 nudge: users with a schedule but no completed task.
+    const day10TargetDaysLeft = TRIAL_DAYS - 10; // 11
+    const day10Target = addDays(today, day10TargetDaysLeft);
+    const day10Users = await db.user.findMany({
+      where: {
+        planStatus: "trialing",
+        day10NudgeSentAt: null,
+        trialEngagementBonusGrantedAt: null,
+        trialEndsAt: { gte: day10Target, lt: addDays(day10Target, 1) },
+      },
+      select: { id: true, email: true, name: true },
+    });
+    await mapWithConcurrency(day10Users, EMAIL_CONCURRENCY, async (user) => {
+      if (!user.email) return;
+      const [hasSchedule, hasTask] = await Promise.all([
+        userHasAnySchedule(user.id),
+        userHasAnyCompletedTask(user.id),
+      ]);
+      if (!hasSchedule || hasTask) return; // either condition makes the nudge irrelevant.
+
+      // Claim-first idempotency: mark the flag before sending to prevent retry double-sends.
+      const claim = await db.user.updateMany({
+        where: { id: user.id, day10NudgeSentAt: null },
+        data: { day10NudgeSentAt: new Date() },
+      });
+      if (claim.count === 0) return;
+
+      const { subject, html } = buildDay10TaskNudgeEmail({
+        userName: user.name?.split(" ")[0] ?? "there",
+        dashboardUrl: `${baseUrl}/dashboard`,
+      });
+      try {
+        await resend.emails.send({
+          from: "Yard Analyzer <noreply@yardanalyzer.com>",
+          to: user.email,
+          subject,
+          html,
+        });
+        sent++;
+      } catch (err) {
+        failed++;
+        logger.error("trial-reminders: day10 email send failed", {
+          userId: user.id,
+          err: err instanceof Error ? err.message : String(err),
+        });
+      }
+      try {
+        await sendPushToUser(user.id, {
+          title: "Almost there",
+          body: "Mark one task as done to earn 7 more trial days.",
+          data: { kind: "trial_day10" },
+        });
+      } catch { /* push failure non-fatal */ }
     });
 
     for (const daysLeft of reminderDays) {

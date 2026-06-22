@@ -275,6 +275,31 @@ export function buildDay5ScheduleNudgeEmail(opts: {
   return { subject, html };
 }
 
+export function buildDay10TaskNudgeEmail(opts: {
+  userName: string;
+  dashboardUrl: string;
+}): { subject: string; html: string } {
+  const { userName, dashboardUrl } = opts;
+  const subject = "Complete a task to earn 7 more trial days";
+  const html = `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">
+    Your schedule is set, nice work. Mark any one of your recommended tasks as done to earn
+    <strong>7 more days of free trial</strong>.
+  </p>
+  <p style="margin:24px 0;">
+    <a href="${dashboardUrl}" style="background:#16a34a;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600;">
+      Open my dashboard
+    </a>
+  </p>
+</body>
+</html>`;
+  return { subject, html };
+}
+
 export function buildPasswordResetEmail(opts: {
   userName: string;
   resetUrl: string;
