@@ -19,7 +19,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Search } from "lucide-react";
 import { toSqft, toDisplaySize } from "@/lib/size-utils";
 import { ScheduleEditor } from "./ScheduleEditor";
+import { WateringWarning, MowingWarning } from "@/components/yard/ScheduleWarnings";
 import { canSetSectionSchedule } from "@/lib/plan/can-set-section-schedule";
+
+interface AnalysisInput {
+  wateringSuggestedDaysPerWeek?: number | null;
+  wateringSuggestedMinutesPerSession?: number | null;
+  mowingSuggestedDaysPerWeek?: number | null;
+  mowingSuggestedHeightInches?: number | null;
+}
 
 interface Props {
   yardId: string;
@@ -28,13 +36,21 @@ interface Props {
   lotSqft?: number;
   buildingSqft?: number;
   streetAddress?: string;
-  initialData?: Partial<YardSectionFormInput & { id: string; slug: string }>;
-  yardMowingSchedule?: string | null;
-  yardWateringSchedule?: string | null;
+  initialData?: Partial<YardSectionFormInput & {
+    id: string;
+    slug: string;
+    wateringDays?: string[] | null;
+    wateringTime?: string | null;
+    mowingDays?: string[] | null;
+    mowingTime?: string | null;
+  }>;
   plan?: string | null;
-  yardWateringDaysPerWeek?: number | null;
+  latestAnalysis?: AnalysisInput | null;
+  yardWateringDays?: string[] | null;
+  yardWateringTime?: string | null;
   yardWateringMinutesPerSession?: number | null;
-  yardMowingDaysPerWeek?: number | null;
+  yardMowingDays?: string[] | null;
+  yardMowingTime?: string | null;
   yardMowingHeightInches?: number | null;
   // Hide the area-type picker and section-name input. Useful when the section
   // represents the whole yard (only section in the yard) and these fields
@@ -44,7 +60,7 @@ interface Props {
 
 
 
-export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, yardMowingSchedule, yardWateringSchedule, plan, yardWateringDaysPerWeek, yardWateringMinutesPerSession, yardMowingDaysPerWeek, yardMowingHeightInches, hideSectionIdentity = false }: Props) {
+export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, streetAddress: initialStreetAddress, initialData, plan, latestAnalysis = null, yardWateringDays, yardWateringTime, yardWateringMinutesPerSession, yardMowingDays, yardMowingTime, yardMowingHeightInches, hideSectionIdentity = false }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const isEdit = !!initialData?.id;
@@ -65,12 +81,12 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         soilTestSource: initialData?.soilTestSource ?? undefined,
         soilTestedAt: initialData?.soilTestedAt as YardSectionFormInput["soilTestedAt"],
         notes: initialData?.notes ?? undefined,
-        wateringDaysPerWeek: initialData?.wateringDaysPerWeek as YardSectionFormInput["wateringDaysPerWeek"],
         wateringMinutesPerSession: initialData?.wateringMinutesPerSession as YardSectionFormInput["wateringMinutesPerSession"],
-        mowingDaysPerWeek: initialData?.mowingDaysPerWeek as YardSectionFormInput["mowingDaysPerWeek"],
         mowingHeightInches: initialData?.mowingHeightInches as YardSectionFormInput["mowingHeightInches"],
-        mowingSchedule: initialData?.mowingSchedule ?? undefined,
-        wateringSchedule: initialData?.wateringSchedule ?? undefined,
+        wateringDays: (initialData?.wateringDays ?? []) as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[],
+        wateringTime: initialData?.wateringTime ?? undefined,
+        mowingDays: (initialData?.mowingDays ?? []) as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[],
+        mowingTime: initialData?.mowingTime ?? undefined,
         yardSizeSqft: (initialData?.yardSizeSqft ?? (lotSqft && !initialData ? (lotSqft - (buildingSqft ?? 0)) || lotSqft : undefined)) as YardSectionFormInput["yardSizeSqft"],
       },
     });
@@ -88,9 +104,6 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
   const [lookingUp, setLookingUp] = useState(false);
   const [lookupNote, setLookupNote] = useState<string | null>(null);
   const [sizeUnit, setSizeUnit] = useState<"sqft" | "acres">("sqft");
-
-  const mowingSchedule = watch("mowingSchedule") as string | undefined;
-  const wateringSchedule = watch("wateringSchedule") as string | undefined;
 
   const [sizeDisplay, setSizeDisplay] = useState(() => {
     if (initialData?.yardSizeSqft) return String(initialData.yardSizeSqft);
@@ -126,7 +139,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         setValue("yardSizeSqft", sqft as YardSectionFormInput["yardSizeSqft"]);
         if (data.usableSqft && data.buildingSqft) {
           setLookupNote(
-            `Lot: ~${data.lotSqft.toLocaleString()} sq ft · Home: ~${data.buildingSqft.toLocaleString()} sq ft · Lawn: ~${data.usableSqft.toLocaleString()} sq ft. Adjust below for just this section.`
+            `Lot: ~${data.lotSqft.toLocaleString()} sq ft, Home: ~${data.buildingSqft.toLocaleString()} sq ft, Lawn: ~${data.usableSqft.toLocaleString()} sq ft. Adjust below for just this section.`
           );
         } else {
           setLookupNote(`Lot: ~${data.lotSqft.toLocaleString()} sq ft. Adjust below for just this section.`);
@@ -202,7 +215,7 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
         {hasYardLotData ? (
           <div className="rounded-lg bg-green-50 border border-green-100 px-4 py-3 text-sm text-green-800">
             {buildingSqft
-              ? <>Lot: ~{lotSqft!.toLocaleString()} sq ft · Home: ~{buildingSqft.toLocaleString()} sq ft · Lawn: ~{usableSqft!.toLocaleString()} sq ft</>
+              ? <>Lot: ~{lotSqft!.toLocaleString()} sq ft, Home: ~{buildingSqft.toLocaleString()} sq ft, Lawn: ~{usableSqft!.toLocaleString()} sq ft</>
               : <>Lot: ~{lotSqft!.toLocaleString()} sq ft</>
             }
             <span className="text-green-600">. Adjust the size below for just this section.</span>
@@ -319,59 +332,47 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
           <h3 className="text-sm font-semibold text-gray-700">Schedule Overrides</h3>
           <p className="text-xs text-gray-400">Override the yard-level defaults for this section only.</p>
           {canSetSectionSchedule(plan ?? null) ? (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label>Watering days / week <span className="text-gray-400 font-normal">(optional)</span></Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={7}
-                  placeholder={yardWateringDaysPerWeek?.toString() ?? ""}
-                  {...register("wateringDaysPerWeek")}
-                />
-                {errors.wateringDaysPerWeek && (
-                  <p className="text-sm text-red-500">{errors.wateringDaysPerWeek.message}</p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label>Watering min. / session <span className="text-gray-400 font-normal">(optional)</span></Label>
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder={yardWateringMinutesPerSession?.toString() ?? ""}
-                  {...register("wateringMinutesPerSession")}
-                />
-                {errors.wateringMinutesPerSession && (
-                  <p className="text-sm text-red-500">{errors.wateringMinutesPerSession.message}</p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label>Mowing days / week <span className="text-gray-400 font-normal">(optional)</span></Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={7}
-                  placeholder={yardMowingDaysPerWeek?.toString() ?? ""}
-                  {...register("mowingDaysPerWeek")}
-                />
-                {errors.mowingDaysPerWeek && (
-                  <p className="text-sm text-red-500">{errors.mowingDaysPerWeek.message}</p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label>Mowing height (in.) <span className="text-gray-400 font-normal">(optional)</span></Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={5}
-                  step={0.5}
-                  placeholder={yardMowingHeightInches?.toString() ?? ""}
-                  {...register("mowingHeightInches")}
-                />
-                {errors.mowingHeightInches && (
-                  <p className="text-sm text-red-500">{errors.mowingHeightInches.message}</p>
-                )}
-              </div>
+            <div className="space-y-4">
+              <ScheduleEditor
+                kind="watering"
+                label="Watering schedule"
+                days={watch("wateringDays") ?? []}
+                time={(watch("wateringTime") as string | null | undefined) ?? null}
+                secondaryValue={(watch("wateringMinutesPerSession") as number | null | undefined) ?? null}
+                onDaysChange={(v) => setValue("wateringDays", v as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[])}
+                onTimeChange={(v) => setValue("wateringTime", v ?? undefined)}
+                onSecondaryChange={(v) => setValue("wateringMinutesPerSession", v ?? undefined)}
+                yardDefaultHint={
+                  yardWateringDays && yardWateringDays.length > 0
+                    ? `${yardWateringDays.join(", ")}${yardWateringTime ? `, ${yardWateringTime}` : ""}${yardWateringMinutesPerSession != null ? `, ${yardWateringMinutesPerSession} min` : ""}`
+                    : null
+                }
+              />
+              <WateringWarning
+                latestAnalysis={latestAnalysis}
+                currentDayCount={(watch("wateringDays") ?? []).length}
+                currentMinutes={(watch("wateringMinutesPerSession") as number | null | undefined) ?? null}
+              />
+              <ScheduleEditor
+                kind="mowing"
+                label="Mowing schedule"
+                days={watch("mowingDays") ?? []}
+                time={(watch("mowingTime") as string | null | undefined) ?? null}
+                secondaryValue={(watch("mowingHeightInches") as number | null | undefined) ?? null}
+                onDaysChange={(v) => setValue("mowingDays", v as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[])}
+                onTimeChange={(v) => setValue("mowingTime", v ?? undefined)}
+                onSecondaryChange={(v) => setValue("mowingHeightInches", v ?? undefined)}
+                yardDefaultHint={
+                  yardMowingDays && yardMowingDays.length > 0
+                    ? `${yardMowingDays.join(", ")}${yardMowingTime ? `, ${yardMowingTime}` : ""}${yardMowingHeightInches != null ? `, ${yardMowingHeightInches} in` : ""}`
+                    : null
+                }
+              />
+              <MowingWarning
+                latestAnalysis={latestAnalysis}
+                currentDayCount={(watch("mowingDays") ?? []).length}
+                currentHeight={(watch("mowingHeightInches") as number | null | undefined) ?? null}
+              />
             </div>
           ) : (
             <p className="text-sm text-gray-500">
@@ -381,30 +382,6 @@ export function SectionForm({ yardId, yardSlug, zipCode, lotSqft, buildingSqft, 
               </Link>
             </p>
           )}
-        </div>
-
-        <div id="schedule" className="space-y-4 border-t border-gray-100 pt-4">
-          <h3 className="text-sm font-semibold text-gray-700">Personalized Reminders</h3>
-
-          <ScheduleEditor
-            kind="mow"
-            label="Mowing schedule"
-            value={mowingSchedule}
-            onChange={(v) => setValue("mowingSchedule", v)}
-            yardDefault={yardMowingSchedule}
-          />
-
-          <ScheduleEditor
-            kind="water"
-            label="Watering schedule"
-            value={wateringSchedule}
-            onChange={(v) => setValue("wateringSchedule", v)}
-            yardDefault={yardWateringSchedule}
-          />
-
-          <p className="text-xs text-gray-400">
-            These are your own notes. They won&apos;t affect your lawn analysis.
-          </p>
         </div>
       </div>
 

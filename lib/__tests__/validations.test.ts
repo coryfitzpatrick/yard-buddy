@@ -153,35 +153,37 @@ describe("yardSectionSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts mowingSchedule as a short string", () => {
-    const result = yardSectionSchema.safeParse({ ...base, mowingSchedule: "Weekly at 3.5 inches" });
+  it("accepts mowingDays as a valid day array", () => {
+    const result = yardSectionSchema.safeParse({ ...base, mowingDays: ["Mon", "Thu"] });
     expect(result.success).toBe(true);
+    if (result.success) expect(result.data.mowingDays).toEqual(["Mon", "Thu"]);
   });
 
-  it("accepts mowingSchedule longer than 500 chars (AI-generated text)", () => {
-    const result = yardSectionSchema.safeParse({ ...base, mowingSchedule: "x".repeat(501) });
-    expect(result.success).toBe(true);
+  it("rejects mowingDays with an invalid day name", () => {
+    const result = yardSectionSchema.safeParse({ ...base, mowingDays: ["Monday"] });
+    expect(result.success).toBe(false);
   });
 
-  it("accepts mowingSchedule as absent", () => {
+  it("accepts mowingDays as absent", () => {
     const result = yardSectionSchema.safeParse({ ...base });
     expect(result.success).toBe(true);
-    if (result.success) expect(result.data.mowingSchedule).toBeUndefined();
+    if (result.success) expect(result.data.mowingDays).toBeUndefined();
   });
 
-  it("accepts wateringSchedule as a short string", () => {
-    const result = yardSectionSchema.safeParse({ ...base, wateringSchedule: "Mon/Wed/Fri mornings, 20 min" });
+  it("accepts wateringDays as a valid day array", () => {
+    const result = yardSectionSchema.safeParse({ ...base, wateringDays: ["Mon", "Wed", "Fri"] });
     expect(result.success).toBe(true);
+    if (result.success) expect(result.data.wateringDays).toEqual(["Mon", "Wed", "Fri"]);
   });
 
-  it("accepts wateringSchedule longer than 500 chars (AI-generated text)", () => {
-    const result = yardSectionSchema.safeParse({ ...base, wateringSchedule: "x".repeat(501) });
-    expect(result.success).toBe(true);
+  it("rejects wateringDays with an invalid day name", () => {
+    const result = yardSectionSchema.safeParse({ ...base, wateringDays: ["Wednesday"] });
+    expect(result.success).toBe(false);
   });
 
-  it("accepts wateringSchedule as absent", () => {
+  it("accepts wateringDays as absent", () => {
     const result = yardSectionSchema.safeParse({ ...base });
     expect(result.success).toBe(true);
-    if (result.success) expect(result.data.wateringSchedule).toBeUndefined();
+    if (result.success) expect(result.data.wateringDays).toBeUndefined();
   });
 });

@@ -20,11 +20,11 @@ export default async function NewSectionPage({ params }: { params: Promise<{ id:
         streetAddress: true,
         lotSqft: true,
         buildingSqft: true,
-        mowingSchedule: true,
-        wateringSchedule: true,
-        wateringDaysPerWeek: true,
+        wateringDays: true,
+        wateringTime: true,
         wateringMinutesPerSession: true,
-        mowingDaysPerWeek: true,
+        mowingDays: true,
+        mowingTime: true,
         mowingHeightInches: true,
       },
     }),
@@ -47,13 +47,14 @@ export default async function NewSectionPage({ params }: { params: Promise<{ id:
         zipCode={yard.zipCode}
         lotSqft={yard.lotSqft ?? undefined}
         buildingSqft={yard.buildingSqft ?? undefined}
-        yardMowingSchedule={yard.mowingSchedule}
-        yardWateringSchedule={yard.wateringSchedule}
         plan={subscriptionUser?.plan ?? null}
-        yardWateringDaysPerWeek={yard.wateringDaysPerWeek}
-        yardWateringMinutesPerSession={yard.wateringMinutesPerSession}
-        yardMowingDaysPerWeek={yard.mowingDaysPerWeek}
-        yardMowingHeightInches={yard.mowingHeightInches}
+        latestAnalysis={null}
+        yardWateringDays={yard.wateringDays}
+        yardWateringTime={yard.wateringTime ?? null}
+        yardWateringMinutesPerSession={yard.wateringMinutesPerSession ?? null}
+        yardMowingDays={yard.mowingDays}
+        yardMowingTime={yard.mowingTime ?? null}
+        yardMowingHeightInches={yard.mowingHeightInches ?? null}
       />
     </div>
   );

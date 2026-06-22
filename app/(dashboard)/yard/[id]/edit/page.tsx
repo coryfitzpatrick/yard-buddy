@@ -128,8 +128,13 @@ export default async function EditYardPage({
             buildingSqft={yard.buildingSqft ?? undefined}
             streetAddress={yard.streetAddress ?? undefined}
             plan={subscriptionUser?.plan ?? null}
-            yardWateringMinutesPerSession={yard.wateringMinutesPerSession}
-            yardMowingHeightInches={yard.mowingHeightInches}
+            latestAnalysis={latestAnalysis}
+            yardWateringDays={yard.wateringDays}
+            yardWateringTime={yard.wateringTime ?? null}
+            yardWateringMinutesPerSession={yard.wateringMinutesPerSession ?? null}
+            yardMowingDays={yard.mowingDays}
+            yardMowingTime={yard.mowingTime ?? null}
+            yardMowingHeightInches={yard.mowingHeightInches ?? null}
             hideSectionIdentity
             initialData={{
               id: onlySection.id,

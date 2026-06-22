@@ -26,26 +26,38 @@ export default async function EditSectionPage({
   ]);
   if (!yard) notFound();
 
-  const section = await db.yardSection.findFirst({
-    where: { slug: sectionSlug, yardId: yard.id },
-    include: {
-      yard: {
-        select: {
-          name: true,
-          zipCode: true,
-          lotSqft: true,
-          buildingSqft: true,
-          streetAddress: true,
-          mowingSchedule: true,
-          wateringSchedule: true,
-          wateringDaysPerWeek: true,
-          wateringMinutesPerSession: true,
-          mowingDaysPerWeek: true,
-          mowingHeightInches: true,
+  const [section, latestAnalysis] = await Promise.all([
+    db.yardSection.findFirst({
+      where: { slug: sectionSlug, yardId: yard.id },
+      include: {
+        yard: {
+          select: {
+            name: true,
+            zipCode: true,
+            lotSqft: true,
+            buildingSqft: true,
+            streetAddress: true,
+            wateringDays: true,
+            wateringTime: true,
+            wateringMinutesPerSession: true,
+            mowingDays: true,
+            mowingTime: true,
+            mowingHeightInches: true,
+          },
         },
       },
-    },
-  });
+    }),
+    db.lawnAnalysis.findFirst({
+      where: { yardSection: { slug: sectionSlug, yardId: yard.id } },
+      orderBy: { createdAt: "desc" },
+      select: {
+        wateringSuggestedDaysPerWeek: true,
+        wateringSuggestedMinutesPerSession: true,
+        mowingSuggestedDaysPerWeek: true,
+        mowingSuggestedHeightInches: true,
+      },
+    }),
+  ]);
   if (!section) notFound();
 
   return (
@@ -61,13 +73,14 @@ export default async function EditSectionPage({
         lotSqft={section.yard.lotSqft ?? undefined}
         buildingSqft={section.yard.buildingSqft ?? undefined}
         streetAddress={section.yard.streetAddress ?? undefined}
-        yardMowingSchedule={section.yard.mowingSchedule}
-        yardWateringSchedule={section.yard.wateringSchedule}
         plan={subscriptionUser?.plan ?? null}
-        yardWateringDaysPerWeek={section.yard.wateringDaysPerWeek}
-        yardWateringMinutesPerSession={section.yard.wateringMinutesPerSession}
-        yardMowingDaysPerWeek={section.yard.mowingDaysPerWeek}
-        yardMowingHeightInches={section.yard.mowingHeightInches}
+        latestAnalysis={latestAnalysis}
+        yardWateringDays={section.yard.wateringDays}
+        yardWateringTime={section.yard.wateringTime ?? null}
+        yardWateringMinutesPerSession={section.yard.wateringMinutesPerSession ?? null}
+        yardMowingDays={section.yard.mowingDays}
+        yardMowingTime={section.yard.mowingTime ?? null}
+        yardMowingHeightInches={section.yard.mowingHeightInches ?? null}
         initialData={{
           id: section.id,
           slug: section.slug,
@@ -84,12 +97,12 @@ export default async function EditSectionPage({
           soilTestedAt: section.soilTestedAt ? section.soilTestedAt.toISOString().slice(0, 10) : undefined,
           soilMoisture: section.soilMoisture as "dry" | "moderate" | "moist" | undefined,
           notes: section.notes ?? undefined,
-          wateringDaysPerWeek: section.wateringDaysPerWeek ?? undefined,
+          wateringDays: (section.wateringDays as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[] | undefined) ?? undefined,
+          wateringTime: section.wateringTime ?? null,
           wateringMinutesPerSession: section.wateringMinutesPerSession ?? undefined,
-          mowingDaysPerWeek: section.mowingDaysPerWeek ?? undefined,
+          mowingDays: (section.mowingDays as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[] | undefined) ?? undefined,
+          mowingTime: section.mowingTime ?? null,
           mowingHeightInches: section.mowingHeightInches ?? undefined,
-          mowingSchedule: section.mowingSchedule ?? undefined,
-          wateringSchedule: section.wateringSchedule ?? undefined,
         }}
       />
     </div>
