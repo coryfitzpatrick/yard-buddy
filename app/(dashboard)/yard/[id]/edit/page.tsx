@@ -17,7 +17,7 @@ export default async function EditYardPage({
   if (!session?.user?.id) redirect("/login");
 
   const { id } = await params;
-  const [yard, subscriptionUser] = await Promise.all([
+  const [yard, subscriptionUser, latestAnalysis] = await Promise.all([
     db.yard.findFirst({
     where: { slug: id, userId: session.user.id },
     select: {
@@ -29,12 +29,12 @@ export default async function EditYardPage({
       buildingSqft: true,
       spreaderType: true,
       spreaderModel: true,
-      wateringDaysPerWeek: true,
+      wateringDays: true,
+      wateringTime: true,
       wateringMinutesPerSession: true,
-      mowingDaysPerWeek: true,
+      mowingDays: true,
+      mowingTime: true,
       mowingHeightInches: true,
-      mowingSchedule: true,
-      wateringSchedule: true,
       sections: {
         orderBy: { createdAt: "asc" },
         select: {
@@ -53,12 +53,12 @@ export default async function EditYardPage({
           soilTestedAt: true,
           soilMoisture: true,
           notes: true,
-          wateringDaysPerWeek: true,
+          wateringDays: true,
+          wateringTime: true,
           wateringMinutesPerSession: true,
-          mowingDaysPerWeek: true,
+          mowingDays: true,
+          mowingTime: true,
           mowingHeightInches: true,
-          mowingSchedule: true,
-          wateringSchedule: true,
         },
       },
     },
@@ -66,6 +66,16 @@ export default async function EditYardPage({
     db.user.findUnique({
       where: { id: session.user.id },
       select: { plan: true },
+    }),
+    db.lawnAnalysis.findFirst({
+      where: { yardSection: { yard: { slug: id, userId: session.user.id } } },
+      orderBy: { createdAt: "desc" },
+      select: {
+        wateringSuggestedDaysPerWeek: true,
+        wateringSuggestedMinutesPerSession: true,
+        mowingSuggestedDaysPerWeek: true,
+        mowingSuggestedHeightInches: true,
+      },
     }),
   ]);
   if (!yard) notFound();
@@ -88,15 +98,18 @@ export default async function EditYardPage({
       <YardEditForm
         yardId={yard.id}
         yardSlug={id}
+        latestAnalysis={latestAnalysis}
         initialData={{
           name: yard.name,
           zipCode: yard.zipCode,
           spreaderType: yard.spreaderType ?? undefined,
           spreaderModel: yard.spreaderModel ?? undefined,
-          wateringDaysPerWeek: yard.wateringDaysPerWeek ?? undefined,
+          wateringDays: yard.wateringDays,
+          wateringTime: yard.wateringTime ?? null,
           wateringMinutesPerSession: yard.wateringMinutesPerSession ?? undefined,
-          mowingSchedule: yard.mowingSchedule ?? undefined,
-          wateringSchedule: yard.wateringSchedule ?? undefined,
+          mowingDays: yard.mowingDays,
+          mowingTime: yard.mowingTime ?? null,
+          mowingHeightInches: yard.mowingHeightInches ?? undefined,
         }}
       />
 
@@ -114,12 +127,8 @@ export default async function EditYardPage({
             lotSqft={yard.lotSqft ?? undefined}
             buildingSqft={yard.buildingSqft ?? undefined}
             streetAddress={yard.streetAddress ?? undefined}
-            yardMowingSchedule={yard.mowingSchedule}
-            yardWateringSchedule={yard.wateringSchedule}
             plan={subscriptionUser?.plan ?? null}
-            yardWateringDaysPerWeek={yard.wateringDaysPerWeek}
             yardWateringMinutesPerSession={yard.wateringMinutesPerSession}
-            yardMowingDaysPerWeek={yard.mowingDaysPerWeek}
             yardMowingHeightInches={yard.mowingHeightInches}
             hideSectionIdentity
             initialData={{
@@ -138,12 +147,12 @@ export default async function EditYardPage({
               soilTestedAt: onlySection.soilTestedAt ? onlySection.soilTestedAt.toISOString().slice(0, 10) : undefined,
               soilMoisture: onlySection.soilMoisture as "dry" | "moderate" | "moist" | undefined,
               notes: onlySection.notes ?? undefined,
-              wateringDaysPerWeek: onlySection.wateringDaysPerWeek ?? undefined,
+              wateringDays: onlySection.wateringDays as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[],
+              wateringTime: onlySection.wateringTime ?? null,
               wateringMinutesPerSession: onlySection.wateringMinutesPerSession ?? undefined,
-              mowingDaysPerWeek: onlySection.mowingDaysPerWeek ?? undefined,
+              mowingDays: onlySection.mowingDays as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[],
+              mowingTime: onlySection.mowingTime ?? null,
               mowingHeightInches: onlySection.mowingHeightInches ?? undefined,
-              mowingSchedule: onlySection.mowingSchedule ?? undefined,
-              wateringSchedule: onlySection.wateringSchedule ?? undefined,
             }}
           />
         </>

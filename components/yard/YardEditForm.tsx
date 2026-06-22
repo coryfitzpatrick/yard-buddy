@@ -12,27 +12,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScheduleEditor } from "./ScheduleEditor";
+import { WateringWarning, MowingWarning } from "@/components/yard/ScheduleWarnings";
 
 type YardFormInput = z.input<typeof yardSchema>;
+
+interface AnalysisInput {
+  wateringSuggestedDaysPerWeek?: number | null;
+  wateringSuggestedMinutesPerSession?: number | null;
+  mowingSuggestedDaysPerWeek?: number | null;
+  mowingSuggestedHeightInches?: number | null;
+}
 
 interface Props {
   yardId: string;
   yardSlug: string;
+  latestAnalysis?: AnalysisInput | null;
   initialData: {
     name: string;
     zipCode: string;
     spreaderType?: string;
     spreaderModel?: string;
-    wateringDaysPerWeek?: number;
+    wateringDays?: string[];
+    wateringTime?: string | null;
     wateringMinutesPerSession?: number;
-    mowingDaysPerWeek?: number;
+    mowingDays?: string[];
+    mowingTime?: string | null;
     mowingHeightInches?: number;
-    mowingSchedule?: string;
-    wateringSchedule?: string;
   };
 }
 
-export function YardEditForm({ yardId, yardSlug, initialData }: Props) {
+export function YardEditForm({ yardId, yardSlug, initialData, latestAnalysis = null }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
@@ -44,17 +53,14 @@ export function YardEditForm({ yardId, yardSlug, initialData }: Props) {
         zipCode: initialData.zipCode,
         spreaderType: initialData.spreaderType as YardInput["spreaderType"],
         spreaderModel: initialData.spreaderModel,
-        wateringDaysPerWeek: initialData.wateringDaysPerWeek,
+        wateringDays: (initialData.wateringDays ?? []) as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[],
+        wateringTime: initialData.wateringTime ?? undefined,
         wateringMinutesPerSession: initialData.wateringMinutesPerSession,
-        mowingDaysPerWeek: initialData.mowingDaysPerWeek,
+        mowingDays: (initialData.mowingDays ?? []) as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[],
+        mowingTime: initialData.mowingTime ?? undefined,
         mowingHeightInches: initialData.mowingHeightInches,
-        mowingSchedule: initialData.mowingSchedule,
-        wateringSchedule: initialData.wateringSchedule,
       },
     });
-
-  const mowingSchedule = watch("mowingSchedule");
-  const wateringSchedule = watch("wateringSchedule");
 
   async function onSubmit(data: YardInput) {
     setError(null);
@@ -110,58 +116,46 @@ export function YardEditForm({ yardId, yardSlug, initialData }: Props) {
           <p className="text-xs text-gray-400 mt-0.5">Applies to all sections unless overridden.</p>
         </div>
         <ScheduleEditor
-          kind="mow"
+          kind="mowing"
           label="Mowing schedule"
-          value={mowingSchedule}
-          onChange={(v) => setValue("mowingSchedule", v)}
+          days={watch("mowingDays") ?? []}
+          time={(watch("mowingTime") as string | null | undefined) ?? null}
+          secondaryValue={(watch("mowingHeightInches") as number | null | undefined) ?? null}
+          onDaysChange={(v) => setValue("mowingDays", v as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[])}
+          onTimeChange={(v) => setValue("mowingTime", v ?? undefined)}
+          onSecondaryChange={(v) => setValue("mowingHeightInches", v ?? undefined)}
         />
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label>Mowing days / week <span className="text-gray-400 font-normal">(optional)</span></Label>
-            <Input
-              type="number"
-              min={1}
-              max={7}
-              placeholder="e.g. 2"
-              {...register("mowingDaysPerWeek")}
-            />
-            {errors.mowingDaysPerWeek && (
-              <p className="text-sm text-red-500">{errors.mowingDaysPerWeek.message}</p>
-            )}
-          </div>
-          <div className="space-y-1">
-            <Label>Mowing height (in.) <span className="text-gray-400 font-normal">(optional)</span></Label>
-            <Input
-              type="number"
-              min={1}
-              max={5}
-              step={0.5}
-              placeholder="e.g. 3"
-              {...register("mowingHeightInches")}
-            />
-            {errors.mowingHeightInches && (
-              <p className="text-sm text-red-500">{errors.mowingHeightInches.message}</p>
-            )}
-          </div>
-        </div>
+        <MowingWarning
+          latestAnalysis={latestAnalysis}
+          currentDayCount={(watch("mowingDays") ?? []).length}
+          currentHeight={(watch("mowingHeightInches") as number | null | undefined) ?? null}
+        />
 
         <div>
           <p className="text-sm font-semibold text-gray-700">Default Watering Schedule</p>
           <p className="text-xs text-gray-400 mt-0.5">Applies to all sections unless overridden.</p>
         </div>
         <ScheduleEditor
-          kind="water"
+          kind="watering"
           label="Watering schedule"
-          value={wateringSchedule}
-          onChange={(v) => setValue("wateringSchedule", v)}
+          days={watch("wateringDays") ?? []}
+          time={(watch("wateringTime") as string | null | undefined) ?? null}
+          secondaryValue={(watch("wateringMinutesPerSession") as number | null | undefined) ?? null}
+          onDaysChange={(v) => setValue("wateringDays", v as ("Sun"|"Mon"|"Tue"|"Wed"|"Thu"|"Fri"|"Sat")[])}
+          onTimeChange={(v) => setValue("wateringTime", v ?? undefined)}
+          onSecondaryChange={(v) => setValue("wateringMinutesPerSession", v ?? undefined)}
+        />
+        <WateringWarning
+          latestAnalysis={latestAnalysis}
+          currentDayCount={(watch("wateringDays") ?? []).length}
+          currentMinutes={(watch("wateringMinutesPerSession") as number | null | undefined) ?? null}
         />
       </div>
 
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
         <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
-          {isSubmitting ? "Saving…" : "Save Changes"}
+          {isSubmitting ? "Saving..." : "Save Changes"}
         </Button>
       </div>
     </form>
