@@ -9,7 +9,6 @@ import { AREA_CONFIG } from "@/components/yard/AreaTypeSelector";
 import type { AreaType } from "@/types";
 import { SectionHealthChart } from "@/components/yard/SectionHealthChart";
 import { TaskList } from "@/components/dashboard/TaskList";
-import { PersonalizedRemindersCard } from "@/components/sections/PersonalizedRemindersCard";
 import { ScheduleRecommendationCard } from "@/components/sections/ScheduleRecommendationCard";
 import { effectiveWatering, effectiveMowing } from "@/lib/schedules/effective-schedule";
 import { format } from "date-fns";
@@ -369,13 +368,6 @@ export default async function SectionDetailPage({
           </div>
         </details>
       )}
-
-      <PersonalizedRemindersCard
-        yardId={yardSlug}
-        sectionId={sectionSlug}
-        mowingSchedule={section.mowingSchedule ?? null}
-        wateringSchedule={section.wateringSchedule ?? null}
-      />
 
       {/* Schedule recommendation cards */}
       <div className="space-y-4 mb-6">

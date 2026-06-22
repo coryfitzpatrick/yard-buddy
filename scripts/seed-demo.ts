@@ -60,7 +60,6 @@ async function main() {
       buildingSqft: 2800,
       spreaderType: "broadcast",
       spreaderModel: "Scotts Turf Builder EdgeGuard DLX",
-      wateringDaysPerWeek: 3,
       wateringMinutesPerSession: 25,
     },
   });
@@ -83,8 +82,6 @@ async function main() {
       soilTestSource: "UGA Cooperative Extension Lab",
       soilMoisture: "moderate",
       notes: "Gets full sun all day. Slight slope toward the street drains well.",
-      wateringSchedule: "Water 3 days per week, 25 minutes per session — consistent with the yard schedule. Bermuda in full sun needs about 1–1.25 inches per week during Atlanta's summer. Water early morning to minimize evaporation and reduce fungal pressure. The slope drains well so no runoff concerns at this duration.",
-      mowingSchedule: "Every 5-7 days at 1.5 inches during growing season. Mow in early morning before peak heat.",
     },
   });
 
@@ -99,8 +96,6 @@ async function main() {
       soilPh: 6.5,
       soilMoisture: "moderate",
       notes: "Full sun. Kids play area near the deck needs extra wear recovery.",
-      wateringSchedule: "Water 3 days per week, 25 minutes per session — matches the yard schedule. The compacted play zone near the deck may need a supplemental pass during heat waves since hardpan soil sheds water faster; consider a brief hand-water of that 200 sq ft zone on off days if you see wilting.",
-      mowingSchedule: "Every 5-7 days at 1.5 inches. Skip the play zone near the deck if turf is actively recovering.",
     },
   });
 
@@ -115,8 +110,6 @@ async function main() {
       soilPh: 6.2,
       soilMoisture: "moist",
       notes: "Shaded by the neighbor's oak most of the day. Fescue holds better here than bermuda.",
-      wateringSchedule: "Water 2 days per week, 20 minutes per session — less than the yard's standard schedule. The oak canopy dramatically reduces evaporation and the soil is already staying moist. Matching the 3-day bermuda schedule here would keep the soil too wet and accelerate the moss encroachment you're already fighting along the fence.",
-      mowingSchedule: "Every 10-14 days at 3.5 inches. Never remove more than 1/3 of blade length — fescue in shade grows slowly.",
     },
   });
 
@@ -131,8 +124,6 @@ async function main() {
       soilPh: 6.4,
       soilMoisture: "moderate",
       notes: "Decorative border around the patio. Partial shade in the afternoon.",
-      wateringSchedule: "Water 2 days per week, 20 minutes per session — reduced from the yard schedule. St. Augustine in partial shade retains moisture significantly longer than the full-sun bermuda sections. Watering at the 3-day bermuda rate here would keep the border chronically wet and invite fungal issues at the patio edge.",
-      mowingSchedule: "Every 7-10 days at 3 inches. Edge along the patio border after each mow.",
     },
   });
 
@@ -395,7 +386,6 @@ async function main() {
       buildingSqft: 1950,
       spreaderType: "broadcast",
       spreaderModel: "Earthway 2150 Commercial",
-      wateringDaysPerWeek: 3,
       wateringMinutesPerSession: 30,
     },
   });
@@ -413,8 +403,6 @@ async function main() {
       soilPh: 6.4,
       soilMoisture: "moderate",
       notes: "Full sun, slight slope away from house. HOA requires uniform green coverage.",
-      wateringSchedule: "Water 3 days per week, 30 minutes per session — matches the yard schedule, but split each zone into two passes (15 min, pause 30 min, 15 min) to allow absorption on the slope and prevent runoff before the irrigation heads can fix coverage. Zoysia builds strong drought tolerance with deep infrequent watering; don't increase frequency during heat waves — increase duration instead.",
-      mowingSchedule: "Every 7-10 days at 2 inches during growing season. Zoysia is slow-growing — avoid scalping.",
     },
   });
 
@@ -429,8 +417,6 @@ async function main() {
       soilPh: 6.6,
       soilMoisture: "moderate",
       notes: "Covered patio takes up 400 sq ft. Rest gets partial afternoon shade from live oaks.",
-      wateringSchedule: "Water 2 days per week, 25 minutes per session — less than the yard schedule. The live oak canopy provides meaningful shade that reduces evaporation, and St. Augustine handles light drought stress better than it handles chronic wetness. With chinch bug activity at the patio edge, keeping soil consistently moist would worsen conditions; dry-down periods between waterings are beneficial right now.",
-      mowingSchedule: "Every 7 days at 3.5 inches. Avoid mowing within 48 hours of insecticide application.",
     },
   });
 
@@ -445,8 +431,6 @@ async function main() {
       soilPh: 6.4,
       soilMoisture: "moist",
       notes: "Narrow strip between house and fence. Gets afternoon shade, tends to stay moist.",
-      wateringSchedule: "Skip irrigation entirely until the downspout drainage issue is resolved. The downspout already keeps this strip saturated — any additional water will worsen the moss and algae taking over near the fence. Once the channel drain is installed and the soil can dry between rain events, reassess: likely 1 day per week at most for this section.",
-      mowingSchedule: "Every 10-14 days at 3.5 inches. Use a string trimmer rather than a mower in this narrow strip.",
     },
   });
 

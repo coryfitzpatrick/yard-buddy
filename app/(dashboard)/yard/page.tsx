@@ -5,17 +5,20 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowRight, Pencil } from "lucide-react";
 import { YardDeleteButton } from "@/components/yard/YardDeleteButton";
-import { parseSchedule } from "@/lib/schedule";
 
-function parseScheduleSummary(raw: string | null): { days: string; time: string; amount: string } | null {
-  const p = parseSchedule(raw);
-  if (p.days.length === 0) return null;
-  const h = p.time ? Number(p.time.split(":")[0]) : null;
-  const m = p.time ? Number(p.time.split(":")[1]) : null;
+function formatScheduleSummary(
+  days: string[],
+  time: string | null,
+  amount: number | null,
+  unit: "in" | "min",
+): { days: string; time: string; amount: string } | null {
+  if (days.length === 0) return null;
+  const h = time ? Number(time.split(":")[0]) : null;
+  const m = time ? Number(time.split(":")[1]) : null;
   return {
-    days: p.days.join(", "),
+    days: days.join(", "),
     time: h !== null && m !== null ? `${h > 12 ? h - 12 : h || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}` : "",
-    amount: p.inches ?? "",
+    amount: amount != null ? `${amount} ${unit}` : "",
   };
 }
 
@@ -33,10 +36,12 @@ export default async function YardPage() {
       zipCode: true,
       spreaderType: true,
       spreaderModel: true,
-      wateringDaysPerWeek: true,
+      wateringDays: true,
+      wateringTime: true,
       wateringMinutesPerSession: true,
-      mowingSchedule: true,
-      wateringSchedule: true,
+      mowingDays: true,
+      mowingTime: true,
+      mowingHeightInches: true,
       sections: {
         orderBy: { createdAt: "asc" },
         select: {
@@ -72,8 +77,8 @@ export default async function YardPage() {
       ) : (
         <div className="space-y-4">
           {yards.map((yard) => {
-            const yardMow = parseScheduleSummary(yard.mowingSchedule ?? null);
-            const yardWater = parseScheduleSummary(yard.wateringSchedule ?? null);
+            const yardMow = formatScheduleSummary(yard.mowingDays, yard.mowingTime, yard.mowingHeightInches, "in");
+            const yardWater = formatScheduleSummary(yard.wateringDays, yard.wateringTime, yard.wateringMinutesPerSession, "min");
             return (
             <div key={yard.id} className="rounded-lg border border-gray-200 bg-white p-4">
               <div className="flex items-start justify-between gap-2">
@@ -85,13 +90,13 @@ export default async function YardPage() {
                       <> &middot; {yard.sections.length} section{yard.sections.length !== 1 ? "s" : ""}</>
                     )}
                   </p>
-                  {(yard.spreaderType || yard.spreaderModel || yard.wateringDaysPerWeek || yard.wateringMinutesPerSession) && (
+                  {(yard.spreaderType || yard.spreaderModel || yard.wateringDays.length > 0 || yard.wateringMinutesPerSession) && (
                     <div className="text-xs text-gray-500 mt-1.5 space-y-0.5">
                       {(yard.spreaderType || yard.spreaderModel) && (
                         <p>{[yard.spreaderType && `Spreader: ${yard.spreaderType.charAt(0).toUpperCase() + yard.spreaderType.slice(1)}`, yard.spreaderModel].filter(Boolean).join(" · ")}</p>
                       )}
-                      {(yard.wateringDaysPerWeek || yard.wateringMinutesPerSession) && (
-                        <p>{[yard.wateringDaysPerWeek ? `${yard.wateringDaysPerWeek}x/week` : null, yard.wateringMinutesPerSession ? `${yard.wateringMinutesPerSession} min/session` : null].filter(Boolean).join(" · ")}</p>
+                      {(yard.wateringDays.length > 0 || yard.wateringMinutesPerSession) && (
+                        <p>{[yard.wateringDays.length > 0 ? `${yard.wateringDays.length}x/week` : null, yard.wateringMinutesPerSession ? `${yard.wateringMinutesPerSession} min/session` : null].filter(Boolean).join(" · ")}</p>
                       )}
                     </div>
                   )}
@@ -99,12 +104,12 @@ export default async function YardPage() {
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {yardMow && (
                         <span className="inline-flex items-center text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2 py-0.5">
-                          ✂️ {yardMow.days}{yardMow.time ? ` · ${yardMow.time}` : ""}{yardMow.amount ? ` · ${yardMow.amount} in` : ""}
+                          ✂️ {yardMow.days}{yardMow.time ? ` · ${yardMow.time}` : ""}{yardMow.amount ? ` · ${yardMow.amount}` : ""}
                         </span>
                       )}
                       {yardWater && (
                         <span className="inline-flex items-center text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5">
-                          💧 {yardWater.days}{yardWater.time ? ` · ${yardWater.time}` : ""}{yardWater.amount ? ` · ${yardWater.amount} min` : ""}
+                          💧 {yardWater.days}{yardWater.time ? ` · ${yardWater.time}` : ""}{yardWater.amount ? ` · ${yardWater.amount}` : ""}
                         </span>
                       )}
                     </div>
