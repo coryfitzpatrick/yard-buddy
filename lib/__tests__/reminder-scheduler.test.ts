@@ -1,55 +1,74 @@
 import { describe, it, expect } from "vitest";
-import { getTodayReminders } from "../cron/reminder-scheduler";
+import { getTodayReminders } from "@/lib/cron/reminder-scheduler";
 
-const MON = new Date("2026-06-08T00:00:00Z"); // Monday
-const TUE = new Date("2026-06-09T00:00:00Z"); // Tuesday
-const WED = new Date("2026-06-10T00:00:00Z"); // Wednesday
+const monday = new Date("2026-06-22T00:00:00Z"); // a Monday
+const tuesday = new Date("2026-06-23T00:00:00Z");
 
-const mowMon = JSON.stringify({ days: ["Mon"], time: "10:00", inches: "3.5" });
-const waterMonWedFri = JSON.stringify({ days: ["Mon", "Wed", "Fri"], time: "07:00", inches: "20" });
-
-describe("getTodayReminders", () => {
-  it("returns empty array when no sections match today", () => {
-    const sections = [{ name: "Front", yardName: "Home", mowingSchedule: mowMon, wateringSchedule: null }];
-    expect(getTodayReminders(sections, TUE, 0)).toEqual([]);
+describe("getTodayReminders (structured)", () => {
+  it("returns empty when no sections", () => {
+    expect(getTodayReminders([], monday, 0)).toEqual([]);
   });
 
-  it("returns mowing reminder when day matches", () => {
-    const sections = [{ name: "Front", yardName: "Home", mowingSchedule: mowMon, wateringSchedule: null }];
-    const result = getTodayReminders(sections, MON, 0);
+  it("returns empty when sections have no schedules", () => {
+    const sections = [{
+      name: "Front", yardName: "Home",
+      effectiveWatering: { days: [], time: null, minutesPerSession: null },
+      effectiveMowing: { days: [], time: null, heightInches: null },
+    }];
+    expect(getTodayReminders(sections, monday, 0)).toEqual([]);
+  });
+
+  it("returns watering reminder when today is in wateringDays", () => {
+    const sections = [{
+      name: "Front", yardName: "Home",
+      effectiveWatering: { days: ["Mon","Wed","Fri"], time: "07:00", minutesPerSession: 20 },
+      effectiveMowing: { days: [], time: null, heightInches: null },
+    }];
+    expect(getTodayReminders(sections, monday, 0)).toEqual([
+      { sectionName: "Front", yardName: "Home", mowing: null, watering: { time: "07:00", minutes: 20 } },
+    ]);
+  });
+
+  it("returns mowing reminder when today is in mowingDays", () => {
+    const sections = [{
+      name: "Front", yardName: "Home",
+      effectiveWatering: { days: [], time: null, minutesPerSession: null },
+      effectiveMowing: { days: ["Mon"], time: "08:00", heightInches: 3.0 },
+    }];
+    expect(getTodayReminders(sections, monday, 0)).toEqual([
+      { sectionName: "Front", yardName: "Home", mowing: { time: "08:00", inches: 3.0 }, watering: null },
+    ]);
+  });
+
+  it("returns both watering and mowing reminders for the same section", () => {
+    const sections = [{
+      name: "Front", yardName: "Home",
+      effectiveWatering: { days: ["Mon"], time: "07:00", minutesPerSession: 15 },
+      effectiveMowing: { days: ["Mon"], time: "08:00", heightInches: 3.5 },
+    }];
+    const result = getTodayReminders(sections, monday, 0);
     expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
-      sectionName: "Front",
-      yardName: "Home",
-      mowing: { time: "10:00", inches: "3.5" },
-      watering: null,
-    });
+    expect(result[0].watering).toEqual({ time: "07:00", minutes: 15 });
+    expect(result[0].mowing).toEqual({ time: "08:00", inches: 3.5 });
   });
 
-  it("returns watering reminder when day matches", () => {
-    const sections = [{ name: "Back", yardName: "Home", mowingSchedule: null, wateringSchedule: waterMonWedFri }];
-    const result = getTodayReminders(sections, WED, 0);
-    expect(result).toHaveLength(1);
-    expect(result[0].watering).toMatchObject({ time: "07:00", minutes: "20" });
-    expect(result[0].mowing).toBeNull();
+  it("respects daysBefore offset", () => {
+    const sections = [{
+      name: "Front", yardName: "Home",
+      effectiveWatering: { days: ["Tue"], time: "07:00", minutesPerSession: 20 },
+      effectiveMowing: { days: [], time: null, heightInches: null },
+    }];
+    // From Monday, daysBefore=1 means we check Tuesday (the upcoming reminder day).
+    expect(getTodayReminders(sections, monday, 1).length).toBe(1);
+    expect(getTodayReminders(sections, monday, 0).length).toBe(0);
   });
 
-  it("returns both mowing and watering when both match", () => {
-    const sections = [{ name: "Front", yardName: "Home", mowingSchedule: mowMon, wateringSchedule: waterMonWedFri }];
-    const result = getTodayReminders(sections, MON, 0);
-    expect(result[0].mowing).not.toBeNull();
-    expect(result[0].watering).not.toBeNull();
-  });
-
-  it("handles daysBefore=1 by checking tomorrow's day", () => {
-    const sun = new Date("2026-06-07T00:00:00Z"); // Sunday
-    const sections = [{ name: "Front", yardName: "Home", mowingSchedule: mowMon, wateringSchedule: null }];
-    const result = getTodayReminders(sections, sun, 1);
-    expect(result).toHaveLength(1);
-  });
-
-  it("skips sections with unparseable schedule JSON", () => {
-    const sections = [{ name: "Front", yardName: "Home", mowingSchedule: "not json", wateringSchedule: null }];
-    expect(getTodayReminders(sections, MON, 0)).toEqual([]);
+  it("skips watering reminder when time is null even if today is in days", () => {
+    const sections = [{
+      name: "Front", yardName: "Home",
+      effectiveWatering: { days: ["Mon"], time: null, minutesPerSession: 20 },
+      effectiveMowing: { days: [], time: null, heightInches: null },
+    }];
+    expect(getTodayReminders(sections, monday, 0)).toEqual([]);
   });
 });
