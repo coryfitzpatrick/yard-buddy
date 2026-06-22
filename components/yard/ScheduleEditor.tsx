@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
@@ -9,59 +8,52 @@ import {
   SCHEDULE_TIME_OPTIONS,
   MOWING_HEIGHT_OPTIONS,
   WATERING_MINUTE_OPTIONS,
-  parseSchedule,
-  serializeSchedule,
-  formatScheduleSummary,
 } from "@/lib/schedule";
 
 interface Props {
-  kind: "mow" | "water";
+  kind: "watering" | "mowing";
   label: string;
-  // Current schedule as the JSON blob stored in the DB, or undefined when empty.
-  value: string | undefined | null;
-  onChange: (next: string | undefined) => void;
-  // Optional fallback schedule used when the section has no schedule of its
-  // own; rendered as a "Yard default: …" hint next to the label.
-  yardDefault?: string | null;
+  days: string[];
+  time: string | null;
+  secondaryValue: number | null;
+  onDaysChange: (next: string[]) => void;
+  onTimeChange: (next: string | null) => void;
+  onSecondaryChange: (next: number | null) => void;
+  // Optional yard-default hint, rendered next to the label when no override.
+  yardDefaultHint?: string | null;
 }
 
-export function ScheduleEditor({ kind, label, value, onChange, yardDefault }: Props) {
-  const initial = parseSchedule(value);
-  const [days, setDays] = useState<string[]>(initial.days);
-  const [time, setTime] = useState(initial.time);
-  const [inches, setInches] = useState(initial.inches);
+export function ScheduleEditor({
+  kind,
+  label,
+  days,
+  time,
+  secondaryValue,
+  onDaysChange,
+  onTimeChange,
+  onSecondaryChange,
+  yardDefaultHint,
+}: Props) {
+  const unitOptions = kind === "mowing" ? MOWING_HEIGHT_OPTIONS : WATERING_MINUTE_OPTIONS;
+  const unitSuffix = kind === "mowing" ? "in" : "min";
+  const unitPlaceholder = kind === "mowing" ? "Height" : "Duration";
 
-  // Reset local state when the upstream value swaps (e.g. on edit form for a
-  // different section). Inputs are otherwise self-controlled.
-  const [prevValue, setPrevValue] = useState(value);
-  if (prevValue !== value) {
-    const next = parseSchedule(value);
-    setPrevValue(value);
-    setDays(next.days);
-    setTime(next.time);
-    setInches(next.inches);
-  }
+  const toggleDay = (day: string) => {
+    const next = days.includes(day)
+      ? days.filter((d) => d !== day)
+      : [...days, day];
+    // Keep days sorted in canonical Sun→Sat order so storage is stable.
+    onDaysChange(SCHEDULE_DAYS.filter((d) => next.includes(d)));
+  };
 
-  function push(nextDays: string[], nextTime: string, nextInches: string) {
-    setDays(nextDays);
-    setTime(nextTime);
-    setInches(nextInches);
-    onChange(serializeSchedule(nextDays, nextTime, nextInches));
-  }
-
-  const unitOptions = kind === "mow" ? MOWING_HEIGHT_OPTIONS : WATERING_MINUTE_OPTIONS;
-  const unitSuffix = kind === "mow" ? "in" : "min";
-  const unitPlaceholder = kind === "mow" ? "Height" : "Duration";
-
-  const yardDefaultSummary =
-    days.length === 0 && yardDefault ? formatScheduleSummary(yardDefault, unitSuffix) : null;
+  const showHint = days.length === 0 && yardDefaultHint;
 
   return (
     <div className="space-y-2">
       <div className="flex items-baseline gap-2 flex-wrap">
         <Label>{label}</Label>
-        {yardDefaultSummary && (
-          <span className="text-xs text-gray-400">Yard default: {yardDefaultSummary}</span>
+        {showHint && (
+          <span className="text-xs text-gray-400">Yard default: {yardDefaultHint}</span>
         )}
       </div>
 
@@ -72,10 +64,7 @@ export function ScheduleEditor({ kind, label, value, onChange, yardDefault }: Pr
             <button
               key={day}
               type="button"
-              onClick={() => {
-                const nextDays = selected ? days.filter((d) => d !== day) : [...days, day];
-                push(nextDays, time, inches);
-              }}
+              onClick={() => toggleDay(day)}
               className={cn(
                 "px-2.5 py-1 rounded text-xs font-medium border transition-colors",
                 selected
@@ -90,10 +79,13 @@ export function ScheduleEditor({ kind, label, value, onChange, yardDefault }: Pr
       </div>
 
       <div className="flex gap-2">
-        <Select value={time} onValueChange={(v) => push(days, v ?? "", inches)}>
+        <Select
+          value={time ?? ""}
+          onValueChange={(v) => onTimeChange(v === "" ? null : (v ?? null))}
+        >
           <SelectTrigger className="flex-1 min-w-0">
             <SelectValue placeholder="Time">
-              {SCHEDULE_TIME_OPTIONS.find((o) => o.value === time)?.label}
+              {time ? SCHEDULE_TIME_OPTIONS.find((o) => o.value === time)?.label : undefined}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -104,10 +96,13 @@ export function ScheduleEditor({ kind, label, value, onChange, yardDefault }: Pr
             ))}
           </SelectContent>
         </Select>
-        <Select value={inches} onValueChange={(v) => push(days, time, v ?? "")}>
+        <Select
+          value={secondaryValue != null ? String(secondaryValue) : ""}
+          onValueChange={(v) => onSecondaryChange(v === "" || v == null ? null : Number(v))}
+        >
           <SelectTrigger className="w-28 shrink-0">
             <SelectValue placeholder={unitPlaceholder}>
-              {inches ? `${inches} ${unitSuffix}` : undefined}
+              {secondaryValue != null ? `${secondaryValue} ${unitSuffix}` : undefined}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
