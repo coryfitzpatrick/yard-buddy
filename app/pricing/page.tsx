@@ -66,17 +66,22 @@ export default async function PricingPage() {
 
   let currentPlan: string | null = null;
   let planStatus: string | null = null;
+  let hasEverPaid = false;
   if (session?.user?.id) {
     const user = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { plan: true, planStatus: true },
+      select: { plan: true, planStatus: true, stripeCustomerId: true },
     });
     currentPlan = user?.plan ?? null;
     planStatus = user?.planStatus ?? null;
+    hasEverPaid = !!user?.stripeCustomerId;
   }
 
   const isActivePaid = planStatus === "active" && currentPlan !== "trial";
   const isTrial = planStatus === "trialing" || currentPlan === "trial";
+
+  const TIER_RANK: Record<string, number> = { trial: 0, home_basic: 1, home_plus: 2, professional: 3 };
+  const currentRank = currentPlan ? TIER_RANK[currentPlan] ?? -1 : -1;
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -109,7 +114,7 @@ export default async function PricingPage() {
         >
 
           {/* Free Trial card */}
-          {!isActivePaid && (
+          {!isActivePaid && !hasEverPaid && (
             <div className={`rounded-2xl border p-6 flex flex-col ${
               isTrial ? "border-green-500 ring-2 ring-green-500 relative" : "border-gray-200 bg-gray-50"
             }`}>
@@ -210,6 +215,12 @@ export default async function PricingPage() {
                   <div className="w-full text-center text-sm font-semibold text-green-700 bg-green-50 border border-green-200 rounded-lg py-2">
                     Current plan
                   </div>
+                ) : isActivePaid && TIER_RANK[plan.key] < currentRank ? (
+                  <Link href={`/settings/billing?action=downgrade&to=${plan.key}`}>
+                    <Button className="w-full" variant="outline">
+                      Downgrade to {plan.name}
+                    </Button>
+                  </Link>
                 ) : isActivePaid ? (
                   <Link href={`/api/stripe/checkout?plan=${plan.key}&period=monthly`}>
                     <Button className="w-full" variant="outline">
@@ -236,14 +247,16 @@ export default async function PricingPage() {
                   </Link>
                 )}
                 {currentPlan !== plan.key && (
-                  <Link href={isLoggedIn
-                    ? `/api/stripe/checkout?plan=${plan.key}&period=annual`
-                    : `/register`
-                  }>
-                    <Button variant="ghost" size="sm" className="w-full text-xs text-gray-500">
-                      {isActivePaid ? "Switch to annual and save" : "or pay annually and save"}
-                    </Button>
-                  </Link>
+                  isActivePaid && TIER_RANK[plan.key] < currentRank ? null : (
+                    <Link href={isLoggedIn
+                      ? `/api/stripe/checkout?plan=${plan.key}&period=annual`
+                      : `/register`
+                    }>
+                      <Button variant="ghost" size="sm" className="w-full text-xs text-gray-500">
+                        {isActivePaid ? "Switch to annual and save" : "or pay annually and save"}
+                      </Button>
+                    </Link>
+                  )
                 )}
               </div>
             </div>
