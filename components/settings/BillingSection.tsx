@@ -10,7 +10,7 @@ import Link from "next/link";
 import { CreditCard, PauseCircle, PlayCircle, XCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NotInApp from "@/components/NotInApp";
 import { DowngradeModal } from "@/components/settings/DowngradeModal";
 import { DeleteArchivedModal } from "@/components/settings/DeleteArchivedModal";
@@ -93,14 +93,16 @@ export function BillingSection({
   const [downgradeTarget, setDowngradeTarget] = useState<string | null>(null);
   const [showDeleteArchived, setShowDeleteArchived] = useState(false);
 
+  const router = useRouter();
   const searchParams = useSearchParams();
   useEffect(() => {
     const action = searchParams.get("action");
     const target = searchParams.get("to");
     if (action === "downgrade" && target) {
       setDowngradeTarget(target);
+      router.replace("/settings", { scroll: false });
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const isPaused = planStatus === "paused";
   const isTrial = planStatus === "trialing" || plan === "trial";
@@ -240,7 +242,7 @@ export function BillingSection({
             <span className="text-gray-500">Upgrade to restore, or </span>
             <button
               type="button"
-              className="text-red-700 underline hover:text-red-800"
+              className="text-red-700 underline hover:text-red-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded-sm"
               onClick={() => setShowDeleteArchived(true)}
             >
               delete permanently

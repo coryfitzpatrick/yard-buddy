@@ -218,7 +218,7 @@ export default async function PricingPage() {
                     Current plan
                   </div>
                 ) : isActivePaid && TIER_RANK[plan.key] < currentRank ? (
-                  <Link href={`/settings/billing?action=downgrade&to=${plan.key}`}>
+                  <Link href={`/settings?action=downgrade&to=${plan.key}`}>
                     <Button className="w-full" variant="outline">
                       Downgrade to {plan.name}
                     </Button>
