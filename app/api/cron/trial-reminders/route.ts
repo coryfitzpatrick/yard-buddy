@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyCronAuth } from "@/lib/cron/auth";
-import { resend, buildTrialReminderEmail, buildDay5ScheduleNudgeEmail, buildDay10TaskNudgeEmail } from "@/lib/email";
+import { resend, buildTrialReminderEmail, buildDay5ScheduleNudgeEmail, buildDay10TaskNudgeEmail, buildSecondAnalysisPromptEmail } from "@/lib/email";
 import { userHasAnySchedule, userHasAnyCompletedTask } from "@/lib/subscription";
 import { TRIAL_DAYS } from "@/lib/time";
 import { sendPushToUser } from "@/lib/push/send";
@@ -146,6 +146,55 @@ export const GET = withAxiom(async (req: NextRequest) => {
           title: "Almost there",
           body: "Mark one task as done to earn 7 more trial days.",
           data: { kind: "trial_day10" },
+        });
+      } catch { /* push failure non-fatal */ }
+    });
+
+    // Day-14 prompt: nudge a second analysis for the "progress" aha.
+    const day14TargetDaysLeft = TRIAL_DAYS - 14; // 7
+    const day14Target = addDays(today, day14TargetDaysLeft);
+    const day14Users = await db.user.findMany({
+      where: {
+        planStatus: "trialing",
+        day14SecondAnalysisPromptSentAt: null,
+        trialEndsAt: { gte: day14Target, lt: addDays(day14Target, 1) },
+      },
+      select: { id: true, email: true, name: true },
+    });
+    await mapWithConcurrency(day14Users, EMAIL_CONCURRENCY, async (user) => {
+      if (!user.email) return;
+
+      // Claim-first idempotency: mark the flag before sending to prevent retry double-sends.
+      const claim = await db.user.updateMany({
+        where: { id: user.id, day14SecondAnalysisPromptSentAt: null },
+        data: { day14SecondAnalysisPromptSentAt: new Date() },
+      });
+      if (claim.count === 0) return;
+
+      const { subject, html } = buildSecondAnalysisPromptEmail({
+        userName: user.name?.split(" ")[0] ?? "there",
+        analyzeUrl: `${baseUrl}/analyze`,
+      });
+      try {
+        await resend.emails.send({
+          from: "Yard Analyzer <noreply@yardanalyzer.com>",
+          to: user.email,
+          subject,
+          html,
+        });
+        sent++;
+      } catch (err) {
+        failed++;
+        logger.error("trial-reminders: day14 email send failed", {
+          userId: user.id,
+          err: err instanceof Error ? err.message : String(err),
+        });
+      }
+      try {
+        await sendPushToUser(user.id, {
+          title: "Take a progress photo",
+          body: "See what has changed in your yard since your first analysis.",
+          data: { kind: "trial_day14" },
         });
       } catch { /* push failure non-fatal */ }
     });

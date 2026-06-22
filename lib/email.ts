@@ -300,6 +300,30 @@ export function buildDay10TaskNudgeEmail(opts: {
   return { subject, html };
 }
 
+export function buildSecondAnalysisPromptEmail(opts: {
+  userName: string;
+  analyzeUrl: string;
+}): { subject: string; html: string } {
+  const { userName, analyzeUrl } = opts;
+  const subject = "Take a progress photo of your yard";
+  const html = `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">
+    Two weeks in. Take a progress photo of your yard to see what has changed since your first analysis.
+  </p>
+  <p style="margin:24px 0;">
+    <a href="${analyzeUrl}" style="background:#16a34a;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600;">
+      Take progress photo
+    </a>
+  </p>
+</body>
+</html>`;
+  return { subject, html };
+}
+
 export function buildPasswordResetEmail(opts: {
   userName: string;
   resetUrl: string;
