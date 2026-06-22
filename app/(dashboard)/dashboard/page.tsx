@@ -24,6 +24,17 @@ export default async function DashboardPage() {
     },
   });
 
+  const isTrial = user?.planStatus === "trialing" || user?.plan === "trial";
+
+  // Kick off engagement queries in parallel with the yard + task fetches below.
+  // Paid users skip the queries entirely.
+  const engagementSignalsPromise = isTrial && user
+    ? Promise.all([
+        userHasAnySchedule(session.user.id),
+        userHasAnyCompletedTask(session.user.id),
+      ])
+    : null;
+
   const yards = await db.yard.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "asc" },
@@ -111,7 +122,6 @@ export default async function DashboardPage() {
     }))
   );
 
-  const isTrial = user?.planStatus === "trialing" || user?.plan === "trial";
   let engagement = null as null | {
     scheduleSet: boolean;
     taskCompleted: boolean;
@@ -119,11 +129,8 @@ export default async function DashboardPage() {
     bonusGrantedAt: Date | null;
     trialEndsAt: Date | null;
   };
-  if (isTrial && user) {
-    const [anyScheduleSet, anyTaskCompleted] = await Promise.all([
-      userHasAnySchedule(session.user.id),
-      userHasAnyCompletedTask(session.user.id),
-    ]);
+  if (engagementSignalsPromise && user) {
+    const [anyScheduleSet, anyTaskCompleted] = await engagementSignalsPromise;
     const status = computeEngagementStatus(user, { anyScheduleSet, anyTaskCompleted });
     engagement = {
       scheduleSet: status.scheduleSet,
