@@ -32,10 +32,16 @@ export default async function SettingsPage({
     where: { id: session.user.id },
     select: {
       email: true,
+      emailNotificationsEnabled: true,
+      pushNotificationsEnabled: true,
       notificationsEnabled: true,
+      taskPushEnabled: true,
       notifyDaysAhead: true,
       reminderNotificationsEnabled: true,
+      schedulePushEnabled: true,
       reminderDaysBefore: true,
+      weatherEmailEnabled: true,
+      weatherPushEnabled: true,
       gddNotificationsEnabled: true,
       gddBestDayReminderDays: true,
       passwordHash: true,
@@ -162,11 +168,17 @@ export default async function SettingsPage({
             <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
           </div>
           <NotificationPreferences
-            initialEnabled={user.notificationsEnabled}
-            initialDaysAhead={user.notifyDaysAhead}
-            initialReminderEnabled={user.reminderNotificationsEnabled}
+            initialEmailMaster={user.emailNotificationsEnabled}
+            initialPushMaster={user.pushNotificationsEnabled}
+            initialTaskEmail={user.notificationsEnabled}
+            initialTaskPush={user.taskPushEnabled}
+            initialNotifyDaysAhead={user.notifyDaysAhead}
+            initialScheduleEmail={user.reminderNotificationsEnabled}
+            initialSchedulePush={user.schedulePushEnabled}
             initialReminderDaysBefore={user.reminderDaysBefore}
-            initialGddEnabled={user.gddNotificationsEnabled}
+            initialWeatherEmail={user.weatherEmailEnabled}
+            initialWeatherPush={user.weatherPushEnabled}
+            initialGddPush={user.gddNotificationsEnabled}
             initialGddBestDayReminderDays={user.gddBestDayReminderDays}
           />
         </div>

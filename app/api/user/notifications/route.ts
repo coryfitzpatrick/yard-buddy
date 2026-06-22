@@ -19,10 +19,16 @@ export const PUT = withAxiom(async (req: Request) => {
   await db.user.update({
     where: { id: session.user.id },
     data: {
+      emailNotificationsEnabled: parsed.data.emailNotificationsEnabled,
+      pushNotificationsEnabled: parsed.data.pushNotificationsEnabled,
       notificationsEnabled: parsed.data.notificationsEnabled,
+      taskPushEnabled: parsed.data.taskPushEnabled,
       notifyDaysAhead: parsed.data.notifyDaysAhead,
       reminderNotificationsEnabled: parsed.data.reminderNotificationsEnabled,
+      schedulePushEnabled: parsed.data.schedulePushEnabled,
       reminderDaysBefore: parsed.data.reminderDaysBefore,
+      weatherEmailEnabled: parsed.data.weatherEmailEnabled,
+      weatherPushEnabled: parsed.data.weatherPushEnabled,
       gddNotificationsEnabled: parsed.data.gddNotificationsEnabled,
       gddBestDayReminderDays: parsed.data.gddBestDayReminderDays,
     },
