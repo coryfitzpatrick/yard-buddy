@@ -155,15 +155,29 @@ async function runDailyTasks(
   // (yard-level or section-level). May overlap with task users — deduplicated later.
   const reminderUsers = await db.user.findMany({
     where: {
-      yards: {
-        some: {
+      AND: [
+        {
           OR: [
-            { wateringDays: { isEmpty: false } },
-            { mowingDays: { isEmpty: false } },
-            { sections: { some: { OR: [{ wateringDays: { isEmpty: false } }, { mowingDays: { isEmpty: false } }] } } },
+            { planStatus: "active", plan: { not: "trial" } },
+            {
+              OR: [{ planStatus: "trialing" }, { plan: "trial" }],
+              trialEndsAt: { gt: new Date() },
+            },
+            { plan: "admin" },
           ],
         },
-      },
+        {
+          yards: {
+            some: {
+              OR: [
+                { wateringDays: { isEmpty: false } },
+                { mowingDays: { isEmpty: false } },
+                { sections: { some: { OR: [{ wateringDays: { isEmpty: false } }, { mowingDays: { isEmpty: false } }] } } },
+              ],
+            },
+          },
+        },
+      ],
     },
     select: {
       id: true,
