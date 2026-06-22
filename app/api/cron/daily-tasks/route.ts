@@ -157,13 +157,18 @@ async function runDailyTasks(
     where: {
       AND: [
         {
-          OR: [
-            { planStatus: "active", plan: { not: "trial" } },
+          // Mirrors lib/subscription.ts isEffectivelyExpired (negated): user is not
+          // expired or canceled, and if trialing, the trial is still active.
+          AND: [
+            { planStatus: { notIn: ["expired", "canceled"] } },
             {
-              OR: [{ planStatus: "trialing" }, { plan: "trial" }],
-              trialEndsAt: { gt: new Date() },
+              OR: [
+                // Not on trial: subscription status drives reminders.
+                { AND: [{ planStatus: { not: "trialing" } }, { plan: { not: "trial" } }] },
+                // On trial: trial must not have ended yet.
+                { trialEndsAt: { gt: new Date() } },
+              ],
             },
-            { plan: "admin" },
           ],
         },
         {
