@@ -70,9 +70,11 @@ export default async function SectionDetailPage({
         select: {
           id: true,
           name: true,
-          wateringDaysPerWeek: true,
+          wateringDays: true,
+          wateringTime: true,
           wateringMinutesPerSession: true,
-          mowingDaysPerWeek: true,
+          mowingDays: true,
+          mowingTime: true,
           mowingHeightInches: true,
         },
       },
@@ -386,14 +388,14 @@ export default async function SectionDetailPage({
                 kind="watering"
                 sectionId={section.id}
                 latestAnalysis={latestAnalysis}
-                effective={{ daysPerWeek: wEff.daysPerWeek, minutesPerSession: wEff.minutesPerSession, heightInches: null }}
+                effective={{ days: wEff.days, time: wEff.time, minutesPerSession: wEff.minutesPerSession, heightInches: null }}
                 plan={subscriptionUser.plan}
               />
               <ScheduleRecommendationCard
                 kind="mowing"
                 sectionId={section.id}
                 latestAnalysis={latestAnalysis}
-                effective={{ daysPerWeek: mEff.daysPerWeek, minutesPerSession: null, heightInches: mEff.heightInches }}
+                effective={{ days: mEff.days, time: mEff.time, minutesPerSession: null, heightInches: mEff.heightInches }}
                 plan={subscriptionUser.plan}
               />
             </>
