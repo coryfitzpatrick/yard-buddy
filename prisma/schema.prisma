@@ -22,6 +22,12 @@ model User {
   reminderDaysBefore           Int       @default(0)
   gddNotificationsEnabled      Boolean   @default(true)
   gddBestDayReminderDays       Int       @default(0)
+  emailNotificationsEnabled    Boolean   @default(true)
+  pushNotificationsEnabled     Boolean   @default(true)
+  taskPushEnabled              Boolean   @default(false)
+  schedulePushEnabled          Boolean   @default(true)
+  weatherEmailEnabled          Boolean   @default(true)
+  weatherPushEnabled           Boolean   @default(true)
   weatherWidgetCollapsed       Boolean   @default(true)
   createdAt                    DateTime  @default(now())
   plan                 String    @default("trial")
@@ -99,6 +105,10 @@ model Yard {
   wateringMinutesPerSession Int?
   mowingDaysPerWeek         Int?
   mowingHeightInches        Float?
+  wateringDays              String[]   @default([])
+  wateringTime              String?
+  mowingDays                String[]   @default([])
+  mowingTime                String?
   mowingSchedule            String?
   wateringSchedule          String?
   weatherRefreshedAt DateTime?
@@ -133,6 +143,10 @@ model YardSection {
   wateringMinutesPerSession Int?
   mowingDaysPerWeek         Int?
   mowingHeightInches        Float?
+  wateringDays              String[]   @default([])
+  wateringTime              String?
+  mowingDays                String[]   @default([])
+  mowingTime                String?
   currentRoutine    String?
   wateringSchedule  String?
   mowingSchedule    String?
