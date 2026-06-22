@@ -247,6 +247,34 @@ export function buildTrialReminderEmail(opts: {
   return { subject, html };
 }
 
+export function buildDay5ScheduleNudgeEmail(opts: {
+  userName: string;
+  scheduleSetupUrl: string;
+}): { subject: string; html: string } {
+  const { userName, scheduleSetupUrl } = opts;
+  const subject = "Set your schedule to earn 7 more trial days";
+  const html = `<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;">
+  <h1 style="color:#16a34a;font-size:20px;margin-bottom:4px;">Yard Analyzer</h1>
+  <p style="color:#6b7280;margin-top:0;">Hi ${escapeHtml(userName)},</p>
+  <p style="color:#374151;">
+    Setting your watering and mowing schedule earns you <strong>7 more days of free trial</strong>.
+    It also unlocks the reminders that keep your yard on track without you having to think about it.
+  </p>
+  <p style="margin:24px 0;">
+    <a href="${scheduleSetupUrl}" style="background:#16a34a;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600;">
+      Set up my schedule
+    </a>
+  </p>
+  <p style="color:#6b7280;font-size:13px;">
+    You will earn the bonus once you also complete one of your recommended tasks.
+  </p>
+</body>
+</html>`;
+  return { subject, html };
+}
+
 export function buildPasswordResetEmail(opts: {
   userName: string;
   resetUrl: string;
