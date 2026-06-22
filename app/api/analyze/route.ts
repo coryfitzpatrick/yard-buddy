@@ -117,7 +117,7 @@ export const POST = withAxiom(async (req: NextRequest) => {
   // Verify section ownership before any rate-limit queries (prevents BOLA)
   const section = await db.yardSection.findFirst({
     where: { id: sectionId, yard: { userId: session.user.id } },
-    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true, wateringDaysPerWeek: true, wateringMinutesPerSession: true, mowingDaysPerWeek: true, mowingHeightInches: true } } },
+    include: { yard: { select: { zipCode: true, spreaderType: true, streetAddress: true, wateringDays: true, wateringTime: true, wateringMinutesPerSession: true, mowingDays: true, mowingTime: true, mowingHeightInches: true } } },
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -217,9 +217,9 @@ export const POST = withAxiom(async (req: NextRequest) => {
           soilMoisture: section.soilMoisture,
           notes: section.notes,
           zipCode: section.yard.zipCode,
-          wateringDaysPerWeek: wEff.daysPerWeek,
+          wateringDaysPerWeek: wEff.days.length > 0 ? wEff.days.length : null,
           wateringMinutesPerSession: wEff.minutesPerSession,
-          mowingDaysPerWeek: mEff.daysPerWeek,
+          mowingDaysPerWeek: mEff.days.length > 0 ? mEff.days.length : null,
           mowingHeightInches: mEff.heightInches,
           weatherSummary,
         },
