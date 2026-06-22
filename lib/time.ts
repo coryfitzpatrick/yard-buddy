@@ -9,3 +9,7 @@ export const DAYS_30_MS = 30 * DAY_MS;
 
 // Days after a paid sub expires (or a trial ends) before we purge user data.
 export const TRIAL_GRACE_DAYS = 30;
+
+// Trial length in days. Engagement extension adds 7 more (see lib/subscription.ts).
+export const TRIAL_DAYS = 21;
+export const TRIAL_ENGAGEMENT_BONUS_DAYS = 7;

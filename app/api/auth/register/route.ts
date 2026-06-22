@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { registerSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { DAY_MS, HOUR_MS } from "@/lib/time";
+import { DAY_MS, HOUR_MS, TRIAL_DAYS } from "@/lib/time";
 import { withAxiom } from "@/lib/observability/logger";
 
 export const POST = withAxiom(async (req: NextRequest) => {
@@ -35,7 +35,7 @@ export const POST = withAxiom(async (req: NextRequest) => {
       name: parsed.data.name,
       email: parsed.data.email,
       passwordHash,
-      trialEndsAt: new Date(Date.now() + 14 * DAY_MS),
+      trialEndsAt: new Date(Date.now() + TRIAL_DAYS * DAY_MS),
       termsAcceptedAt: new Date(),
     },
   });
