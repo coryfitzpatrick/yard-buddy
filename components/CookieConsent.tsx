@@ -85,6 +85,17 @@ export function CookieConsent() {
     return () => window.removeEventListener(OPEN_COOKIE_PREFS_EVENT, open);
   }, [consent]);
 
+  // URL-triggered open: ?cookie-prefs=1 (handy on mobile where the footer
+  // link can be hard to reach behind the bottom nav).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (new URLSearchParams(window.location.search).has("cookie-prefs")) {
+      setDraft(consent ?? DEFAULT_CONSENT);
+      setShowPrefs(true);
+      setShowBanner(false);
+    }
+  }, [consent]);
+
   function persist(next: ConsentState) {
     writeConsentCookie(next);
     setConsent(next);
