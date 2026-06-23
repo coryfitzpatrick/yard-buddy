@@ -225,6 +225,7 @@ export function useYardSetup() {
     setYardLimitReached(false);
 
     let yardId = createdYardId;
+    let yardSlugLocal = createdYardSlug;
 
     if (!yardId) {
       if (!zipCode.match(/^\d{5}$/)) { setZipError("Enter a valid 5-digit ZIP code"); setStep(0); return; }
@@ -256,6 +257,7 @@ export function useYardSetup() {
         }
         const yard = await yardRes.json();
         yardId = yard.id;
+        yardSlugLocal = yard.slug;
         setCreatedYardId(yard.id);
         setCreatedYardSlug(yard.slug);
         setCreatedPropertyName(propertyName);
@@ -328,9 +330,8 @@ export function useYardSetup() {
             // Analysis succeeded — skip the intermediate success screen and
             // land the user directly on the section page where the analysis
             // results are shown.
-            const yardSlug = createdYardSlug;
-            if (yardSlug) {
-              router.push(`/yard/${yardSlug}/sections/${createdSection.slug}`);
+            if (yardSlugLocal) {
+              router.push(`/yard/${yardSlugLocal}/sections/${createdSection.slug}`);
               return;
             }
             setAnalyzedSectionSlug(createdSection.slug);

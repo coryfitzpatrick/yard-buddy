@@ -7,6 +7,11 @@ import type { YardSetupController } from "./useYardSetup";
 export function SuccessScreen({ c }: { c: YardSetupController }) {
   return (
     <div className="text-center space-y-6 py-8">
+      {c.error && (
+        <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700 text-left">
+          {c.error}
+        </div>
+      )}
       <CheckCircle2 className="mx-auto w-16 h-16 text-green-500" />
       <div>
         <h3 className="text-xl font-semibold text-gray-900">

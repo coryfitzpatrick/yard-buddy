@@ -91,9 +91,14 @@ export function YardSetupForm() {
           ) : (
             <Button
               type="button"
-              disabled={c.isSubmitting || c.postSaveStatus !== "idle" || !c.saveArmed}
+              disabled={
+                c.isSubmitting ||
+                c.postSaveStatus !== "idle" ||
+                !c.saveArmed ||
+                c.setupPhotoCount === 0
+              }
               onClick={c.handleSubmit(c.onSubmit, c.onInvalid)}
-              className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 shadow-sm"
+              className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 shadow-sm disabled:opacity-50"
             >
               {c.postSaveStatus === "saving" && "Saving…"}
               {c.postSaveStatus === "uploading" && "Uploading photos…"}
@@ -101,9 +106,9 @@ export function YardSetupForm() {
               {c.postSaveStatus === "idle" &&
                 (!c.saveArmed
                   ? "Review above…"
-                  : c.setupPhotoCount > 0
-                    ? "Save & analyze"
-                    : "Save")}
+                  : c.setupPhotoCount === 0
+                    ? "Add photos first"
+                    : "Save & analyze")}
             </Button>
           )}
         </div>
