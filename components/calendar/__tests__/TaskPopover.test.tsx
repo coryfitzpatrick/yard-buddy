@@ -54,13 +54,13 @@ describe("TaskPopover", () => {
 
   it("does NOT render buy link when product is null", () => {
     render(<TaskPopover task={baseTask} onClose={vi.fn()} />);
-    expect(screen.queryByText(/Buy:/)).toBeNull();
+    expect(screen.queryByText(/Shop /)).toBeNull();
   });
 
   it("renders buy link when product is set", () => {
     const task = { ...baseTask, product: "Scotts Halts", productSearchQuery: "Scotts Halts crabgrass preventer" };
     render(<TaskPopover task={task} onClose={vi.fn()} />);
-    const link = screen.getByText(/Buy: Scotts Halts/);
+    const link = screen.getByText(/Shop Scotts Halts/);
     expect(link.closest("a")).toHaveAttribute("href", expect.stringContaining("google.com/search"));
     expect(link.closest("a")).toHaveAttribute("target", "_blank");
   });
@@ -68,7 +68,7 @@ describe("TaskPopover", () => {
   it("uses productSearchQuery in the buy link when set", () => {
     const task = { ...baseTask, product: "Scotts Halts", productSearchQuery: "Scotts Halts 10000 sqft" };
     render(<TaskPopover task={task} onClose={vi.fn()} />);
-    const link = screen.getByText(/Buy: Scotts Halts/).closest("a")!;
+    const link = screen.getByText(/Shop Scotts Halts/).closest("a")!;
     expect(link.getAttribute("href")).toContain(encodeURIComponent("Scotts Halts 10000 sqft"));
   });
 

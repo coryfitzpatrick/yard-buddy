@@ -30,7 +30,7 @@ export function TaskPopover({ task, onClose }: Props) {
   const statusLabel = STATUS_LABEL[task.status] ?? task.status;
 
   const buyUrl = task.product
-    ? `https://www.google.com/search?q=${encodeURIComponent(task.productSearchQuery ?? task.product)}`
+    ? `https://www.google.com/search?tbm=shop&q=${encodeURIComponent(task.productSearchQuery ?? task.product)}`
     : null;
 
   return (
@@ -70,10 +70,10 @@ export function TaskPopover({ task, onClose }: Props) {
               href={buyUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-800"
+              className="flex items-center gap-1.5 text-xs font-medium text-green-700 hover:text-green-900 underline underline-offset-2"
             >
               <ShoppingCart className="w-3.5 h-3.5" />
-              Buy: {task.product}
+              Shop {task.product}
             </a>
           )}
           <Link

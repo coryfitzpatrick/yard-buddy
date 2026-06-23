@@ -26,7 +26,7 @@ function BuyLinks({ query, estimatedPrice }: { query: string; estimatedPrice?: s
             href={r.url(query)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-green-700 hover:text-green-900 hover:underline"
+            className="text-xs font-medium text-green-700 hover:text-green-900 underline underline-offset-2"
           >
             {r.label}
           </a>
@@ -36,7 +36,7 @@ function BuyLinks({ query, estimatedPrice }: { query: string; estimatedPrice?: s
           href={`https://www.google.com/search?q=${encodeURIComponent(query + " price")}&tbm=shop`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+          className="text-xs font-medium text-blue-600 hover:text-blue-800 underline underline-offset-2"
         >
           Compare prices →
         </a>

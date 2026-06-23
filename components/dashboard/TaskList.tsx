@@ -141,10 +141,11 @@ function TaskCard({
                     href={`https://www.google.com/search?tbm=shop&q=${encodeURIComponent(task.productSearchQuery)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Shop"
-                    className="ml-auto shrink-0 text-gray-400 hover:text-green-600 transition-colors"
+                    aria-label={`Shop for ${task.product}`}
+                    className="ml-auto shrink-0 inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-900 underline underline-offset-2"
                   >
                     <ShoppingCart className="w-3.5 h-3.5" />
+                    Shop
                   </a>
                 )}
               </div>
@@ -395,10 +396,11 @@ export function TaskList({
                               href={`https://www.google.com/search?tbm=shop&q=${encodeURIComponent(task.productSearchQuery)}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              aria-label="Shop"
-                              className="ml-auto shrink-0 text-gray-300 hover:text-green-600 transition-colors"
+                              aria-label={`Shop for ${task.product}`}
+                              className="ml-auto shrink-0 inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-900 underline underline-offset-2"
                             >
                               <ShoppingCart className="w-3.5 h-3.5" />
+                              Shop
                             </a>
                           )}
                         </div>
