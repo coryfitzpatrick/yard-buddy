@@ -2,11 +2,11 @@ import type { NextConfig } from "next";
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.googletagmanager.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://openweathermap.org https://*.supabase.co",
+  "img-src 'self' data: blob: https://openweathermap.org https://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com",
   "font-src 'self'",
-  "connect-src 'self' https://*.axiom.co",
+  "connect-src 'self' https://*.axiom.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
   "object-src 'none'",
   "base-uri 'self'",
   "frame-ancestors 'none'",
