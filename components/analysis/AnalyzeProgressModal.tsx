@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 const PHRASES = [
   "Counting blades of grass…",
@@ -27,6 +28,12 @@ interface Props {
 
 export function AnalyzeProgressModal({ open, status }: Props) {
   const [idx, setIdx] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  // Portal target only exists in the browser. Wait for mount before rendering.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Pick a random starting phrase whenever the modal opens.
   useEffect(() => {
@@ -42,17 +49,18 @@ export function AnalyzeProgressModal({ open, status }: Props) {
     return () => clearInterval(t);
   }, [open]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
   const headline =
     status === "uploading" ? "Uploading your photos" : "Analyzing your lawn";
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Analysis in progress"
-      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black/50"
+      style={{ zIndex: 2147483646 }}
     >
       <div className="bg-white rounded-2xl max-w-sm w-full p-8 text-center space-y-6">
         <div className="mx-auto w-24 h-24 relative">
@@ -84,6 +92,7 @@ export function AnalyzeProgressModal({ open, status }: Props) {
           </p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
