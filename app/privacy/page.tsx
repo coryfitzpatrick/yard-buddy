@@ -64,7 +64,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">5. Your Rights</h2>
-            <p>You can access, update, or delete your account data at any time from the Settings page. To request a full export or permanent deletion of your data, email us at <a href="mailto:contact@yardanalyzer.com" className="text-green-600 hover:underline">contact@yardanalyzer.com</a>.</p>
+            <p>You can access, update, or delete your account data at any time from the Settings page. To request a full export or permanent deletion of your data, email us at <a href="mailto:contact@nullstatesoftware.com" className="text-green-600 hover:underline">contact@nullstatesoftware.com</a>.</p>
           </section>
 
           <section>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">9. Contact</h2>
-            <p>Questions about this privacy policy? Email us at <a href="mailto:contact@yardanalyzer.com" className="text-green-600 hover:underline">contact@yardanalyzer.com</a>.</p>
+            <p>Questions about this privacy policy? Email us at <a href="mailto:contact@nullstatesoftware.com" className="text-green-600 hover:underline">contact@nullstatesoftware.com</a>.</p>
             <p className="mt-2">Mailing address:</p>
             <address className="not-italic mt-1 text-gray-700">
               Null State Software LLC<br />
