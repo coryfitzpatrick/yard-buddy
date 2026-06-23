@@ -29,7 +29,7 @@ export function SuccessScreen({ c }: { c: YardSetupController }) {
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Button type="button" variant="outline" onClick={c.handleAddAnotherSection}>
-          <Plus className="w-4 h-4 mr-2" /> Add Another Section
+          <Plus className="w-4 h-4 mr-2" /> Add Section
         </Button>
         {c.analyzedSectionSlug && c.createdYardSlug ? (
           <Button
