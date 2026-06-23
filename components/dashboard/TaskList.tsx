@@ -133,21 +133,22 @@ function TaskCard({
             <p className="text-sm text-gray-500 leading-relaxed">{task.description}</p>
             {task.product && (
               <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-600">
-                <Package className="w-3.5 h-3.5 shrink-0 text-green-600" />
-                <span className="font-medium">{task.product}</span>
-                {task.applicationRate && <span className="text-gray-400">· {task.applicationRate}</span>}
-                {task.productSearchQuery && (
+                {task.productSearchQuery ? (
                   <a
                     href={`https://www.google.com/search?tbm=shop&q=${encodeURIComponent(task.productSearchQuery)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Shop for ${task.product}`}
-                    className="ml-auto shrink-0 inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-900 underline underline-offset-2"
+                    className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-900 underline underline-offset-2"
                   >
                     <ShoppingCart className="w-3.5 h-3.5" />
                     Shop
                   </a>
+                ) : (
+                  <Package className="w-3.5 h-3.5 shrink-0 text-green-600" />
                 )}
+                <span className="font-medium">{task.product}</span>
+                {task.applicationRate && <span className="text-gray-400">· {task.applicationRate}</span>}
               </div>
             )}
             {task.spreaderSetting && (
@@ -386,22 +387,23 @@ export function TaskList({
                       <p className="text-sm text-gray-400 leading-relaxed">{task.description}</p>
                       {task.product && (
                         <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-400">
-                          <Package className="w-3.5 h-3.5 shrink-0" />
-                          <span>{task.product}</span>
-                          {task.applicationRate && (
-                            <span className="text-gray-300">· {task.applicationRate}</span>
-                          )}
-                          {task.productSearchQuery && (
+                          {task.productSearchQuery ? (
                             <a
                               href={`https://www.google.com/search?tbm=shop&q=${encodeURIComponent(task.productSearchQuery)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               aria-label={`Shop for ${task.product}`}
-                              className="ml-auto shrink-0 inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-900 underline underline-offset-2"
+                              className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-900 underline underline-offset-2"
                             >
                               <ShoppingCart className="w-3.5 h-3.5" />
                               Shop
                             </a>
+                          ) : (
+                            <Package className="w-3.5 h-3.5 shrink-0" />
+                          )}
+                          <span>{task.product}</span>
+                          {task.applicationRate && (
+                            <span className="text-gray-300">· {task.applicationRate}</span>
                           )}
                         </div>
                       )}
