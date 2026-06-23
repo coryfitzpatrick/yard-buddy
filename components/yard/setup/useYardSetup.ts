@@ -193,7 +193,23 @@ export function useYardSetup() {
     }
   }
 
+  function onInvalid(formErrors: unknown) {
+    console.error("yard-setup: form validation failed", formErrors);
+    const messages: string[] = [];
+    if (formErrors && typeof formErrors === "object") {
+      for (const [field, val] of Object.entries(formErrors as Record<string, { message?: string }>)) {
+        if (val?.message) messages.push(`${field}: ${val.message}`);
+      }
+    }
+    setError(
+      messages.length > 0
+        ? `Validation failed — ${messages.join("; ")}`
+        : "Please fill out all required fields and try again."
+    );
+  }
+
   async function onSubmit(sectionData: YardSectionInput) {
+    console.log("yard-setup: onSubmit start", { sectionData });
     setError(null);
     setYardLimitReached(false);
 
@@ -376,6 +392,7 @@ export function useYardSetup() {
 
     // Submission / result
     onSubmit,
+    onInvalid,
     error, yardLimitReached,
     postSaveStatus,
     createdYardId, createdYardSlug, createdPropertyName,

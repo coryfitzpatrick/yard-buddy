@@ -87,7 +87,7 @@ export function YardSetupForm() {
             <Button
               type="button"
               disabled={c.isSubmitting || c.postSaveStatus !== "idle" || !c.saveArmed}
-              onClick={c.handleSubmit(c.onSubmit)}
+              onClick={c.handleSubmit(c.onSubmit, c.onInvalid)}
               className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 shadow-sm"
             >
               {c.postSaveStatus === "saving" && "Saving…"}
