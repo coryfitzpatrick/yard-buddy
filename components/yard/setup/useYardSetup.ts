@@ -314,7 +314,10 @@ export function useYardSetup() {
         setPostSaveStatus("uploading");
         const photos = await photoUploadRef.current!.upload();
         console.log("yard-setup: upload result", { photoCount: photos.length, photos });
-        if (photos.length > 0) {
+        if (photos.length === 0) {
+          console.error("yard-setup: upload returned 0 photos");
+          setError("Photos couldn't be uploaded. Your yard is saved. Open it and tap Analyze to try again.");
+        } else {
           setPostSaveStatus("analyzing");
           const analyzeRes = await fetch("/api/analyze", {
             method: "POST",
