@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 const FEATURES = [
   "Lawn diagnosis from your photos",
   "Personalized care schedules by grass type",
+  "Reminders and weather alerts by push and email",
   "Exact product amounts and spreader settings",
   "Weather-aware recommendations",
   "Issue detection: weeds, grubs, fungus & more",
