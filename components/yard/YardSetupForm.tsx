@@ -9,18 +9,9 @@ import { GrassStep } from "./setup/GrassStep";
 import { SoilStep } from "./setup/SoilStep";
 import { PhotosStep } from "./setup/PhotosStep";
 import { ReviewStep } from "./setup/ReviewStep";
-import { SuccessScreen } from "./setup/SuccessScreen";
 
 export function YardSetupForm() {
   const c = useYardSetup();
-
-  if (c.showSuccess) {
-    return (
-      <div className="max-w-2xl">
-        <SuccessScreen c={c} />
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-2xl">

@@ -43,10 +43,11 @@ export function useYardSetup() {
   const [createdYardId, setCreatedYardId] = useState<string | null>(null);
   const [createdYardSlug, setCreatedYardSlug] = useState<string | null>(null);
   const [createdPropertyName, setCreatedPropertyName] = useState<string>("");
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [addingAnotherSection, setAddingAnotherSection] = useState(false);
   const [postSaveStatus, setPostSaveStatus] = useState<PostSaveStatus>("idle");
-  const [analyzedSectionSlug, setAnalyzedSectionSlug] = useState<string | null>(null);
+  // Persist section id/slug across retries so a failed analyze doesn't
+  // double-create the section when the user clicks Try again.
+  const [createdSectionId, setCreatedSectionId] = useState<string | null>(null);
+  const [createdSectionSlug, setCreatedSectionSlug] = useState<string | null>(null);
 
   // Property/zip state
   const [propertyName, setPropertyName] = useState("My Property");
@@ -282,88 +283,86 @@ export function useYardSetup() {
       } catch { /* best-effort yard update */ }
     }
 
-    let createdSection: { id: string; slug: string } | null = null;
-    try {
-      setPostSaveStatus("saving");
-      const sectionRes = await fetch(`/api/yard/${yardId}/sections`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sectionData),
-      });
-      if (!sectionRes.ok) {
-        setError("Failed to save section. Please try again.");
+    let createdSection: { id: string; slug: string } | null = createdSectionId && createdSectionSlug
+      ? { id: createdSectionId, slug: createdSectionSlug }
+      : null;
+    if (!createdSection) {
+      try {
+        setPostSaveStatus("saving");
+        const sectionRes = await fetch(`/api/yard/${yardId}/sections`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sectionData),
+        });
+        if (!sectionRes.ok) {
+          setError("Failed to save section. Please try again.");
+          setPostSaveStatus("idle");
+          return;
+        }
+        createdSection = await sectionRes.json();
+        if (createdSection) {
+          setCreatedSectionId(createdSection.id);
+          setCreatedSectionSlug(createdSection.slug);
+        }
+      } catch {
+        setError("Network error. Please check your connection.");
         setPostSaveStatus("idle");
         return;
       }
-      createdSection = await sectionRes.json();
-    } catch {
-      setError("Network error. Please check your connection.");
-      setPostSaveStatus("idle");
-      return;
     }
 
     // If the user added photos in the Photos step, upload + analyze before
-    // showing success. This way they land on a populated section, not an empty one.
+    // Upload + analyze. On success, redirect to the section page. On failure,
+    // stay on the Review step so the user can fix the issue and click
+    // "Save & analyze" again. Yard + section are already saved at this point;
+    // the retry path skips re-creating them via createdYardId/createdSectionId.
     const hasSelection = photoUploadRef.current?.hasSelection();
-    console.log("yard-setup: pre-upload check", {
-      createdSection,
-      refCurrent: photoUploadRef.current,
-      hasSelection,
-      setupPhotoCount,
-    });
     if (createdSection && hasSelection) {
       try {
         setPostSaveStatus("uploading");
         const photos = await photoUploadRef.current!.upload();
-        console.log("yard-setup: upload result", { photoCount: photos.length, photos });
         if (photos.length === 0) {
-          console.error("yard-setup: upload returned 0 photos");
-          setError("Photos couldn't be uploaded. Your yard is saved. Open it and tap Analyze to try again.");
-        } else {
-          setPostSaveStatus("analyzing");
-          const analyzeRes = await fetch("/api/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ sectionId: createdSection.id, photos }),
-          });
-          if (analyzeRes.ok) {
-            // Analysis succeeded — skip the intermediate success screen and
-            // land the user directly on the section page where the analysis
-            // results are shown.
-            if (yardSlugLocal) {
-              router.push(`/yard/${yardSlugLocal}/sections/${createdSection.slug}`);
-              return;
-            }
-            setAnalyzedSectionSlug(createdSection.slug);
-          } else {
-            const data = await analyzeRes.json().catch(() => ({}));
-            console.error("yard-setup: analyze failed", { status: analyzeRes.status, data });
-            setError(
-              data?.message ||
-              `Analysis didn't run (${analyzeRes.status}). Your yard is saved. Try Analyze from the section page.`
-            );
+          setError("Photos couldn't be uploaded. Tap Save & analyze again to retry.");
+          setPostSaveStatus("idle");
+          return;
+        }
+        setPostSaveStatus("analyzing");
+        const analyzeRes = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sectionId: createdSection.id, photos }),
+        });
+        if (analyzeRes.ok) {
+          if (yardSlugLocal) {
+            router.push(`/yard/${yardSlugLocal}/sections/${createdSection.slug}`);
+            return;
           }
+        } else {
+          const data = await analyzeRes.json().catch(() => ({}));
+          setError(
+            data?.message ||
+            `Analysis didn't run (${analyzeRes.status}). Tap Save & analyze again to retry.`
+          );
+          setPostSaveStatus("idle");
+          return;
         }
       } catch (err) {
-        console.error("yard-setup: analyze threw", err);
         setError(
           err instanceof Error
-            ? `Analysis couldn't run: ${err.message}. Your yard is saved. Try Analyze from the section page.`
-            : "Analysis couldn't run. Your yard is saved. Try Analyze from the section page."
+            ? `Analysis couldn't run: ${err.message}. Tap Save & analyze again to retry.`
+            : "Analysis couldn't run. Tap Save & analyze again to retry."
         );
+        setPostSaveStatus("idle");
+        return;
       }
-    } else if (createdSection && setupPhotoCount > 0) {
-      console.error("yard-setup: skipping analyze because hasSelection=false but setupPhotoCount>0", {
-        setupPhotoCount,
-        refCurrent: photoUploadRef.current,
-      });
-      setError(
-        "Your photos couldn't be sent for analysis. Your yard is saved. Open it and tap Analyze to upload again."
-      );
     }
 
+    // Fallback: shouldn't reach here when the Save & analyze button is gated
+    // on setupPhotoCount > 0. If we do, land them on the section page anyway.
     setPostSaveStatus("idle");
-    setShowSuccess(true);
+    if (yardSlugLocal && createdSection) {
+      router.push(`/yard/${yardSlugLocal}/sections/${createdSection.slug}`);
+    }
   }
 
   async function canAdvance(): Promise<boolean> {
@@ -377,21 +376,6 @@ export function useYardSetup() {
     }
     if (step === 2) return trigger(["grassType"]);
     return true;
-  }
-
-  function handleAddAnotherSection() {
-    reset({ name: "Front Yard", grassType: "unknown" });
-    setSizeDisplay("");
-    setSizeUnit("sqft");
-    setStreetAddress("");
-    setLookupNote(null);
-    grassIdentifyRef.current?.reset();
-    setHighlightUpload(false);
-    setShowSuccess(false);
-    setAddingAnotherSection(true);
-    setAnalyzedSectionSlug(null);
-    setSetupPhotoCount(0);
-    setStep(1);
   }
 
   return {
@@ -435,8 +419,6 @@ export function useYardSetup() {
     error, yardLimitReached,
     postSaveStatus,
     createdYardId, createdYardSlug, createdPropertyName,
-    showSuccess, addingAnotherSection, analyzedSectionSlug,
-    handleAddAnotherSection,
   };
 }
 
