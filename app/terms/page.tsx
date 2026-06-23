@@ -95,7 +95,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">13. Contact</h2>
-            <p>Questions about these terms? Email us at <a href="mailto:contact@yardanalyzer.com" className="text-green-600 hover:underline">contact@yardanalyzer.com</a>.</p>
+            <p>Questions about these terms? Email us at <a href="mailto:contact@nullstatesoftware.com" className="text-green-600 hover:underline">contact@nullstatesoftware.com</a>.</p>
             <p className="mt-2">Mailing address:</p>
             <address className="not-italic mt-1 text-gray-700">
               Null State Software LLC<br />
