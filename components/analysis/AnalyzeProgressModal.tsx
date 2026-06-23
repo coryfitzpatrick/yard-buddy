@@ -63,24 +63,15 @@ export function AnalyzeProgressModal({ open, status }: Props) {
       style={{ zIndex: 2147483646 }}
     >
       <div className="bg-white rounded-2xl max-w-sm w-full p-8 text-center space-y-6">
-        <div className="mx-auto w-24 h-24 relative">
-          <svg
-            viewBox="0 0 100 100"
-            className="w-full h-full"
-            style={{ animation: "spin 1s linear infinite" }}
+        <div className="mx-auto w-32 h-32 flex items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/lawnmowerblade.webp"
+            alt=""
             aria-hidden="true"
-          >
-            {/* Lawn-mower blade: a single horizontal bar with angled
-                cutting tips at each end, plus a center hub. The whole svg
-                spins so the cutting tips trace a disc. */}
-            <rect x="6" y="46" width="88" height="8" rx="2" fill="#16a34a" />
-            <polygon points="6,46 14,40 14,46" fill="#15803d" />
-            <polygon points="94,46 86,40 86,46" fill="#15803d" />
-            <polygon points="6,54 14,60 14,54" fill="#15803d" />
-            <polygon points="94,54 86,60 86,54" fill="#15803d" />
-            <circle cx="50" cy="50" r="9" fill="#052e16" />
-            <circle cx="50" cy="50" r="3" fill="#15803d" />
-          </svg>
+            className="w-full h-auto"
+            style={{ animation: "spin 0.9s linear infinite" }}
+          />
         </div>
         <div>
           <p className="text-base font-semibold text-gray-900 mb-1">{headline}</p>
