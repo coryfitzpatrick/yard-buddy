@@ -17,9 +17,11 @@ export default function PrivacyPage() {
 
       <main className="flex-1 max-w-3xl mx-auto px-6 py-12 w-full">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-        <p className="text-sm text-gray-400 mb-10">Last updated: June 21, 2026</p>
+        <p className="text-sm text-gray-400 mb-10">Last updated: June 22, 2026</p>
 
         <div className="space-y-8 text-gray-700 text-sm leading-relaxed">
+
+          <p>This Privacy Policy describes how Null State Software LLC (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) collects, uses, and protects information when you use Yard Analyzer (the &ldquo;Service&rdquo;).</p>
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">1. What We Collect</h2>
@@ -46,7 +48,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">3. Third-Party Services</h2>
-            <p>Yard Analyzer relies on the following providers to operate:</p>
+            <p>We rely on the following providers to operate the Service:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li><strong>Anthropic:</strong> photos and lawn data are sent to Anthropic&apos;s API for automated analysis. Anthropic&apos;s usage policies apply to this data.</li>
               <li><strong>Supabase:</strong> your data and uploaded photos are stored in Supabase&apos;s managed PostgreSQL and object storage.</li>
@@ -72,7 +74,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">7. Children&apos;s Privacy</h2>
-            <p>Yard Analyzer is not directed at children under 13. We do not knowingly collect data from children. If you believe a child has provided us personal information, please contact us and we will remove it promptly.</p>
+            <p>The Service is not directed at children under 13. We do not knowingly collect data from children. If you believe a child has provided us personal information, please contact us and we will remove it promptly.</p>
           </section>
 
           <section>

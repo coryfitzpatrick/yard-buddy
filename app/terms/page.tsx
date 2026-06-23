@@ -17,13 +17,15 @@ export default function TermsPage() {
 
       <main className="flex-1 max-w-3xl mx-auto px-6 py-12 w-full">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Terms of Use</h1>
-        <p className="text-sm text-gray-400 mb-10">Last updated: June 21, 2026</p>
+        <p className="text-sm text-gray-400 mb-10">Last updated: June 22, 2026</p>
 
         <div className="prose prose-gray max-w-none space-y-8 text-gray-700 text-sm leading-relaxed">
 
+          <p>Yard Analyzer (the &ldquo;Service&rdquo;) is operated by Null State Software LLC (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;). These Terms of Use govern your access to and use of the Service.</p>
+
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">1. Acceptance of Terms</h2>
-            <p>By creating an account, clicking &ldquo;I Accept,&rdquo; or using Yard Analyzer, you agree to these Terms of Use and acknowledge that you have read and understood them. If you do not agree, do not use the service.</p>
+            <p>By creating an account, clicking &ldquo;I Accept,&rdquo; or using the Service, you agree to these Terms of Use and acknowledge that you have read and understood them. If you do not agree, do not use the Service.</p>
           </section>
 
           <section>
@@ -38,7 +40,7 @@ export default function TermsPage() {
               <li>Automated recommendations may be incorrect, incomplete, outdated, or inappropriate for your specific lawn, soil, climate, or conditions.</li>
               <li>Following these automated recommendations may result in lawn damage, plant death, wasted product, or financial loss. You assume all risk.</li>
               <li>Product amounts, application rates, spreader settings, and timing are estimates only. Always follow the manufacturer&rsquo;s label instructions, which are legally binding. Never apply any product in a manner inconsistent with its labeling.</li>
-              <li>Yard Analyzer does not guarantee any results. Outcomes depend on factors entirely outside our control including weather, soil conditions, existing lawn health, and the accuracy of information you provide.</li>
+              <li>We do not guarantee any results. Outcomes depend on factors entirely outside our control including weather, soil conditions, existing lawn health, and the accuracy of information you provide.</li>
               <li>If you are uncertain about a recommendation, consult a licensed lawn care professional or your local university extension service before acting on it.</li>
             </ul>
             <p className="mt-3">By using this service you acknowledge that you are solely responsible for all decisions about what products to apply, when, and in what quantities.</p>
@@ -72,13 +74,13 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">9. Limitation of Liability</h2>
             <p className="uppercase font-semibold text-gray-900 text-xs tracking-wide">To the maximum extent permitted by applicable law:</p>
-            <p className="mt-2">YARD ANALYZER AND ITS OPERATORS SHALL NOT BE LIABLE FOR ANY DAMAGE TO YOUR LAWN, GARDEN, PROPERTY, OR PLANTS; ANY FINANCIAL LOSS FROM PRODUCT PURCHASES MADE BASED ON APP RECOMMENDATIONS; ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES; OR ANY LOSS ARISING FROM YOUR RELIANCE ON AUTOMATED RECOMMENDATIONS, WHETHER OR NOT WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+            <p className="mt-2">NULL STATE SOFTWARE LLC AND ITS AFFILIATES SHALL NOT BE LIABLE FOR ANY DAMAGE TO YOUR LAWN, GARDEN, PROPERTY, OR PLANTS; ANY FINANCIAL LOSS FROM PRODUCT PURCHASES MADE BASED ON APP RECOMMENDATIONS; ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES; OR ANY LOSS ARISING FROM YOUR RELIANCE ON AUTOMATED RECOMMENDATIONS, WHETHER OR NOT WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
             <p className="mt-2">Our total liability for any claim arising from your use of the service shall not exceed the total amount you paid us in the twelve (12) months immediately preceding the event giving rise to the claim, or $10.00, whichever is greater.</p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">10. Indemnification</h2>
-            <p>You agree to indemnify and hold harmless Yard Analyzer and its operators from any claims, damages, or expenses (including reasonable legal fees) arising from your use of the service, your violation of these terms, or your application of any automated lawn care recommendations.</p>
+            <p>You agree to indemnify and hold harmless Null State Software LLC and its affiliates from any claims, damages, or expenses (including reasonable legal fees) arising from your use of the Service, your violation of these terms, or your application of any automated lawn care recommendations.</p>
           </section>
 
           <section>
