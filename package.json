@@ -35,6 +35,7 @@
     "@capacitor/share": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
+    "@capgo/capacitor-app-tracking-transparency": "^8.1.12",
     "@capgo/capacitor-native-biometric": "^8.4.11",
     "@hookform/resolvers": "^5.4.0",
     "@prisma/client": "^6.19.3",

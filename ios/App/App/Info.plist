@@ -55,5 +55,7 @@
 	<string>Yard Analyzer saves analyzed lawn reports to your photo library.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Yard Analyzer uses Face ID to unlock your saved session for quick sign-in.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Allow Yard Analyzer to measure how the app is used so we can improve it. Your information is never sold and is not used for advertising.</string>
 </dict>
 </plist>

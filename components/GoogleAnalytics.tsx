@@ -4,6 +4,12 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 import { CONSENT_CHANGE_EVENT, readConsentCookie, type ConsentState } from "@/lib/consent";
 import { isMobileAppClient } from "@/lib/platform";
+import {
+  ATT_STATUS_CHANGE_EVENT,
+  attStatusAllowsTracking,
+  getAttStatus,
+  type AttStatus,
+} from "@/lib/att";
 
 const GA_ID = "G-X67N0138W9";
 const DISABLE_KEY = `ga-disable-${GA_ID}`;
@@ -19,14 +25,16 @@ function detectPlatform(): Platform {
 export function GoogleAnalytics() {
   // null = not hydrated yet (avoid SSR/CSR mismatch on the Script tag).
   const [analyticsGranted, setAnalyticsGranted] = useState<boolean | null>(null);
+  const [attAllows, setAttAllows] = useState<boolean | null>(null);
   const [platform, setPlatform] = useState<Platform>("web");
 
   useEffect(() => {
     const stored = readConsentCookie();
     setAnalyticsGranted(stored?.analytics === "granted");
     setPlatform(detectPlatform());
+    getAttStatus().then((status) => setAttAllows(attStatusAllowsTracking(status)));
 
-    function onChange(e: Event) {
+    function onConsent(e: Event) {
       const ce = e as CustomEvent<ConsentState>;
       const granted = ce.detail.analytics === "granted";
       setAnalyticsGranted(granted);
@@ -35,11 +43,24 @@ export function GoogleAnalytics() {
       // Lets the user revoke consent mid-session without a reload.
       (window as unknown as Record<string, boolean>)[DISABLE_KEY] = !granted;
     }
-    window.addEventListener(CONSENT_CHANGE_EVENT, onChange);
-    return () => window.removeEventListener(CONSENT_CHANGE_EVENT, onChange);
+    function onAtt(e: Event) {
+      const ce = e as CustomEvent<AttStatus>;
+      const allows = attStatusAllowsTracking(ce.detail);
+      setAttAllows(allows);
+      (window as unknown as Record<string, boolean>)[DISABLE_KEY] = !allows;
+    }
+    window.addEventListener(CONSENT_CHANGE_EVENT, onConsent);
+    window.addEventListener(ATT_STATUS_CHANGE_EVENT, onAtt);
+    return () => {
+      window.removeEventListener(CONSENT_CHANGE_EVENT, onConsent);
+      window.removeEventListener(ATT_STATUS_CHANGE_EVENT, onAtt);
+    };
   }, []);
 
-  if (!analyticsGranted) return null;
+  // Hold off rendering until we know both signals so we never load the script
+  // for a user who hasn't consented yet on either layer.
+  if (analyticsGranted !== true) return null;
+  if (attAllows === null || attAllows === false) return null;
 
   return (
     <>
