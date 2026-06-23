@@ -129,7 +129,10 @@ export const PhotoUpload = forwardRef<PhotoUploadHandle, Props>(function PhotoUp
           const { error } = await supabaseClient.storage
             .from("lawn-photos")
             .uploadToSignedUrl(path, token, state.file, { contentType: state.file.type });
-          if (error) continue;
+          if (error) {
+            console.error("PhotoUpload: supabase uploadToSignedUrl failed", { error, path });
+            continue;
+          }
           setSlots((prev) =>
             prev.map((s) =>
               s.id === slot.id && s.state ? { ...s, state: { ...s.state, uploaded: publicUrl } } : s
