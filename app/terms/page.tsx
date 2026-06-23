@@ -84,13 +84,25 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">11. Changes to These Terms</h2>
-            <p>We may update these terms from time to time. We will notify registered users of material changes by email or by requiring re-acceptance within the app. Continued use of the service after changes take effect constitutes acceptance of the updated terms.</p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">11. Governing Law</h2>
+            <p>These Terms are governed by the laws of the State of Delaware, without regard to its conflict of laws principles. Any dispute arising out of or related to these Terms or the Service shall be brought exclusively in the state or federal courts located in Delaware.</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">12. Contact</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">12. Changes to These Terms</h2>
+            <p>We may update these terms from time to time. We will notify registered users of material changes by email or by requiring re-acceptance within the app. Continued use of the Service after changes take effect constitutes acceptance of the updated terms.</p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">13. Contact</h2>
             <p>Questions about these terms? Email us at <a href="mailto:contact@yardanalyzer.com" className="text-green-600 hover:underline">contact@yardanalyzer.com</a>.</p>
+            <p className="mt-2">Mailing address:</p>
+            <address className="not-italic mt-1 text-gray-700">
+              Null State Software LLC<br />
+              8 The Green, STE B<br />
+              Dover, DE 19901<br />
+              United States
+            </address>
           </section>
 
         </div>
