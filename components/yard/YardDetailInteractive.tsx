@@ -214,8 +214,8 @@ function YardSummaryHero({ section, yardId }: { section: SectionSummary; yardId:
         )}
       </div>
       <div className="flex flex-col sm:flex-row gap-2">
-        <Link href={`/analyze?sectionId=${section.id}`} className="flex-1">
-          <Button className="w-full bg-green-600 hover:bg-green-700">
+        <Link href={`/analyze?sectionId=${section.id}`}>
+          <Button className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
             <Camera className="w-4 h-4 mr-1.5" /> Analyze My Yard
           </Button>
         </Link>
