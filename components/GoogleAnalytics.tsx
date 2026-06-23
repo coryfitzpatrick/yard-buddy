@@ -22,6 +22,17 @@ function detectPlatform(): Platform {
   return /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "ios_app" : "android_app";
 }
 
+function isDebug(): boolean {
+  if (typeof window === "undefined") return false;
+  if (window.location.search.includes("ga-debug=1")) return true;
+  if (window.sessionStorage.getItem("ga-debug") === "1") return true;
+  return false;
+}
+
+function dlog(...args: unknown[]) {
+  if (typeof window !== "undefined" && isDebug()) console.log("[ga-debug]", ...args);
+}
+
 export function GoogleAnalytics() {
   // null = not hydrated yet (avoid SSR/CSR mismatch on the Script tag).
   const [analyticsGranted, setAnalyticsGranted] = useState<boolean | null>(null);
@@ -29,10 +40,20 @@ export function GoogleAnalytics() {
   const [platform, setPlatform] = useState<Platform>("web");
 
   useEffect(() => {
+    // Sticky debug: ?ga-debug=1 once enables it for the whole session.
+    if (typeof window !== "undefined" && window.location.search.includes("ga-debug=1")) {
+      window.sessionStorage.setItem("ga-debug", "1");
+    }
     const stored = readConsentCookie();
-    setAnalyticsGranted(stored?.analytics === "granted");
+    const granted = stored?.analytics === "granted";
+    setAnalyticsGranted(granted);
     setPlatform(detectPlatform());
-    getAttStatus().then((status) => setAttAllows(attStatusAllowsTracking(status)));
+    dlog("mount", { storedConsent: stored, analyticsGranted: granted });
+    getAttStatus().then((status) => {
+      const allows = attStatusAllowsTracking(status);
+      setAttAllows(allows);
+      dlog("att status", { status, allows });
+    });
 
     function onConsent(e: Event) {
       const ce = e as CustomEvent<ConsentState>;
@@ -59,8 +80,18 @@ export function GoogleAnalytics() {
 
   // Hold off rendering until we know both signals so we never load the script
   // for a user who hasn't consented yet on either layer.
-  if (analyticsGranted !== true) return null;
-  if (attAllows === null || attAllows === false) return null;
+  if (analyticsGranted !== true) {
+    dlog("not rendering: analyticsGranted =", analyticsGranted);
+    return null;
+  }
+  if (attAllows === null || attAllows === false) {
+    dlog("not rendering: attAllows =", attAllows);
+    return null;
+  }
+
+  const debugOn = isDebug();
+  const configExtras = debugOn ? ", debug_mode: true" : "";
+  dlog("rendering gtag scripts", { GA_ID, platform, debugOn });
 
   return (
     <>
@@ -70,12 +101,15 @@ export function GoogleAnalytics() {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('set', 'user_properties', { platform: ${JSON.stringify(platform)} });
-          gtag('config', '${GA_ID}');
+          gtag('config', '${GA_ID}', { send_page_view: true${configExtras} });
+          ${debugOn ? "console.log('[ga-debug] gtag initialized', '${GA_ID}');" : ""}
         `}
       </Script>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
         strategy="afterInteractive"
+        onLoad={() => dlog("gtag.js loaded")}
+        onError={(e) => dlog("gtag.js failed", e)}
       />
     </>
   );
