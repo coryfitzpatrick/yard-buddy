@@ -302,10 +302,18 @@ export function useYardSetup() {
 
     // If the user added photos in the Photos step, upload + analyze before
     // showing success. This way they land on a populated section, not an empty one.
-    if (createdSection && photoUploadRef.current?.hasSelection()) {
+    const hasSelection = photoUploadRef.current?.hasSelection();
+    console.log("yard-setup: pre-upload check", {
+      createdSection,
+      refCurrent: photoUploadRef.current,
+      hasSelection,
+      setupPhotoCount,
+    });
+    if (createdSection && hasSelection) {
       try {
         setPostSaveStatus("uploading");
-        const photos = await photoUploadRef.current.upload();
+        const photos = await photoUploadRef.current!.upload();
+        console.log("yard-setup: upload result", { photoCount: photos.length, photos });
         if (photos.length > 0) {
           setPostSaveStatus("analyzing");
           const analyzeRes = await fetch("/api/analyze", {
@@ -332,6 +340,14 @@ export function useYardSetup() {
             : "Analysis couldn't run. Your yard is saved. Try Analyze from the section page."
         );
       }
+    } else if (createdSection && setupPhotoCount > 0) {
+      console.error("yard-setup: skipping analyze because hasSelection=false but setupPhotoCount>0", {
+        setupPhotoCount,
+        refCurrent: photoUploadRef.current,
+      });
+      setError(
+        "Your photos couldn't be sent for analysis. Your yard is saved. Open it and tap Analyze to upload again."
+      );
     }
 
     setPostSaveStatus("idle");
