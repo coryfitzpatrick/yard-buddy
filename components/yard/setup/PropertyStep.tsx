@@ -28,6 +28,11 @@ export function PropertyStep({ c }: { c: YardSetupController }) {
               c.setZipCity(null);
             }
             if (c.zipError) c.setZipError(null);
+            // Kick off verify as soon as 5 digits are typed so the user can
+            // tap Next immediately without losing the first tap to blur.
+            if (digits.length === 5 && c.zipVerifiedFor !== digits) {
+              c.verifyZip(digits);
+            }
           }}
           onBlur={() => {
             if (c.zipCode.length === 0) return;
@@ -35,6 +40,8 @@ export function PropertyStep({ c }: { c: YardSetupController }) {
               c.setZipError("ZIP code must be 5 digits");
               return;
             }
+            // Already kicked off in onChange when length hit 5; safe no-op
+            // here but harmless to re-trigger.
             c.verifyZip(c.zipCode);
           }}
         />
