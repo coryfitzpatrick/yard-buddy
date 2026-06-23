@@ -68,7 +68,10 @@ export function YardSetupForm() {
         </div>
         {c.step === 5 && <ReviewStep c={c} />}
 
-        <div className="flex justify-between mt-8">
+        {c.activeStepIdx === c.activeSteps.length - 1 && c.setupPhotoCount === 0 && (
+          <p className="mt-6 text-sm text-red-600 text-right">Add at least one photo to enable Save &amp; analyze.</p>
+        )}
+        <div className="flex justify-between mt-3">
           {c.activeStepIdx > 0 ? (
             <Button
               type="button"
@@ -104,11 +107,7 @@ export function YardSetupForm() {
               {c.postSaveStatus === "uploading" && "Uploading photos…"}
               {c.postSaveStatus === "analyzing" && "Analyzing your lawn…"}
               {c.postSaveStatus === "idle" &&
-                (!c.saveArmed
-                  ? "Review above…"
-                  : c.setupPhotoCount === 0
-                    ? "Add photos first"
-                    : "Save & analyze")}
+                (!c.saveArmed ? "Review above…" : "Save & analyze")}
             </Button>
           )}
         </div>
