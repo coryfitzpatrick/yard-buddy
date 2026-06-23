@@ -5,7 +5,7 @@
  * Creates (or reuses) a demo user and populates two full properties
  * with sections, analyses, and tasks that look great in screenshots.
  *
- * Set DEMO_EMAIL env var to target a specific account (default: demo@yardanalyzer.com)
+ * Set DEMO_EMAIL env var to target a specific account (default: yardanalyzer+demo@gmail.com)
  * Set DEMO_YARD_NAME to customize the property name.
  */
 
@@ -17,7 +17,7 @@ function slugify(name: string): string {
 
 const db = new PrismaClient();
 
-const DEMO_EMAIL = process.env.DEMO_EMAIL ?? "demo@yardanalyzer.com";
+const DEMO_EMAIL = process.env.DEMO_EMAIL ?? "yardanalyzer+demo@gmail.com";
 const DEMO_NAME = "Alex Henderson";
 const YARD_NAME = "Henderson Property";
 const YARD2_NAME = "Rivera Property";

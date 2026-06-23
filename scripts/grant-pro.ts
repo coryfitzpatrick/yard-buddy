@@ -8,6 +8,7 @@ import { PrismaClient } from "@prisma/client";
 const db = new PrismaClient();
 
 const EMAILS = [
+  "yardanalyzer+demo@gmail.com",
   "demo@yardanalyzer.com",
   "demo@yardbuddy.app",
   "fitzmx6@gmail.com",
