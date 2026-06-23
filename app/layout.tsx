@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { CookieConsent } from "@/components/CookieConsent";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import BiometricUnlockGate from "@/components/mobile/BiometricUnlockGate";
 
 const roboto = Roboto({
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <BiometricUnlockGate>{children}</BiometricUnlockGate>
         <CookieConsent />
+        <GoogleAnalytics />
       </body>
     </html>
   );
