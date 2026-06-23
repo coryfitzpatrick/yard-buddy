@@ -68,8 +68,8 @@ export function YardSetupForm() {
         </div>
         {c.step === 5 && <ReviewStep c={c} />}
 
-        {c.activeStepIdx === c.activeSteps.length - 1 && c.setupPhotoCount === 0 && (
-          <p className="mt-6 text-sm text-red-600 text-right">Add at least one photo to enable Save &amp; analyze.</p>
+        {c.step === 4 && c.setupPhotoCount === 0 && (
+          <p className="mt-6 text-sm text-red-600 text-right">Add at least one photo to continue.</p>
         )}
         <div className="flex justify-between mt-3">
           {c.activeStepIdx > 0 ? (
@@ -86,8 +86,9 @@ export function YardSetupForm() {
           {c.activeStepIdx < c.activeSteps.length - 1 ? (
             <Button
               type="button"
+              disabled={c.step === 4 && c.setupPhotoCount === 0}
               onClick={async () => { if (await c.canAdvance()) c.setStep(c.activeSteps[c.activeStepIdx + 1]); }}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
             >
               Next
             </Button>
@@ -97,8 +98,7 @@ export function YardSetupForm() {
               disabled={
                 c.isSubmitting ||
                 c.postSaveStatus !== "idle" ||
-                !c.saveArmed ||
-                c.setupPhotoCount === 0
+                !c.saveArmed
               }
               onClick={c.handleSubmit(c.onSubmit, c.onInvalid)}
               className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 shadow-sm disabled:opacity-50"
