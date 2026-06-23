@@ -322,6 +322,14 @@ export function useYardSetup() {
             body: JSON.stringify({ sectionId: createdSection.id, photos }),
           });
           if (analyzeRes.ok) {
+            // Analysis succeeded — skip the intermediate success screen and
+            // land the user directly on the section page where the analysis
+            // results are shown.
+            const yardSlug = createdYardSlug;
+            if (yardSlug) {
+              router.push(`/yard/${yardSlug}/sections/${createdSection.slug}`);
+              return;
+            }
             setAnalyzedSectionSlug(createdSection.slug);
           } else {
             const data = await analyzeRes.json().catch(() => ({}));
