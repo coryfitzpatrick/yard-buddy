@@ -44,7 +44,7 @@ export function PublicHamburger() {
               const active =
                 pathname === href || (href !== "/" && pathname.startsWith(href));
               return (
-                <SheetClose key={href} render={<Link href={href} />}>
+                <SheetClose key={href} render={<Link href={href} prefetch={false} />}>
                   <span
                     className={cn(
                       "flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors",
