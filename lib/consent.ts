@@ -28,11 +28,12 @@ export interface ConsentState {
   decidedAt: number;
 }
 
-// Default state when no decision has been made: everything optional is denied
-// (GDPR default). The banner will surface until the user picks.
+// Default state when no decision has been made: analytics granted by default
+// (US CCPA opt-out model), marketing still denied. Banner surfaces so users
+// can opt out, but tracking is on by default to match common US norms.
 export const DEFAULT_CONSENT: ConsentState = {
   necessary: "granted",
-  analytics: "denied",
+  analytics: "granted",
   marketing: "denied",
   version: 0,
   decidedAt: 0,
