@@ -9,12 +9,17 @@ import { GrassStep } from "./setup/GrassStep";
 import { SoilStep } from "./setup/SoilStep";
 import { PhotosStep } from "./setup/PhotosStep";
 import { ReviewStep } from "./setup/ReviewStep";
+import { AnalyzeProgressModal } from "@/components/analysis/AnalyzeProgressModal";
 
 export function YardSetupForm() {
   const c = useYardSetup();
 
   return (
     <div className="max-w-2xl">
+      <AnalyzeProgressModal
+        open={c.postSaveStatus === "uploading" || c.postSaveStatus === "analyzing"}
+        status={c.postSaveStatus === "uploading" ? "uploading" : "analyzing"}
+      />
       <div className="flex gap-1 mb-8">
         {c.activeSteps.map((stepNum, idx) => (
           <div
