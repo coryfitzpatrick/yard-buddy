@@ -3,6 +3,7 @@ import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
 import NotInApp from "@/components/NotInApp";
+import { PublicHamburger } from "@/components/PublicHamburger";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,9 +15,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <span className="text-gray-300">|</span>
             <span className="text-[26px] leading-none font-bold text-green-700">Yard Analyzer</span>
           </Link>
-          <NotInApp>
-            <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
-          </NotInApp>
+          <div className="flex items-center gap-2">
+            <NotInApp>
+              <Link href="/pricing" className="hidden sm:inline-flex"><Button variant="ghost">Pricing</Button></Link>
+            </NotInApp>
+            <NotInApp>
+              <PublicHamburger />
+            </NotInApp>
+          </div>
         </div>
       </nav>
       <div className="flex-1 flex items-center justify-center p-4">

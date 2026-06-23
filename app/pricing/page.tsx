@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isMobileApp } from "@/lib/platform.server";
+import { PublicHamburger } from "@/components/PublicHamburger";
 
 export const metadata = { title: "Pricing | Yard Analyzer" };
 
@@ -91,10 +92,15 @@ export default async function PricingPage() {
           <span className="text-gray-300">|</span>
           <span className="text-[26px] leading-none font-bold text-green-700">Yard Analyzer</span>
         </Link>
-        {isLoggedIn
-          ? <Link href="/dashboard"><Button variant="ghost" size="sm">Dashboard</Button></Link>
-          : <Link href="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
-        }
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="hidden sm:inline-flex">
+            {isLoggedIn
+              ? <Link href="/dashboard"><Button variant="ghost" size="sm">Dashboard</Button></Link>
+              : <Link href="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
+            }
+          </div>
+          {!isLoggedIn && <PublicHamburger />}
+        </div>
       </nav>
 
       <main className="flex-1 max-w-6xl mx-auto px-4 py-16 w-full">

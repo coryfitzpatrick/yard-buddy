@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
+import { PublicHamburger } from "@/components/PublicHamburger";
 
 export const metadata = { title: "Terms of Use | Yard Analyzer" };
 
@@ -13,6 +14,7 @@ export default function TermsPage() {
           <span className="text-gray-300">|</span>
           <span className="text-[26px] leading-none font-bold text-green-700">Yard Analyzer</span>
         </Link>
+        <PublicHamburger />
       </nav>
 
       <main className="flex-1 max-w-3xl mx-auto px-6 py-12 w-full">

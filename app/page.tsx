@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PublicHamburger } from "@/components/PublicHamburger";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
@@ -25,10 +26,13 @@ export default function HomePage() {
             <span className="text-gray-300">|</span>
             <span className="text-[26px] leading-none font-bold text-green-700">Yard Analyzer</span>
           </div>
-          <div className="flex gap-2 shrink-0">
-            <Link href="/pricing" className="hidden sm:inline-flex"><Button variant="ghost">Pricing</Button></Link>
-            <Link href="/login" className="hidden sm:inline-flex"><Button variant="ghost">Sign in</Button></Link>
-            <Link href="/register"><Button size="sm" className="bg-green-600 hover:bg-green-700 sm:h-10 sm:px-4">Get started free</Button></Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="hidden sm:flex gap-2">
+              <Link href="/pricing"><Button variant="ghost">Pricing</Button></Link>
+              <Link href="/login"><Button variant="ghost">Sign in</Button></Link>
+              <Link href="/register"><Button className="bg-green-600 hover:bg-green-700">Get started free</Button></Link>
+            </div>
+            <PublicHamburger />
           </div>
         </div>
       </nav>

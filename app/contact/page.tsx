@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Mail } from "lucide-react";
 import { Footer } from "@/components/Footer";
+import { PublicHamburger } from "@/components/PublicHamburger";
 
 export const metadata = { title: "Contact Us | Yard Analyzer" };
 
@@ -29,6 +30,7 @@ export default function ContactPage() {
           <span className="text-gray-300">|</span>
           <span className="text-[26px] leading-none font-bold text-green-700">Yard Analyzer</span>
         </Link>
+        <PublicHamburger />
       </nav>
 
       <main className="flex-1 max-w-2xl mx-auto px-6 py-16 w-full">
