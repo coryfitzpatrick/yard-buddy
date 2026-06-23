@@ -110,6 +110,17 @@ export function useYardSetup() {
     return () => clearTimeout(t);
   }, [step]);
 
+  // Auto-verify ZIP whenever it reaches 5 digits in state. Handles autofill
+  // (password managers like Bitwarden, browser address autofill) that may
+  // bypass React's onChange — as long as state ends up at 5 digits, this
+  // fires verify without requiring the user to leave the input first.
+  useEffect(() => {
+    if (zipCode.length === 5 && zipVerifiedFor !== zipCode && !zipChecking) {
+      verifyZip(zipCode);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zipCode]);
+
   async function verifyZip(value: string): Promise<boolean> {
     if (zipVerifiedFor === value) return true;
     setZipChecking(true);

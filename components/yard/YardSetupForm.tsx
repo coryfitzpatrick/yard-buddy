@@ -60,7 +60,12 @@ export function YardSetupForm() {
         {c.step === 1 && <AreaStep c={c} />}
         {c.step === 2 && <GrassStep c={c} />}
         {c.step === 3 && <SoilStep c={c} />}
-        {c.step === 4 && <PhotosStep c={c} />}
+        {/* PhotosStep stays mounted so the photoUploadRef (and the user's
+            selected photos) survive navigating between steps. The actual
+            content is only visible when on step 4. */}
+        <div className={c.step === 4 ? "" : "hidden"}>
+          <PhotosStep c={c} />
+        </div>
         {c.step === 5 && <ReviewStep c={c} />}
 
         <div className="flex justify-between mt-8">
