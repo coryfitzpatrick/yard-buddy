@@ -288,11 +288,22 @@ export function useYardSetup() {
           });
           if (analyzeRes.ok) {
             setAnalyzedSectionSlug(createdSection.slug);
+          } else {
+            const data = await analyzeRes.json().catch(() => ({}));
+            console.error("yard-setup: analyze failed", { status: analyzeRes.status, data });
+            setError(
+              data?.message ||
+              `Analysis didn't run (${analyzeRes.status}). Your yard is saved. Try Analyze from the section page.`
+            );
           }
-          // Analysis failure isn't blocking - yard + section still exist.
         }
-      } catch {
-        // Same - surface success anyway; user can re-analyze from /analyze.
+      } catch (err) {
+        console.error("yard-setup: analyze threw", err);
+        setError(
+          err instanceof Error
+            ? `Analysis couldn't run: ${err.message}. Your yard is saved. Try Analyze from the section page.`
+            : "Analysis couldn't run. Your yard is saved. Try Analyze from the section page."
+        );
       }
     }
 
