@@ -70,7 +70,13 @@ export function AnalyzeProgressModal({ open, status }: Props) {
             alt=""
             aria-hidden="true"
             className="w-full h-auto"
-            style={{ animation: "spin 0.9s linear infinite reverse" }}
+            style={{
+              animationName: "spin",
+              animationDuration: "0.9s",
+              animationTimingFunction: "linear",
+              animationIterationCount: "infinite",
+              animationDirection: "reverse",
+            }}
           />
         </div>
         <div>
