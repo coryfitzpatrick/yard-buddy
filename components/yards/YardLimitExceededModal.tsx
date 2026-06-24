@@ -59,7 +59,7 @@ export function YardLimitExceededModal({ planLabel, newMaxYards, yards }: Props)
           Your plan changed to {planLabel}
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          {planLabel} supports {newMaxYards} yard{newMaxYards === 1 ? "" : "s"}, and you currently have {yards.length}. Pick the {newMaxYards} yard{newMaxYards === 1 ? "" : "s"} you want to keep on {planLabel}, or upgrade to keep all {yards.length}.
+          {planLabel} supports {newMaxYards} yard{newMaxYards === 1 ? "" : "s"}, and you currently have {yards.length}. Pick the {newMaxYards} yard{newMaxYards === 1 ? "" : "s"}{" "}you want to keep on {planLabel}, or upgrade to keep all {yards.length}.
         </p>
 
         <p className="text-sm font-medium text-gray-900 mb-2">
@@ -86,7 +86,7 @@ export function YardLimitExceededModal({ planLabel, newMaxYards, yards }: Props)
         </ul>
 
         <p className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
-          The {archiveCount} yard{archiveCount === 1 ? "" : "s"} you don&apos;t pick will be archived. Archived yards stop sending reminders and don&apos;t count toward your plan. Your data is kept and is automatically restored if you upgrade later.
+          The {archiveCount} yard{archiveCount === 1 ? "" : "s"}{" "}you don&apos;t pick will be archived. Archived yards stop sending reminders and don&apos;t count toward your plan. Your data is kept and is automatically restored if you upgrade later.
         </p>
 
         {error && (

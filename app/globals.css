@@ -135,6 +135,14 @@
   html {
     @apply font-sans;
   }
+  /* Tailwind preflight sets button cursor to default. Restore the pointer for
+     enabled clickable elements so every clickable surface in the app feels
+     interactive. Disabled buttons stay default. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
 }
 
 @layer utilities {
