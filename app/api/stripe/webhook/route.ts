@@ -10,7 +10,7 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
   // Look up user by our stored customerId — never trust payload userId directly
   const user = await db.user.findUnique({
     where: { stripeCustomerId: sub.customer as string },
-    select: { id: true, plan: true, planStatus: true },
+    select: { id: true, plan: true, planStatus: true, pauseStartedAt: true },
   });
   if (!user) return; // Customer exists in Stripe but not in our DB; skip
 
@@ -20,9 +20,17 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
     throw new Error(`Unrecognized priceId ${priceId} for customer ${sub.customer} — check STRIPE_PRICE_* env vars`);
   }
 
+  // A "trialing" status with metadata.pauseExtension means we set trial_end
+  // to push a paid annual subscription's renewal out by the pause duration.
+  // It is not a real trial — surface it as active/paused based on whether
+  // pause_collection is currently in force.
+  const isPauseExtension = sub.metadata?.pauseExtension === "true";
+
   let planStatus: string;
   switch (sub.status) {
-    case "trialing":  planStatus = "trialing";  break;
+    case "trialing":
+      planStatus = isPauseExtension ? (sub.pause_collection ? "paused" : "active") : "trialing";
+      break;
     case "active":    planStatus = "active";    break;
     case "past_due":  planStatus = "past_due";  break;
     case "paused":    planStatus = "paused";    break;
@@ -34,8 +42,17 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
     ? new Date(sub.pause_collection.resumes_at * 1000)
     : null;
 
-  // Skip update if nothing changed (idempotency guard)
-  if (user.plan === plan && user.planStatus === planStatus && !sub.pause_collection) {
+  // Skip update if nothing changed (idempotency guard). When a pause-extension
+  // subscription naturally auto-resumes we still need to clear our pause
+  // tracking fields, so allow the update through whenever pauseStartedAt is
+  // set but Stripe no longer has pause_collection.
+  const pauseStateNeedsReset = user.pauseStartedAt && !sub.pause_collection;
+  if (
+    user.plan === plan &&
+    user.planStatus === planStatus &&
+    !sub.pause_collection &&
+    !pauseStateNeedsReset
+  ) {
     return;
   }
 
@@ -50,6 +67,12 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
       stripeSubscriptionId: sub.id,
       currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : null,
       pausedUntil,
+      // Auto-resume: pause_collection cleared by Stripe. We don't shorten the
+      // trial_end here (the user used the whole pause), but we do clear our
+      // tracking fields so a future user-initiated pause starts fresh.
+      ...(pauseStateNeedsReset
+        ? { pauseStartedAt: null, pauseOriginalPeriodEnd: null }
+        : {}),
     },
   });
 

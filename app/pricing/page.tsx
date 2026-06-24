@@ -273,7 +273,45 @@ export default async function PricingPage() {
           ))}
         </div>
 
-        <div className="mt-12 text-center text-sm text-gray-400 space-y-1">
+        <div className="mt-12 max-w-2xl mx-auto">
+          <details className="rounded-xl border border-gray-200 bg-white p-5 group">
+            <summary className="cursor-pointer font-semibold text-gray-900 text-sm flex items-center justify-between list-none [&::-webkit-details-marker]:hidden">
+              <span>How billing works</span>
+              <span className="text-gray-400 text-xs group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div className="mt-4 space-y-4 text-sm text-gray-600">
+              <div>
+                <p className="font-medium text-gray-900">Monthly vs. annual</p>
+                <p className="mt-1">Monthly bills once a month, cancel anytime. Annual is a 12-month commitment: you pay for the year up front in exchange for the roughly two-month discount.</p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Upgrading or downgrading tiers</p>
+                <p className="mt-1">Tier changes apply immediately. Upgrades are charged the prorated difference; downgrades credit the unused portion of the higher tier toward your next bill.</p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Switching cadences</p>
+                <p className="mt-1">Switching from monthly to annual takes effect immediately and prepays the year. Switching from annual to monthly takes effect at your next renewal date because annual is a 12-month commitment.</p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Seasonal pause</p>
+                <p className="mt-1">Pause for 1 to 6 months at any time. Monthly subscribers skip charges during the pause. Annual subscribers have their renewal date extended by the time actually spent paused.</p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Downgrading past your yard limit</p>
+                <p className="mt-1">If your new plan supports fewer yards than you currently have, you&apos;ll pick which yard(s) to keep before the switch is confirmed. The rest are archived and can be restored within 30 days.</p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Cancellation</p>
+                <p className="mt-1">Cancel anytime. Your access continues through the end of the current billing period. Data is retained for 30 days after that in case you re-subscribe.</p>
+              </div>
+              <p className="text-xs text-gray-400 border-t border-gray-100 pt-3">
+                See the full rules in our <Link href="/terms#billing" className="text-green-600 hover:underline">Terms of Use</Link>.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div className="mt-8 text-center text-sm text-gray-400 space-y-1">
           {!hasEverPaid && <p>No credit card required to start your free trial.</p>}
           <p>Cancel or pause anytime from your settings. Your data is retained for 30 days after cancellation.</p>
           <p className="mt-2">Questions? <a href="mailto:contact@yardanalyzer.com" className="underline text-green-600">contact@yardanalyzer.com</a></p>

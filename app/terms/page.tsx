@@ -19,7 +19,7 @@ export default function TermsPage() {
 
       <main className="flex-1 max-w-3xl mx-auto px-6 py-12 w-full">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Terms of Use</h1>
-        <p className="text-sm text-gray-400 mb-10">Last updated: June 22, 2026</p>
+        <p className="text-sm text-gray-400 mb-10">Last updated: June 23, 2026</p>
 
         <div className="prose prose-gray max-w-none space-y-8 text-gray-700 text-sm leading-relaxed">
 
@@ -58,9 +58,56 @@ export default function TermsPage() {
             <p>By uploading photos or entering data into Yard Analyzer, you grant us a non-exclusive license to use that content solely to provide the service. We do not sell your content to third parties. You retain ownership of everything you upload.</p>
           </section>
 
-          <section>
+          <section id="billing">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">6. Payments and Billing</h2>
-            <p>Some features require a paid subscription. Billing terms, pricing, and refund policies are presented at the time of purchase. You may cancel at any time; access continues until the end of the current billing period. For billing questions, contact us at <a href="mailto:contact@nullstatesoftware.llc" className="text-green-600 hover:underline">contact@nullstatesoftware.llc</a>.</p>
+            <p>Some features require a paid subscription. Current pricing is shown on the <Link href="/pricing" className="text-green-600 hover:underline">pricing page</Link>. Billing is handled by Stripe; the charges that appear on your statement are subject to Stripe&rsquo;s terms in addition to ours.</p>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.1 Free trial</h3>
+            <p>New accounts include a 21-day free trial of the Basic plan. No payment method is required to start the trial. If you do not subscribe before the trial ends, your account becomes read-only and your data is retained for 30 days before deletion.</p>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.2 Monthly vs. annual billing</h3>
+            <ul className="list-disc pl-5 space-y-2 mt-2">
+              <li><strong>Monthly</strong> plans bill once a month and can be canceled or downgraded at any time.</li>
+              <li><strong>Annual</strong> plans are a 12-month commitment. You pay for the full year up front in exchange for a roughly two-month discount. The commitment is the reason for the discount.</li>
+            </ul>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.3 Tier changes (Basic ↔ Plus ↔ Professional)</h3>
+            <ul className="list-disc pl-5 space-y-2 mt-2">
+              <li><strong>Tier upgrades</strong> take effect immediately. You are charged the prorated difference between your current plan and the new plan for the remainder of the current billing period. Your renewal date does not change.</li>
+              <li><strong>Tier downgrades</strong> take effect immediately. The unused portion of your current plan is credited toward your next bill. No refund is issued to your payment method; the credit is applied automatically to upcoming invoices.</li>
+              <li>If a downgrade would put you over the new plan&rsquo;s yard limit, you will be asked to choose which yard(s) to keep before the change is confirmed. Other yards are archived. Archived yards remain recoverable for 30 days if you upgrade again.</li>
+            </ul>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.4 Switching between monthly and annual</h3>
+            <ul className="list-disc pl-5 space-y-2 mt-2">
+              <li><strong>Monthly → annual</strong> takes effect immediately. You are charged the annual amount today, less a credit for unused days of the current month. Your new annual term runs for 12 months from that date.</li>
+              <li><strong>Annual → monthly</strong> takes effect at the end of your current annual term. The switch is scheduled, and your account continues at the annual plan until then. This is because annual is a 12-month commitment.</li>
+              <li>You can cancel a scheduled switch from the billing screen at any time before it takes effect.</li>
+            </ul>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.5 Seasonal pause</h3>
+            <ul className="list-disc pl-5 space-y-2 mt-2">
+              <li>You can pause your subscription for 1 to 6 months from the billing screen.</li>
+              <li><strong>Monthly plans:</strong> billing is suspended while paused. No charges are made during the pause window. Billing resumes automatically on the resume date you selected.</li>
+              <li><strong>Annual plans:</strong> because you already paid for the year, pausing instead extends your annual term by the time you actually spent paused. If you resume early, your renewal date is shifted by the time elapsed, not by the originally requested pause length.</li>
+              <li>During a pause your account retains full access to all features. The pause affects billing only.</li>
+            </ul>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.6 Cancellation and data retention</h3>
+            <ul className="list-disc pl-5 space-y-2 mt-2">
+              <li>You may cancel at any time from the billing screen. Cancellation takes effect at the end of your current billing period; you keep access until then.</li>
+              <li>After cancellation, your data is retained for 30 days. You can re-subscribe within that window and your yards, photos, and analyses will be restored.</li>
+              <li>Annual subscribers who cancel mid-term keep access through the original renewal date. No partial-year refunds are issued.</li>
+            </ul>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.7 Failed payments and past-due accounts</h3>
+            <p>If a renewal charge fails, we will retry the payment per Stripe&rsquo;s default schedule and email you to update your payment method. If the charge is not resolved within Stripe&rsquo;s retry window, your account moves to a past-due status with limited access. You may restore full access by updating your payment method at any time.</p>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.8 Price changes</h3>
+            <p>If we change pricing, currently active subscribers continue at their existing price through the end of their current term. New pricing applies at the next renewal, and we will notify you by email at least 14 days before the change takes effect.</p>
+
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.9 Questions</h3>
+            <p>For billing questions, contact us at <a href="mailto:contact@nullstatesoftware.llc" className="text-green-600 hover:underline">contact@nullstatesoftware.llc</a>.</p>
           </section>
 
           <section>

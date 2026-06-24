@@ -209,22 +209,54 @@ export function BillingSection({
       {/* Current plan status */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-semibold text-gray-900 text-base">{planLabel}</p>
-          {isTrial && trialDaysLeft !== null && trialDaysLeft > 0 && (
-            <p className="text-sm text-gray-500 mt-0.5">
-              {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining in your free trial
-            </p>
-          )}
-          {isPaused && pausedUntil && (
-            <p className="text-sm text-amber-600 mt-0.5">
-              Billing paused until {new Date(pausedUntil).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-            </p>
-          )}
-          {!isTrial && !isPaused && currentPeriodEnd && (
-            <p className="text-sm text-gray-500 mt-0.5">
-              Renews {new Date(currentPeriodEnd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-            </p>
-          )}
+          <p className="font-semibold text-gray-900 text-base">
+            {planLabel}
+            {!isTrial && (
+              <span className="ml-2 text-sm font-normal text-gray-500">
+                ({currentPeriod === "annual" ? "Annual" : "Monthly"})
+              </span>
+            )}
+          </p>
+          {(() => {
+            const currentPlanCfg = CHANGE_PLANS.find((p) => p.key === currentPlan);
+            const nextChargeAmount = currentPlanCfg
+              ? currentPeriod === "annual" ? currentPlanCfg.annual : currentPlanCfg.monthly
+              : null;
+            const nextChargeSuffix = currentPeriod === "annual" ? "/yr" : "/mo";
+            const nextChargeDate = currentPeriodEnd
+              ? new Date(currentPeriodEnd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+              : null;
+
+            if (isTrial && trialDaysLeft !== null && trialDaysLeft > 0) {
+              return (
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining in your free trial
+                </p>
+              );
+            }
+            if (isPaused && pausedUntil) {
+              return (
+                <>
+                  <p className="text-sm text-amber-600 mt-0.5">
+                    Billing paused until {new Date(pausedUntil).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </p>
+                  {nextChargeDate && nextChargeAmount != null && (
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      Next charge: <span className="font-medium text-gray-700">${nextChargeAmount}{nextChargeSuffix}</span> on {nextChargeDate}
+                    </p>
+                  )}
+                </>
+              );
+            }
+            if (!isTrial && nextChargeDate && nextChargeAmount != null) {
+              return (
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Next charge: <span className="font-medium text-gray-700">${nextChargeAmount}{nextChargeSuffix}</span> on {nextChargeDate}
+                </p>
+              );
+            }
+            return null;
+          })()}
           {isExpired && (
             <NotInApp>
               <p className="text-sm text-red-600 font-medium mt-0.5">
