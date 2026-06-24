@@ -110,7 +110,7 @@ export default async function PricingPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Simple, honest pricing</h1>
           <p className="text-lg text-gray-500">
             {isActivePaid
-              ? "Upgrade, downgrade, or switch billing period anytime."
+              ? "Upgrade, downgrade, or switch between monthly and annual anytime."
               : hasEverPaid
               ? "Welcome back. Pick a plan to resume."
               : "Try free for 21 days, then pick the plan that fits."}
