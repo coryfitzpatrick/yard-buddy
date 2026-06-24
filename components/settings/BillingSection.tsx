@@ -69,7 +69,7 @@ const CHANGE_PLANS = [
     key: "professional",
     label: "Professional",
     monthly: 24.99,
-    annual: 229,
+    annual: 229.99,
     summary: "Up to 10 yards · 8 analyses/yard/month · for rentals & HOAs",
   },
 ] as const;
