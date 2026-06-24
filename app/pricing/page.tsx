@@ -293,7 +293,7 @@ export default async function PricingPage() {
               </div>
               <div>
                 <p className="font-medium text-gray-900">Downgrading past your yard limit</p>
-                <p className="mt-1">If your new plan supports fewer yards than you currently have, you&apos;ll pick which yard(s) to keep before the switch is confirmed. The rest are archived and can be restored within 30 days.</p>
+                <p className="mt-1">If your new plan supports fewer yards than you currently have, you&apos;ll pick which yard(s) to keep before the switch is confirmed. The rest are archived and auto-restore if you upgrade to a plan that supports them again.</p>
               </div>
               <div>
                 <p className="font-medium text-gray-900">Cancellation</p>
