@@ -63,61 +63,70 @@ Test coverage:
 
 Each `it()` title references the contract item it pins (e.g., "contract #1: monthly tier upgrade is immediate, no schedule"). When something fails, the test name names the rule.
 
-## Open: Stripe status mapping (the next thing to do)
+## Open: Stripe status mapping + past_due gating (the next thing to do)
 
 User asked us to explicitly handle every Stripe subscription status instead of relying on the catchall default. **The plan was proposed but NOT executed.** Pick up here.
 
-### The four Stripe statuses currently falling into the default
+### Decision: collapse "billing unwell" states into `past_due` and fix the access gate
 
-| Stripe status | Semantic meaning | Proposed app `planStatus` | Rationale |
+The user pointed out that from a customer's perspective, `incomplete`, `unpaid`, `paused`, and `past_due` are all the same lived experience: "my billing is broken, I can't use the app, I need to fix it." Four distinct Stripe signals, one user-facing reality. So instead of introducing a new `PlanStatus` value, **collapse all four to `past_due` and fix the existing `past_due` access gate at the same time**.
+
+This bundles audit item #1 (past_due users get full plan access today, which is wrong) into the same change.
+
+### The mapping
+
+| Stripe status | Semantic meaning | App `planStatus` | Why |
 |---|---|---|---|
-| `incomplete` | Sub created, initial payment hasn't cleared (SCA pending). Lives up to 23h. | **new** `incomplete` | They JUST signed up; "past_due" would imply they're late, which is wrong. No paid feature access. Deletion clock does NOT start. |
-| `unpaid` | Stripe finished dunning retries and gave up. Sub still exists; user can recover by updating card. | **new** `incomplete` | Same UX as above — billing is recoverable, no paid feature access. Stripe did NOT cancel; mapping to `canceled` would be wrong because it would start the deletion clock prematurely. |
-| `incomplete_expired` | 23h SCA window passed. Sub is permanently dead. | `canceled` | Subscription is over. 30-day data retention applies. |
-| `paused` | Someone set `pause_collection` (admin action; we don't surface it). | `active` (recommended) — but USER WAS UNDECIDED | Stripe-side pause typically comps the user during a support issue. Mapping to `active` honors that intent. Open question — see below. |
+| `incomplete` | Sub created, initial payment hasn't cleared (SCA pending). Lives up to 23h. | `past_due` | Same lived experience as a failed payment — billing is unwell, user can fix it. |
+| `unpaid` | Stripe finished dunning retries and gave up. Sub still exists; user can recover by updating card. | `past_due` | Same — recoverable, billing needs attention. |
+| `incomplete_expired` | 23h SCA window passed. Sub is permanently dead. | `canceled` | This one really is dead. 30-day deletion clock applies. |
+| `paused` | Someone set `pause_collection` (admin action; we don't surface it). | `past_due` | User confirmed: if billing is paused, access should be gated. Same lived experience as failed payment. |
 
-### Implementation steps to execute the plan
+We lose some at-a-glance debugging granularity in the User row (can't tell whether a `past_due` user is mid-SCA, mid-dunning, or pause-comped), but Stripe and our webhook logs still have it.
 
-1. **Extend the `PlanStatus` union** in `lib/subscription.ts`:
+### Implementation steps
+
+1. **No `PlanStatus` enum change.** Existing 5 values stay.
+2. **Update the webhook switch** in `app/api/stripe/webhook/route.ts` (around lines 25-45):
    ```ts
-   export type PlanStatus = "trialing" | "active" | "past_due" | "expired" | "canceled" | "incomplete";
+   case "incomplete":         planStatus = "past_due"; break;
+   case "unpaid":             planStatus = "past_due"; break;
+   case "paused":             planStatus = "past_due"; break;
+   case "incomplete_expired": planStatus = "canceled"; break;
    ```
-2. **Add an `incomplete` row to `LIMITS`** in the same file. Use the same numbers as `expired` (`maxYards: 1, maxAnalysesPerYardPerMonth: 0, maxVisibleTasks: 1, canRunAnalysis: false`). They have no paid features until payment clears.
-3. **Critically, `isEffectivelyExpired` MUST NOT include `"incomplete"`** — the entire point of separating it from `expired` is to prevent the deletion cron from running on someone who's mid-checkout.
-4. **Update the webhook switch** in `app/api/stripe/webhook/route.ts` (around lines 25-45):
-   ```ts
-   case "incomplete":         planStatus = "incomplete"; break;
-   case "unpaid":             planStatus = "incomplete"; break;
-   case "incomplete_expired": planStatus = "canceled";   break;
-   case "paused":             planStatus = "active";     break; // confirm with user!
-   ```
-5. **Keep the defensive default** (warn log + `past_due`) as a guardrail for future Stripe statuses.
-6. **UI surface for `incomplete`**: add a banner to the dashboard layout that shows when `planStatus === "incomplete"` with copy like *"Finish your payment to activate [Plan]. [Open billing portal →]"*. Link goes to `/api/stripe/portal`.
-7. **Update existing test** in `app/api/stripe/webhook/__tests__/route.test.ts`:
-   - The contract #6 tests currently assert "unknown status maps to past_due + log." Update them:
-     - `incomplete` should now hit its own case and map to `incomplete` (no log)
-     - The default-case test should use a genuinely unknown status (e.g., `"made_up_status"`) to exercise the guardrail
-   - Add new tests for each of `incomplete`, `unpaid`, `incomplete_expired`, and `paused` mapping
-8. **Update the doc contract** in `docs/billing-behavior-reference.md`. The webhook section currently says:
-   > 6. **Any unrecognized Stripe `status`** … → persists `planStatus = "past_due"` AND emits a `logger.warn`
-   
-   Update to enumerate the four newly-handled statuses, with contract items #6a–6d, and keep #6 (default) as the guardrail with adjusted wording.
+   Keep the defensive default (warn log + `past_due`) as a guardrail for future Stripe statuses we haven't seen.
+3. **Fix the `past_due` access gate** — this is audit item #1, now bundled here:
+   - In `lib/subscription.ts`, add a `past_due` row to `LIMITS` with no-access entitlements (`maxYards: 1, maxAnalysesPerYardPerMonth: 0, maxVisibleTasks: 1, canRunAnalysis: false`).
+   - Update `getPlanLimits` to return that row when `planStatus === "past_due"`. Currently it falls through to the user's plan tier and returns full access.
+   - **CRITICAL**: do NOT include `past_due` in `isEffectivelyExpired`. The whole point is no access without starting the deletion clock — billing is recoverable.
+4. **Dashboard banner for `past_due`**: add a banner in `app/(dashboard)/layout.tsx` that renders when `planStatus === "past_due"`. Copy: *"Your billing needs attention. [Open billing portal →]"* linked to `/api/stripe/portal`. The banner should be persistent (similar to the trial banner currently there).
+5. **Update tests** in `app/api/stripe/webhook/__tests__/route.test.ts`:
+   - Current contract #6 tests (paused + incomplete → past_due via default) need to be moved to their own explicit cases. The default-branch test should use a genuinely unknown status (e.g., `"made_up_status"`) to exercise the guardrail.
+   - Add a test for `unpaid → past_due` and `incomplete_expired → canceled`.
+   - Add tests for `getPlanLimits` returning the no-access row for `past_due`.
+6. **Update the contract doc** `docs/billing-behavior-reference.md`:
+   - Webhook section: replace the current items #5 (past_due → past_due) and #6 (default → past_due + log) with explicit items #5a (incomplete), #5b (unpaid), #5c (paused), #5d (incomplete_expired → canceled), and a revised default-guardrail #6 that uses a truly-unknown status as its example.
+   - Add a new section after "Failed payments" titled "What `past_due` actually means now": no paid feature access (analyses, multi-yard, full task list), persistent banner in-app, billing portal link, no deletion clock.
+   - The Failed payments section currently says `past_due` users keep full plan access — fix that. The new behavior is "no paid feature access until billing is restored."
+7. **Audit other surfaces** for hardcoded `past_due` assumptions:
+   - `app/api/analyze/route.ts` — does it call `canRunAnalysis` which respects the new limits? It should, but verify.
+   - Email templates — `lib/email/weather-alerts.ts` etc. — do they continue sending to `past_due` users? Probably should stop, since access is now gated.
 
-### Open question that needs the user's call
+### Decisions made in this session
 
-**`paused` mapping**: my recommendation is `active`, on the reasoning that Stripe-side pause is typically a manual support intervention to comp a user. The user said *"we should not have a pause feature to fall back on"* — that referred to NOT pretending we support pause, which is a different concern. Mapping `paused` to `active` doesn't add a pause feature; it just keeps a comp'd user in working state.
-
-The conservative alternative is `incomplete` (gate access until pause is lifted). Less generous but defensible.
-
-Confirm with the user before wiring this case.
+- **All "billing unwell" Stripe states (incomplete, unpaid, paused, past_due) collapse to one `past_due` planStatus.** No new enum value needed.
+- **`past_due` now gates paid features.** Access is recoverable by updating payment; no deletion clock.
+- **`incomplete_expired` maps to `canceled`** because the subscription is permanently dead.
+- **Single user-facing banner** for all four cases — we don't surface which exact Stripe state to the user.
 
 ## Remaining open items from the original audit
 
 These were flagged in the audit but NOT addressed in this session:
 
-1. **Past-due users get full plan access.** `getPlanLimits` doesn't degrade for `planStatus === "past_due"`. They keep all features until Stripe's retry window expires. Email + portal link via webhook is the only nudge.
-2. **No reminder email before a scheduled annual→monthly fires.** A user who scheduled the switch in January gets no email in late December. They could be surprised when the next bill changes shape.
-3. **Trial expiration has no explicit "you're now expired" page.** When the 21 days end, the account goes read-only with no in-app moment that says "trial over, pick a plan or your data deletes in 30 days."
+1. **No reminder email before a scheduled annual→monthly fires.** A user who scheduled the switch in January gets no email in late December. They could be surprised when the next bill changes shape.
+2. **Trial expiration has no explicit "you're now expired" page.** When the 21 days end, the account goes read-only with no in-app moment that says "trial over, pick a plan or your data deletes in 30 days."
+
+Note: the original audit also flagged "past-due users get full plan access." That's now bundled into the next task above (the Stripe status mapping + past_due gating work).
 
 None of these are blocking — they're product polish.
 
