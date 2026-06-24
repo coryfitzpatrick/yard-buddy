@@ -32,11 +32,20 @@ export async function updateUserFromSubscription(sub: Stripe.Subscription) {
     case "active":    planStatus = "active";    break;
     case "past_due":  planStatus = "past_due";  break;
     case "canceled":  planStatus = "canceled";  break;
-    // We don't ship a pause feature today. If Stripe ever surfaces "paused"
-    // for any reason (admin action, future feature), treat it like past_due
-    // so the account doesn't get bumped into the expired-deletion flow.
-    case "paused":    planStatus = "past_due";  break;
-    default:          planStatus = "expired";
+    default:
+      // Any Stripe status we haven't explicitly enumerated lands here:
+      // paused, incomplete, incomplete_expired, unpaid, or anything Stripe
+      // adds in the future. The previous default was "expired", which
+      // silently started the 30-day account-deletion clock — never the
+      // right answer for a state we don't understand. We map to past_due
+      // (the non-destructive "billing is unwell" bucket) and log loudly so
+      // we know to add real handling next time it shows up.
+      logger.warn("Unrecognized Stripe subscription status; mapping to past_due", {
+        subscriptionId: sub.id,
+        stripeStatus: sub.status,
+        customer: typeof sub.customer === "string" ? sub.customer : sub.customer.id,
+      });
+      planStatus = "past_due";
   }
 
   // In the v2 Stripe API, current_period_end lives on the subscription item

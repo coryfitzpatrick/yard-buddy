@@ -250,7 +250,7 @@ The route reads live state from Stripe (via `subscriptions.retrieve`) rather tha
 3. **No-op idempotency** → skips the DB write only when ALL of plan, planStatus, currentPeriodEnd, and stripeSubscriptionId match what we already have. A renewal that advances `current_period_end` without changing plan/status MUST still write through, otherwise the "Next charge on …" UI sticks at the old date.
 4. **Subscription `status = "canceled"`** → persists `planStatus = "canceled"`.
 5. **Subscription `status = "past_due"`** → persists `planStatus = "past_due"`.
-6. **Subscription `status = "paused"`** → persists `planStatus = "past_due"` (NEVER `"expired"`; expired triggers the 30-day deletion clock).
+6. **Any unrecognized Stripe `status`** (paused, incomplete, incomplete_expired, unpaid, or a new value Stripe adds) → persists `planStatus = "past_due"` AND emits a `logger.warn` with the offending status. The default is NEVER `"expired"` because expired triggers the 30-day deletion clock and we shouldn't nuke an account because Stripe sent something we don't recognize yet. The log surfaces the unknown status so a real handler can be added.
 7. **Plan increase that allows more yards** → auto-restores most recently archived yards up to the new limit, atomically with the user update inside a single `db.$transaction`.
 
 ### Analyze route quota cutoff

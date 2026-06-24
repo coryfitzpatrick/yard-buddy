@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type Stripe from "stripe";
 
+const { mockLoggerWarn } = vi.hoisted(() => ({ mockLoggerWarn: vi.fn() }));
+
+vi.mock("@/lib/observability/logger", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/observability/logger")>("@/lib/observability/logger");
+  return { ...actual, logger: { ...actual.logger, warn: mockLoggerWarn, error: vi.fn(), info: vi.fn() } };
+});
+
 vi.mock("@/lib/stripe", async () => {
   const actual = await vi.importActual<typeof import("@/lib/stripe")>("@/lib/stripe");
   return {
@@ -67,6 +74,7 @@ describe("updateUserFromSubscription", () => {
     (db.yard.findMany as ReturnType<typeof vi.fn>).mockReset();
     (db.yard.updateMany as ReturnType<typeof vi.fn>).mockReset();
     (db.$transaction as ReturnType<typeof vi.fn>).mockClear();
+    mockLoggerWarn.mockClear();
     (db.user.update as ReturnType<typeof vi.fn>).mockResolvedValue({});
     (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(0);
     (db.yard.findMany as ReturnType<typeof vi.fn>).mockResolvedValue([]);
@@ -174,10 +182,10 @@ describe("updateUserFromSubscription", () => {
     expect(updateCall.data.planStatus).toBe("past_due");
   });
 
-  it("contract #4c: status paused → planStatus = past_due (NEVER expired)", async () => {
-    // Paused isn't a state we ship today, but if Stripe ever surfaces it
-    // (admin action, future feature) we must NOT flip the user to expired,
-    // which would start the 30-day account-deletion clock.
+  it("contract #6: any unrecognized Stripe status maps to past_due AND logs a warning (never expired)", async () => {
+    // Don't enumerate states we don't ship — instead make the fallback safe
+    // and observable. Covers paused, incomplete, incomplete_expired, unpaid,
+    // and anything Stripe adds in the future.
     (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
       id: "u1", plan: "home_plus", planStatus: "active",
     });
@@ -186,6 +194,25 @@ describe("updateUserFromSubscription", () => {
 
     const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(updateCall.data.planStatus).toBe("past_due");
+    expect(mockLoggerWarn).toHaveBeenCalledWith(
+      expect.stringContaining("Unrecognized Stripe subscription status"),
+      expect.objectContaining({ stripeStatus: "paused" }),
+    );
+  });
+
+  it("contract #6 (incomplete): also lands in past_due with a log", async () => {
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1", plan: "home_basic", planStatus: "active",
+    });
+
+    await updateUserFromSubscription(subscription({ status: "incomplete" as never, priceId: "price_home_basic_monthly" }));
+
+    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(updateCall.data.planStatus).toBe("past_due");
+    expect(mockLoggerWarn).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ stripeStatus: "incomplete" }),
+    );
   });
 
   it("contract #5: plan increase to a higher yard limit auto-restores most recently archived yards up to the new cap", async () => {
