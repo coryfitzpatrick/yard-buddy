@@ -137,20 +137,18 @@ export function BillingSection({
     window.location.reload();
   }
 
-  async function handleChangePlan(opts?: { deferTier?: boolean }) {
+  async function handleChangePlan() {
     if (!changePlanKey) return;
     const targetLimits = getPlanLimits({ plan: changePlanKey, planStatus, trialEndsAt: null });
-    // The yard picker only opens for changes that take effect today. Deferred
-    // changes don't archive anything now; the user keeps every yard through
-    // the prepaid annual term and the schedule sorts it out at renewal.
+    // The yard picker only opens for downgrades that take effect today. For
+    // annual downgrades the user keeps all yards through the prepaid term and
+    // picks at renewal (handled by the app's archive-required modal then).
     const TIER_RANK: Record<string, number> = { trial: 0, home_basic: 1, home_plus: 2, professional: 3 };
     const targetRank = TIER_RANK[changePlanKey] ?? 0;
     const currentRank = TIER_RANK[currentPlan] ?? 0;
-    const isTierChange = changePlanKey !== currentPlan;
     const isAnnualDowngrade = currentPeriod === "annual" && targetRank < currentRank;
-    const isAnnualToMonthly = currentPeriod === "annual" && changePeriod === "monthly";
-    const tierAppliesNow = isTierChange && !isAnnualDowngrade && (!isAnnualToMonthly || opts?.deferTier === false);
-    if (tierAppliesNow && targetLimits.maxYards > 0 && yards.length > targetLimits.maxYards) {
+    const isImmediateDowngrade = !isAnnualDowngrade && targetRank < currentRank;
+    if (isImmediateDowngrade && targetLimits.maxYards > 0 && yards.length > targetLimits.maxYards) {
       setDowngradeTarget(changePlanKey);
       setChangePlanKey(null);
       return;
@@ -164,7 +162,6 @@ export function BillingSection({
       body: JSON.stringify({
         plan: changePlanKey,
         period: changePeriod,
-        ...(opts?.deferTier !== undefined ? { deferTier: opts.deferTier } : {}),
       }),
     });
     setBusy(false);
@@ -346,25 +343,35 @@ export function BillingSection({
 
             let directionCopy: string;
             const currentLabel = CHANGE_PLANS.find((p) => p.key === currentPlan)?.label ?? "your current plan";
+            const targetMaxYards = getPlanLimits({ plan: changePlanKey, planStatus, trialEndsAt: null }).maxYards;
+            const willExceedYardLimit = targetMaxYards > 0 && yards.length > targetMaxYards;
+            const yardsToPick = willExceedYardLimit ? targetMaxYards : 0;
+            const yardsToArchive = willExceedYardLimit ? yards.length - targetMaxYards : 0;
             if (isAnnualDowngrade) {
               const targetCadenceLabel = changePeriod === "annual" ? "annual" : "monthly";
               const targetRate = changePeriod === "annual"
                 ? `$${selectedPlan?.annual}/yr`
                 : `$${selectedPlan?.monthly}/mo`;
-              directionCopy = `You keep ${currentLabel} annual through ${renewalDate}. On ${renewalDate}, your plan switches to ${selectedPlan?.label} ${targetCadenceLabel} at ${targetRate}. Nothing changes today, and you don't lose any features you already paid for.`;
+              const yardPickCopy = willExceedYardLimit
+                ? ` At that point you'll need to pick the ${yardsToPick} yard${yardsToPick === 1 ? "" : "s"} you want to keep on ${selectedPlan?.label}, or upgrade to keep all ${yards.length}.`
+                : "";
+              directionCopy = `You keep ${currentLabel} annual through ${renewalDate}, with all ${yards.length} of your yards. On ${renewalDate}, your plan switches to ${selectedPlan?.label} ${targetCadenceLabel} at ${targetRate}.${yardPickCopy}`;
             } else if (isAnnualToMonthly && !isCombinedAnnualToMonthlyUpgrade) {
               directionCopy = `Your annual plan runs through ${renewalDate}. After that, billing switches to ${selectedPlan?.label} at $${selectedPlan?.monthly}/mo. Nothing changes today.`;
+            } else if (isCombinedAnnualToMonthlyUpgrade) {
+              directionCopy = `To move to ${selectedPlan?.label} monthly while you're on ${currentLabel} annual, the remaining ${currentLabel} annual term has to upgrade to ${selectedPlan?.label} annual first. Today you're charged the prorated ${selectedPlan?.label} annual − ${currentLabel} annual difference, and ${selectedPlan?.label} features unlock immediately. You stay on annual billing through ${renewalDate}. On ${renewalDate}, your plan switches to ${selectedPlan?.label} monthly at $${selectedPlan?.monthly}/mo.`;
             } else if (isMonthlyToAnnual && !isDowngradeChange && !isUpgradeChange) {
               directionCopy = `You'll be charged $${selectedPlan?.annual} today. Any unused days from this month are credited toward your next bill. Your annual term runs for 12 months from today.`;
             } else if (isDowngradeChange) {
-              directionCopy = `We'll credit the prorated difference for the rest of this billing period toward your next bill. New plan starts now.`;
+              const yardPickCopy = willExceedYardLimit
+                ? ` ${yardsToArchive} of your yards will be archived when you confirm.`
+                : "";
+              directionCopy = `We'll credit the prorated difference for the rest of this billing period toward your next bill. New plan starts now.${yardPickCopy}`;
             } else if (isUpgradeChange) {
               directionCopy = `You'll be charged the prorated difference for the rest of this billing period today. New plan starts now.`;
             } else {
               directionCopy = `Plan changes take effect immediately.`;
             }
-
-            const currentPlanCfg = CHANGE_PLANS.find((p) => p.key === currentPlan);
 
             return (
             <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 space-y-3">
@@ -394,77 +401,30 @@ export function BillingSection({
                 </button>
               </div>
 
-              {isCombinedAnnualToMonthlyUpgrade ? (
-                <>
-                  <div className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-900">
-                    This change involves both upgrading your plan <em>and</em> switching off annual. Annual is a 12-month commitment, so we can&apos;t do both today. Pick how you want to proceed:
-                  </div>
-                  <div className="space-y-2">
-                    <div className="rounded-md bg-white border border-gray-200 p-3 space-y-2">
-                      <p className="text-sm font-semibold text-gray-900">
-                        Upgrade to {selectedPlan?.label} annual now
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        You&apos;ll be charged the prorated difference between {currentLabel} annual and {selectedPlan?.label} annual today. {selectedPlan?.label} features unlock immediately. You stay on annual billing through {renewalDate}.
-                      </p>
-                      <Button
-                        size="sm"
-                        onClick={() => handleChangePlan({ deferTier: false })}
-                        disabled={busy}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        {busy ? "Switching…" : `Upgrade to ${selectedPlan?.label} annual now`}
-                      </Button>
-                    </div>
-                    <div className="rounded-md bg-white border border-gray-200 p-3 space-y-2">
-                      <p className="text-sm font-semibold text-gray-900">
-                        Schedule {selectedPlan?.label} monthly for {renewalDate}
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        Nothing changes today. You finish your current annual term on {currentLabel}. On {renewalDate}, your plan switches to {selectedPlan?.label} monthly at ${selectedPlan?.monthly}/mo.
-                      </p>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleChangePlan({ deferTier: true })}
-                        disabled={busy}
-                      >
-                        {busy ? "Scheduling…" : `Schedule for ${renewalDate}`}
-                      </Button>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="ghost" onClick={() => setChangePlanKey(null)}>
-                    Never mind
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <div className="rounded-md bg-white border border-gray-200 px-3 py-2 text-sm">
-                    <span className="text-gray-500">You&apos;ll be billed </span>
-                    <span className="font-semibold text-gray-900">${billedAmount} {billedSuffix}</span>
-                    <span className="text-gray-500"> going forward.</span>
-                  </div>
-                  <p className="text-xs text-gray-600">
-                    {directionCopy}
-                  </p>
-                  <p className="text-xs text-gray-400 border-t border-gray-200 pt-2">
-                    Plan changes apply immediately. The only exception is switching from annual to monthly, which takes effect at your next renewal because annual is a 12-month commitment.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => handleChangePlan()}
-                      disabled={busy || (changePlanKey === currentPlan && changePeriod === currentPeriod)}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      {busy ? busyLabel : confirmLabel}
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setChangePlanKey(null)}>
-                      Never mind
-                    </Button>
-                  </div>
-                </>
-              )}
+              <div className="rounded-md bg-white border border-gray-200 px-3 py-2 text-sm">
+                <span className="text-gray-500">You&apos;ll be billed </span>
+                <span className="font-semibold text-gray-900">${billedAmount} {billedSuffix}</span>
+                <span className="text-gray-500"> going forward.</span>
+              </div>
+              <p className="text-xs text-gray-600">
+                {directionCopy}
+              </p>
+              <p className="text-xs text-gray-400 border-t border-gray-200 pt-2">
+                On annual, the only change that takes effect today is a tier upgrade. Anything else waits until your next renewal because annual is a 12-month commitment.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => handleChangePlan()}
+                  disabled={busy || (changePlanKey === currentPlan && changePeriod === currentPeriod)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {busy ? busyLabel : confirmLabel}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setChangePlanKey(null)}>
+                  Never mind
+                </Button>
+              </div>
             </div>
             );
           })() : (

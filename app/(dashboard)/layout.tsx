@@ -7,7 +7,8 @@ import NotInApp from "@/components/NotInApp";
 import PushPermissionPrompt from "@/components/mobile/PushPermissionPrompt";
 import BiometricOptInPrompt from "@/components/mobile/BiometricOptInPrompt";
 import Link from "next/link";
-import { daysUntilTrialEnd } from "@/lib/subscription";
+import { daysUntilTrialEnd, getPlanLimits, PLAN_LABELS } from "@/lib/subscription";
+import { YardLimitExceededModal } from "@/components/yards/YardLimitExceededModal";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -15,7 +16,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { plan: true, planStatus: true, trialEndsAt: true, termsAcceptedAt: true },
+    select: { plan: true, planStatus: true, trialEndsAt: true, termsAcceptedAt: true, currentPeriodEnd: true },
   });
 
   if (!user?.termsAcceptedAt) {
@@ -24,6 +25,27 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const isTrial = user?.planStatus === "trialing" || user?.plan === "trial";
   const trialDaysLeft = daysUntilTrialEnd(user?.trialEndsAt);
+
+  // When a deferred annual downgrade fires at renewal, the user can end up
+  // with more active yards than the new plan supports. Force a pick (or an
+  // upgrade) before the rest of the app is usable.
+  const planLimits = getPlanLimits({
+    plan: user.plan,
+    planStatus: user.planStatus,
+    trialEndsAt: user.trialEndsAt,
+    currentPeriodEnd: user.currentPeriodEnd,
+  });
+  let overLimitYards: { id: string; name: string }[] = [];
+  if (planLimits.maxYards > 0) {
+    const activeYards = await db.yard.findMany({
+      where: { userId: session.user.id, archivedAt: null },
+      orderBy: { createdAt: "asc" },
+      select: { id: true, name: true },
+    });
+    if (activeYards.length > planLimits.maxYards) {
+      overLimitYards = activeYards;
+    }
+  }
 
   async function handleSignOut() {
     "use server";
@@ -58,6 +80,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {children}
       </main>
       <Footer />
+      {overLimitYards.length > 0 && (
+        <YardLimitExceededModal
+          planLabel={PLAN_LABELS[user.plan] ?? user.plan}
+          newMaxYards={planLimits.maxYards}
+          yards={overLimitYards}
+        />
+      )}
       <PushPermissionPrompt />
       <BiometricOptInPrompt userIsAuthed={!!session?.user?.id} />
     </div>

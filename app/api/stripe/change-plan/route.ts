@@ -18,13 +18,13 @@ export const POST = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let body: { plan?: string; period?: string; archiveYardIds?: string[]; deferTier?: boolean };
+  let body: { plan?: string; period?: string; archiveYardIds?: string[] };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const { plan, period, archiveYardIds, deferTier } = body;
+  const { plan, period, archiveYardIds } = body;
 
   if (archiveYardIds !== undefined && (!Array.isArray(archiveYardIds) || !archiveYardIds.every((id) => typeof id === "string"))) {
     return NextResponse.json({ error: "archiveYardIds must be a string array" }, { status: 400 });
@@ -69,33 +69,22 @@ export const POST = withAxiom(async (req: NextRequest) => {
   const isUpgrade = isTierUpgrade(user.plan, plan);
   const isDowngrade = isTierDowngrade(user.plan, plan);
 
-  // "You get what you paid for." Any change that would take away features
-  // mid-prepaid-term is deferred to renewal. That covers:
-  //   - tier downgrades while on annual (any target cadence)
-  //   - pure annual→monthly switches (no tier change)
-  // Annual→monthly combined with an upgrade is the only ambiguous case;
-  // the user picks via the fork (deferTier flag).
+  // "You get what you paid for." Any tier downgrade while on annual waits
+  // for renewal, as does any pure annual→monthly switch (the 12-month
+  // commitment). Annual + upgrade is always immediate at the annual rate;
+  // if the user is also moving to monthly, the cadence flip schedules for
+  // renewal but the tier upgrade still happens today.
   const isAnnualDowngrade = currentPeriod === "annual" && isTierChange && isDowngrade;
-  const forceDeferAll = isAnnualDowngrade;
-  const effectiveDeferTier = forceDeferAll ? true : deferTier;
-
-  if (isAnnualToMonthly && isTierChange && isUpgrade && effectiveDeferTier === undefined) {
-    return NextResponse.json(
-      { error: "Cadence choice required", code: "cadence_choice_required" },
-      { status: 409 },
-    );
-  }
-
-  // A schedule is needed for any deferred change.
   const needsSchedule = currentPeriod === "annual" && (
     isAnnualToMonthly ||
-    (isTierChange && isDowngrade)
+    isAnnualDowngrade
   );
 
-  // Tier flips today only when (a) the tier is changing AND (b) we are not
-  // deferring. Same-period upgrades and monthly downgrades flip immediately;
-  // annual downgrades and "schedule everything" upgrade picks defer.
-  const tierAppliesNow = isTierChange && !(needsSchedule && effectiveDeferTier !== false);
+  // Tier flips today for upgrades and for monthly tier changes. The only
+  // time a tier change is held is when the whole change is deferred, which
+  // happens for annual downgrades. (A combined annual upgrade + monthly
+  // target still flips tier today on annual cadence.)
+  const tierAppliesNow = isTierChange && !isAnnualDowngrade;
   const newLimits = getPlanLimits({
     plan,
     planStatus: user.planStatus,
@@ -134,15 +123,16 @@ export const POST = withAxiom(async (req: NextRequest) => {
 
   try {
     if (needsSchedule) {
-      // For a combined upgrade with deferTier=false, the tier change still
-      // applies today on the existing annual cadence; phase 1 then mirrors
-      // the new tier's annual price. Otherwise phase 1 mirrors the current
-      // subscription price (no change today).
-      const phase1PriceId = isTierChange && effectiveDeferTier === false
+      // For a combined upgrade with cadence change (e.g. Basic annual →
+      // Plus monthly), the tier change applies today on the existing annual
+      // cadence; phase 1 then mirrors the new tier's annual price. For
+      // pure cadence flips and annual downgrades, phase 1 mirrors the
+      // current subscription (no immediate change).
+      const phase1PriceId = tierAppliesNow
         ? STRIPE_PRICES[plan as StripePlan][currentPeriod as StripePeriod]
         : currentPriceId;
 
-      if (isTierChange && effectiveDeferTier === false) {
+      if (tierAppliesNow) {
         await stripe.subscriptions.update(user.stripeSubscriptionId, {
           items: [{ id: itemId, price: phase1PriceId }],
           proration_behavior: "always_invoice",

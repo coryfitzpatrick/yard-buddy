@@ -145,7 +145,7 @@ describe("change-plan route", () => {
     );
   });
 
-  it("annual → monthly with tier upgrade requires explicit cadence choice (409)", async () => {
+  it("annual + tier upgrade + monthly target: upgrades tier today on annual; schedules monthly for renewal", async () => {
     (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
       stripeSubscriptionId: "sub_1",
       plan: "home_basic",
@@ -158,71 +158,20 @@ describe("change-plan route", () => {
       schedule: null,
     });
     const res = await POST(jsonRequest({ plan: "home_plus", period: "monthly" }) as never, {} as never);
-    expect(res.status).toBe(409);
-    const body = await res.json();
-    expect(body.code).toBe("cadence_choice_required");
-    expect(mockSubscriptionsUpdate).not.toHaveBeenCalled();
-    expect(mockSchedulesCreate).not.toHaveBeenCalled();
-  });
-
-  it("annual → monthly with tier upgrade and deferTier=false: tier change immediate, cadence scheduled", async () => {
-    (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
-      stripeSubscriptionId: "sub_1",
-      plan: "home_basic",
-      planStatus: "active",
-      stripeCustomerId: "cus_1",
-    });
-    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(1);
-    mockSubscriptionsRetrieve.mockResolvedValue({
-      items: { data: [{ id: "si_1", price: { id: "price_home_basic_annual" } }] },
-      schedule: null,
-    });
-    const res = await POST(jsonRequest({ plan: "home_plus", period: "monthly", deferTier: false }) as never, {} as never);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toEqual({ ok: true, deferred: true });
+    // Tier upgrades today on annual cadence
     expect(mockSubscriptionsUpdate).toHaveBeenCalledWith("sub_1", expect.objectContaining({
       items: [{ id: "si_1", price: "price_home_plus_annual" }],
       proration_behavior: "always_invoice",
     }));
-    expect(mockSchedulesCreate).toHaveBeenCalled();
+    // Cadence flip scheduled for renewal
     expect(mockSchedulesUpdate).toHaveBeenCalledWith(
       "schd_1",
       expect.objectContaining({
         phases: [
           expect.objectContaining({ items: [{ price: "price_home_plus_annual", quantity: 1 }] }),
-          expect.objectContaining({ items: [{ price: "price_home_plus_monthly", quantity: 1 }] }),
-        ],
-      }),
-    );
-  });
-
-  it("annual → monthly with tier upgrade and deferTier=true: nothing today, both deferred to renewal", async () => {
-    (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
-      stripeSubscriptionId: "sub_1",
-      plan: "home_basic",
-      planStatus: "active",
-      stripeCustomerId: "cus_1",
-    });
-    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(1);
-    mockSubscriptionsRetrieve.mockResolvedValue({
-      items: { data: [{ id: "si_1", price: { id: "price_home_basic_annual" } }] },
-      schedule: null,
-    });
-    const res = await POST(jsonRequest({ plan: "home_plus", period: "monthly", deferTier: true }) as never, {} as never);
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body).toEqual({ ok: true, deferred: true });
-    // No immediate price change — the tier stays on current plan until phase 2 fires
-    expect(mockSubscriptionsUpdate).not.toHaveBeenCalled();
-    // DB plan write is skipped: webhook will pick up the change when the schedule transitions
-    expect((db.user.update as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
-    // Schedule has phase 1 = current (Basic annual) → phase 2 = target (Plus monthly)
-    expect(mockSchedulesUpdate).toHaveBeenCalledWith(
-      "schd_1",
-      expect.objectContaining({
-        phases: [
-          expect.objectContaining({ items: [{ price: "price_home_basic_annual", quantity: 1 }] }),
           expect.objectContaining({ items: [{ price: "price_home_plus_monthly", quantity: 1 }] }),
         ],
       }),
@@ -291,30 +240,24 @@ describe("change-plan route", () => {
     );
   });
 
-  it("annual → monthly with tier downgrade ignores deferTier=false (forced defer)", async () => {
+  it("annual + tier downgrade doesn't archive yards today (picker happens at renewal)", async () => {
     (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
       stripeSubscriptionId: "sub_1",
       plan: "home_plus",
       planStatus: "active",
       stripeCustomerId: "cus_1",
     });
-    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(1);
+    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(2);
     mockSubscriptionsRetrieve.mockResolvedValue({
       items: { data: [{ id: "si_1", price: { id: "price_home_plus_annual" } }] },
       schedule: null,
     });
-    const res = await POST(jsonRequest({ plan: "home_basic", period: "monthly", deferTier: false }) as never, {} as never);
+    // Plus annual (2 yards) → Basic annual (1 yard limit). No archive picker
+    // needed today; the user picks at renewal when the plan actually changes.
+    const res = await POST(jsonRequest({ plan: "home_basic", period: "annual" }) as never, {} as never);
     expect(res.status).toBe(200);
     expect(mockSubscriptionsUpdate).not.toHaveBeenCalled();
-    expect(mockSchedulesUpdate).toHaveBeenCalledWith(
-      "schd_1",
-      expect.objectContaining({
-        phases: [
-          expect.objectContaining({ items: [{ price: "price_home_plus_annual", quantity: 1 }] }),
-          expect.objectContaining({ items: [{ price: "price_home_basic_monthly", quantity: 1 }] }),
-        ],
-      }),
-    );
+    expect((db.yard.updateMany as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
   });
 
   it("monthly → annual (same tier) updates the subscription immediately", async () => {
