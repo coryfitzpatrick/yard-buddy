@@ -32,12 +32,13 @@ type Effective = {
 interface Props {
   kind: Kind;
   sectionId: string;
+  yardSlug: string;
   latestAnalysis: AnalysisShape | null;
   effective: Effective;
   plan: string | null;
 }
 
-export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, effective, plan }: Props) {
+export function ScheduleRecommendationCard({ kind, sectionId, yardSlug, latestAnalysis, effective, plan }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -72,6 +73,7 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
     const hasNoSchedule = effective.days.length === 0;
     const hasSuggestion = suggestedDays != null;
     const showSetupCta = hasNoSchedule && hasSuggestion;
+    const showManualSetupCta = hasNoSchedule && !hasSuggestion;
 
     const setUp = async () => {
       if (!suggestedDays) return;
@@ -116,6 +118,19 @@ export function ScheduleRecommendationCard({ kind, sectionId, latestAnalysis, ef
               {busy ? "Saving..." : `Set up ${kind}`}
             </button>
             {error && <p role="alert" className="text-sm text-red-700 mt-2">{error}</p>}
+          </div>
+        )}
+        {showManualSetupCta && (
+          <div className="mt-3">
+            <p className="text-sm text-gray-500 mb-2">
+              You haven&apos;t set up a {kind} schedule yet.
+            </p>
+            <Link
+              href={`/yard/${yardSlug}/edit`}
+              className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+            >
+              Set up {kind} schedule
+            </Link>
           </div>
         )}
       </div>

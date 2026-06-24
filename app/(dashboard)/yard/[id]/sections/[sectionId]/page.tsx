@@ -379,6 +379,7 @@ export default async function SectionDetailPage({
               <ScheduleRecommendationCard
                 kind="watering"
                 sectionId={section.id}
+                yardSlug={yardSlug}
                 latestAnalysis={latestAnalysis}
                 effective={{ days: wEff.days, time: wEff.time, minutesPerSession: wEff.minutesPerSession, heightInches: null }}
                 plan={subscriptionUser.plan}
@@ -386,6 +387,7 @@ export default async function SectionDetailPage({
               <ScheduleRecommendationCard
                 kind="mowing"
                 sectionId={section.id}
+                yardSlug={yardSlug}
                 latestAnalysis={latestAnalysis}
                 effective={{ days: mEff.days, time: mEff.time, minutesPerSession: null, heightInches: mEff.heightInches }}
                 plan={subscriptionUser.plan}

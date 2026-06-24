@@ -28,26 +28,26 @@ const baseEffective = { days: ["Mon","Wed","Fri"], time: "07:00", minutesPerSess
 
 describe("ScheduleRecommendationCard - watering", () => {
   it("state A: shows empty state when no analysis", () => {
-    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={null} effective={baseEffective} plan="home_basic" />);
+    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" yardSlug="yard-1" latestAnalysis={null} effective={baseEffective} plan="home_basic" />);
     expect(screen.getByText(/run an analysis/i)).toBeInTheDocument();
   });
 
   it("state B: shows neutral confirmation when not deviating", () => {
-    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={baseAnalysis} effective={baseEffective} plan="home_basic" />);
+    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" yardSlug="yard-1" latestAnalysis={baseAnalysis} effective={baseEffective} plan="home_basic" />);
     expect(screen.getByText(/works well/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /ignore/i })).not.toBeInTheDocument();
   });
 
   it("state C: shows Apply and Ignore when deviating and not dismissed", () => {
     const dev = { ...baseAnalysis, wateringDeviates: true, wateringSuggestedMinutesPerSession: 15 };
-    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={dev} effective={baseEffective} plan="home_basic" />);
+    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" yardSlug="yard-1" latestAnalysis={dev} effective={baseEffective} plan="home_basic" />);
     expect(screen.getByRole("button", { name: /apply/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /ignore/i })).toBeInTheDocument();
   });
 
   it("state D: shows banner when deviating and dismissed", () => {
     const dev = { ...baseAnalysis, wateringDeviates: true, wateringSuggestedMinutesPerSession: 15, wateringRecommendationDismissedAt: new Date() };
-    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={dev} effective={baseEffective} plan="home_basic" />);
+    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" yardSlug="yard-1" latestAnalysis={dev} effective={baseEffective} plan="home_basic" />);
     expect(screen.getByText(/schedule override/i)).toBeInTheDocument();
   });
 
@@ -55,13 +55,28 @@ describe("ScheduleRecommendationCard - watering", () => {
     // User manually edited yard to match the suggestion; even though dismissed, stillDeviates is false.
     const dev = { ...baseAnalysis, wateringDeviates: true, wateringSuggestedDaysPerWeek: 3, wateringSuggestedMinutesPerSession: 15, wateringRecommendationDismissedAt: new Date() };
     const matching = { days: ["Mon","Wed","Fri"], time: "07:00", minutesPerSession: 15, heightInches: null };
-    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={dev} effective={matching} plan="home_basic" />);
+    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" yardSlug="yard-1" latestAnalysis={dev} effective={matching} plan="home_basic" />);
     expect(screen.queryByText(/schedule override/i)).not.toBeInTheDocument();
+  });
+
+  it("state B: shows manual setup CTA when no schedule and no AI suggestion", () => {
+    const noSuggestion = {
+      ...baseAnalysis,
+      wateringSchedule: null,
+      wateringDeviates: null,
+      wateringSuggestedDaysPerWeek: null,
+      wateringSuggestedMinutesPerSession: null,
+    };
+    const empty = { days: [], time: null, minutesPerSession: null, heightInches: null };
+    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" yardSlug="yard-1" latestAnalysis={noSuggestion} effective={empty} plan="home_basic" />);
+    const link = screen.getByRole("link", { name: /set up watering schedule/i });
+    expect(link).toHaveAttribute("href", "/yard/yard-1/edit");
+    expect(screen.getByText(/haven't set up a watering schedule/i)).toBeInTheDocument();
   });
 
   it("shows the user's days array in the Current display", () => {
     const dev = { ...baseAnalysis, wateringDeviates: true, wateringSuggestedDaysPerWeek: 2, wateringSuggestedMinutesPerSession: 20 };
-    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" latestAnalysis={dev} effective={baseEffective} plan="home_basic" />);
+    render(<ScheduleRecommendationCard kind="watering" sectionId="sec_1" yardSlug="yard-1" latestAnalysis={dev} effective={baseEffective} plan="home_basic" />);
     expect(screen.getByText(/3 days\/week \(Mon, Wed, Fri\)/)).toBeInTheDocument();
   });
 });
@@ -78,7 +93,7 @@ describe("ScheduleRecommendationCard - mowing", () => {
   it("renders mowing-specific state C with height in inches", () => {
     // height mismatch (2.5 != 3.0) drives the deviation
     const effective = { days: ["Sat"], time: "08:00", minutesPerSession: null, heightInches: 2.5 };
-    render(<ScheduleRecommendationCard kind="mowing" sectionId="sec_1" latestAnalysis={mowingAnalysis} effective={effective} plan="home_basic" />);
+    render(<ScheduleRecommendationCard kind="mowing" sectionId="sec_1" yardSlug="yard-1" latestAnalysis={mowingAnalysis} effective={effective} plan="home_basic" />);
     expect(screen.getByRole("button", { name: /apply/i })).toBeInTheDocument();
     expect(screen.getAllByText(/3 in/).length).toBeGreaterThan(0);
     expect(screen.getByText(/different mowing schedule/i)).toBeInTheDocument();
