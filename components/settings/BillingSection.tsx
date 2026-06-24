@@ -514,12 +514,12 @@ export function BillingSection({
       {/* Trial upgrade prompt */}
       {isTrial && (
         <NotInApp>
-          <div className="border-t border-gray-100 pt-4">
+          <div className="border-t border-gray-100 pt-4 flex flex-col items-center text-center">
             <p className="text-sm text-gray-500 mb-2">
-              Unlock unlimited recommendations, multiple yards, and more.
+              Upgrade for more analyses each month, the full task list, and multi-yard support.
             </p>
             <Link href="/pricing">
-              <Button className="bg-green-600 hover:bg-green-700 w-full">See all plans</Button>
+              <Button className="bg-green-600 hover:bg-green-700">See all plans</Button>
             </Link>
           </div>
         </NotInApp>
