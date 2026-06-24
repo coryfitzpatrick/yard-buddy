@@ -55,19 +55,50 @@ If any one of them drifts, fail the scenario and capture the divergence in a not
 
 **Expected UI:** pending-switch banner appears on `/settings` with the renewal date.
 
-### S2. Tier change + annual → monthly (combined)
+### S2. Tier change + annual → monthly: confirm screen forks the choice
 
 **Setup:** subscribe to **Plus annual**.
 
-**Action:** switch to **Basic monthly** in one go from the billing UI.
+**Action:** in the billing UI, pick **Basic** plan and **Monthly** cadence on the confirm screen. Do not click confirm yet.
+
+**Expected UI:** instead of a single confirm button, the screen shows two boxed options:
+- "Downgrade to Home Basic annual now" — explains the proration credit and that the user stays on annual billing through the current term.
+- "Schedule Home Basic monthly for [renewal date]" — explains that nothing changes today, and at renewal the plan switches to Basic monthly.
+
+**Direct API check:** calling `POST /api/stripe/change-plan` with `{plan: "home_basic", period: "monthly"}` (no `deferTier`) returns `409 { code: "cadence_choice_required" }`. No Stripe writes, no DB writes.
+
+### S2a. Combined choice A: change plans now, stay on annual
+
+**Setup:** Plus annual, on the fork from S2.
+
+**Action:** click **"Downgrade to Home Basic annual now"**. The UI sends `{plan: "home_basic", period: "monthly", deferTier: false}`.
 
 **Expected Stripe state:**
-- Subscription price flips immediately to `home_basic_annual`. A proration invoice is created and shown as a customer balance credit (negative).
-- A schedule is attached with phase 1 = Basic annual until renewal, phase 2 = Basic monthly.
+- Subscription price flips immediately to `home_basic_annual`. A prorated credit appears on the customer balance.
+- A schedule is attached: phase 1 = `home_basic_annual` until renewal, phase 2 = `home_basic_monthly`.
 
 **Expected DB:** `plan = "home_basic"` immediately; `currentPeriodEnd` unchanged.
 
 **Expected UI:** plan label flips to Home Basic. Pending banner reads "Switching to Home Basic (Monthly) on …".
+
+### S2b. Combined choice B: schedule the whole thing for renewal
+
+**Setup:** Plus annual, on the fork from S2.
+
+**Action:** click **"Schedule Home Basic monthly for [renewal date]"**. The UI sends `{plan: "home_basic", period: "monthly", deferTier: true}`.
+
+**Expected Stripe state:**
+- Subscription price **does not change today**. No proration invoice.
+- A schedule is attached: phase 1 = `home_plus_annual` (current!) until renewal, phase 2 = `home_basic_monthly`.
+
+**Expected DB:** `plan = "home_plus"` (unchanged). No DB write at all on this call.
+
+**Expected UI:** plan label is still Home Plus. Pending banner reads "Switching to Home Basic (Monthly) on …".
+
+**Critical:** advance the test clock past `current_period_end` and verify:
+- Webhook fires and writes `plan = "home_basic"`.
+- Subscription is on `home_basic_monthly` going forward.
+- No double-charge: the user's old annual term ran out cleanly and the new monthly billing started.
 
 ### S3. Cancel a pending switch via `/cancel-pending`
 

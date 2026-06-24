@@ -18,13 +18,13 @@ export const POST = withAxiom(async (req: NextRequest) => {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let body: { plan?: string; period?: string; archiveYardIds?: string[] };
+  let body: { plan?: string; period?: string; archiveYardIds?: string[]; deferTier?: boolean };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const { plan, period, archiveYardIds } = body;
+  const { plan, period, archiveYardIds, deferTier } = body;
 
   if (archiveYardIds !== undefined && (!Array.isArray(archiveYardIds) || !archiveYardIds.every((id) => typeof id === "string"))) {
     return NextResponse.json({ error: "archiveYardIds must be a string array" }, { status: 400 });
@@ -104,17 +104,29 @@ export const POST = withAxiom(async (req: NextRequest) => {
   const isAnnualToMonthly = currentPeriod === "annual" && period === "monthly";
   const isTierChange = user.plan !== plan;
 
+  // Combined tier change + annual→monthly is ambiguous: did the user want
+  // their new tier today (charged at the annual rate) or do they want the
+  // whole change to wait for renewal? Force the UI to disambiguate so we
+  // never silently coerce part of the request into a different cadence.
+  if (isAnnualToMonthly && isTierChange && deferTier === undefined) {
+    return NextResponse.json(
+      { error: "Cadence choice required", code: "cadence_choice_required" },
+      { status: 409 },
+    );
+  }
+
   try {
     if (isAnnualToMonthly) {
       // Annual is a 12-month commitment. The cadence switch waits for renewal.
-      // If the tier is also changing, the tier change still happens immediately
-      // on the existing (annual) cadence, then the schedule flips to monthly at
-      // the renewal date.
-      const phase1PriceId = isTierChange
+      // For a pure cadence switch (no tier change) phase 1 mirrors the current
+      // subscription. For a combined change, deferTier=false keeps the tier
+      // change immediate on the existing annual cadence; deferTier=true holds
+      // both the tier change and the cadence change until renewal.
+      const phase1PriceId = isTierChange && !deferTier
         ? STRIPE_PRICES[plan as StripePlan][currentPeriod]
         : currentPriceId;
 
-      if (isTierChange) {
+      if (isTierChange && !deferTier) {
         await stripe.subscriptions.update(user.stripeSubscriptionId, {
           items: [{ id: itemId, price: phase1PriceId }],
           proration_behavior: "always_invoice",
@@ -171,9 +183,14 @@ export const POST = withAxiom(async (req: NextRequest) => {
     return NextResponse.json({ error: "Couldn't process the plan change. Check your payment method and try again." }, { status: 402 });
   }
 
+  // When the tier change itself is deferred (annual→monthly with deferTier),
+  // we keep our DB plan on the current value until the schedule fires at
+  // renewal. The webhook picks up the price flip and updates the plan then.
+  const persistPlanNow = !(isAnnualToMonthly && deferTier);
+
   try {
     await db.$transaction([
-      ...(overLimit && archiveYardIds
+      ...(overLimit && archiveYardIds && persistPlanNow
         ? [
             db.yard.updateMany({
               where: { id: { in: archiveYardIds }, userId: session.user.id },
@@ -181,7 +198,9 @@ export const POST = withAxiom(async (req: NextRequest) => {
             }),
           ]
         : []),
-      db.user.update({ where: { id: session.user.id }, data: { plan } }),
+      ...(persistPlanNow
+        ? [db.user.update({ where: { id: session.user.id }, data: { plan } })]
+        : []),
     ]);
   } catch (err) {
     logger.error("change-plan: prisma transaction failed after stripe succeeded", {

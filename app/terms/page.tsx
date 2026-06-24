@@ -81,7 +81,8 @@ export default function TermsPage() {
             <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.4 Switching between monthly and annual</h3>
             <ul className="list-disc pl-5 space-y-2 mt-2">
               <li><strong>Monthly → annual</strong> takes effect immediately. You are charged the annual amount today, less a credit for unused days of the current month. Your new annual term runs for 12 months from that date.</li>
-              <li><strong>Annual → monthly</strong> takes effect at the end of your current annual term. The switch is scheduled, and your account continues at the annual plan until then. This is because annual is a 12-month commitment.</li>
+              <li><strong>Annual → monthly</strong> (same plan) takes effect at the end of your current annual term. The switch is scheduled, and your account continues at the annual plan until then. This is because annual is a 12-month commitment.</li>
+              <li><strong>Annual → monthly that also changes plans</strong> (for example, Basic annual to Plus monthly) cannot be done in a single step today because annual is a 12-month commitment. The billing screen presents two choices: (a) change plans immediately and stay on annual billing through your current term, or (b) keep your current plan and current annual term, and schedule the new plan + monthly billing to start at renewal. You pick which one fits.</li>
               <li>You can cancel a scheduled switch from the billing screen at any time before it takes effect.</li>
             </ul>
 

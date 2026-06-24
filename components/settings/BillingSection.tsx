@@ -137,7 +137,7 @@ export function BillingSection({
     window.location.reload();
   }
 
-  async function handleChangePlan() {
+  async function handleChangePlan(opts?: { deferTier?: boolean }) {
     if (!changePlanKey) return;
     const targetLimits = getPlanLimits({ plan: changePlanKey, planStatus, trialEndsAt: null });
     // Only open the picker modal when the user is actually over the new plan's
@@ -153,7 +153,11 @@ export function BillingSection({
     const res = await fetch("/api/stripe/change-plan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan: changePlanKey, period: changePeriod }),
+      body: JSON.stringify({
+        plan: changePlanKey,
+        period: changePeriod,
+        ...(opts?.deferTier !== undefined ? { deferTier: opts.deferTier } : {}),
+      }),
     });
     setBusy(false);
     if (!res.ok) {
@@ -320,6 +324,7 @@ export function BillingSection({
             const isUpgradeChange = targetRank > currentRank;
             const isAnnualToMonthly = currentPeriod === "annual" && changePeriod === "monthly";
             const isMonthlyToAnnual = currentPeriod === "monthly" && changePeriod === "annual";
+            const isCombinedAnnualToMonthly = isAnnualToMonthly && (isUpgradeChange || isDowngradeChange);
             const renewalDate = currentPeriodEnd
               ? new Date(currentPeriodEnd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
               : "your next renewal";
@@ -327,7 +332,7 @@ export function BillingSection({
             const busyLabel = isAnnualToMonthly ? "Scheduling…" : isDowngradeChange ? "Downgrading…" : isUpgradeChange ? "Upgrading…" : "Switching…";
 
             let directionCopy: string;
-            if (isAnnualToMonthly) {
+            if (isAnnualToMonthly && !isCombinedAnnualToMonthly) {
               directionCopy = `Your annual plan runs through ${renewalDate}. After that, billing switches to ${selectedPlan?.label} at $${selectedPlan?.monthly}/mo. Nothing changes today.`;
             } else if (isMonthlyToAnnual && !isDowngradeChange && !isUpgradeChange) {
               directionCopy = `You'll be charged $${selectedPlan?.annual} today. Any unused days from this month are credited toward your next bill. Your annual term runs for 12 months from today.`;
@@ -338,6 +343,8 @@ export function BillingSection({
             } else {
               directionCopy = `Plan changes take effect immediately.`;
             }
+
+            const currentPlanCfg = CHANGE_PLANS.find((p) => p.key === currentPlan);
 
             return (
             <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 space-y-3">
@@ -366,30 +373,80 @@ export function BillingSection({
                   Annual · ${selectedPlan?.annual}/yr · 12-month commitment
                 </button>
               </div>
-              <div className="rounded-md bg-white border border-gray-200 px-3 py-2 text-sm">
-                <span className="text-gray-500">You&apos;ll be billed </span>
-                <span className="font-semibold text-gray-900">${billedAmount} {billedSuffix}</span>
-                <span className="text-gray-500"> going forward.</span>
-              </div>
-              <p className="text-xs text-gray-600">
-                {directionCopy}
-              </p>
-              <p className="text-xs text-gray-400 border-t border-gray-200 pt-2">
-                Plan changes apply immediately. The only exception is switching from annual to monthly, which takes effect at your next renewal because annual is a 12-month commitment.
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={handleChangePlan}
-                  disabled={busy || (changePlanKey === currentPlan && changePeriod === currentPeriod)}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  {busy ? busyLabel : confirmLabel}
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => setChangePlanKey(null)}>
-                  Never mind
-                </Button>
-              </div>
+
+              {isCombinedAnnualToMonthly ? (
+                <>
+                  <div className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-900">
+                    This change involves both a plan change <em>and</em> switching off annual. Annual is a 12-month commitment, so we can&apos;t do both today. Pick how you want to proceed:
+                  </div>
+                  <div className="space-y-2">
+                    <div className="rounded-md bg-white border border-gray-200 p-3 space-y-2">
+                      <p className="text-sm font-semibold text-gray-900">
+                        {isUpgradeChange ? "Upgrade" : "Downgrade"} to {selectedPlan?.label} annual now
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {isUpgradeChange
+                          ? `You'll be charged the prorated difference between ${currentPlanCfg?.label ?? "your current plan"} annual and ${selectedPlan?.label} annual today. ${selectedPlan?.label} features unlock immediately. You stay on annual billing through ${renewalDate}.`
+                          : `We'll credit the prorated difference for the rest of this billing period toward your next bill. ${selectedPlan?.label} starts now. You stay on annual billing through ${renewalDate}.`}
+                      </p>
+                      <Button
+                        size="sm"
+                        onClick={() => handleChangePlan({ deferTier: false })}
+                        disabled={busy}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        {busy ? "Switching…" : `${isUpgradeChange ? "Upgrade" : "Downgrade"} to ${selectedPlan?.label} annual now`}
+                      </Button>
+                    </div>
+                    <div className="rounded-md bg-white border border-gray-200 p-3 space-y-2">
+                      <p className="text-sm font-semibold text-gray-900">
+                        Schedule {selectedPlan?.label} monthly for {renewalDate}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Nothing changes today. You finish your current annual term on {currentPlanCfg?.label ?? "your current plan"}. On {renewalDate}, your plan switches to {selectedPlan?.label} monthly at ${selectedPlan?.monthly}/mo.
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleChangePlan({ deferTier: true })}
+                        disabled={busy}
+                      >
+                        {busy ? "Scheduling…" : `Schedule for ${renewalDate}`}
+                      </Button>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="ghost" onClick={() => setChangePlanKey(null)}>
+                    Never mind
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="rounded-md bg-white border border-gray-200 px-3 py-2 text-sm">
+                    <span className="text-gray-500">You&apos;ll be billed </span>
+                    <span className="font-semibold text-gray-900">${billedAmount} {billedSuffix}</span>
+                    <span className="text-gray-500"> going forward.</span>
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    {directionCopy}
+                  </p>
+                  <p className="text-xs text-gray-400 border-t border-gray-200 pt-2">
+                    Plan changes apply immediately. The only exception is switching from annual to monthly, which takes effect at your next renewal because annual is a 12-month commitment.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleChangePlan()}
+                      disabled={busy || (changePlanKey === currentPlan && changePeriod === currentPeriod)}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {busy ? busyLabel : confirmLabel}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setChangePlanKey(null)}>
+                      Never mind
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
             );
           })() : (
