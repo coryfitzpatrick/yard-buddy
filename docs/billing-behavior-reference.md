@@ -146,9 +146,25 @@ Annual subscribers who cancel mid-term keep access through the original renewal 
 
 ## Trial
 
+The trial is "full product with two real gates and two quantitative throttles." Most paid features work; the user is just metered on volume and on task visibility, plus the 21-day clock.
+
+**Real gates (capability):**
+- **Tasks**: `maxVisibleTasks: 1` — only the first prioritized task is visible; the rest are teased with titles and a count.
+- **Time**: 21 days, +7 if the user sets a schedule AND completes a task (one-time engagement bonus).
+
+**Throttles (count caps):**
+- 1 yard
+- 2 analyses per month
+
+**Not gated:**
+- Watering and mowing schedules (yard level and per-section). `canSetSectionSchedule` returns `true` for `"trial"`.
+- Email reminders for schedules.
+- Running analyses (within the 2/month throttle).
+- Full UI, weather widget, photo history.
+
 | When | What happens |
 |---|---|
-| Account creation | 21-day trial of Basic begins. No card required. `User.plan = "trial"`, `User.planStatus = "trialing"`, `User.trialEndsAt = now + 21d`. |
+| Account creation | 21-day trial begins. No card required. `User.plan = "trial"`, `User.planStatus = "trialing"`, `User.trialEndsAt = now + 21d`. |
 | User engages with the product | If they set up a schedule AND complete a task during the trial, `trialEngagementBonusGrantedAt` is set and `trialEndsAt` extends by 7 days. One-time per account. |
 | Trial ends without subscription | `isEffectivelyExpired` returns true. `getPlanLimits` returns the `expired` row (no analyses allowed, 1 yard limit). `getDaysUntilDeletion` starts counting down 30 days from `trialEndsAt`. |
 | Trial user subscribes before trial ends | Stripe checkout creates a real subscription. Webhook updates `plan` and `planStatus`. Trial billing is replaced by paid billing on the chosen plan. |

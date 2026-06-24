@@ -144,14 +144,22 @@ export default async function PricingPage() {
 
               <ul className="space-y-2 mb-6 flex-1 text-sm text-gray-600">
                 <li className="font-semibold text-gray-900">1 yard</li>
-                <li className="font-medium text-gray-700">2 analyses for your yard</li>
+                <li className="font-medium text-gray-700">2 analyses per month</li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                  Your first personalized task
+                  Per-section AI analysis and recommendations
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                  Preview of all features
+                  Per-section watering and mowing schedules
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                  Weather integration and alerts
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                  First personalized task (more unlock with a paid plan)
                 </li>
               </ul>
 
