@@ -5,7 +5,7 @@ import { DAY_MS, TRIAL_ENGAGEMENT_BONUS_DAYS, TRIAL_GRACE_DAYS } from "@/lib/tim
 // Stripe checkout. Assigned manually via scripts/grant-pro.ts for demo accounts
 // and internal use.
 export type Plan = "trial" | "home_basic" | "home_plus" | "professional" | "admin";
-export type PlanStatus = "trialing" | "active" | "past_due" | "paused" | "expired" | "canceled";
+export type PlanStatus = "trialing" | "active" | "past_due" | "expired" | "canceled";
 
 export interface PlanLimits {
   maxYards: number;                     // -1 = unlimited
@@ -19,7 +19,6 @@ export type SubscriptionUser = {
   planStatus: PlanStatus | string;
   trialEndsAt: Date | null;
   currentPeriodEnd?: Date | null;
-  pausedUntil?: Date | null;
   trialEngagementBonusGrantedAt?: Date | null;
 };
 
@@ -107,12 +106,6 @@ export function eligiblePlansForUser(user: { stripeCustomerId?: string | null })
 
 export async function getActiveYardCount(userId: string): Promise<number> {
   return db.yard.count({ where: { userId, archivedAt: null } });
-}
-
-export function canPause(user: SubscriptionUser): boolean {
-  if (user.planStatus !== "active") return false;
-  if (user.plan === "trial") return false;
-  return true;
 }
 
 export function getVisibleTasksArgs(user: SubscriptionUser): { take?: number } {

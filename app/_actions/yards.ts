@@ -58,7 +58,34 @@ export async function deleteYardAction(id: string): Promise<{ ok: true } | { ok:
   const yard = await getOwnedYard(id, session.user.id);
   if (!yard) return { ok: false, error: "Not found" };
 
+  // Collect Supabase image paths before deleting the DB rows; the cascade
+  // removes the analyses immediately, so we can't query them after.
+  const analyses = await db.lawnAnalysis.findMany({
+    where: { yardSection: { yardId: id } },
+    select: { imageUrls: true },
+  });
+  const paths = analyses
+    .flatMap((a) => a.imageUrls)
+    .map((url) => {
+      const match = url.match(/\/object\/public\/[^/]+\/(.+)$/);
+      return match ? match[1] : null;
+    })
+    .filter((p): p is string => p !== null);
+
   await db.yard.delete({ where: { id } });
+
+  if (paths.length > 0) {
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      );
+      await supabase.storage.from("lawn-photos").remove(paths);
+    } catch {
+      // Photo cleanup is best-effort; the DB row is already gone.
+    }
+  }
 
   revalidatePath("/yard");
   revalidatePath("/dashboard");

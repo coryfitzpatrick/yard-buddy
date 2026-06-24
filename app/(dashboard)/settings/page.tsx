@@ -6,7 +6,7 @@ import { ChangePassword } from "@/components/settings/ChangePassword";
 import { BillingSection } from "@/components/settings/BillingSection";
 import { EmailSection } from "@/components/settings/EmailSection";
 import { Bell, Lock, CreditCard, Mail } from "lucide-react";
-import { getDaysUntilDeletion, PLAN_LABELS, canPause, daysUntilTrialEnd } from "@/lib/subscription";
+import { getDaysUntilDeletion, PLAN_LABELS, daysUntilTrialEnd } from "@/lib/subscription";
 import { isMobileApp } from "@/lib/platform.server";
 
 const EMAIL_CHANGE_MESSAGES: Record<string, { tone: "success" | "error"; text: string }> = {
@@ -49,7 +49,6 @@ export default async function SettingsPage({
       planStatus: true,
       trialEndsAt: true,
       currentPeriodEnd: true,
-      pausedUntil: true,
       stripeCustomerId: true,
       stripeSubscriptionId: true,
       accounts: { select: { provider: true } },
@@ -73,11 +72,9 @@ export default async function SettingsPage({
     planStatus: user.planStatus,
     trialEndsAt: user.trialEndsAt,
     currentPeriodEnd: user.currentPeriodEnd,
-    pausedUntil: user.pausedUntil,
   };
   const daysUntilDeletion = getDaysUntilDeletion(subUser);
   const trialDaysLeft = daysUntilTrialEnd(user.trialEndsAt);
-  const canPauseSubscription = canPause(subUser);
 
   // Determine billing period from active Stripe price ID, and detect any
   // pending subscription schedule (the only one we create is for annual→monthly).
@@ -171,12 +168,10 @@ export default async function SettingsPage({
               planLabel={PLAN_LABELS[user.plan] ?? user.plan}
               daysUntilDeletion={daysUntilDeletion}
               currentPeriodEnd={user.currentPeriodEnd?.toISOString() ?? null}
-              pausedUntil={user.pausedUntil?.toISOString() ?? null}
               hasStripeSubscription={!!user.stripeSubscriptionId}
               hasStripeCustomer={!!user.stripeCustomerId}
               paymentMethod={paymentMethod}
               trialDaysLeft={trialDaysLeft}
-              canPauseSubscription={canPauseSubscription}
               currentPlan={user.plan}
               currentPeriod={currentPeriod}
               pendingChange={pendingChange}

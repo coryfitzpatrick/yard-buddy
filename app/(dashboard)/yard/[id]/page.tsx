@@ -27,7 +27,6 @@ export default async function YardDetailPage({
       planStatus: true,
       trialEndsAt: true,
       currentPeriodEnd: true,
-      pausedUntil: true,
     },
   });
 

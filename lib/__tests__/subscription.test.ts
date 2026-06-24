@@ -3,7 +3,6 @@ import {
   getPlanLimits,
   canRunAnalysis,
   canCreateYard,
-  canPause,
   getVisibleTasksArgs,
   getDaysUntilDeletion,
   PLAN_LABELS,
@@ -15,7 +14,6 @@ const makeUser = (overrides: Partial<SubscriptionUser>) => ({
   planStatus: "trialing",
   trialEndsAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
   currentPeriodEnd: null,
-  pausedUntil: null,
   ...overrides,
 });
 
@@ -59,16 +57,6 @@ describe("getPlanLimits", () => {
     const limits = getPlanLimits(makeUser({ plan: "admin", planStatus: "active" }));
     expect(limits.maxYards).toBe(-1);
     expect(limits.maxAnalysesPerYardPerMonth).toBe(-1);
-    expect(limits.canRunAnalysis).toBe(true);
-  });
-
-  it("returns full plan access when paused", () => {
-    const limits = getPlanLimits(makeUser({
-      plan: "home_basic",
-      planStatus: "paused",
-      pausedUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    }));
-    expect(limits.maxYards).toBe(1);
     expect(limits.canRunAnalysis).toBe(true);
   });
 
@@ -118,32 +106,6 @@ describe("canCreateYard", () => {
   });
 });
 
-describe("canPause", () => {
-  it("allows pause for active paid subscriber", () => {
-    expect(canPause(makeUser({ plan: "home_basic", planStatus: "active" }))).toBe(true);
-  });
-
-  it("blocks pause for trial user", () => {
-    expect(canPause(makeUser({ plan: "trial", planStatus: "trialing" }))).toBe(false);
-  });
-
-  it("blocks pause for expired user", () => {
-    expect(canPause(makeUser({ trialEndsAt: new Date(Date.now() - 1000) }))).toBe(false);
-  });
-
-  it("blocks pause when already paused", () => {
-    expect(canPause(makeUser({ plan: "home_basic", planStatus: "paused" }))).toBe(false);
-  });
-
-  it("blocks pause for user with planStatus trialing even if plan is different", () => {
-    expect(canPause(makeUser({ plan: "home_basic", planStatus: "trialing" }))).toBe(false);
-  });
-
-  it("blocks pause for user with plan trial even if planStatus is active", () => {
-    expect(canPause(makeUser({ plan: "trial", planStatus: "active" }))).toBe(false);
-  });
-});
-
 describe("past_due planStatus", () => {
   it("returns full plan limits when planStatus is past_due", () => {
     const limits = getPlanLimits(makeUser({ plan: "home_basic", planStatus: "past_due" }));
@@ -156,9 +118,6 @@ describe("past_due planStatus", () => {
     expect(canRunAnalysis(makeUser({ plan: "home_plus", planStatus: "past_due" }), 7)).toBe(true);
   });
 
-  it("blocks canPause when planStatus is past_due", () => {
-    expect(canPause(makeUser({ plan: "home_basic", planStatus: "past_due" }))).toBe(false);
-  });
 });
 
 describe("getVisibleTasksArgs", () => {

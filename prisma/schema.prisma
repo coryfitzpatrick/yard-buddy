@@ -36,9 +36,6 @@ model User {
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?   @unique
   currentPeriodEnd     DateTime?
-  pausedUntil          DateTime?
-  pauseStartedAt       DateTime?
-  pauseOriginalPeriodEnd DateTime?
 
   // Trial engagement extension — set when user completes the +7 day bonus criteria
   trialEngagementBonusGrantedAt DateTime?

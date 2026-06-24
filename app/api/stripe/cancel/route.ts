@@ -21,6 +21,17 @@ export const POST = withAxiom(async (_req: NextRequest) => {
     return NextResponse.json({ error: "Subscription is already canceled" }, { status: 400 });
   }
 
+  // Release any pending plan change so it doesn't try to fire at the same moment
+  // cancellation takes effect. The subscription itself keeps running on its
+  // current price until period end.
+  const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+  const scheduleId = subscription.schedule
+    ? (typeof subscription.schedule === "string" ? subscription.schedule : subscription.schedule.id)
+    : null;
+  if (scheduleId) {
+    await stripe.subscriptionSchedules.release(scheduleId);
+  }
+
   await stripe.subscriptions.update(user.stripeSubscriptionId, {
     cancel_at_period_end: true,
   });

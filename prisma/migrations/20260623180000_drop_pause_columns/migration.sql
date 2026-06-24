@@ -1,0 +1,3 @@
+ALTER TABLE "User" DROP COLUMN IF EXISTS "pausedUntil";
+ALTER TABLE "User" DROP COLUMN IF EXISTS "pauseStartedAt";
+ALTER TABLE "User" DROP COLUMN IF EXISTS "pauseOriginalPeriodEnd";

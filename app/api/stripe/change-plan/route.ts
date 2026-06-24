@@ -149,6 +149,15 @@ export const POST = withAxiom(async (req: NextRequest) => {
         ],
       });
     } else {
+      // If a pending schedule is attached (e.g. a prior annual→monthly switch
+      // the user is now overriding), release it first so the immediate price
+      // change isn't undone or conflicted later when phase 2 fires.
+      const existingScheduleId = subscription.schedule
+        ? (typeof subscription.schedule === "string" ? subscription.schedule : subscription.schedule.id)
+        : null;
+      if (existingScheduleId) {
+        await stripe.subscriptionSchedules.release(existingScheduleId);
+      }
       await stripe.subscriptions.update(user.stripeSubscriptionId, {
         items: [{ id: itemId, price: priceId }],
         proration_behavior: "always_invoice",

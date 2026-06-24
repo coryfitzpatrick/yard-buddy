@@ -75,7 +75,7 @@ export default function TermsPage() {
             <ul className="list-disc pl-5 space-y-2 mt-2">
               <li><strong>Tier upgrades</strong> take effect immediately. You are charged the prorated difference between your current plan and the new plan for the remainder of the current billing period. Your renewal date does not change.</li>
               <li><strong>Tier downgrades</strong> take effect immediately. The unused portion of your current plan is credited toward your next bill. No refund is issued to your payment method; the credit is applied automatically to upcoming invoices.</li>
-              <li>If a downgrade would put you over the new plan&rsquo;s yard limit, you will be asked to choose which yard(s) to keep before the change is confirmed. Other yards are archived. Archived yards remain recoverable for 30 days if you upgrade again.</li>
+              <li>If a downgrade would put you over the new plan&rsquo;s yard limit, you will be asked to choose which yard(s) to keep before the change is confirmed. The remaining yards are archived. Archived yards stay in your account and are automatically restored if you upgrade to a plan that supports them again. You can permanently delete archived yards yourself from the settings screen.</li>
             </ul>
 
             <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.4 Switching between monthly and annual</h3>
@@ -85,28 +85,20 @@ export default function TermsPage() {
               <li>You can cancel a scheduled switch from the billing screen at any time before it takes effect.</li>
             </ul>
 
-            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.5 Seasonal pause</h3>
-            <ul className="list-disc pl-5 space-y-2 mt-2">
-              <li>You can pause your subscription for 1 to 6 months from the billing screen.</li>
-              <li><strong>Monthly plans:</strong> billing is suspended while paused. No charges are made during the pause window. Billing resumes automatically on the resume date you selected.</li>
-              <li><strong>Annual plans:</strong> because you already paid for the year, pausing instead extends your annual term by the time you actually spent paused. If you resume early, your renewal date is shifted by the time elapsed, not by the originally requested pause length.</li>
-              <li>During a pause your account retains full access to all features. The pause affects billing only.</li>
-            </ul>
-
-            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.6 Cancellation and data retention</h3>
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.5 Cancellation and data retention</h3>
             <ul className="list-disc pl-5 space-y-2 mt-2">
               <li>You may cancel at any time from the billing screen. Cancellation takes effect at the end of your current billing period; you keep access until then.</li>
               <li>After cancellation, your data is retained for 30 days. You can re-subscribe within that window and your yards, photos, and analyses will be restored.</li>
               <li>Annual subscribers who cancel mid-term keep access through the original renewal date. No partial-year refunds are issued.</li>
             </ul>
 
-            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.7 Failed payments and past-due accounts</h3>
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.6 Failed payments and past-due accounts</h3>
             <p>If a renewal charge fails, we will retry the payment per Stripe&rsquo;s default schedule and email you to update your payment method. If the charge is not resolved within Stripe&rsquo;s retry window, your account moves to a past-due status with limited access. You may restore full access by updating your payment method at any time.</p>
 
-            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.8 Price changes</h3>
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.7 Price changes</h3>
             <p>If we change pricing, currently active subscribers continue at their existing price through the end of their current term. New pricing applies at the next renewal, and we will notify you by email at least 14 days before the change takes effect.</p>
 
-            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.9 Questions</h3>
+            <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">6.8 Questions</h3>
             <p>For billing questions, contact us at <a href="mailto:contact@nullstatesoftware.llc" className="text-green-600 hover:underline">contact@nullstatesoftware.llc</a>.</p>
           </section>
 

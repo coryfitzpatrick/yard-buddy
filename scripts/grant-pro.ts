@@ -26,7 +26,6 @@ async function main() {
         planStatus: "active",
         trialEndsAt: null,
         currentPeriodEnd: FAR_FUTURE,
-        pausedUntil: null,
       },
       create: {
         email,

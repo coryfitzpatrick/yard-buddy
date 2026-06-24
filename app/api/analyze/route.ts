@@ -111,7 +111,7 @@ export const POST = withAxiom(async (req: NextRequest) => {
 
   const subUser = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
-    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true, pausedUntil: true },
+    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true },
   });
 
   // Verify section ownership before any rate-limit queries (prevents BOLA)

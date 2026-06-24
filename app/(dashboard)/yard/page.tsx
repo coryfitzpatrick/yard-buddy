@@ -62,7 +62,6 @@ export default async function YardPage() {
       planStatus: true,
       trialEndsAt: true,
       currentPeriodEnd: true,
-      pausedUntil: true,
     },
   });
 

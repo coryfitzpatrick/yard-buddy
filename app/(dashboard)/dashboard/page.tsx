@@ -19,7 +19,6 @@ export default async function DashboardPage() {
       planStatus: true,
       trialEndsAt: true,
       currentPeriodEnd: true,
-      pausedUntil: true,
       trialEngagementBonusGrantedAt: true,
     },
   });

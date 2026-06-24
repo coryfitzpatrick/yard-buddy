@@ -39,7 +39,7 @@ export const POST = withAxiom(async (req: Request) => {
 
   const subUser = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
-    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true, pausedUntil: true },
+    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true },
   });
   const yardCount = await getActiveYardCount(session.user.id);
 

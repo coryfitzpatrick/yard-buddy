@@ -27,7 +27,6 @@ const PLANS = [
       "All personalized task recommendations",
       "Schedule reminders by email",
       "5-day weather integration",
-      "Seasonal billing pause",
     ],
   },
   {
@@ -293,10 +292,6 @@ export default async function PricingPage() {
                 <p className="mt-1">Switching from monthly to annual takes effect immediately and prepays the year. Switching from annual to monthly takes effect at your next renewal date because annual is a 12-month commitment.</p>
               </div>
               <div>
-                <p className="font-medium text-gray-900">Seasonal pause</p>
-                <p className="mt-1">Pause for 1 to 6 months at any time. Monthly subscribers skip charges during the pause. Annual subscribers have their renewal date extended by the time actually spent paused.</p>
-              </div>
-              <div>
                 <p className="font-medium text-gray-900">Downgrading past your yard limit</p>
                 <p className="mt-1">If your new plan supports fewer yards than you currently have, you&apos;ll pick which yard(s) to keep before the switch is confirmed. The rest are archived and can be restored within 30 days.</p>
               </div>
@@ -313,7 +308,7 @@ export default async function PricingPage() {
 
         <div className="mt-8 text-center text-sm text-gray-400 space-y-1">
           {!hasEverPaid && <p>No credit card required to start your free trial.</p>}
-          <p>Cancel or pause anytime from your settings. Your data is retained for 30 days after cancellation.</p>
+          <p>Cancel anytime from your settings. Your data is retained for 30 days after cancellation.</p>
           <p className="mt-2">Questions? <a href="mailto:contact@yardanalyzer.com" className="underline text-green-600">contact@yardanalyzer.com</a></p>
         </div>
       </main>
