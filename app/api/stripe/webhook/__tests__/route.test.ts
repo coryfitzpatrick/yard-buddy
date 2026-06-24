@@ -182,25 +182,7 @@ describe("updateUserFromSubscription", () => {
     expect(updateCall.data.planStatus).toBe("past_due");
   });
 
-  it("contract #6: any unrecognized Stripe status maps to past_due AND logs a warning (never expired)", async () => {
-    // Don't enumerate states we don't ship — instead make the fallback safe
-    // and observable. Covers paused, incomplete, incomplete_expired, unpaid,
-    // and anything Stripe adds in the future.
-    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
-      id: "u1", plan: "home_plus", planStatus: "active",
-    });
-
-    await updateUserFromSubscription(subscription({ status: "paused" as never, priceId: "price_home_plus_monthly" }));
-
-    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(updateCall.data.planStatus).toBe("past_due");
-    expect(mockLoggerWarn).toHaveBeenCalledWith(
-      expect.stringContaining("Unrecognized Stripe subscription status"),
-      expect.objectContaining({ stripeStatus: "paused" }),
-    );
-  });
-
-  it("contract #6 (incomplete): also lands in past_due with a log", async () => {
+  it("contract #5a: status incomplete → planStatus = past_due, no warn (explicitly mapped)", async () => {
     (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
       id: "u1", plan: "home_basic", planStatus: "active",
     });
@@ -209,9 +191,60 @@ describe("updateUserFromSubscription", () => {
 
     const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(updateCall.data.planStatus).toBe("past_due");
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
+  });
+
+  it("contract #5b: status unpaid → planStatus = past_due, no warn", async () => {
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1", plan: "home_basic", planStatus: "active",
+    });
+
+    await updateUserFromSubscription(subscription({ status: "unpaid" as never, priceId: "price_home_basic_monthly" }));
+
+    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(updateCall.data.planStatus).toBe("past_due");
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
+  });
+
+  it("contract #5c: status paused → planStatus = past_due, no warn", async () => {
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1", plan: "home_plus", planStatus: "active",
+    });
+
+    await updateUserFromSubscription(subscription({ status: "paused" as never, priceId: "price_home_plus_monthly" }));
+
+    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(updateCall.data.planStatus).toBe("past_due");
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
+  });
+
+  it("contract #5d: status incomplete_expired → planStatus = canceled (sub is dead, 30-day clock applies)", async () => {
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1", plan: "home_basic", planStatus: "active",
+    });
+
+    await updateUserFromSubscription(subscription({ status: "incomplete_expired" as never, priceId: "price_home_basic_monthly" }));
+
+    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(updateCall.data.planStatus).toBe("canceled");
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
+  });
+
+  it("contract #6: a truly-unknown future Stripe status falls through to past_due AND warns (never expired)", async () => {
+    // Guardrail: any status Stripe ships that we haven't enumerated yet must
+    // land somewhere safe (past_due, not expired which starts deletion) and
+    // emit a warn so we know to add explicit handling.
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1", plan: "home_plus", planStatus: "active",
+    });
+
+    await updateUserFromSubscription(subscription({ status: "made_up_status" as never, priceId: "price_home_plus_monthly" }));
+
+    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(updateCall.data.planStatus).toBe("past_due");
     expect(mockLoggerWarn).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ stripeStatus: "incomplete" }),
+      expect.stringContaining("Unrecognized Stripe subscription status"),
+      expect.objectContaining({ stripeStatus: "made_up_status" }),
     );
   });
 

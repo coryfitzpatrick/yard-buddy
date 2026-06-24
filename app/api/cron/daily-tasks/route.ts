@@ -118,6 +118,7 @@ async function runDailyTasks(
           email: true,
           name: true,
           plan: true,
+          planStatus: true,
           notificationsEnabled: true,
           reminderNotificationsEnabled: true,
           reminderDaysBefore: true,
@@ -157,10 +158,13 @@ async function runDailyTasks(
     where: {
       AND: [
         {
-          // Mirrors lib/subscription.ts isEffectivelyExpired (negated): user is not
-          // expired or canceled, and if trialing, the trial is still active.
+          // Mirrors lib/subscription.ts: skip users who can't use paid features.
+          // past_due gates app access (recoverable but currently blocked), and
+          // sending watering/mowing/weather reminders to someone who can't act
+          // on them is incoherent. Card-expiry warnings still go through that
+          // cron separately.
           AND: [
-            { planStatus: { notIn: ["expired", "canceled"] } },
+            { planStatus: { notIn: ["expired", "canceled", "past_due"] } },
             {
               OR: [
                 // Not on trial: subscription status drives reminders.
@@ -190,6 +194,7 @@ async function runDailyTasks(
       email: true,
       name: true,
       plan: true,
+      planStatus: true,
       notificationsEnabled: true,
       reminderNotificationsEnabled: true,
       reminderDaysBefore: true,
@@ -723,6 +728,12 @@ async function runDailyTasks(
     const emailEnabled = user.emailNotificationsEnabled ?? true;
     const taskEmailEnabled = user.notificationsEnabled;
     const reminderEmailEnabled = user.reminderNotificationsEnabled;
+
+    // past_due users have paid features gated in-app; the only nudge they
+    // should get is the billing-portal banner + the payment_failed email
+    // (sent from the Stripe webhook). Suppress task/reminder digests so we
+    // don't ping someone about lawn work when they can't open the app.
+    if (user.planStatus === "past_due") return;
 
     const shouldSendEmail =
       emailEnabled &&

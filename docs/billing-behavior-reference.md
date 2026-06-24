@@ -178,7 +178,16 @@ The trial is "full product with two real gates and two quantitative throttles." 
 | User updates card before Stripe gives up | Next retry succeeds, `customer.subscription.updated` webhook flips `planStatus` back to `"active"`. |
 | Stripe gives up retries | Subscription transitions to `canceled` in Stripe. Webhook flips DB `planStatus = "canceled"`. 30-day deletion clock starts as for any cancellation. |
 
-`past_due` users currently keep full plan access in-app. The email + portal link is the only nudge. (Tightening this — e.g., a banner or feature gate — is on the open-issues list.)
+## What `past_due` actually means now
+
+`past_due` is the single user-facing bucket for "billing is broken, you can't use the app until it's fixed." It collapses four Stripe states: `past_due` (failed renewal), `incomplete` (SCA pending), `unpaid` (dunning exhausted), and `paused` (admin pause_collection). The Stripe distinction lives in the webhook log; in our DB it's one bucket.
+
+While `planStatus === "past_due"`:
+
+- **No paid feature access.** `getPlanLimits` returns the `past_due` row: `maxAnalysesPerYardPerMonth: 0`, `canRunAnalysis: false`, `maxVisibleTasks: 1`, `maxYards: 1`. Same shape as `expired`, different meaning.
+- **Persistent in-app banner** at the top of the dashboard layout: *"Your billing needs attention. Paid features are paused until your payment method is updated."* Links to `/api/stripe/portal?flow=payment_method_update` which jumps straight into the Stripe billing portal card-update flow.
+- **No deletion clock.** `past_due` is intentionally NOT in `isEffectivelyExpired`, so `getDaysUntilDeletion` returns null. Billing is recoverable; the moment a retry succeeds the webhook flips `planStatus` back to `"active"` and all access returns.
+- **No task/weather reminder emails.** The daily-tasks cron filters `past_due` out of the reminder-user query — sending watering reminders to someone who can't use the app is incoherent. Card-expiry warnings still go through.
 
 ## At-renewal yard limit modal
 
@@ -197,7 +206,7 @@ The modal cannot be dismissed without picking. Once submitted, `/api/yards/archi
 | Stripe subscription | Current price (drives DB `plan` and `currentPeriodEnd`), `cancel_at_period_end`, `schedule` reference |
 | Stripe subscription_schedule | Phase 1 and phase 2 prices, phase boundaries |
 | Our DB `User.plan` | Cached current tier — updated on webhook events. Authoritative for app entitlements. |
-| Our DB `User.planStatus` | `trialing` / `active` / `past_due` / `expired` / `canceled` — mapped from Stripe subscription status |
+| Our DB `User.planStatus` | `trialing` / `active` / `past_due` / `expired` / `canceled` — mapped from Stripe subscription status. `past_due` collapses Stripe `past_due`, `incomplete`, `unpaid`, `paused`; `incomplete_expired` maps to `canceled`. |
 | Our DB `User.currentPeriodEnd` | Cached from Stripe `items[0].current_period_end` — used in UI for "Next charge on …" |
 | Our DB `User.analysisQuotaResetAt` | Set when a trial user first subscribes to a paid plan; used by the analyze route as a cap-counting cutoff so trial usage doesn't dock the first paid month. |
 | Our DB `User.lastPaymentFailedInvoiceId` | Idempotency guard so we don't double-process the same `invoice.payment_failed` retry. |
@@ -250,7 +259,11 @@ The route reads live state from Stripe (via `subscriptions.retrieve`) rather tha
 3. **No-op idempotency** → skips the DB write only when ALL of plan, planStatus, currentPeriodEnd, and stripeSubscriptionId match what we already have. A renewal that advances `current_period_end` without changing plan/status MUST still write through, otherwise the "Next charge on …" UI sticks at the old date.
 4. **Subscription `status = "canceled"`** → persists `planStatus = "canceled"`.
 5. **Subscription `status = "past_due"`** → persists `planStatus = "past_due"`.
-6. **Any unrecognized Stripe `status`** (paused, incomplete, incomplete_expired, unpaid, or a new value Stripe adds) → persists `planStatus = "past_due"` AND emits a `logger.warn` with the offending status. The default is NEVER `"expired"` because expired triggers the 30-day deletion clock and we shouldn't nuke an account because Stripe sent something we don't recognize yet. The log surfaces the unknown status so a real handler can be added.
+5a. **Subscription `status = "incomplete"`** (initial payment hasn't cleared; SCA pending, 23h window) → persists `planStatus = "past_due"`. No warn — explicitly mapped.
+5b. **Subscription `status = "unpaid"`** (dunning retries exhausted; sub still exists, user can recover by updating card) → persists `planStatus = "past_due"`. No warn — explicitly mapped.
+5c. **Subscription `status = "paused"`** (admin set `pause_collection`) → persists `planStatus = "past_due"`. No warn — explicitly mapped.
+5d. **Subscription `status = "incomplete_expired"`** (23h SCA window passed; sub permanently dead) → persists `planStatus = "canceled"`. The 30-day deletion clock applies.
+6. **Any other Stripe `status`** Stripe might ship in the future → persists `planStatus = "past_due"` AND emits a `logger.warn` with the offending status. The default is NEVER `"expired"` because expired triggers the 30-day deletion clock and we shouldn't nuke an account because Stripe sent something we don't recognize yet. The log surfaces the unknown status so a real handler can be added. (Tested with a fabricated `"made_up_status"` to exercise the guardrail without aliasing a known status.)
 7. **Plan increase that allows more yards** → auto-restores most recently archived yards up to the new limit, atomically with the user update inside a single `db.$transaction`.
 
 ### Analyze route quota cutoff

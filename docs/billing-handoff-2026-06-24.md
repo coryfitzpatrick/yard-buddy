@@ -12,7 +12,7 @@ The billing flow has been substantially rebuilt and audited in this session. The
 4. **Yard archive happens at the moment of the downgrade**, never at submit time for deferred changes.
 5. **Trial → paid resets the analysis quota** so trial usage doesn't dock the first paid month.
 
-All five rules are documented in `docs/billing-behavior-reference.md` with row-by-row tables and a contract section. 612 tests pass; tsc clean. **There is one open work item — see "Open: Stripe status mapping" below.**
+All five rules are documented in `docs/billing-behavior-reference.md` with row-by-row tables and a contract section. 617 tests pass; tsc clean. **The Stripe status mapping + past_due gating work that was open in the prior session is now landed — see "Stripe status mapping landed" below.**
 
 ## What landed in this session
 
@@ -63,9 +63,21 @@ Test coverage:
 
 Each `it()` title references the contract item it pins (e.g., "contract #1: monthly tier upgrade is immediate, no schedule"). When something fails, the test name names the rule.
 
-## Open: Stripe status mapping + past_due gating (the next thing to do)
+## Stripe status mapping landed (this section was the open task; it's done now)
 
-User asked us to explicitly handle every Stripe subscription status instead of relying on the catchall default. **The plan was proposed but NOT executed.** Pick up here.
+All seven steps from the original plan shipped. The notes below describe what's in the codebase now; the original step-by-step plan that follows is preserved as a record of the decisions, not a TODO.
+
+**What changed:**
+
+- Webhook `updateUserFromSubscription` switch now explicitly enumerates `incomplete`, `unpaid`, `paused` → `past_due` and `incomplete_expired` → `canceled`. The default branch still warns + maps to `past_due` (tested with a fabricated `"made_up_status"`).
+- `lib/subscription.ts` gained a `past_due` row in `LIMITS` (no-access entitlements: `maxAnalysesPerYardPerMonth: 0`, `canRunAnalysis: false`, `maxYards: 1`, `maxVisibleTasks: 1`). `getPlanLimits` returns it when `planStatus === "past_due"`. `past_due` is deliberately NOT in `isEffectivelyExpired` — no deletion clock.
+- `app/(dashboard)/layout.tsx` renders a persistent red banner for `past_due` users linking to `/api/stripe/portal?flow=payment_method_update`.
+- `app/api/cron/daily-tasks/route.ts` excludes `past_due` from both the reminder-user query and the task digest send. Card-expiry warnings still go through their own cron path.
+- `docs/billing-behavior-reference.md` Webhook section has explicit items #5a–d for the four "billing unwell" Stripe statuses; the default-guardrail #6 example was changed to a fabricated unknown status. New section "What `past_due` actually means now" replaces the old "past_due users currently keep full plan access" line.
+- Webhook test suite (+5 tests): renamed/expanded #6 into #5a, #5b, #5c, #5d, and a new #6 guardrail using `"made_up_status"`.
+- Subscription test suite (+2 tests, replaced the two stale past_due tests): now pins no-access for past_due, blocks `canRunAnalysis`, asserts `isEffectivelyExpired` is false (no deletion clock), and `getDaysUntilDeletion` is null.
+
+**The original plan (kept for traceability):**
 
 ### Decision: collapse "billing unwell" states into `past_due` and fix the access gate
 
@@ -121,12 +133,13 @@ We lose some at-a-glance debugging granularity in the User row (can't tell wheth
 
 ## Remaining open items from the original audit
 
-These were flagged in the audit but NOT addressed in this session:
+Still NOT addressed:
 
 1. **No reminder email before a scheduled annual→monthly fires.** A user who scheduled the switch in January gets no email in late December. They could be surprised when the next bill changes shape.
 2. **Trial expiration has no explicit "you're now expired" page.** When the 21 days end, the account goes read-only with no in-app moment that says "trial over, pick a plan or your data deletes in 30 days."
+3. **Task-window pushes from the daily-tasks cron are not gated by `past_due`.** The push paths around `safePushUser` for weather-tomorrow alerts, GDD pre-emergent/grub/overseed window-open alerts, and best-day pushes run per-yard without a planStatus check. These currently still fire for past_due users. Less impactful than the email digest (and arguably useful as a heads-up), but if you want symmetry with the email + reminder gating, add a `user.planStatus === "past_due"` early-return inside the per-yard loop.
 
-Note: the original audit also flagged "past-due users get full plan access." That's now bundled into the next task above (the Stripe status mapping + past_due gating work).
+Note: the original audit's "past-due users get full plan access" item is now closed by the Stripe status mapping work above.
 
 None of these are blocking — they're product polish.
 

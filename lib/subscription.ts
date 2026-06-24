@@ -52,6 +52,10 @@ export function computeEngagementStatus(
 const LIMITS: Record<string, PlanLimits> = {
   trial:        { maxYards: 1,  maxAnalysesPerYardPerMonth: 2,  maxVisibleTasks: 1,  canRunAnalysis: true  },
   expired:      { maxYards: 1,  maxAnalysesPerYardPerMonth: 0,  maxVisibleTasks: 1,  canRunAnalysis: false },
+  // Same shape as expired but with a different meaning: billing is recoverable
+  // and there's no deletion clock. Used when planStatus === "past_due" (which
+  // covers Stripe past_due, incomplete, unpaid, and paused — see webhook).
+  past_due:     { maxYards: 1,  maxAnalysesPerYardPerMonth: 0,  maxVisibleTasks: 1,  canRunAnalysis: false },
   home_basic:   { maxYards: 1,  maxAnalysesPerYardPerMonth: 4,  maxVisibleTasks: -1, canRunAnalysis: true  },
   home_plus:    { maxYards: 2,  maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
   professional: { maxYards: 10, maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
@@ -99,6 +103,10 @@ export function isEffectivelyExpired(user: SubscriptionUser): boolean {
 
 export function getPlanLimits(user: SubscriptionUser): PlanLimits {
   if (isEffectivelyExpired(user)) return LIMITS.expired;
+  // past_due is intentionally NOT in isEffectivelyExpired — billing can still
+  // be recovered with a card update, so we don't want to start the deletion
+  // clock. But while in this state, paid features are gated.
+  if (user.planStatus === "past_due") return LIMITS.past_due;
   if (user.planStatus === "trialing" || user.plan === "trial") return LIMITS.trial;
   return LIMITS[user.plan] ?? LIMITS.trial;
 }

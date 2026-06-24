@@ -24,6 +24,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   const isTrial = user?.planStatus === "trialing" || user?.plan === "trial";
+  const isPastDue = user?.planStatus === "past_due";
   const trialDaysLeft = daysUntilTrialEnd(user?.trialEndsAt);
 
   // When a deferred annual downgrade fires at renewal, the user can end up
@@ -71,6 +72,23 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 className="shrink-0 text-sm font-semibold text-amber-900 bg-amber-200 hover:bg-amber-300 px-3 py-1 rounded-full transition-colors"
               >
                 Upgrade
+              </Link>
+            </div>
+          </div>
+        </NotInApp>
+      )}
+      {isPastDue && (
+        <NotInApp>
+          <div className="bg-red-50 border-b border-red-200 px-4 py-2.5">
+            <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+              <p className="text-sm text-red-800">
+                Your billing needs attention. Paid features are paused until your payment method is updated.
+              </p>
+              <Link
+                href="/api/stripe/portal?flow=payment_method_update"
+                className="shrink-0 text-sm font-semibold text-red-900 bg-red-200 hover:bg-red-300 px-3 py-1 rounded-full transition-colors"
+              >
+                Open billing portal
               </Link>
             </div>
           </div>

@@ -28,18 +28,26 @@ export async function updateUserFromSubscription(sub: Stripe.Subscription) {
 
   let planStatus: string;
   switch (sub.status) {
-    case "trialing":  planStatus = "trialing";  break;
-    case "active":    planStatus = "active";    break;
-    case "past_due":  planStatus = "past_due";  break;
-    case "canceled":  planStatus = "canceled";  break;
+    case "trialing":           planStatus = "trialing";  break;
+    case "active":             planStatus = "active";    break;
+    case "past_due":           planStatus = "past_due";  break;
+    case "canceled":           planStatus = "canceled";  break;
+    // The next four collapse to one user-facing reality: "billing is unwell,
+    // you can't use the app until it's fixed." Stripe distinguishes them
+    // (incomplete = SCA pending, unpaid = dunning exhausted, paused = admin
+    // pause_collection), but for the customer the lived experience is the
+    // same. Keep the granularity in Stripe + webhook logs, not in our DB.
+    case "incomplete":         planStatus = "past_due";  break;
+    case "unpaid":             planStatus = "past_due";  break;
+    case "paused":             planStatus = "past_due";  break;
+    // The 23h SCA window passed and the subscription is permanently dead.
+    case "incomplete_expired": planStatus = "canceled";  break;
     default:
-      // Any Stripe status we haven't explicitly enumerated lands here:
-      // paused, incomplete, incomplete_expired, unpaid, or anything Stripe
-      // adds in the future. The previous default was "expired", which
-      // silently started the 30-day account-deletion clock — never the
-      // right answer for a state we don't understand. We map to past_due
-      // (the non-destructive "billing is unwell" bucket) and log loudly so
-      // we know to add real handling next time it shows up.
+      // Guardrail for any future Stripe status we haven't enumerated. The
+      // previous default was "expired", which silently started the 30-day
+      // account-deletion clock — never the right answer for a state we
+      // don't understand. Map to past_due (the non-destructive "billing is
+      // unwell" bucket) and log loudly so we know to add real handling.
       logger.warn("Unrecognized Stripe subscription status; mapping to past_due", {
         subscriptionId: sub.id,
         stripeStatus: sub.status,

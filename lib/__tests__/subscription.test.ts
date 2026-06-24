@@ -6,6 +6,7 @@ import {
   analysisCutoff,
   getVisibleTasksArgs,
   getDaysUntilDeletion,
+  isEffectivelyExpired,
   PLAN_LABELS,
   type SubscriptionUser,
 } from "../subscription";
@@ -108,17 +109,26 @@ describe("canCreateYard", () => {
 });
 
 describe("past_due planStatus", () => {
-  it("returns full plan limits when planStatus is past_due", () => {
+  it("returns no-access limits when planStatus is past_due (paid features gated)", () => {
     const limits = getPlanLimits(makeUser({ plan: "home_basic", planStatus: "past_due" }));
+    expect(limits.maxAnalysesPerYardPerMonth).toBe(0);
+    expect(limits.canRunAnalysis).toBe(false);
+    expect(limits.maxVisibleTasks).toBe(1);
     expect(limits.maxYards).toBe(1);
-    expect(limits.maxAnalysesPerYardPerMonth).toBe(4);
-    expect(limits.canRunAnalysis).toBe(true);
   });
 
-  it("allows canRunAnalysis when planStatus is past_due", () => {
-    expect(canRunAnalysis(makeUser({ plan: "home_plus", planStatus: "past_due" }), 7)).toBe(true);
+  it("blocks canRunAnalysis when planStatus is past_due, regardless of plan", () => {
+    expect(canRunAnalysis(makeUser({ plan: "home_plus", planStatus: "past_due" }), 0)).toBe(false);
+    expect(canRunAnalysis(makeUser({ plan: "professional", planStatus: "past_due" }), 0)).toBe(false);
   });
 
+  it("does NOT mark past_due as effectively expired (no deletion clock — billing is recoverable)", () => {
+    expect(isEffectivelyExpired(makeUser({ plan: "home_basic", planStatus: "past_due", trialEndsAt: null }))).toBe(false);
+  });
+
+  it("returns null from getDaysUntilDeletion for past_due (no countdown)", () => {
+    expect(getDaysUntilDeletion(makeUser({ plan: "home_basic", planStatus: "past_due", trialEndsAt: null }))).toBeNull();
+  });
 });
 
 describe("analysisCutoff", () => {
