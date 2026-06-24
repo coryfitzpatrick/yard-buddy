@@ -128,7 +128,7 @@ describe("POST /api/sections/[sectionId]/mowing/apply", () => {
     expect(res.status).toBe(200);
   });
 
-  it("200 Basic user: writes only mowingHeightInches to tx.yard.update; clears dismissedAt; emits target=yard", async () => {
+  it("200 Basic user: writes only mowingHeightInches to tx.yardSection.update; clears dismissedAt; emits target=section", async () => {
     (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
     mockYardSectionFindUnique.mockResolvedValue({
       id: "s1",
@@ -157,18 +157,18 @@ describe("POST /api/sections/[sectionId]/mowing/apply", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ target: "yard", heightInches: 3.0 });
+    expect(body).toEqual({ target: "section", heightInches: 3.0 });
 
-    expect(txYardUpdate).toHaveBeenCalledWith({
-      where: { id: "y1" },
+    expect(txYardSectionUpdate).toHaveBeenCalledWith({
+      where: { id: "s1" },
       data: { mowingHeightInches: 3.0 },
     });
-    expect(txYardSectionUpdate).not.toHaveBeenCalled();
+    expect(txYardUpdate).not.toHaveBeenCalled();
     expect(txLawnAnalysisUpdate).toHaveBeenCalledWith({
       where: { id: "a1" },
       data: { mowingRecommendationDismissedAt: null },
     });
-    expect(emitMowingApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "yard" });
+    expect(emitMowingApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "section" });
   });
 
   it("200 Plus user: writes only mowingHeightInches to tx.yardSection.update; emits target=section", async () => {
@@ -242,12 +242,13 @@ describe("POST /api/sections/[sectionId]/mowing/apply", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ target: "yard", heightInches: 3.0, days: ["Mon", "Wed", "Fri"], time: "10:00" });
+    expect(body).toEqual({ target: "section", heightInches: 3.0, days: ["Mon", "Wed", "Fri"], time: "10:00" });
 
-    expect(txYardUpdate).toHaveBeenCalledWith({
-      where: { id: "y1" },
+    expect(txYardSectionUpdate).toHaveBeenCalledWith({
+      where: { id: "s1" },
       data: { mowingHeightInches: 3.0, mowingDays: ["Mon", "Wed", "Fri"], mowingTime: "10:00" },
     });
+    expect(txYardUpdate).not.toHaveBeenCalled();
   });
 
   it("200 empty body still works (no days/time written)", async () => {
@@ -279,11 +280,12 @@ describe("POST /api/sections/[sectionId]/mowing/apply", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ target: "yard", heightInches: 3.0 });
+    expect(body).toEqual({ target: "section", heightInches: 3.0 });
 
-    expect(txYardUpdate).toHaveBeenCalledWith({
-      where: { id: "y1" },
+    expect(txYardSectionUpdate).toHaveBeenCalledWith({
+      where: { id: "s1" },
       data: { mowingHeightInches: 3.0 },
     });
+    expect(txYardUpdate).not.toHaveBeenCalled();
   });
 });

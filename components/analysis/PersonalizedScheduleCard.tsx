@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Lock } from "lucide-react";
 import { ScheduleEditor } from "@/components/yard/ScheduleEditor";
 import { WateringWarning, MowingWarning } from "@/components/yard/ScheduleWarnings";
 import { canSetSectionSchedule } from "@/lib/plan/can-set-section-schedule";
@@ -187,7 +185,7 @@ export function PersonalizedScheduleCard({ sectionId, plan, latestAnalysis, effe
 
       {(wMode === "picker" || mMode === "picker") && (
         <>
-          {showCheckbox ? (
+          {showCheckbox && (
             <label className="flex items-center gap-2 mb-3 text-sm text-gray-700">
               <input
                 type="checkbox"
@@ -197,24 +195,6 @@ export function PersonalizedScheduleCard({ sectionId, plan, latestAnalysis, effe
               />
               Apply to whole yard (all sections)
             </label>
-          ) : (
-            <Link
-              href="/pricing"
-              className="flex items-center gap-2 mb-3 text-sm text-gray-500 hover:text-gray-700"
-            >
-              <input
-                type="checkbox"
-                checked={false}
-                disabled
-                className="cursor-not-allowed"
-                aria-hidden="true"
-              />
-              <span className="line-through">Save just for this section</span>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-                <Lock className="w-3 h-3" />
-                Home Plus
-              </span>
-            </Link>
           )}
           <div className="flex gap-2">
             <button

@@ -38,13 +38,13 @@ describe("effectiveWatering", () => {
     expect(result).toEqual({ days: ["Tue","Thu"], time: "06:00", minutesPerSession: 30 });
   });
 
-  it("ignores section override on home_basic plan", () => {
+  it("prefers section override on home_basic plan", () => {
     const result = effectiveWatering(
       section({ wDays: ["Mon"], wTime: "10:00", wMin: 5 }),
       yard({ wDays: ["Tue","Thu"], wTime: "06:00", wMin: 30 }),
       "home_basic",
     );
-    expect(result).toEqual({ days: ["Tue","Thu"], time: "06:00", minutesPerSession: 30 });
+    expect(result).toEqual({ days: ["Mon"], time: "10:00", minutesPerSession: 5 });
   });
 
   it("returns empty days and nulls when nothing is set", () => {
@@ -90,13 +90,13 @@ describe("effectiveMowing", () => {
     expect(result).toEqual({ days: ["Sun"], time: "09:00", heightInches: 2.5 });
   });
 
-  it("ignores section override on home_basic", () => {
+  it("prefers section override on home_basic", () => {
     const result = effectiveMowing(
       section({ mDays: ["Sat"], mTime: "08:00", mH: 3.0 }),
       yard({ mDays: ["Sun"], mTime: "09:00", mH: 2.5 }),
       "home_basic",
     );
-    expect(result).toEqual({ days: ["Sun"], time: "09:00", heightInches: 2.5 });
+    expect(result).toEqual({ days: ["Sat"], time: "08:00", heightInches: 3.0 });
   });
 
   it("returns empty days and nulls when nothing is set", () => {

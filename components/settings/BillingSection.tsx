@@ -47,16 +47,16 @@ const CHANGE_PLANS = [
   {
     key: "home_basic",
     label: "Home Basic",
-    monthly: 7.99,
-    annual: 79,
-    summary: "1 yard · 8 analyses/yard/month",
+    monthly: 5.99,
+    annual: 59.99,
+    summary: "1 yard · 4 analyses/month · per-section schedules",
   },
   {
     key: "home_plus",
     label: "Home Plus",
-    monthly: 14.99,
-    annual: 139,
-    summary: "Up to 3 yards · 8 analyses/yard/month · multi-yard dashboard",
+    monthly: 9.99,
+    annual: 99.99,
+    summary: "Up to 2 yards · 8 analyses/yard/month · multi-yard dashboard",
   },
   {
     key: "professional",

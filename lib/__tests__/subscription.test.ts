@@ -38,14 +38,14 @@ describe("getPlanLimits", () => {
   it("returns home_basic limits for active home_basic subscriber", () => {
     const limits = getPlanLimits(makeUser({ plan: "home_basic", planStatus: "active", trialEndsAt: null }));
     expect(limits.maxYards).toBe(1);
-    expect(limits.maxAnalysesPerYardPerMonth).toBe(8);
+    expect(limits.maxAnalysesPerYardPerMonth).toBe(4);
     expect(limits.maxVisibleTasks).toBe(-1);
     expect(limits.canRunAnalysis).toBe(true);
   });
 
   it("returns home_plus limits for home_plus plan", () => {
     const limits = getPlanLimits(makeUser({ plan: "home_plus", planStatus: "active" }));
-    expect(limits.maxYards).toBe(3);
+    expect(limits.maxYards).toBe(2);
     expect(limits.maxAnalysesPerYardPerMonth).toBe(8);
   });
 
@@ -80,11 +80,11 @@ describe("getPlanLimits", () => {
 
 describe("canRunAnalysis", () => {
   it("allows when under yard monthly limit", () => {
-    expect(canRunAnalysis(makeUser({ plan: "home_basic", planStatus: "active" }), 7)).toBe(true);
+    expect(canRunAnalysis(makeUser({ plan: "home_basic", planStatus: "active" }), 3)).toBe(true);
   });
 
   it("blocks when at yard monthly limit", () => {
-    expect(canRunAnalysis(makeUser({ plan: "home_basic", planStatus: "active" }), 8)).toBe(false);
+    expect(canRunAnalysis(makeUser({ plan: "home_basic", planStatus: "active" }), 4)).toBe(false);
   });
 
   it("blocks professional when at yard monthly limit", () => {
@@ -102,11 +102,11 @@ describe("canRunAnalysis", () => {
 
 describe("canCreateYard", () => {
   it("allows when under limit", () => {
-    expect(canCreateYard(makeUser({ plan: "home_plus", planStatus: "active" }), 2)).toBe(true);
+    expect(canCreateYard(makeUser({ plan: "home_plus", planStatus: "active" }), 1)).toBe(true);
   });
 
   it("blocks when at limit", () => {
-    expect(canCreateYard(makeUser({ plan: "home_plus", planStatus: "active" }), 3)).toBe(false);
+    expect(canCreateYard(makeUser({ plan: "home_plus", planStatus: "active" }), 2)).toBe(false);
   });
 
   it("blocks professional past 10 yards", () => {
@@ -148,7 +148,7 @@ describe("past_due planStatus", () => {
   it("returns full plan limits when planStatus is past_due", () => {
     const limits = getPlanLimits(makeUser({ plan: "home_basic", planStatus: "past_due" }));
     expect(limits.maxYards).toBe(1);
-    expect(limits.maxAnalysesPerYardPerMonth).toBe(8);
+    expect(limits.maxAnalysesPerYardPerMonth).toBe(4);
     expect(limits.canRunAnalysis).toBe(true);
   });
 

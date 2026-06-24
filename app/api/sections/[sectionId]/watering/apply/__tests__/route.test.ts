@@ -129,7 +129,7 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
     expect(res.status).toBe(200);
   });
 
-  it("200 Basic user: writes only wateringMinutesPerSession to tx.yard.update; clears dismissedAt; emits", async () => {
+  it("200 Basic user: writes only wateringMinutesPerSession to tx.yardSection.update; clears dismissedAt; emits", async () => {
     (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
     mockYardSectionFindUnique.mockResolvedValue({
       id: "s1",
@@ -158,18 +158,18 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ target: "yard", minutesPerSession: 20 });
+    expect(body).toEqual({ target: "section", minutesPerSession: 20 });
 
-    expect(txYardUpdate).toHaveBeenCalledWith({
-      where: { id: "y1" },
+    expect(txYardSectionUpdate).toHaveBeenCalledWith({
+      where: { id: "s1" },
       data: { wateringMinutesPerSession: 20 },
     });
-    expect(txYardSectionUpdate).not.toHaveBeenCalled();
+    expect(txYardUpdate).not.toHaveBeenCalled();
     expect(txLawnAnalysisUpdate).toHaveBeenCalledWith({
       where: { id: "a1" },
       data: { wateringRecommendationDismissedAt: null },
     });
-    expect(emitWateringApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "yard" });
+    expect(emitWateringApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "section" });
   });
 
   it("200 Plus user: writes only wateringMinutesPerSession to tx.yardSection.update; emits with target=section", async () => {
@@ -243,12 +243,13 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ target: "yard", minutesPerSession: 20, days: ["Mon", "Wed", "Fri"], time: "07:00" });
+    expect(body).toEqual({ target: "section", minutesPerSession: 20, days: ["Mon", "Wed", "Fri"], time: "07:00" });
 
-    expect(txYardUpdate).toHaveBeenCalledWith({
-      where: { id: "y1" },
+    expect(txYardSectionUpdate).toHaveBeenCalledWith({
+      where: { id: "s1" },
       data: { wateringMinutesPerSession: 20, wateringDays: ["Mon", "Wed", "Fri"], wateringTime: "07:00" },
     });
+    expect(txYardUpdate).not.toHaveBeenCalled();
   });
 
   it("200 empty body still works (no days/time written)", async () => {
@@ -280,11 +281,12 @@ describe("POST /api/sections/[sectionId]/watering/apply", () => {
 
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ target: "yard", minutesPerSession: 20 });
+    expect(body).toEqual({ target: "section", minutesPerSession: 20 });
 
-    expect(txYardUpdate).toHaveBeenCalledWith({
-      where: { id: "y1" },
+    expect(txYardSectionUpdate).toHaveBeenCalledWith({
+      where: { id: "s1" },
       data: { wateringMinutesPerSession: 20 },
     });
+    expect(txYardUpdate).not.toHaveBeenCalled();
   });
 });

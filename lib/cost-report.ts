@@ -9,8 +9,8 @@ export const PLAN_MONTHLY_REVENUE_USD: Record<string, number> = {
   trial:        0,
   admin:        0,
   expired:      0,
-  home_basic:   7.99,
-  home_plus:    14.99,
+  home_basic:   5.99,
+  home_plus:    9.99,
   professional: 24.99,
 };
 

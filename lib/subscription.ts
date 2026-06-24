@@ -53,8 +53,8 @@ export function computeEngagementStatus(
 const LIMITS: Record<string, PlanLimits> = {
   trial:        { maxYards: 1,  maxAnalysesPerYardPerMonth: 2,  maxVisibleTasks: 1,  canRunAnalysis: true  },
   expired:      { maxYards: 1,  maxAnalysesPerYardPerMonth: 0,  maxVisibleTasks: 1,  canRunAnalysis: false },
-  home_basic:   { maxYards: 1,  maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
-  home_plus:    { maxYards: 3,  maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
+  home_basic:   { maxYards: 1,  maxAnalysesPerYardPerMonth: 4,  maxVisibleTasks: -1, canRunAnalysis: true  },
+  home_plus:    { maxYards: 2,  maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
   professional: { maxYards: 10, maxAnalysesPerYardPerMonth: 8,  maxVisibleTasks: -1, canRunAnalysis: true  },
   admin:        { maxYards: -1, maxAnalysesPerYardPerMonth: -1, maxVisibleTasks: -1, canRunAnalysis: true  },
 };

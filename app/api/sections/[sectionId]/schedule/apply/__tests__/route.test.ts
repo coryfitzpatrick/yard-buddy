@@ -68,7 +68,7 @@ describe("POST /api/sections/[sectionId]/schedule/apply", () => {
     expect(res.status).toBe(404);
   });
 
-  it("Basic with applyToYard:false still writes to yard (plan override)", async () => {
+  it("Basic with applyToYard:false writes to section", async () => {
     (auth as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: "u1" } });
     findUnique.mockResolvedValue({
       id: "s1",
@@ -88,14 +88,14 @@ describe("POST /api/sections/[sectionId]/schedule/apply", () => {
     );
     const res = await POST(req(body({ applyToYard: false })) as never, params("s1") as never);
     expect(res.status).toBe(200);
-    expect(yardUpdate).toHaveBeenCalled();
-    expect(sectionUpdate).not.toHaveBeenCalled();
+    expect(sectionUpdate).toHaveBeenCalled();
+    expect(yardUpdate).not.toHaveBeenCalled();
     expect(analysisUpdate).toHaveBeenCalledWith({
       where: { id: "a1" },
       data: { wateringRecommendationDismissedAt: null, mowingRecommendationDismissedAt: null },
     });
-    expect(emitWateringApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "yard" });
-    expect(emitMowingApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "yard" });
+    expect(emitWateringApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "section" });
+    expect(emitMowingApplied).toHaveBeenCalledWith({ sectionId: "s1", plan: "home_basic", target: "section" });
   });
 
   it("Plus with applyToYard:false writes to section", async () => {

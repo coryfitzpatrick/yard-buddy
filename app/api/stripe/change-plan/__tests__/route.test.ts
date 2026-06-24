@@ -72,7 +72,7 @@ describe("change-plan route", () => {
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.code).toBe("archive_required");
-    expect(body.requiredCount).toBe(2);
+    expect(body.requiredCount).toBe(3);
   });
 
   it("rejects downgrade with wrong archiveYardIds length", async () => {

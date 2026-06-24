@@ -20,8 +20,10 @@ const PLANS = [
     annualSavings: "Save 2 months",
     highlight: false,
     yards: "1 yard",
-    analyses: "8 analyses per month",
+    analyses: "4 analyses per month",
     features: [
+      "Per-section AI analysis and recommendations",
+      "Per-section watering and mowing schedules",
       "All personalized task recommendations",
       "Schedule reminders by email",
       "5-day weather integration",
@@ -31,16 +33,16 @@ const PLANS = [
   {
     name: "Home Plus",
     key: "home_plus",
-    monthly: 12.99,
-    annual: 129.99,
+    monthly: 9.99,
+    annual: 99.99,
     annualSavings: "Save 2 months",
     highlight: true,
-    yards: "Up to 3 yards",
+    yards: "Up to 2 yards",
     analyses: "8 analyses per yard per month",
     features: [
       "Everything in Home Basic",
       "Multi-yard dashboard",
-      "Per-section watering and mowing schedules",
+      "2x the analyses per month",
     ],
   },
   {
