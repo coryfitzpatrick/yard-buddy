@@ -110,7 +110,7 @@ export default async function PricingPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Simple, honest pricing</h1>
           <p className="text-lg text-gray-500">
             {isActivePaid
-              ? "Upgrade, downgrade, or switch between monthly and annual anytime."
+              ? "Upgrade or downgrade anytime. Annual is a 12-month commitment; switching to monthly takes effect at your next renewal."
               : hasEverPaid
               ? "Welcome back. Pick a plan to resume."
               : "Try free for 21 days, then pick the plan that fits."}
@@ -205,7 +205,7 @@ export default async function PricingPage() {
                   <span className="text-gray-400 text-sm"> per month</span>
                 </div>
                 <p className="text-xs text-green-600 font-medium mt-0.5">
-                  ${plan.annual} per year. {plan.annualSavings}.
+                  ${plan.annual} per year. {plan.annualSavings} · 12-month commitment.
                 </p>
               </div>
 

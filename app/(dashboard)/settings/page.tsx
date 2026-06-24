@@ -79,14 +79,43 @@ export default async function SettingsPage({
   const trialDaysLeft = daysUntilTrialEnd(user.trialEndsAt);
   const canPauseSubscription = canPause(subUser);
 
-  // Determine billing period from active Stripe price ID
+  // Determine billing period from active Stripe price ID, and detect any
+  // pending subscription schedule (the only one we create is for annual→monthly).
   const { STRIPE_PRICES, stripe } = await import("@/lib/stripe");
   let currentPeriod: "monthly" | "annual" = "monthly";
+  let pendingChange: { plan: string; period: "monthly" | "annual"; effectiveAt: string } | null = null;
   if (user.stripeSubscriptionId) {
     const sub = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
     const activePriceId = sub.items.data[0]?.price.id ?? "";
     for (const periods of Object.values(STRIPE_PRICES)) {
       if (periods.annual === activePriceId) { currentPeriod = "annual"; break; }
+    }
+
+    const scheduleId = sub.schedule
+      ? (typeof sub.schedule === "string" ? sub.schedule : sub.schedule.id)
+      : null;
+    if (scheduleId) {
+      try {
+        const schedule = await stripe.subscriptionSchedules.retrieve(scheduleId);
+        const futurePhase = schedule.phases[1];
+        const futurePrice = futurePhase?.items[0]?.price;
+        const futurePriceId = typeof futurePrice === "string" ? futurePrice : futurePrice?.id;
+        if (futurePhase && futurePriceId) {
+          for (const [planKey, periods] of Object.entries(STRIPE_PRICES)) {
+            const matchedPeriod = periods.monthly === futurePriceId ? "monthly" : periods.annual === futurePriceId ? "annual" : null;
+            if (matchedPeriod) {
+              pendingChange = {
+                plan: planKey,
+                period: matchedPeriod,
+                effectiveAt: new Date(futurePhase.start_date * 1000).toISOString(),
+              };
+              break;
+            }
+          }
+        }
+      } catch {
+        // Don't fail page load if schedule fetch fails
+      }
     }
   }
 
@@ -150,6 +179,7 @@ export default async function SettingsPage({
               canPauseSubscription={canPauseSubscription}
               currentPlan={user.plan}
               currentPeriod={currentPeriod}
+              pendingChange={pendingChange}
               yards={yards}
               archivedCount={archivedCount}
             />

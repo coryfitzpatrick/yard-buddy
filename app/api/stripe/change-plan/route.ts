@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { stripe, STRIPE_PRICES, isValidPlan, isValidPeriod } from "@/lib/stripe";
+import type { StripePlan, StripePeriod } from "@/lib/stripe";
 import { getPlanLimits, getActiveYardCount } from "@/lib/subscription";
 import { withAxiom, logger } from "@/lib/observability/logger";
+
+function detectCurrentPeriod(priceId: string): StripePeriod | null {
+  for (const prices of Object.values(STRIPE_PRICES)) {
+    if (prices.monthly === priceId) return "monthly";
+    if (prices.annual === priceId) return "annual";
+  }
+  return null;
+}
 
 export const POST = withAxiom(async (req: NextRequest) => {
   const session = await auth();
@@ -86,15 +95,65 @@ export const POST = withAxiom(async (req: NextRequest) => {
 
   const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
   const itemId = subscription.items.data[0]?.id;
+  const currentPriceId = subscription.items.data[0]?.price.id ?? "";
   if (!itemId) {
     return NextResponse.json({ error: "Subscription item not found" }, { status: 500 });
   }
 
+  const currentPeriod = detectCurrentPeriod(currentPriceId);
+  const isAnnualToMonthly = currentPeriod === "annual" && period === "monthly";
+  const isTierChange = user.plan !== plan;
+
   try {
-    await stripe.subscriptions.update(user.stripeSubscriptionId, {
-      items: [{ id: itemId, price: priceId }],
-      proration_behavior: "always_invoice",
-    });
+    if (isAnnualToMonthly) {
+      // Annual is a 12-month commitment. The cadence switch waits for renewal.
+      // If the tier is also changing, the tier change still happens immediately
+      // on the existing (annual) cadence, then the schedule flips to monthly at
+      // the renewal date.
+      const phase1PriceId = isTierChange
+        ? STRIPE_PRICES[plan as StripePlan][currentPeriod]
+        : currentPriceId;
+
+      if (isTierChange) {
+        await stripe.subscriptions.update(user.stripeSubscriptionId, {
+          items: [{ id: itemId, price: phase1PriceId }],
+          proration_behavior: "always_invoice",
+        });
+      }
+
+      // Release any pre-existing pending schedule so we can stage a fresh one.
+      const refreshed = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const existingScheduleId = refreshed.schedule
+        ? (typeof refreshed.schedule === "string" ? refreshed.schedule : refreshed.schedule.id)
+        : null;
+      if (existingScheduleId) {
+        await stripe.subscriptionSchedules.release(existingScheduleId);
+      }
+
+      const schedule = await stripe.subscriptionSchedules.create({
+        from_subscription: user.stripeSubscriptionId,
+      });
+      const phase1 = schedule.phases[0];
+      await stripe.subscriptionSchedules.update(schedule.id, {
+        end_behavior: "release",
+        phases: [
+          {
+            items: [{ price: phase1PriceId, quantity: 1 }],
+            start_date: phase1.start_date,
+            end_date: phase1.end_date,
+          },
+          {
+            items: [{ price: priceId, quantity: 1 }],
+            duration: { interval: "month", interval_count: 1 },
+          },
+        ],
+      });
+    } else {
+      await stripe.subscriptions.update(user.stripeSubscriptionId, {
+        items: [{ id: itemId, price: priceId }],
+        proration_behavior: "always_invoice",
+      });
+    }
   } catch (err) {
     logger.error("change-plan: stripe update failed", {
       userId: session.user.id,
@@ -159,5 +218,5 @@ export const POST = withAxiom(async (req: NextRequest) => {
     }
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, deferred: isAnnualToMonthly });
 });

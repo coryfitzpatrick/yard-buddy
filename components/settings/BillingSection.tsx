@@ -23,6 +23,12 @@ interface PaymentMethod {
   expYear: number;
 }
 
+interface PendingChange {
+  plan: string;
+  period: "monthly" | "annual";
+  effectiveAt: string;
+}
+
 interface Props {
   plan: string;
   planStatus: string;
@@ -37,6 +43,7 @@ interface Props {
   canPauseSubscription: boolean;
   currentPlan: string;
   currentPeriod: "monthly" | "annual";
+  pendingChange: PendingChange | null;
   yards: { id: string; name: string }[];
   archivedCount: number;
 }
@@ -81,6 +88,7 @@ export function BillingSection({
   canPauseSubscription,
   currentPlan,
   currentPeriod,
+  pendingChange,
   yards,
   archivedCount,
 }: Props) {
@@ -149,6 +157,18 @@ export function BillingSection({
       return;
     }
     setDialog(null);
+    window.location.reload();
+  }
+
+  async function handleCancelPending() {
+    setBusy(true);
+    setActionError(null);
+    const res = await fetch("/api/stripe/cancel-pending", { method: "POST" });
+    setBusy(false);
+    if (!res.ok) {
+      setActionError("Failed to cancel the pending change. Please try again.");
+      return;
+    }
     window.location.reload();
   }
 
@@ -232,6 +252,22 @@ export function BillingSection({
         </div>
       </div>
 
+      {pendingChange && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
+          <p className="text-sm text-amber-900">
+            <span className="font-semibold">Switching to {PLAN_LABELS[pendingChange.plan] ?? pendingChange.plan} ({pendingChange.period === "monthly" ? "Monthly" : "Annual"})</span> on {new Date(pendingChange.effectiveAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. Nothing changes until then.
+          </p>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={handleCancelPending}
+            className="mt-2 text-sm text-amber-900 underline hover:text-amber-700 disabled:opacity-50"
+          >
+            Cancel pending switch
+          </button>
+        </div>
+      )}
+
       {archivedCount > 0 && (
         <div className="border-t border-gray-100 pt-4">
           <p className="text-sm text-gray-700">
@@ -299,8 +335,27 @@ export function BillingSection({
             const currentRank = TIER_RANK[currentPlan] ?? 0;
             const isDowngradeChange = targetRank < currentRank;
             const isUpgradeChange = targetRank > currentRank;
-            const confirmLabel = isDowngradeChange ? "Downgrade" : isUpgradeChange ? "Upgrade" : "Confirm switch";
-            const busyLabel = isDowngradeChange ? "Downgrading…" : isUpgradeChange ? "Upgrading…" : "Switching…";
+            const isAnnualToMonthly = currentPeriod === "annual" && changePeriod === "monthly";
+            const isMonthlyToAnnual = currentPeriod === "monthly" && changePeriod === "annual";
+            const renewalDate = currentPeriodEnd
+              ? new Date(currentPeriodEnd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+              : "your next renewal";
+            const confirmLabel = isAnnualToMonthly ? "Schedule switch" : isDowngradeChange ? "Downgrade" : isUpgradeChange ? "Upgrade" : "Confirm switch";
+            const busyLabel = isAnnualToMonthly ? "Scheduling…" : isDowngradeChange ? "Downgrading…" : isUpgradeChange ? "Upgrading…" : "Switching…";
+
+            let directionCopy: string;
+            if (isAnnualToMonthly) {
+              directionCopy = `Your annual plan runs through ${renewalDate}. After that, billing switches to ${selectedPlan?.label} at $${selectedPlan?.monthly}/mo. Nothing changes today.`;
+            } else if (isMonthlyToAnnual && !isDowngradeChange && !isUpgradeChange) {
+              directionCopy = `You'll be charged $${selectedPlan?.annual} today. Any unused days from this month are credited toward your next bill. Your annual term runs for 12 months from today.`;
+            } else if (isDowngradeChange) {
+              directionCopy = `We'll credit the prorated difference for the rest of this billing period toward your next bill. New plan starts now.`;
+            } else if (isUpgradeChange) {
+              directionCopy = `You'll be charged the prorated difference for the rest of this billing period today. New plan starts now.`;
+            } else {
+              directionCopy = `Plan changes take effect immediately.`;
+            }
+
             return (
             <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 space-y-3">
               <p className="text-sm font-medium text-gray-800">
@@ -325,7 +380,7 @@ export function BillingSection({
                       : "border-gray-200 text-gray-600 hover:border-gray-300"
                   }`}
                 >
-                  Annual · ${selectedPlan?.annual}/yr (save 2 months)
+                  Annual · ${selectedPlan?.annual}/yr · 12-month commitment
                 </button>
               </div>
               <div className="rounded-md bg-white border border-gray-200 px-3 py-2 text-sm">
@@ -333,14 +388,17 @@ export function BillingSection({
                 <span className="font-semibold text-gray-900">${billedAmount} {billedSuffix}</span>
                 <span className="text-gray-500"> going forward.</span>
               </div>
-              <p className="text-xs text-gray-500">
-                Your billing will be adjusted immediately. You will be charged or credited the prorated difference for the remaining time in your billing period.
+              <p className="text-xs text-gray-600">
+                {directionCopy}
+              </p>
+              <p className="text-xs text-gray-400 border-t border-gray-200 pt-2">
+                Plan changes apply immediately. The only exception is switching from annual to monthly, which takes effect at your next renewal because annual is a 12-month commitment.
               </p>
               <div className="flex gap-2">
                 <Button
                   size="sm"
                   onClick={handleChangePlan}
-                  disabled={busy || changePlanKey === currentPlan}
+                  disabled={busy || (changePlanKey === currentPlan && changePeriod === currentPeriod)}
                   className="bg-green-600 hover:bg-green-700"
                 >
                   {busy ? busyLabel : confirmLabel}
