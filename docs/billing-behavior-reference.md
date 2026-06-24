@@ -2,6 +2,62 @@
 
 Authoritative list of what happens when a subscriber changes plans. Every row in the tables below corresponds to one customer-visible behavior. If the implementation drifts from this doc, fix the implementation, not the doc.
 
+## TL;DR
+
+| You're on | You want | Happens |
+|---|---|---|
+| Any plan | Tier upgrade (same cadence) | Now, pay prorated diff |
+| Monthly | Tier downgrade | Now, credit prorated diff, pick yards if over limit |
+| Monthly | Switch to annual (same tier) | Now, pay annual amount less unused-month credit |
+| Annual | Tier upgrade (same or different cadence) | Now: upgrade to higher annual at prorated diff. If target cadence is monthly, also schedule the monthly switch for renewal. |
+| Annual | Tier downgrade (any cadence target) | Wait until renewal. Pick yards at renewal via modal. |
+| Annual | Switch to monthly (same tier) | Wait until renewal. |
+
+**One rule of thumb:** if you're on annual, the only thing that takes effect today is a tier upgrade. Everything else waits.
+
+## Plain-English walkthrough of the canonical cases
+
+These are the specific journeys the rules were designed around.
+
+### Basic annual → Basic monthly (same plan, switch off annual)
+
+1. User clicks confirm.
+2. Nothing changes today. The subscription stays on Basic annual through the rest of the prepaid year.
+3. On the renewal date, the subscription switches to Basic monthly. The user is charged $5.99 then and every month after.
+4. No yard archive — same tier, same yard limit.
+
+### Basic annual → Plus monthly (upgrade tier AND switch off annual)
+
+1. User clicks confirm.
+2. **Today:** the remaining Basic annual term is upgraded to Plus annual. Stripe charges the prorated difference (Plus annual − Basic annual, scaled to remaining days of the year). Plus features unlock immediately.
+3. **On the renewal date:** the subscription switches from Plus annual to Plus monthly. From then on, the user is billed $9.99/mo.
+4. **There is no shortcut to "Plus monthly today."** The annual commitment has to finish out at the higher tier first.
+
+### Plus monthly → Basic annual (tier downgrade AND switch to annual)
+
+1. User clicks confirm.
+2. Since the user has 2 yards on Plus and Basic only supports 1, the picker modal opens at submit. User picks the yard to keep, others go to archive list.
+3. **Today:** subscription updates to Basic annual. Stripe charges $59.99 for the year less a credit for unused days of the current Plus monthly cycle. The unpicked yard is archived immediately.
+4. The user's annual term runs 12 months from today.
+
+### Plus annual → Basic annual (tier downgrade, same cadence, while on annual)
+
+1. User clicks confirm.
+2. Nothing changes today. The subscription stays on Plus annual with all yards through the rest of the prepaid year.
+3. **On the renewal date:** subscription switches to Basic annual. The user is charged $59.99 for the next year.
+4. **Also on the renewal date:** if the user has more yards than Basic supports, the next time they open the app the at-renewal yard limit modal blocks them and forces a pick. They can either keep 1 yard and archive the rest, or upgrade back to Plus to keep them all.
+
+### Plus annual → Basic monthly (tier downgrade AND switch off annual)
+
+1. User clicks confirm.
+2. Nothing changes today.
+3. **On the renewal date:** subscription switches to Basic monthly ($5.99/mo billing starts).
+4. **Same yard-limit modal as above:** on next app load after the flip, user picks 1 yard to keep on Basic or upgrades.
+
+### Pro tier variants
+
+Pro behaves the same as Plus across all of these. Pro annual → Plus annual is a deferred downgrade with a yard limit modal at renewal (Plus supports 2 yards; if Pro user has 10, they pick 2). Pro monthly → Plus monthly is an immediate downgrade with a picker today.
+
 ## Core principles
 
 1. **If you're on annual, the only change that takes effect today is a tier upgrade.** You pay the prorated difference and start using the higher tier immediately. Everything else (downgrade, cadence switch, combination) waits for renewal.
@@ -87,6 +143,26 @@ Annual subscribers who cancel mid-term keep access through the original renewal 
 | Trigger | Effect |
 |---|---|
 | User clicks "Cancel pending switch" | Active subscription_schedule is released. Subscription stays on its current price/tier exactly as it was before the switch was scheduled. No money moves. |
+
+## Trial
+
+| When | What happens |
+|---|---|
+| Account creation | 21-day trial of Basic begins. No card required. `User.plan = "trial"`, `User.planStatus = "trialing"`, `User.trialEndsAt = now + 21d`. |
+| User engages with the product | If they set up a schedule AND complete a task during the trial, `trialEngagementBonusGrantedAt` is set and `trialEndsAt` extends by 7 days. One-time per account. |
+| Trial ends without subscription | `isEffectivelyExpired` returns true. `getPlanLimits` returns the `expired` row (no analyses allowed, 1 yard limit). `getDaysUntilDeletion` starts counting down 30 days from `trialEndsAt`. |
+| Trial user subscribes before trial ends | Stripe checkout creates a real subscription. Webhook updates `plan` and `planStatus`. Trial billing is replaced by paid billing on the chosen plan. |
+| 30 days past trial end with no subscription | Account-deletion cron removes the user, their yards, analyses, and Supabase photos. |
+
+## Failed payments
+
+| When | What happens |
+|---|---|
+| Stripe charge fails on renewal | Stripe retries per its default schedule. `invoice.payment_failed` webhook fires. If our `User.lastPaymentFailedInvoiceId !== invoice.id` (idempotency), we update `planStatus = "past_due"` (if it was `"active"`), record the invoice id, and email the user with a billing portal link. |
+| User updates card before Stripe gives up | Next retry succeeds, `customer.subscription.updated` webhook flips `planStatus` back to `"active"`. |
+| Stripe gives up retries | Subscription transitions to `canceled` in Stripe. Webhook flips DB `planStatus = "canceled"`. 30-day deletion clock starts as for any cancellation. |
+
+`past_due` users currently keep full plan access in-app. The email + portal link is the only nudge. (Tightening this — e.g., a banner or feature gate — is on the open-issues list.)
 
 ## At-renewal yard limit modal
 
