@@ -19,12 +19,22 @@ vi.mock("@/lib/stripe", async () => {
   };
 });
 
-vi.mock("@/lib/db", () => ({
-  db: {
-    user: { findUnique: vi.fn(), update: vi.fn() },
+vi.mock("@/lib/db", () => {
+  // Hoist-friendly tx-aware mock: $transaction calls back with a transaction
+  // client that delegates to the same fns the tests inspect, so a single
+  // assertion can verify writes inside the transaction.
+  const tx = {
+    user: { update: vi.fn() },
     yard: { count: vi.fn(), findMany: vi.fn(), updateMany: vi.fn() },
-  },
-}));
+  };
+  return {
+    db: {
+      user: { findUnique: vi.fn(), update: tx.user.update },
+      yard: { count: tx.yard.count, findMany: tx.yard.findMany, updateMany: tx.yard.updateMany },
+      $transaction: vi.fn(async (fn: (t: typeof tx) => Promise<unknown>) => fn(tx)),
+    },
+  };
+});
 
 import { updateUserFromSubscription } from "../route";
 import { db } from "@/lib/db";
@@ -56,6 +66,7 @@ describe("updateUserFromSubscription", () => {
     (db.yard.count as ReturnType<typeof vi.fn>).mockReset();
     (db.yard.findMany as ReturnType<typeof vi.fn>).mockReset();
     (db.yard.updateMany as ReturnType<typeof vi.fn>).mockReset();
+    (db.$transaction as ReturnType<typeof vi.fn>).mockClear();
     (db.user.update as ReturnType<typeof vi.fn>).mockResolvedValue({});
     (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(0);
     (db.yard.findMany as ReturnType<typeof vi.fn>).mockResolvedValue([]);
@@ -91,14 +102,54 @@ describe("updateUserFromSubscription", () => {
     expect(updateCall.data).not.toHaveProperty("analysisQuotaResetAt");
   });
 
-  it("contract #3: no-op (plan and planStatus unchanged) → no DB update", async () => {
+  it("contract #3: no-op only when plan, planStatus, currentPeriodEnd, and subscriptionId all match", async () => {
     (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
-      id: "u1", plan: "home_basic", planStatus: "active",
+      id: "u1",
+      plan: "home_basic",
+      planStatus: "active",
+      currentPeriodEnd: new Date(1_900_000_000 * 1000),
+      stripeSubscriptionId: "sub_1",
     });
 
     await updateUserFromSubscription(subscription({ priceId: "price_home_basic_monthly" }));
 
     expect((db.user.update as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+  });
+
+  it("contract #3b (renewal): plan+status unchanged but current_period_end advanced → DB update persists new period end", async () => {
+    // This is the bug we fixed: a renewal that bumps current_period_end with
+    // no change to plan/status MUST still write through, or the "Next charge
+    // on [date]" copy in the UI sticks at the prior renewal date.
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1",
+      plan: "home_basic",
+      planStatus: "active",
+      currentPeriodEnd: new Date(1_800_000_000 * 1000), // stale
+      stripeSubscriptionId: "sub_1",
+    });
+
+    await updateUserFromSubscription(subscription({
+      priceId: "price_home_basic_monthly",
+      currentPeriodEnd: 1_900_000_000, // fresh from Stripe
+    }));
+
+    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(updateCall.data.currentPeriodEnd.getTime()).toBe(1_900_000_000 * 1000);
+  });
+
+  it("contract #3c: subscription id drift → DB update persists the new sub id", async () => {
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1",
+      plan: "home_basic",
+      planStatus: "active",
+      currentPeriodEnd: new Date(1_900_000_000 * 1000),
+      stripeSubscriptionId: "sub_old",
+    });
+
+    await updateUserFromSubscription(subscription({ priceId: "price_home_basic_monthly" }));
+
+    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(updateCall.data.stripeSubscriptionId).toBe("sub_1");
   });
 
   it("contract #4: status canceled → planStatus = canceled", async () => {
@@ -118,6 +169,20 @@ describe("updateUserFromSubscription", () => {
     });
 
     await updateUserFromSubscription(subscription({ status: "past_due", priceId: "price_home_plus_monthly" }));
+
+    const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(updateCall.data.planStatus).toBe("past_due");
+  });
+
+  it("contract #4c: status paused → planStatus = past_due (NEVER expired)", async () => {
+    // Paused isn't a state we ship today, but if Stripe ever surfaces it
+    // (admin action, future feature) we must NOT flip the user to expired,
+    // which would start the 30-day account-deletion clock.
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1", plan: "home_plus", planStatus: "active",
+    });
+
+    await updateUserFromSubscription(subscription({ status: "paused" as never, priceId: "price_home_plus_monthly" }));
 
     const updateCall = (db.user.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(updateCall.data.planStatus).toBe("past_due");
@@ -163,6 +228,18 @@ describe("updateUserFromSubscription", () => {
     await expect(
       updateUserFromSubscription(subscription({ priceId: "price_phantom" })),
     ).rejects.toThrow(/Unrecognized priceId/);
+  });
+
+  it("user update + yard restore happen inside a single $transaction (atomicity)", async () => {
+    (db.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "u1", plan: "home_basic", planStatus: "active",
+    });
+    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(0);
+    (db.yard.findMany as ReturnType<typeof vi.fn>).mockResolvedValue([{ id: "y_1" }]);
+
+    await updateUserFromSubscription(subscription({ priceId: "price_home_plus_monthly" }));
+
+    expect((db.$transaction as ReturnType<typeof vi.fn>)).toHaveBeenCalledOnce();
   });
 
   it("currentPeriodEnd is persisted as Date from Stripe's unix seconds", async () => {

@@ -224,9 +224,12 @@ These are the invariants that every code change must preserve. If a test fails o
 
 ### Route: `POST /api/stripe/cancel`
 
-1. **No pending schedule** → calls `subscriptions.update` with `cancel_at_period_end: true`. No schedule release attempt.
+The route reads live state from Stripe (via `subscriptions.retrieve`) rather than our cached `User.planStatus`, since webhook delivery delays can leave the DB lagging behind Stripe.
+
+1. **No pending schedule, status active, `cancel_at_period_end: false`** → calls `subscriptions.update` with `cancel_at_period_end: true`. No schedule release attempt.
 2. **Pending schedule exists** → calls `subscriptionSchedules.release` first, then `subscriptions.update` with `cancel_at_period_end: true`.
-3. **Already canceled** → returns 400, no Stripe calls.
+3. **Stripe reports status canceled** → returns 400, no schedule release, no update. (Note: uses live Stripe state, not cached `User.planStatus`.)
+4. **`cancel_at_period_end` already true** → returns 400, no duplicate Stripe writes.
 
 ### Route: `POST /api/stripe/cancel-pending`
 
@@ -244,9 +247,11 @@ These are the invariants that every code change must preserve. If a test fails o
 
 1. **Plan change from `"trial"` to any paid plan** → persists the new `plan`, persists `planStatus = "active"`, sets `analysisQuotaResetAt = now`.
 2. **Plan change between paid tiers** → persists the new `plan`. Does NOT touch `analysisQuotaResetAt`.
-3. **No-op (plan and status unchanged)** → does nothing (idempotency).
+3. **No-op idempotency** → skips the DB write only when ALL of plan, planStatus, currentPeriodEnd, and stripeSubscriptionId match what we already have. A renewal that advances `current_period_end` without changing plan/status MUST still write through, otherwise the "Next charge on …" UI sticks at the old date.
 4. **Subscription `status = "canceled"`** → persists `planStatus = "canceled"`.
-5. **Plan increase that allows more yards** → auto-restores most recently archived yards up to the new limit.
+5. **Subscription `status = "past_due"`** → persists `planStatus = "past_due"`.
+6. **Subscription `status = "paused"`** → persists `planStatus = "past_due"` (NEVER `"expired"`; expired triggers the 30-day deletion clock).
+7. **Plan increase that allows more yards** → auto-restores most recently archived yards up to the new limit, atomically with the user update inside a single `db.$transaction`.
 
 ### Analyze route quota cutoff
 

@@ -10,7 +10,13 @@ export async function updateUserFromSubscription(sub: Stripe.Subscription) {
   // Look up user by our stored customerId — never trust payload userId directly
   const user = await db.user.findUnique({
     where: { stripeCustomerId: sub.customer as string },
-    select: { id: true, plan: true, planStatus: true },
+    select: {
+      id: true,
+      plan: true,
+      planStatus: true,
+      currentPeriodEnd: true,
+      stripeSubscriptionId: true,
+    },
   });
   if (!user) return; // Customer exists in Stripe but not in our DB; skip
 
@@ -26,16 +32,32 @@ export async function updateUserFromSubscription(sub: Stripe.Subscription) {
     case "active":    planStatus = "active";    break;
     case "past_due":  planStatus = "past_due";  break;
     case "canceled":  planStatus = "canceled";  break;
+    // We don't ship a pause feature today. If Stripe ever surfaces "paused"
+    // for any reason (admin action, future feature), treat it like past_due
+    // so the account doesn't get bumped into the expired-deletion flow.
+    case "paused":    planStatus = "past_due";  break;
     default:          planStatus = "expired";
-  }
-
-  // Skip update if nothing changed (idempotency guard)
-  if (user.plan === plan && user.planStatus === planStatus) {
-    return;
   }
 
   // In the v2 Stripe API, current_period_end lives on the subscription item
   const periodEnd = sub.items.data[0]?.current_period_end ?? null;
+  const newPeriodEnd = periodEnd ? new Date(periodEnd * 1000) : null;
+
+  // Idempotency guard: skip the DB write only when EVERY synced field matches.
+  // A renewal advances current_period_end without changing plan or planStatus,
+  // so we must compare period end here too — otherwise the "Next charge on
+  // [date]" copy in the UI sticks at the old date.
+  const periodEndMatches =
+    (user.currentPeriodEnd?.getTime() ?? null) === (newPeriodEnd?.getTime() ?? null);
+  const subscriptionIdMatches = user.stripeSubscriptionId === sub.id;
+  if (
+    user.plan === plan &&
+    user.planStatus === planStatus &&
+    periodEndMatches &&
+    subscriptionIdMatches
+  ) {
+    return;
+  }
 
   // Trial → paid: reset the analysis-quota cutoff so trial usage doesn't
   // count against the new plan's first calendar month. Naturally drops off
@@ -44,39 +66,43 @@ export async function updateUserFromSubscription(sub: Stripe.Subscription) {
   // trial → paid event.
   const isTrialToPaid = user.plan === "trial";
 
-  await db.user.update({
-    where: { id: user.id },
-    data: {
-      plan,
-      planStatus,
-      stripeSubscriptionId: sub.id,
-      currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : null,
-      ...(isTrialToPaid ? { analysisQuotaResetAt: new Date() } : {}),
-    },
-  });
-
-  // Auto-restore most recently archived yards if the new plan increases the limit.
+  // Atomic user update + (optional) auto-restore of archived yards on tier-up.
+  // Wrapping both in one transaction guarantees we never leave the user on the
+  // new plan with stale archives that should have been brought back.
   const newLimits = getPlanLimits({ plan, planStatus, trialEndsAt: null });
-  if (newLimits.maxYards !== -1 && newLimits.maxYards > 0) {
-    const activeCount = await db.yard.count({
-      where: { userId: user.id, archivedAt: null },
+  await db.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: {
+        plan,
+        planStatus,
+        stripeSubscriptionId: sub.id,
+        currentPeriodEnd: newPeriodEnd,
+        ...(isTrialToPaid ? { analysisQuotaResetAt: new Date() } : {}),
+      },
     });
-    const restoreCount = newLimits.maxYards - activeCount;
-    if (restoreCount > 0) {
-      const archived = await db.yard.findMany({
-        where: { userId: user.id, archivedAt: { not: null } },
-        orderBy: { archivedAt: "desc" },
-        take: restoreCount,
-        select: { id: true },
+
+    if (newLimits.maxYards !== -1 && newLimits.maxYards > 0) {
+      const activeCount = await tx.yard.count({
+        where: { userId: user.id, archivedAt: null },
       });
-      if (archived.length > 0) {
-        await db.yard.updateMany({
-          where: { id: { in: archived.map((y) => y.id) } },
-          data: { archivedAt: null },
+      const restoreCount = newLimits.maxYards - activeCount;
+      if (restoreCount > 0) {
+        const archived = await tx.yard.findMany({
+          where: { userId: user.id, archivedAt: { not: null } },
+          orderBy: { archivedAt: "desc" },
+          take: restoreCount,
+          select: { id: true },
         });
+        if (archived.length > 0) {
+          await tx.yard.updateMany({
+            where: { id: { in: archived.map((y) => y.id) } },
+            data: { archivedAt: null },
+          });
+        }
       }
     }
-  }
+  });
 }
 
 export const POST = withAxiom(async (req: NextRequest) => {
