@@ -199,8 +199,66 @@ The modal cannot be dismissed without picking. Once submitted, `/api/yards/archi
 | Our DB `User.plan` | Cached current tier — updated on webhook events. Authoritative for app entitlements. |
 | Our DB `User.planStatus` | `trialing` / `active` / `past_due` / `expired` / `canceled` — mapped from Stripe subscription status |
 | Our DB `User.currentPeriodEnd` | Cached from Stripe `items[0].current_period_end` — used in UI for "Next charge on …" |
+| Our DB `User.analysisQuotaResetAt` | Set when a trial user first subscribes to a paid plan; used by the analyze route as a cap-counting cutoff so trial usage doesn't dock the first paid month. |
+| Our DB `User.lastPaymentFailedInvoiceId` | Idempotency guard so we don't double-process the same `invoice.payment_failed` retry. |
 
 There is no `deferTier` flag, no `pendingYardArchiveIds`, no yard-pick stored at submit time for deferred downgrades. The yard pick happens after the plan actually changes, via the modal.
+
+## Behavior contract (what tests must enforce)
+
+These are the invariants that every code change must preserve. If a test fails one of these claims, the implementation is wrong, not the test.
+
+### Route: `POST /api/stripe/change-plan`
+
+1. **Tier upgrade on monthly** → calls `subscriptions.update` immediately with the target monthly price and `proration_behavior: "always_invoice"`. Creates no schedule. Persists `User.plan`. Returns `{ ok: true, deferred: false }`.
+2. **Tier downgrade on monthly** → same as (1) but with target downgrade price. If `activeYardCount > newPlan.maxYards`, returns `400 archive_required` unless the request includes the right number of `archiveYardIds`. With a valid pick, archives those yards in the same transaction as the plan write.
+3. **Same-tier monthly → annual** → calls `subscriptions.update` with the target annual price, no schedule, persists DB.
+4. **Same-tier annual → monthly** → does NOT call `subscriptions.update`. Releases any pre-existing schedule, then creates a new schedule from the subscription with phase 1 = current annual price (kept through `current_period_end`) and phase 2 = target monthly price with monthly duration. Does NOT persist `User.plan` (it doesn't change today). Returns `{ ok: true, deferred: true }`.
+5. **Tier upgrade on annual, same cadence (annual → annual)** → calls `subscriptions.update` immediately with the higher annual price. No schedule.
+6. **Tier downgrade on annual, same cadence (annual → annual)** → does NOT call `subscriptions.update`. Creates a schedule with phase 1 = current annual, phase 2 = target annual with annual duration. Does NOT persist `User.plan`. Yard archive is NOT required at submit time; deferred to renewal.
+7. **Combined: annual + tier upgrade + target monthly** (e.g. Basic annual → Plus monthly) → calls `subscriptions.update` immediately to upgrade the tier on the existing annual cadence (charges prorated upgrade diff). Then creates a schedule with phase 1 = new tier annual, phase 2 = new tier monthly with monthly duration. Persists `User.plan` immediately.
+8. **Combined: annual + tier downgrade + target monthly** (e.g. Plus annual → Basic monthly) → fully deferred. No `subscriptions.update` today, no DB plan write today, no yard archive required at submit. Schedule has phase 1 = current annual, phase 2 = target monthly.
+9. **Existing pending schedule + new change** → releases the old schedule before applying the new one in both immediate and scheduled branches.
+10. **`plan === "trial"` in request** → rejected with 400.
+11. **No subscription** → rejected with 400.
+
+### Route: `POST /api/stripe/cancel`
+
+1. **No pending schedule** → calls `subscriptions.update` with `cancel_at_period_end: true`. No schedule release attempt.
+2. **Pending schedule exists** → calls `subscriptionSchedules.release` first, then `subscriptions.update` with `cancel_at_period_end: true`.
+3. **Already canceled** → returns 400, no Stripe calls.
+
+### Route: `POST /api/stripe/cancel-pending`
+
+1. **Schedule attached** → releases it. Subscription itself is untouched. Returns 200.
+2. **No schedule attached** → 400.
+3. **No subscription** → 400.
+
+### Route: `POST /api/yards/archive`
+
+1. **Valid yard IDs the caller owns and that are not already archived** → sets `archivedAt` on each.
+2. **Empty or non-array** → 400.
+3. **An ID the user doesn't own or that's already archived** → 400 with `code: "archive_invalid_ids"`.
+
+### Webhook: `customer.subscription.updated`
+
+1. **Plan change from `"trial"` to any paid plan** → persists the new `plan`, persists `planStatus = "active"`, sets `analysisQuotaResetAt = now`.
+2. **Plan change between paid tiers** → persists the new `plan`. Does NOT touch `analysisQuotaResetAt`.
+3. **No-op (plan and status unchanged)** → does nothing (idempotency).
+4. **Subscription `status = "canceled"`** → persists `planStatus = "canceled"`.
+5. **Plan increase that allows more yards** → auto-restores most recently archived yards up to the new limit.
+
+### Analyze route quota cutoff
+
+1. **No `analysisQuotaResetAt`** → counts analyses from start of calendar month.
+2. **`analysisQuotaResetAt` in current month** → counts analyses since that timestamp.
+3. **`analysisQuotaResetAt` in a previous month** → falls back to start-of-month (the field has timed out naturally).
+
+### Layout: dashboard renders `YardLimitExceededModal`
+
+1. **`activeYardCount > maxYards`** → modal renders.
+2. **`activeYardCount <= maxYards`** → modal does not render.
+3. **`maxYards === -1`** (admin / unlimited) → modal never renders.
 
 ## Implementation entry points
 

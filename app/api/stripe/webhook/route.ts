@@ -6,7 +6,7 @@ import { resend, buildPaymentFailedEmail } from "@/lib/email";
 import { withAxiom, logger } from "@/lib/observability/logger";
 import { getPlanLimits } from "@/lib/subscription";
 
-async function updateUserFromSubscription(sub: Stripe.Subscription) {
+export async function updateUserFromSubscription(sub: Stripe.Subscription) {
   // Look up user by our stored customerId — never trust payload userId directly
   const user = await db.user.findUnique({
     where: { stripeCustomerId: sub.customer as string },

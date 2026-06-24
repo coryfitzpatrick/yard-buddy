@@ -5,7 +5,7 @@ import { analyzeImages, validateLawnImages, generateScheduleRecommendation } fro
 import { effectiveWatering, effectiveMowing } from "@/lib/schedules/effective-schedule";
 import { getWeatherByZip, formatForecastForClaude } from "@/lib/weather";
 import { deduplicateRecommendations } from "@/lib/analysis-utils";
-import { canRunAnalysis, getPlanLimits } from "@/lib/subscription";
+import { canRunAnalysis, getPlanLimits, analysisCutoff } from "@/lib/subscription";
 import { isOwnedLawnPhotoUrl } from "@/lib/storage-url";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withAxiom, logger } from "@/lib/observability/logger";
@@ -121,16 +121,8 @@ export const POST = withAxiom(async (req: NextRequest) => {
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Count analyses for the entire yard since the cap-counting cutoff. Cutoff
-  // is the later of (a) start of this calendar month and (b) the moment the
-  // user first subscribed to a paid plan (analysisQuotaResetAt). So trial
-  // usage doesn't count against the new plan's first month.
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
-  const cutoff = subUser.analysisQuotaResetAt && subUser.analysisQuotaResetAt > startOfMonth
-    ? subUser.analysisQuotaResetAt
-    : startOfMonth;
+  // Cap-counting cutoff: see analysisCutoff in lib/subscription for the rule.
+  const cutoff = analysisCutoff({ analysisQuotaResetAt: subUser.analysisQuotaResetAt });
   const monthlyCount = await db.lawnAnalysis.count({
     where: {
       yardSection: { yardId: section.yardId },

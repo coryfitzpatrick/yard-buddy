@@ -3,6 +3,7 @@ import {
   getPlanLimits,
   canRunAnalysis,
   canCreateYard,
+  analysisCutoff,
   getVisibleTasksArgs,
   getDaysUntilDeletion,
   PLAN_LABELS,
@@ -118,6 +119,41 @@ describe("past_due planStatus", () => {
     expect(canRunAnalysis(makeUser({ plan: "home_plus", planStatus: "past_due" }), 7)).toBe(true);
   });
 
+});
+
+describe("analysisCutoff", () => {
+  it("contract #1: no analysisQuotaResetAt → start of calendar month", () => {
+    const now = new Date(2026, 5, 15, 12, 0, 0); // June 15, 2026 noon
+    const cutoff = analysisCutoff({ analysisQuotaResetAt: null, now });
+    expect(cutoff.getFullYear()).toBe(2026);
+    expect(cutoff.getMonth()).toBe(5);
+    expect(cutoff.getDate()).toBe(1);
+    expect(cutoff.getHours()).toBe(0);
+    expect(cutoff.getMinutes()).toBe(0);
+  });
+
+  it("contract #2: analysisQuotaResetAt in current month → uses the resetAt timestamp", () => {
+    const now = new Date(2026, 5, 15, 12, 0, 0); // June 15
+    const resetAt = new Date(2026, 5, 10, 9, 30, 0); // June 10
+    const cutoff = analysisCutoff({ analysisQuotaResetAt: resetAt, now });
+    expect(cutoff).toEqual(resetAt);
+  });
+
+  it("contract #3: analysisQuotaResetAt in a previous month → falls back to startOfMonth", () => {
+    const now = new Date(2026, 5, 15, 12, 0, 0); // June 15
+    const resetAt = new Date(2026, 4, 20, 9, 30, 0); // May 20 — irrelevant now
+    const cutoff = analysisCutoff({ analysisQuotaResetAt: resetAt, now });
+    expect(cutoff.getMonth()).toBe(5); // June
+    expect(cutoff.getDate()).toBe(1);
+  });
+
+  it("edge: resetAt exactly at startOfMonth → uses startOfMonth (resetAt is not strictly greater)", () => {
+    const now = new Date(2026, 5, 15, 12, 0, 0);
+    const resetAt = new Date(2026, 5, 1, 0, 0, 0); // exactly start of June
+    const cutoff = analysisCutoff({ analysisQuotaResetAt: resetAt, now });
+    // resetAt is not strictly > startOfMonth, so we use startOfMonth
+    expect(cutoff.getTime()).toBe(new Date(2026, 5, 1, 0, 0, 0).getTime());
+  });
 });
 
 describe("getVisibleTasksArgs", () => {

@@ -103,6 +103,20 @@ export function getPlanLimits(user: SubscriptionUser): PlanLimits {
   return LIMITS[user.plan] ?? LIMITS.trial;
 }
 
+// Returns the cutoff date for counting "this month's" analyses. Normally this
+// is start of the calendar month, but if the user has an analysisQuotaResetAt
+// in the current month (set when they first transitioned from trial to paid),
+// we use that timestamp so trial usage doesn't dock the new plan's first
+// month. Once the calendar rolls over, the field has no effect.
+export function analysisCutoff(args: { analysisQuotaResetAt: Date | null | undefined; now?: Date }): Date {
+  const now = args.now ?? new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  if (args.analysisQuotaResetAt && args.analysisQuotaResetAt > startOfMonth) {
+    return args.analysisQuotaResetAt;
+  }
+  return startOfMonth;
+}
+
 export function canRunAnalysis(user: SubscriptionUser, currentYardMonthCount: number): boolean {
   const limits = getPlanLimits(user);
   if (!limits.canRunAnalysis) return false;

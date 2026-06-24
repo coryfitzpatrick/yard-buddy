@@ -89,6 +89,108 @@ describe("change-plan route", () => {
     mockSchedulesRelease.mockResolvedValue({ id: "schd_1" });
   });
 
+  it("contract #1: monthly tier upgrade is immediate, no schedule", async () => {
+    (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
+      stripeSubscriptionId: "sub_1",
+      plan: "home_basic",
+      planStatus: "active",
+      stripeCustomerId: "cus_1",
+    });
+    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(0);
+    mockSubscriptionsRetrieve.mockResolvedValue({
+      items: { data: [{ id: "si_1", price: { id: "price_home_basic_monthly" } }] },
+      schedule: null,
+    });
+
+    const res = await POST(jsonRequest({ plan: "home_plus", period: "monthly" }) as never, {} as never);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual({ ok: true, deferred: false });
+    expect(mockSubscriptionsUpdate).toHaveBeenCalledWith("sub_1", expect.objectContaining({
+      items: [{ id: "si_1", price: "price_home_plus_monthly" }],
+      proration_behavior: "always_invoice",
+    }));
+    expect(mockSchedulesCreate).not.toHaveBeenCalled();
+  });
+
+  it("contract #5: annual tier upgrade same cadence is immediate, no schedule", async () => {
+    (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
+      stripeSubscriptionId: "sub_1",
+      plan: "home_basic",
+      planStatus: "active",
+      stripeCustomerId: "cus_1",
+    });
+    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(0);
+    mockSubscriptionsRetrieve.mockResolvedValue({
+      items: { data: [{ id: "si_1", price: { id: "price_home_basic_annual" } }] },
+      schedule: null,
+    });
+
+    const res = await POST(jsonRequest({ plan: "home_plus", period: "annual" }) as never, {} as never);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual({ ok: true, deferred: false });
+    expect(mockSubscriptionsUpdate).toHaveBeenCalledWith("sub_1", expect.objectContaining({
+      items: [{ id: "si_1", price: "price_home_plus_annual" }],
+    }));
+    expect(mockSchedulesCreate).not.toHaveBeenCalled();
+  });
+
+  it("contract #9: immediate path releases any pre-existing schedule first", async () => {
+    (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
+      stripeSubscriptionId: "sub_1",
+      plan: "home_basic",
+      planStatus: "active",
+      stripeCustomerId: "cus_1",
+    });
+    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(0);
+    mockSubscriptionsRetrieve.mockResolvedValue({
+      items: { data: [{ id: "si_1", price: { id: "price_home_basic_monthly" } }] },
+      schedule: "schd_old",
+    });
+
+    await POST(jsonRequest({ plan: "home_plus", period: "monthly" }) as never, {} as never);
+
+    expect(mockSchedulesRelease).toHaveBeenCalledWith("schd_old");
+    // Order: release before update (otherwise update could be undone by the orphan schedule's phase 2)
+    const releaseOrder = mockSchedulesRelease.mock.invocationCallOrder[0];
+    const updateOrder = mockSubscriptionsUpdate.mock.invocationCallOrder[0];
+    expect(releaseOrder).toBeLessThan(updateOrder);
+  });
+
+  it("contract #8: combined annual + tier downgrade + monthly target fully defers — no DB plan write, no Stripe.subscriptions.update", async () => {
+    (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
+      stripeSubscriptionId: "sub_1",
+      plan: "home_plus",
+      planStatus: "active",
+      stripeCustomerId: "cus_1",
+    });
+    (db.yard.count as ReturnType<typeof vi.fn>).mockResolvedValue(1);
+    mockSubscriptionsRetrieve.mockResolvedValue({
+      items: { data: [{ id: "si_1", price: { id: "price_home_plus_annual" } }] },
+      schedule: null,
+    });
+
+    const res = await POST(jsonRequest({ plan: "home_basic", period: "monthly" }) as never, {} as never);
+    expect(res.status).toBe(200);
+    expect(mockSubscriptionsUpdate).not.toHaveBeenCalled();
+    expect((db.user.update as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+  });
+
+  it("contract #11: no Stripe subscription on the user → 400, no Stripe calls", async () => {
+    (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
+      stripeSubscriptionId: null,
+      plan: "home_basic",
+      planStatus: "active",
+      stripeCustomerId: "cus_1",
+    });
+
+    const res = await POST(jsonRequest({ plan: "home_plus", period: "monthly" }) as never, {} as never);
+    expect(res.status).toBe(400);
+    expect(mockSubscriptionsRetrieve).not.toHaveBeenCalled();
+    expect(mockSubscriptionsUpdate).not.toHaveBeenCalled();
+  });
+
   it("rejects plan=trial", async () => {
     (db.user.findUniqueOrThrow as ReturnType<typeof vi.fn>).mockResolvedValue({
       stripeSubscriptionId: "sub_1",

@@ -12,7 +12,7 @@ import { TaskList } from "@/components/dashboard/TaskList";
 import { ScheduleRecommendationCard } from "@/components/sections/ScheduleRecommendationCard";
 import { effectiveWatering, effectiveMowing } from "@/lib/schedules/effective-schedule";
 import { format } from "date-fns";
-import { getPlanLimits, getDaysUntilDeletion, canRunAnalysis } from "@/lib/subscription";
+import { getPlanLimits, getDaysUntilDeletion, canRunAnalysis, analysisCutoff } from "@/lib/subscription";
 import NotInApp from "@/components/NotInApp";
 
 export default async function SectionDetailPage({
@@ -46,12 +46,7 @@ export default async function SectionDetailPage({
   if (!sectionRecord) notFound();
   const sectionId = sectionRecord.id;
 
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
-  const cutoff = subscriptionUser.analysisQuotaResetAt && subscriptionUser.analysisQuotaResetAt > startOfMonth
-    ? subscriptionUser.analysisQuotaResetAt
-    : startOfMonth;
+  const cutoff = analysisCutoff({ analysisQuotaResetAt: subscriptionUser.analysisQuotaResetAt });
   const monthlyAnalysisCount = await db.lawnAnalysis.count({
     where: {
       yardSection: { yardId },
