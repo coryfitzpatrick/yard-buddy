@@ -140,9 +140,17 @@ export function BillingSection({
   async function handleChangePlan(opts?: { deferTier?: boolean }) {
     if (!changePlanKey) return;
     const targetLimits = getPlanLimits({ plan: changePlanKey, planStatus, trialEndsAt: null });
-    // Only open the picker modal when the user is actually over the new plan's
-    // yard limit. A downgrade that fits inside the new plan can switch directly.
-    if (targetLimits.maxYards > 0 && yards.length > targetLimits.maxYards) {
+    // The yard picker only opens for changes that take effect today. Deferred
+    // changes don't archive anything now; the user keeps every yard through
+    // the prepaid annual term and the schedule sorts it out at renewal.
+    const TIER_RANK: Record<string, number> = { trial: 0, home_basic: 1, home_plus: 2, professional: 3 };
+    const targetRank = TIER_RANK[changePlanKey] ?? 0;
+    const currentRank = TIER_RANK[currentPlan] ?? 0;
+    const isTierChange = changePlanKey !== currentPlan;
+    const isAnnualDowngrade = currentPeriod === "annual" && targetRank < currentRank;
+    const isAnnualToMonthly = currentPeriod === "annual" && changePeriod === "monthly";
+    const tierAppliesNow = isTierChange && !isAnnualDowngrade && (!isAnnualToMonthly || opts?.deferTier === false);
+    if (tierAppliesNow && targetLimits.maxYards > 0 && yards.length > targetLimits.maxYards) {
       setDowngradeTarget(changePlanKey);
       setChangePlanKey(null);
       return;
@@ -324,7 +332,12 @@ export function BillingSection({
             const isUpgradeChange = targetRank > currentRank;
             const isAnnualToMonthly = currentPeriod === "annual" && changePeriod === "monthly";
             const isMonthlyToAnnual = currentPeriod === "monthly" && changePeriod === "annual";
-            const isCombinedAnnualToMonthly = isAnnualToMonthly && (isUpgradeChange || isDowngradeChange);
+            // Any tier downgrade while on annual defers to renewal so the
+            // user keeps what they prepaid for.
+            const isAnnualDowngrade = currentPeriod === "annual" && isDowngradeChange;
+            // Combined upgrade + annual→monthly is the only case that asks
+            // the user to pick: "upgrade now (annual)" vs "schedule everything for renewal".
+            const isCombinedAnnualToMonthlyUpgrade = isAnnualToMonthly && isUpgradeChange;
             const renewalDate = currentPeriodEnd
               ? new Date(currentPeriodEnd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
               : "your next renewal";
@@ -332,7 +345,14 @@ export function BillingSection({
             const busyLabel = isAnnualToMonthly ? "Scheduling…" : isDowngradeChange ? "Downgrading…" : isUpgradeChange ? "Upgrading…" : "Switching…";
 
             let directionCopy: string;
-            if (isAnnualToMonthly && !isCombinedAnnualToMonthly) {
+            const currentLabel = CHANGE_PLANS.find((p) => p.key === currentPlan)?.label ?? "your current plan";
+            if (isAnnualDowngrade) {
+              const targetCadenceLabel = changePeriod === "annual" ? "annual" : "monthly";
+              const targetRate = changePeriod === "annual"
+                ? `$${selectedPlan?.annual}/yr`
+                : `$${selectedPlan?.monthly}/mo`;
+              directionCopy = `You keep ${currentLabel} annual through ${renewalDate}. On ${renewalDate}, your plan switches to ${selectedPlan?.label} ${targetCadenceLabel} at ${targetRate}. Nothing changes today, and you don't lose any features you already paid for.`;
+            } else if (isAnnualToMonthly && !isCombinedAnnualToMonthlyUpgrade) {
               directionCopy = `Your annual plan runs through ${renewalDate}. After that, billing switches to ${selectedPlan?.label} at $${selectedPlan?.monthly}/mo. Nothing changes today.`;
             } else if (isMonthlyToAnnual && !isDowngradeChange && !isUpgradeChange) {
               directionCopy = `You'll be charged $${selectedPlan?.annual} today. Any unused days from this month are credited toward your next bill. Your annual term runs for 12 months from today.`;
@@ -374,20 +394,18 @@ export function BillingSection({
                 </button>
               </div>
 
-              {isCombinedAnnualToMonthly ? (
+              {isCombinedAnnualToMonthlyUpgrade ? (
                 <>
                   <div className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-900">
-                    This change involves both a plan change <em>and</em> switching off annual. Annual is a 12-month commitment, so we can&apos;t do both today. Pick how you want to proceed:
+                    This change involves both upgrading your plan <em>and</em> switching off annual. Annual is a 12-month commitment, so we can&apos;t do both today. Pick how you want to proceed:
                   </div>
                   <div className="space-y-2">
                     <div className="rounded-md bg-white border border-gray-200 p-3 space-y-2">
                       <p className="text-sm font-semibold text-gray-900">
-                        {isUpgradeChange ? "Upgrade" : "Downgrade"} to {selectedPlan?.label} annual now
+                        Upgrade to {selectedPlan?.label} annual now
                       </p>
                       <p className="text-xs text-gray-600">
-                        {isUpgradeChange
-                          ? `You'll be charged the prorated difference between ${currentPlanCfg?.label ?? "your current plan"} annual and ${selectedPlan?.label} annual today. ${selectedPlan?.label} features unlock immediately. You stay on annual billing through ${renewalDate}.`
-                          : `We'll credit the prorated difference for the rest of this billing period toward your next bill. ${selectedPlan?.label} starts now. You stay on annual billing through ${renewalDate}.`}
+                        You&apos;ll be charged the prorated difference between {currentLabel} annual and {selectedPlan?.label} annual today. {selectedPlan?.label} features unlock immediately. You stay on annual billing through {renewalDate}.
                       </p>
                       <Button
                         size="sm"
@@ -395,7 +413,7 @@ export function BillingSection({
                         disabled={busy}
                         className="bg-green-600 hover:bg-green-700"
                       >
-                        {busy ? "Switching…" : `${isUpgradeChange ? "Upgrade" : "Downgrade"} to ${selectedPlan?.label} annual now`}
+                        {busy ? "Switching…" : `Upgrade to ${selectedPlan?.label} annual now`}
                       </Button>
                     </div>
                     <div className="rounded-md bg-white border border-gray-200 p-3 space-y-2">
@@ -403,7 +421,7 @@ export function BillingSection({
                         Schedule {selectedPlan?.label} monthly for {renewalDate}
                       </p>
                       <p className="text-xs text-gray-600">
-                        Nothing changes today. You finish your current annual term on {currentPlanCfg?.label ?? "your current plan"}. On {renewalDate}, your plan switches to {selectedPlan?.label} monthly at ${selectedPlan?.monthly}/mo.
+                        Nothing changes today. You finish your current annual term on {currentLabel}. On {renewalDate}, your plan switches to {selectedPlan?.label} monthly at ${selectedPlan?.monthly}/mo.
                       </p>
                       <Button
                         size="sm"

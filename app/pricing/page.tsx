@@ -290,7 +290,8 @@ export default async function PricingPage() {
               <div>
                 <p className="font-medium text-gray-900">Switching cadences</p>
                 <p className="mt-1">Switching from monthly to annual takes effect immediately and prepays the year. Switching from annual to monthly takes effect at your next renewal date because annual is a 12-month commitment.</p>
-                <p className="mt-1">Changing plans <em>and</em> switching off annual at the same time (for example, Basic annual to Plus monthly) shows two options on the confirm screen: change plans now and stay on annual through your current term, or keep your current plan and schedule both the new plan and monthly billing for renewal. We never coerce one into the other.</p>
+                <p className="mt-1">If you&apos;re on annual and want to <em>upgrade</em> your plan and move to monthly at the same time, the confirm screen shows two options: upgrade now at the annual rate and switch to monthly at renewal, or schedule the whole change for renewal. You pick.</p>
+                <p className="mt-1">If you&apos;re on annual and want to <em>downgrade</em> your plan and move to monthly at the same time, we wait for renewal. You keep using the plan you paid for through the full annual term, then switch to the new lower tier on monthly billing.</p>
               </div>
               <div>
                 <p className="font-medium text-gray-900">Downgrading past your yard limit</p>

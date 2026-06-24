@@ -66,6 +66,27 @@ export const PLAN_LABELS: Record<string, string> = {
   admin:        "Admin",
 };
 
+// Used to decide upgrade vs downgrade for plan changes.
+const TIER_RANK: Record<string, number> = {
+  trial:        0,
+  home_basic:   1,
+  home_plus:    2,
+  professional: 3,
+  admin:        4,
+};
+
+export function tierRank(plan: string): number {
+  return TIER_RANK[plan] ?? 0;
+}
+
+export function isTierUpgrade(from: string, to: string): boolean {
+  return tierRank(to) > tierRank(from);
+}
+
+export function isTierDowngrade(from: string, to: string): boolean {
+  return tierRank(to) < tierRank(from);
+}
+
 export function isEffectivelyExpired(user: SubscriptionUser): boolean {
   if (user.planStatus === "expired" || user.planStatus === "canceled") return true;
   if (

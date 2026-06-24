@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { stripe, STRIPE_PRICES, isValidPlan, isValidPeriod } from "@/lib/stripe";
 import type { StripePlan, StripePeriod } from "@/lib/stripe";
-import { getPlanLimits, getActiveYardCount } from "@/lib/subscription";
+import { getPlanLimits, getActiveYardCount, isTierDowngrade, isTierUpgrade } from "@/lib/subscription";
 import { withAxiom, logger } from "@/lib/observability/logger";
 
 function detectCurrentPeriod(priceId: string): StripePeriod | null {
@@ -56,14 +56,53 @@ export const POST = withAxiom(async (req: NextRequest) => {
     return NextResponse.json({ error: "Subscription is canceled" }, { status: 400 });
   }
 
-  // Downgrade gating
+  const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+  const itemId = subscription.items.data[0]?.id;
+  const currentPriceId = subscription.items.data[0]?.price.id ?? "";
+  if (!itemId) {
+    return NextResponse.json({ error: "Subscription item not found" }, { status: 500 });
+  }
+
+  const currentPeriod = detectCurrentPeriod(currentPriceId);
+  const isAnnualToMonthly = currentPeriod === "annual" && period === "monthly";
+  const isTierChange = user.plan !== plan;
+  const isUpgrade = isTierUpgrade(user.plan, plan);
+  const isDowngrade = isTierDowngrade(user.plan, plan);
+
+  // "You get what you paid for." Any change that would take away features
+  // mid-prepaid-term is deferred to renewal. That covers:
+  //   - tier downgrades while on annual (any target cadence)
+  //   - pure annual→monthly switches (no tier change)
+  // Annual→monthly combined with an upgrade is the only ambiguous case;
+  // the user picks via the fork (deferTier flag).
+  const isAnnualDowngrade = currentPeriod === "annual" && isTierChange && isDowngrade;
+  const forceDeferAll = isAnnualDowngrade;
+  const effectiveDeferTier = forceDeferAll ? true : deferTier;
+
+  if (isAnnualToMonthly && isTierChange && isUpgrade && effectiveDeferTier === undefined) {
+    return NextResponse.json(
+      { error: "Cadence choice required", code: "cadence_choice_required" },
+      { status: 409 },
+    );
+  }
+
+  // A schedule is needed for any deferred change.
+  const needsSchedule = currentPeriod === "annual" && (
+    isAnnualToMonthly ||
+    (isTierChange && isDowngrade)
+  );
+
+  // Tier flips today only when (a) the tier is changing AND (b) we are not
+  // deferring. Same-period upgrades and monthly downgrades flip immediately;
+  // annual downgrades and "schedule everything" upgrade picks defer.
+  const tierAppliesNow = isTierChange && !(needsSchedule && effectiveDeferTier !== false);
   const newLimits = getPlanLimits({
     plan,
     planStatus: user.planStatus,
     trialEndsAt: null,
   });
   const activeCount = await getActiveYardCount(session.user.id);
-  const overLimit = activeCount > newLimits.maxYards && newLimits.maxYards > 0;
+  const overLimit = tierAppliesNow && activeCount > newLimits.maxYards && newLimits.maxYards > 0;
   const requiredCount = Math.max(0, activeCount - newLimits.maxYards);
 
   if (overLimit && (!archiveYardIds || archiveYardIds.length === 0)) {
@@ -93,47 +132,23 @@ export const POST = withAxiom(async (req: NextRequest) => {
     }
   }
 
-  const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-  const itemId = subscription.items.data[0]?.id;
-  const currentPriceId = subscription.items.data[0]?.price.id ?? "";
-  if (!itemId) {
-    return NextResponse.json({ error: "Subscription item not found" }, { status: 500 });
-  }
-
-  const currentPeriod = detectCurrentPeriod(currentPriceId);
-  const isAnnualToMonthly = currentPeriod === "annual" && period === "monthly";
-  const isTierChange = user.plan !== plan;
-
-  // Combined tier change + annual→monthly is ambiguous: did the user want
-  // their new tier today (charged at the annual rate) or do they want the
-  // whole change to wait for renewal? Force the UI to disambiguate so we
-  // never silently coerce part of the request into a different cadence.
-  if (isAnnualToMonthly && isTierChange && deferTier === undefined) {
-    return NextResponse.json(
-      { error: "Cadence choice required", code: "cadence_choice_required" },
-      { status: 409 },
-    );
-  }
-
   try {
-    if (isAnnualToMonthly) {
-      // Annual is a 12-month commitment. The cadence switch waits for renewal.
-      // For a pure cadence switch (no tier change) phase 1 mirrors the current
-      // subscription. For a combined change, deferTier=false keeps the tier
-      // change immediate on the existing annual cadence; deferTier=true holds
-      // both the tier change and the cadence change until renewal.
-      const phase1PriceId = isTierChange && !deferTier
-        ? STRIPE_PRICES[plan as StripePlan][currentPeriod]
+    if (needsSchedule) {
+      // For a combined upgrade with deferTier=false, the tier change still
+      // applies today on the existing annual cadence; phase 1 then mirrors
+      // the new tier's annual price. Otherwise phase 1 mirrors the current
+      // subscription price (no change today).
+      const phase1PriceId = isTierChange && effectiveDeferTier === false
+        ? STRIPE_PRICES[plan as StripePlan][currentPeriod as StripePeriod]
         : currentPriceId;
 
-      if (isTierChange && !deferTier) {
+      if (isTierChange && effectiveDeferTier === false) {
         await stripe.subscriptions.update(user.stripeSubscriptionId, {
           items: [{ id: itemId, price: phase1PriceId }],
           proration_behavior: "always_invoice",
         });
       }
 
-      // Release any pre-existing pending schedule so we can stage a fresh one.
       const refreshed = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
       const existingScheduleId = refreshed.schedule
         ? (typeof refreshed.schedule === "string" ? refreshed.schedule : refreshed.schedule.id)
@@ -146,6 +161,9 @@ export const POST = withAxiom(async (req: NextRequest) => {
         from_subscription: user.stripeSubscriptionId,
       });
       const phase1 = schedule.phases[0];
+      const phase2Duration = period === "monthly"
+        ? { interval: "month" as const, interval_count: 1 }
+        : { interval: "year" as const, interval_count: 1 };
       await stripe.subscriptionSchedules.update(schedule.id, {
         end_behavior: "release",
         phases: [
@@ -156,14 +174,11 @@ export const POST = withAxiom(async (req: NextRequest) => {
           },
           {
             items: [{ price: priceId, quantity: 1 }],
-            duration: { interval: "month", interval_count: 1 },
+            duration: phase2Duration,
           },
         ],
       });
     } else {
-      // If a pending schedule is attached (e.g. a prior annual→monthly switch
-      // the user is now overriding), release it first so the immediate price
-      // change isn't undone or conflicted later when phase 2 fires.
       const existingScheduleId = subscription.schedule
         ? (typeof subscription.schedule === "string" ? subscription.schedule : subscription.schedule.id)
         : null;
@@ -183,10 +198,10 @@ export const POST = withAxiom(async (req: NextRequest) => {
     return NextResponse.json({ error: "Couldn't process the plan change. Check your payment method and try again." }, { status: 402 });
   }
 
-  // When the tier change itself is deferred (annual→monthly with deferTier),
-  // we keep our DB plan on the current value until the schedule fires at
-  // renewal. The webhook picks up the price flip and updates the plan then.
-  const persistPlanNow = !(isAnnualToMonthly && deferTier);
+  // When the tier change is deferred, our DB plan stays on the current value
+  // until the schedule fires at renewal. The webhook picks up the price flip
+  // and updates the plan then.
+  const persistPlanNow = tierAppliesNow;
 
   try {
     await db.$transaction([
@@ -222,10 +237,11 @@ export const POST = withAxiom(async (req: NextRequest) => {
     planStatus: user.planStatus,
     trialEndsAt: null,
   });
-  const isUpgrade = newLimits.maxYards > 0
+  const restoreEligible = tierAppliesNow
+    && newLimits.maxYards > 0
     && currentPlanLimits.maxYards > 0
     && newLimits.maxYards > currentPlanLimits.maxYards;
-  if (isUpgrade) {
+  if (restoreEligible) {
     const postChangeActiveCount = await db.yard.count({
       where: { userId: session.user.id, archivedAt: null },
     });
@@ -246,5 +262,5 @@ export const POST = withAxiom(async (req: NextRequest) => {
     }
   }
 
-  return NextResponse.json({ ok: true, deferred: isAnnualToMonthly });
+  return NextResponse.json({ ok: true, deferred: needsSchedule });
 });
