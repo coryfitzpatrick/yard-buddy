@@ -259,7 +259,7 @@ interface SlotCardProps {
 function SlotCard({ slot, icon: Icon, labelOverride, limitLabel, description, cameraRef, fileRef, onPickCamera, onPickFile, onFile, onClearPhoto, onRemoveSlot, onAddAnother }: SlotCardProps) {
   const filled = !!slot.state;
   return (
-    <div className={`rounded-xl border-2 transition-colors ${filled ? "border-green-300 bg-green-50/40" : "border-dashed border-gray-200 bg-white"}`}>
+    <div className={`rounded-xl border-2 transition-colors flex flex-col h-full ${filled ? "border-green-300 bg-green-50/40" : "border-dashed border-gray-200 bg-white"}`}>
       <input
         ref={cameraRef}
         type="file"
@@ -275,7 +275,7 @@ function SlotCard({ slot, icon: Icon, labelOverride, limitLabel, description, ca
         className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onFile(f); }}
       />
-      <div className="p-3 space-y-2">
+      <div className="p-3 flex flex-col gap-2 flex-1">
         <div className="flex items-start gap-2">
           <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${filled ? "text-green-600" : "text-gray-400"}`} />
           <div className="min-w-0 flex-1">
@@ -300,7 +300,7 @@ function SlotCard({ slot, icon: Icon, labelOverride, limitLabel, description, ca
         </div>
 
         {filled ? (
-          <div className="flex items-center gap-3 pt-1">
+          <div className="flex items-center gap-3 pt-1 mt-auto">
             <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shrink-0">
               <Image src={slot.state!.preview} alt={`${labelOverride} preview`} fill className="object-cover" unoptimized />
             </div>
@@ -317,7 +317,7 @@ function SlotCard({ slot, icon: Icon, labelOverride, limitLabel, description, ca
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 mt-auto">
             <button
               type="button"
               onClick={onPickCamera}
