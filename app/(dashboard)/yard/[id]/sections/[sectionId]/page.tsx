@@ -34,7 +34,7 @@ export default async function SectionDetailPage({
 
   const subscriptionUser = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
-    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true },
+    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true, analysisQuotaResetAt: true },
   });
   const limits = getPlanLimits(subscriptionUser);
   const daysUntilDeletion = getDaysUntilDeletion(subscriptionUser);
@@ -49,10 +49,13 @@ export default async function SectionDetailPage({
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
+  const cutoff = subscriptionUser.analysisQuotaResetAt && subscriptionUser.analysisQuotaResetAt > startOfMonth
+    ? subscriptionUser.analysisQuotaResetAt
+    : startOfMonth;
   const monthlyAnalysisCount = await db.lawnAnalysis.count({
     where: {
       yardSection: { yardId },
-      createdAt: { gte: startOfMonth },
+      createdAt: { gte: cutoff },
     },
   });
 

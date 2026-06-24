@@ -37,6 +37,13 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
   // In the v2 Stripe API, current_period_end lives on the subscription item
   const periodEnd = sub.items.data[0]?.current_period_end ?? null;
 
+  // Trial → paid: reset the analysis-quota cutoff so trial usage doesn't
+  // count against the new plan's first calendar month. Naturally drops off
+  // once the calendar month rolls over (startOfMonth > resetAt). planFromPriceId
+  // only returns paid plans, so any trial-stored user transitioning here is a
+  // trial → paid event.
+  const isTrialToPaid = user.plan === "trial";
+
   await db.user.update({
     where: { id: user.id },
     data: {
@@ -44,6 +51,7 @@ async function updateUserFromSubscription(sub: Stripe.Subscription) {
       planStatus,
       stripeSubscriptionId: sub.id,
       currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : null,
+      ...(isTrialToPaid ? { analysisQuotaResetAt: new Date() } : {}),
     },
   });
 

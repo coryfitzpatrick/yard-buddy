@@ -167,7 +167,7 @@ The trial is "full product with two real gates and two quantitative throttles." 
 | Account creation | 21-day trial begins. No card required. `User.plan = "trial"`, `User.planStatus = "trialing"`, `User.trialEndsAt = now + 21d`. |
 | User engages with the product | If they set up a schedule AND complete a task during the trial, `trialEngagementBonusGrantedAt` is set and `trialEndsAt` extends by 7 days. One-time per account. |
 | Trial ends without subscription | `isEffectivelyExpired` returns true. `getPlanLimits` returns the `expired` row (no analyses allowed, 1 yard limit). `getDaysUntilDeletion` starts counting down 30 days from `trialEndsAt`. |
-| Trial user subscribes before trial ends | Stripe checkout creates a real subscription. Webhook updates `plan` and `planStatus`. Trial billing is replaced by paid billing on the chosen plan. |
+| Trial user subscribes before trial ends | Stripe checkout creates a real subscription. Webhook updates `plan` and `planStatus`, and stamps `User.analysisQuotaResetAt = now` so trial analyses don't count against the new plan's first calendar month. The analyze route uses `max(startOfMonth, analysisQuotaResetAt)` as the cutoff, so the user gets the full paid quota (4 on Basic, 8 on Plus/Pro) for the rest of that month. |
 | 30 days past trial end with no subscription | Account-deletion cron removes the user, their yards, analyses, and Supabase photos. |
 
 ## Failed payments

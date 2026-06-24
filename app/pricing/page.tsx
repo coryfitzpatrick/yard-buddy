@@ -144,7 +144,10 @@ export default async function PricingPage() {
 
               <ul className="space-y-2 mb-6 flex-1 text-sm text-gray-600">
                 <li className="font-semibold text-gray-900">1 yard</li>
-                <li className="font-medium text-gray-700">2 analyses per month</li>
+                <li className="font-medium text-gray-700">
+                  2 analyses to try
+                  <span className="block text-xs text-gray-500 font-normal mt-0.5">(use them freely — your paid plan&apos;s monthly quota resets when you subscribe)</span>
+                </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
                   Per-section AI analysis and recommendations

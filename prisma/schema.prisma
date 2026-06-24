@@ -36,6 +36,11 @@ model User {
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?   @unique
   currentPeriodEnd     DateTime?
+  // Set when a trial user first subscribes to a paid plan. The analyze route
+  // uses max(startOfMonth, analysisQuotaResetAt) as the cap-counting cutoff,
+  // so trial usage doesn't dock the user's first paid month. Naturally
+  // becomes irrelevant on the next calendar rollover.
+  analysisQuotaResetAt DateTime?
 
   // Trial engagement extension — set when user completes the +7 day bonus criteria
   trialEngagementBonusGrantedAt DateTime?

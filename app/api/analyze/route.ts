@@ -111,7 +111,7 @@ export const POST = withAxiom(async (req: NextRequest) => {
 
   const subUser = await db.user.findUniqueOrThrow({
     where: { id: session.user.id },
-    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true },
+    select: { plan: true, planStatus: true, trialEndsAt: true, currentPeriodEnd: true, analysisQuotaResetAt: true },
   });
 
   // Verify section ownership before any rate-limit queries (prevents BOLA)
@@ -121,15 +121,20 @@ export const POST = withAxiom(async (req: NextRequest) => {
   });
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Count analyses for the entire yard this calendar month — limits are now
-  // yard-scoped so splitting a yard into sections doesn't reset the pool.
+  // Count analyses for the entire yard since the cap-counting cutoff. Cutoff
+  // is the later of (a) start of this calendar month and (b) the moment the
+  // user first subscribed to a paid plan (analysisQuotaResetAt). So trial
+  // usage doesn't count against the new plan's first month.
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
+  const cutoff = subUser.analysisQuotaResetAt && subUser.analysisQuotaResetAt > startOfMonth
+    ? subUser.analysisQuotaResetAt
+    : startOfMonth;
   const monthlyCount = await db.lawnAnalysis.count({
     where: {
       yardSection: { yardId: section.yardId },
-      createdAt: { gte: startOfMonth },
+      createdAt: { gte: cutoff },
     },
   });
 
