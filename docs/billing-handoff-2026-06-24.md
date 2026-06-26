@@ -148,7 +148,7 @@ None of these are blocking — they're product polish.
 | Purpose | File |
 |---|---|
 | Product contract | `docs/billing-behavior-reference.md` |
-| Stripe schedule manual test plan | `docs/stripe-schedule-release-test-plan.md` |
+| Full billing manual test plan | `docs/stripe-schedule-release-test-plan.md` |
 | Plan limits, helpers, tier rank | `lib/subscription.ts` |
 | Plan price IDs by env var | `lib/stripe.ts` |
 | Plan change route | `app/api/stripe/change-plan/route.ts` |
@@ -178,7 +178,7 @@ npx vitest run app/api/stripe app/api/yards lib/__tests__/subscription.test.ts
 
 ## How to actually exercise the flow against Stripe
 
-Follow `docs/stripe-schedule-release-test-plan.md`. It documents 10 scenarios with the exact Stripe Dashboard state, DB state, and UI state expected at each step. The most important one is **S5**: advance the test clock past `current_period_end` after a tier change with a pending switch, to verify the bug we fixed (orphan schedule firing months later) stays fixed.
+Follow `docs/stripe-schedule-release-test-plan.md`. It now covers the entire billing model end-to-end with a Stripe primer for newcomers — trial lifecycle (T1–T4), every upgrade/downgrade/cadence permutation (U1–CU1), cancellation (CA1–CA3), all four "billing unwell" Stripe statuses + the fabricated-unknown guardrail (F1–F8), the at-renewal yard limit modal (Y1–Y3), and analysis-cutoff edge cases (A1–A3). The orphan-schedule regression test is now **P1** (replace a pending schedule with another change, then advance the clock past renewal to confirm only the new state fires).
 
 ## How to set up the over-limit test account
 

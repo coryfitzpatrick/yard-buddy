@@ -292,6 +292,6 @@ The route reads live state from Stripe (via `subscriptions.retrieve`) rather tha
 
 ## See also
 
-- `docs/stripe-schedule-release-test-plan.md` — manual test plan for verifying these flows in Stripe test mode
+- `docs/stripe-schedule-release-test-plan.md` — comprehensive manual test plan for the full billing model in Stripe test mode (trials, every upgrade/downgrade/cadence combination, cancellation, past_due, the four "billing unwell" Stripe statuses, the at-renewal yard limit modal, analysis quota cutoffs)
 - `app/terms/page.tsx` § 6 — customer-facing version of these rules
 - `app/pricing/page.tsx` "How billing works" expandable — short customer-facing summary
