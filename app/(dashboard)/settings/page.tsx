@@ -5,6 +5,7 @@ import { NotificationPreferences } from "@/components/settings/NotificationPrefe
 import { ChangePassword } from "@/components/settings/ChangePassword";
 import { BillingSection } from "@/components/settings/BillingSection";
 import { EmailSection } from "@/components/settings/EmailSection";
+import { MobileInstallSection } from "@/components/settings/MobileInstallSection";
 import { Bell, Lock, CreditCard, Mail } from "lucide-react";
 import { getDaysUntilDeletion, PLAN_LABELS, daysUntilTrialEnd } from "@/lib/subscription";
 import { isMobileApp } from "@/lib/platform.server";
@@ -45,6 +46,7 @@ export default async function SettingsPage({
       gddNotificationsEnabled: true,
       gddBestDayReminderDays: true,
       passwordHash: true,
+      addToHomeScreenDismissedAt: true,
       plan: true,
       planStatus: true,
       trialEndsAt: true,
@@ -219,6 +221,8 @@ export default async function SettingsPage({
             initialGddBestDayReminderDays={user.gddBestDayReminderDays}
           />
         </div>
+
+        <MobileInstallSection alreadyDismissed={user.addToHomeScreenDismissedAt != null} />
       </div>
     </div>
   );

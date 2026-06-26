@@ -9,6 +9,7 @@ import BiometricOptInPrompt from "@/components/mobile/BiometricOptInPrompt";
 import Link from "next/link";
 import { daysUntilTrialEnd, getPlanLimits, PLAN_LABELS } from "@/lib/subscription";
 import { YardLimitExceededModal } from "@/components/yards/YardLimitExceededModal";
+import { AddToHomeScreenPrompt } from "@/components/mobile/AddToHomeScreenPrompt";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -16,7 +17,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { plan: true, planStatus: true, trialEndsAt: true, termsAcceptedAt: true, currentPeriodEnd: true },
+    select: {
+      plan: true,
+      planStatus: true,
+      trialEndsAt: true,
+      termsAcceptedAt: true,
+      currentPeriodEnd: true,
+      addToHomeScreenDismissedAt: true,
+    },
   });
 
   if (!user?.termsAcceptedAt) {
@@ -107,6 +115,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       )}
       <PushPermissionPrompt />
       <BiometricOptInPrompt userIsAuthed={!!session?.user?.id} />
+      <AddToHomeScreenPrompt alreadyDismissed={user.addToHomeScreenDismissedAt != null} />
     </div>
   );
 }

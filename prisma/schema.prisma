@@ -61,6 +61,11 @@ model User {
   cardExpiryWarningSentAt DateTime?
   lastPaymentFailedInvoiceId String?
   termsAcceptedAt      DateTime?
+  // Stamped when the user dismisses the "Add to home screen" prompt. Per-user
+  // (not per-device) so that clearing browser storage doesn't resurrect the
+  // prompt. We still detect display-mode: standalone client-side to suppress
+  // the prompt when the app is already installed on the current device.
+  addToHomeScreenDismissedAt DateTime?
   updatedAt            DateTime  @updatedAt
   accounts             Account[]
   sessions             Session[]
