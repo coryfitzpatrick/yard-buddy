@@ -60,5 +60,11 @@ scripts/validation/results/*.json
 # Backup files
 *.bak
 
+# Graphify — commit the graph itself for shared "codebase memory" across
+# sessions and teammates, but skip the local-only cost ledger and the
+# regenerable cache directory (each dev rebuilds these locally).
+graphify-out/cost.json
+graphify-out/cache/
+
 # Affinity Designer / Photo lock files
 *~lock~

@@ -15,7 +15,8 @@
     "test:coverage": "vitest run --coverage",
     "validate": "tsx --env-file .env.local scripts/validation/run.ts",
     "validate:image": "tsx --env-file .env.local scripts/validation/run-image.ts",
-    "validate:image:smoke": "tsx --env-file .env.local scripts/validation/run-image.ts --smoke"
+    "validate:image:smoke": "tsx --env-file .env.local scripts/validation/run-image.ts --smoke",
+    "graphify:rebuild": "set -a && . ./.env.local && set +a && graphify ."
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",

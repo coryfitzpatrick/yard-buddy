@@ -1,0 +1,58 @@
+# Skip these from the knowledge graph — no value to the AI, just noise.
+# Same syntax as .gitignore. Merged on top of the project .gitignore.
+
+# Build/runtime artifacts
+.next/
+out/
+build/
+coverage/
+
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/
+
+# Generated Prisma client
+lib/generated/prisma/
+
+# Binary assets — no value to the graph, and vision-extraction would burn tokens.
+# Belt-and-suspenders: directory excludes first, then a global media-type sweep.
+/public/icons/**
+/public/screenshots/**
+/public/weather/**
+/public/**/*.png
+/public/**/*.webp
+/public/**/*.jpg
+/public/**/*.jpeg
+/public/**/*.gif
+/public/**/*.svg
+/public/**/*.ico
+/public/**/*.af
+
+# Catch-all for any image anywhere else in the tree.
+**/*.png
+**/*.webp
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.svg
+**/*.ico
+
+# Lockfiles — long, low signal
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# IDE / OS noise
+.DS_Store
+.vscode/
+.idea/
+
+# Local-only runtime state from other tooling
+.worktrees/
+.superpowers/
+.claude/scheduled_tasks.lock
+scripts/validation/results/
+
+# Don't try to graph yourself
+graphify-out/
